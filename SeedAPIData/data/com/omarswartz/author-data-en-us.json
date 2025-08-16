@@ -1,0 +1,25 @@
+{
+  "name": "Omar Swartz",
+  "welcome": "Omar Swartz is an American author, professor, and advocate for social justice, known for his work in communication, law, and critical theory. He has published widely on topics such as civil rights, rhetoric, and the philosophy of communication.",
+  "aboutMe": "Omar Swartz, PhD, JD, is an Associate Professor at the University of Colorado Denver. He is recognized for his scholarship in communication studies, law, and social advocacy, and is the author or editor of several books, including works on Howard Zinn, legal rhetoric, and critical theory.",
+  "headshot": "/authorphotos/omar_1.avif",
+  "books": [
+    {
+      "title": "Anti-Dobbs: An Interdisciplinary Polemi",
+      "description": "Dobbs v. Jackson Women’s Health Organization, rooted in an unarticulated patriarchy in the Supreme Court’s historical narrative, represents an untimely expression of deeply religious and conservative hostility towards women. Anti-Dobbs: An Interdisciplinary Polemic offers a contrasting viewpoint, asserting that abortion prohibitions are inherently anti-woman and that no valid arguments for restricting abortion exist without demeaning women. The abortion issue is a shadow cast by the law over a more fundamental question: the status and recognition of women as human beings and equal citizens. The book argues that expansive abortion rights are fundamental to women’s equality and asserts that Dobbs was profoundly wrong, both legally and morally. Based on over 20 years of the author’s experience teaching a course entitled \"Law and Diversity in U.S. History,\" the work is a critical response and a polemic advocating for the equality of women who have been reduced by the Supreme Court to little more than \"fetal containers.\"",
+      "url": "https://amzn.to/3TJ6K6P",
+      "cover": "/covers/ANTIDobbs.jpg"
+    },
+    {
+      "title": "In Defense of Partisan Criticism: Communication Studies, Law, and Social Analysis (Frontiers in Political Communication)",
+      "description": "In Defense of Partisan Criticism is a far-reaching exploration of the legal, philosophical, and rhetorical basis for understanding social justice in the United States. Through a thoughtful investigation of key political, social, and legal events in the history of the United States, Omar Swartz develops a compelling argument for engaged political scholarship by American academics, and offers readers a critical understanding of the place of race and class in American cultural history. Central to this understanding is an awareness of the «communication imagination» – the power of citizens to name the constraints placed upon them by U.S. political and legal institutions and to counter those constraints with narratives constructing a more socially just society based upon a wider sense of human identification and partisan engagement than is currently practiced in the normative U.S. public sphere.",
+      "url": "https://amzn.to/44ADHZk",
+      "cover": "/covers/DefenseOfPartisanCriticism.jpg"
+    }
+  ],
+  "copyright": "© 2025 Omar Swartz. All rights reserved.",
+  "social": [
+    { "name": "LinkedIn", "url": "https://www.linkedin.com/in/omar-swartz-996b1b170/" }
+  ],
+  "email": "omar.swartz@ucdenver.edu"
+}

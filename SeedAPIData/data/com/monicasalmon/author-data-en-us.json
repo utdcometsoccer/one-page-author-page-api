@@ -1,0 +1,77 @@
+{
+  "name": "Monica Salmon",
+  "welcome": "Monica Salmón is a best-selling author known for her fearless and deeply personal approach to writing. She tackles themes such as breast cancer, eroticism, and unconventional pathologies—topics many tend to avoid, but which she confronts head-on. With honesty, sensuality, and emotional clarity, her stories engage readers in raw, intimate, and necessary explorations. She writes about what others keep silent, transforming shame into power and pain into narratives that resonate long after the final page.",
+  "aboutMe": "Clinical Psychologist, Bestselling Author, and Columnist.",
+  "headshot": "/authorphotos/monica.avif",
+  "books": [
+    {
+      "title": "Debajo de mi piel (Spanish Edition)",
+      "description": "Under My Skin: An endearing and supportive testimony that shows cancer is more a synonym for life than for death.",
+      "url": "https://www.penguinlibros.com/us/tematicas/226997-ebook-debajo-de-mi-piel-9786073198110",
+      "cover": "/covers/debajo-de-mi-piel.avif"
+    },
+    {
+      "title": "Cuídame de ti (Spanish Edition)",
+      "description": "Protect Me from You: Sofía's life changes when she meets Nadia, a 75-year-old governess who reveals secrets and wounds from the past.",
+      "url": "https://www.penguinlibros.com/us/tematicas/44536-ebook-cuidame-de-ti-9786073177627",
+      "cover": "/covers/cuidamedeti.jpg"
+    },
+    {
+      "title": "Olvidaré tu nombre (Spanish Edition)",
+      "description": "I Will Forget Your Name: Ofelia faces the challenge of heartbreak and the difficult task of letting go of someone she loves through a series of emails.",
+      "url": "https://www.penguinlibros.com/us/tematicas/342701-audiolibro-olvidare-tu-nombre-9786073841443",
+      "cover": "/covers/olvidare-tu-nombre.avif"
+    },
+    {
+      "title": "Que quede entre nosotros (Spanish Edition)",
+      "description": "Let's Keep it Between Us: A coming-of-age and courageous novel that explores femininity, eroticism, and women's resilience.",
+      "url": "https://www.penguinlibros.com/us/tematicas/44750-audiolibro-que-quede-entre-nosotros-9786073180214",
+      "cover": "/covers/quequedeentrenosotros.webp"
+    },
+     {
+      "title": "Let´s Keep this Between Us",
+      "description": "A provocative novel exploring female desire, infidelity, and self-discovery as Victoria embarks on a transformative affair that challenges societal expectations and her own identity.",
+      "url": "https://amzn.to/4m6Pqoy",
+      "cover": "/covers/KeepItBetweenUs.jpg"
+    }
+  ],
+  "copyright": "© 2025 Monica Salmon. All rights reserved.",
+  "social": [
+    { "name": "Facebook", "url": "https://www.facebook.com/13Mokanita" },
+    { "name": "Twitter", "url": "https://x.com/monicasalmon_" },
+    { "name": "Instagram", "url": "https://www.instagram.com/monicasalmon_" },
+    { "name": "LinkedIn", "url": "https://www.linkedin.com/in/m%C3%B3nica-salm%C3%B3n-9917414b" },
+    { "name": "YouTube", "url": "https://www.youtube.com/c/Caf%C3%A9SinEgo" },
+    { "name": "Threads", "url": "https://www.threads.com/@monicasalmon_" },
+    { "name": "Substack", "url": "https://substack.com/@mokanita" }
+  ],
+  "email": "psicologa.monicasalmon@gmail.com",
+  "articles": [
+    {
+      "title": "Where is the love?",
+      "url": "https://heraldodemexico.com.mx/opinion/2025/7/3/donde-esta-el-amor-712128.html",
+      "publication": "El Heraldo de México",
+      "date": "2025-07-03"
+    },
+    {
+      "title": "How many roads must a man walk down?",
+      "url": "https://heraldodemexico.com.mx/opinion/2025/6/5/cuantos-caminos-debe-recorrer-un-hombre-704803.html",
+      "publication": "El Heraldo de México",
+      "date": "2025-06-05"
+    }
+    ,
+    {
+      "title": "The Agony of Eros",
+      "url": "https://heraldodemexico.com.mx/opinion/2025/5/12/la-agonia-del-eros-698214.html",
+      "publication": "El Heraldo de México",
+      "date": "2025-05-12"
+    }
+    ,
+    {
+      "title": "When Depth Becomes Trivial, Narcissism Becomes Fashionable",
+      "url": "https://heraldodemexico.com.mx/opinion/2025/4/25/cuando-la-profundidad-se-banaliza-el-narcisismo-se-vuelve-moda-694009.html",
+      "publication": "El Heraldo de México",
+      "date": "2025-04-25"
+    }
+  ]
+}

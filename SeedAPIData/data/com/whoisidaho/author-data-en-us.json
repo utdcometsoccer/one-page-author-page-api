@@ -1,0 +1,14 @@
+{
+  "name": "Idaho Edokpayi",
+  "welcome": "Idaho Edokpayi is a Nigerian-American author, and technologist.",
+  "aboutMe": "Idaho Edokpayi is a writer, and consultant with a passion for storytelling and technology.",
+  "headshot": "/authorphotos/baletd_DSC6537.jpg",
+  "copyright": "© 2025 Idaho Edokpayi. All rights reserved.",
+  "social": [
+    { "name": "LinkedIn", "url": "https://www.linkedin.com/in/whoisidaho/" },
+    { "name": "Facebook", "url": "https://www.facebook.com/whoisidaho/" },    
+    { "name": "Instagram", "url": "https://www.instagram.com/idahosaedokpayi_/" },
+    { "name": "Substack", "url": "https://idahoedokpayi.substack.com/" }
+  ],
+  "email": "idaho@edokpayi.com"
+}

@@ -1,0 +1,71 @@
+{
+  "name": "Monica Salmon",
+  "welcome": "Monica Salmon est une auteure à succès avec un parcours littéraire unique, offrant une gamme variée de livres qui abordent des sujets tels que le cancer du sein, l'érotisme et la maltraitance maternelle. Son écriture explore sans crainte des thèmes controversés et sensibles tout en captivant les lecteurs avec des récits puissants.",
+  "aboutMe": "Psychologue clinicienne, auteure à succès et chroniqueuse.",
+  "headshot": "/authorphotos/monica.avif",
+  "books": [
+    {
+      "title": "Debajo de mi piel (Édition espagnole)",
+      "description": "Sous ma peau",
+      "url": "https://www.penguinlibros.com/us/tematicas/226997-ebook-debajo-de-mi-piel-9786073198110",
+      "cover": "/covers/debajo-de-mi-piel.avif"
+    },
+    {
+      "title": "Cuídame de ti (Édition espagnole)",
+      "description": "Protège-moi de toi",
+      "url": "https://www.penguinlibros.com/us/tematicas/44536-ebook-cuidame-de-ti-9786073177627",
+      "cover": "/covers/cuidamedeti.jpg"
+    },
+    {
+      "title": "Olvidaré tu nombre (Édition espagnole)",
+      "description": "J'oublierai ton nom",
+      "url": "https://www.penguinlibros.com/us/tematicas/342701-audiolibro-olvidare-tu-nombre-9786073841443",
+      "cover": "/covers/olvidare-tu-nombre.avif"
+    },
+    {
+      "title": "Que quede entre nosotros (Édition espagnole)",
+      "description": "Que cela reste entre nous",
+      "url": "https://www.penguinlibros.com/us/tematicas/44750-audiolibro-que-quede-entre-nosotros-9786073180214",
+      "cover": "/covers/que-quede-entre-nous.avif"
+    }
+  ],
+  "copyright": "© 2025 Monica Salmon. Tous droits réservés.",
+  "social": [
+    { "name": "Facebook", "url": "https://www.facebook.com/13Mokanita" },
+    { "name": "Twitter", "url": "https://x.com/monicasalmon_" },
+    { "name": "Instagram", "url": "https://www.instagram.com/monicasalmon_" },
+    { "name": "LinkedIn", "url": "https://www.linkedin.com/in/m%C3%B3nica-salm%C3%B3n-9917414b" },
+    { "name": "YouTube", "url": "https://www.youtube.com/c/Caf%C3%A9SinEgo" },
+    { "name": "Threads", "url": "https://www.threads.com/@monicasalmon_" },
+    { "name": "Substack", "url": "https://substack.com/@mokanita" }
+  ],
+  "email": "psicologa.monicasalmon@gmail.com",
+  "articles": [
+    {
+      "title": "Où est l'amour ?",
+      "url": "https://heraldodemexico.com.mx/opinion/2025/7/3/donde-esta-el-amor-712128.html",
+      "publication": "El Heraldo de México",
+      "date": "2025-07-03"
+    },
+    {
+      "title": "Combien de routes un homme doit-il parcourir ?",
+      "url": "https://heraldodemexico.com.mx/opinion/2025/6/5/cuantos-caminos-debe-recorrer-un-homme-704803.html",
+      "publication": "El Heraldo de México",
+      "date": "2025-06-05"
+    }
+    ,
+    {
+      "title": "L'agonie de l'éros",
+      "url": "https://heraldodemexico.com.mx/opinion/2025/5/12/la-agonia-del-eros-698214.html",
+      "publication": "El Heraldo de México",
+      "date": "2025-05-12"
+    }
+    ,
+    {
+      "title": "Quand la profondeur se banalise, le narcissisme devient à la mode",
+      "url": "https://heraldodemexico.com.mx/opinion/2025/4/25/cuando-la-profundidad-se-banalisa-el-narcisismo-se-vuelve-moda-694009.html",
+      "publication": "El Heraldo de México",
+      "date": "2025-04-25"
+    }
+  ]
+}
