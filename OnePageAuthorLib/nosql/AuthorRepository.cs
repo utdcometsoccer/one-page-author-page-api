@@ -9,6 +9,43 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
     /// </summary>
     public class AuthorRepository : GenericRepository<Author>, IAuthorRepository
     {
+        /// <summary>
+        /// Gets authors by TopLevelDomain and SecondLevelDomain where IsDefault is true.
+        /// </summary>
+        public async Task<IList<Author>> GetByDomainAndDefaultAsync(string topLevelDomain, string secondLevelDomain)
+        {
+            var query = new QueryDefinition(
+                "SELECT * FROM c WHERE c.TopLevelDomain = @tld AND c.SecondLevelDomain = @sld AND c.IsDefault = true")
+                .WithParameter("@tld", topLevelDomain)
+                .WithParameter("@sld", secondLevelDomain);
+            var iterator = _container.GetItemQueryIterator<Author>(query);
+            var results = new List<Author>();
+            while (iterator.HasMoreResults)
+            {
+                var response = await iterator.ReadNextAsync();
+                results.AddRange(response.Resource);
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// Gets authors by TopLevelDomain and SecondLevelDomain.
+        /// </summary>
+        public async Task<IList<Author>> GetByDomainAsync(string topLevelDomain, string secondLevelDomain)
+        {
+            var query = new QueryDefinition(
+                "SELECT * FROM c WHERE c.TopLevelDomain = @tld AND c.SecondLevelDomain = @sld")
+                .WithParameter("@tld", topLevelDomain)
+                .WithParameter("@sld", secondLevelDomain);
+            var iterator = _container.GetItemQueryIterator<Author>(query);
+            var results = new List<Author>();
+            while (iterator.HasMoreResults)
+            {
+                var response = await iterator.ReadNextAsync();
+                results.AddRange(response.Resource);
+            }
+            return results;
+        }
         private readonly Container _container;
 
         public AuthorRepository(Container container) : base(container)
