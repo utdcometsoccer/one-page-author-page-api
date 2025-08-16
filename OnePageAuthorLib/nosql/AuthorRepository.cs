@@ -13,6 +13,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
 
         public AuthorRepository(Container container) : base(container)
         {
+            if (container == null)
+                throw new ArgumentNullException(nameof(container), "AuthorRepository: The provided Cosmos DB container is null. Ensure you are passing a valid container instance.");
             _container = container;
         }
 
