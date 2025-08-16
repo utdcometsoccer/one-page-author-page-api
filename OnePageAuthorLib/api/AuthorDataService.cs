@@ -1,3 +1,4 @@
+using InkStainedWretch.OnePageAuthorAPI.Entities;
 namespace InkStainedWretch.OnePageAuthorAPI.API
 {
     public class AuthorDataService : IAuthorDataService
@@ -21,8 +22,36 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
         public async Task<AuthorResponse?> GetAuthorWithDataAsync(string topLevelDomain, string secondLevelDomain, string languageName, string? regionName = null)
         {
+            // 1. Try full match (TLD, SLD, language, region)
+
             var authors = await _authorRepository.GetByDomainAndLocaleAsync(topLevelDomain, secondLevelDomain, languageName, regionName ?? "");
+            if (authors == null) authors = new List<Author>();
             var author = authors.FirstOrDefault();
+
+            // 2. If not found, try match without region
+            if (author == null)
+            {
+                authors = await _authorRepository.GetByDomainAndLocaleAsync(topLevelDomain, secondLevelDomain, languageName, "");
+                if (authors == null) authors = new List<Author>();
+                author = authors.FirstOrDefault();
+            }
+
+            // 3. If not found, try first default author for TLD and SLD
+            if (author == null)
+            {
+                authors = await _authorRepository.GetByDomainAndDefaultAsync(topLevelDomain, secondLevelDomain);
+                if (authors == null) authors = new List<Author>();
+                author = authors.FirstOrDefault(a => a.IsDefault);
+            }
+
+            // 4. If not found, try first author for TLD and SLD
+            if (author == null)
+            {
+                authors = await _authorRepository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
+                if (authors == null) authors = new List<Author>();
+                author = authors.FirstOrDefault();
+            }
+
             if (author == null)
                 return null;
 
