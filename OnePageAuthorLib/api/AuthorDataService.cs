@@ -1,5 +1,3 @@
-using InkStainedWretch.OnePageAuthorAPI.Entities;
-
 namespace InkStainedWretch.OnePageAuthorAPI.API
 {
     public class AuthorDataService : IAuthorDataService

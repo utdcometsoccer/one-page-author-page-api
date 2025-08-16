@@ -1,16 +1,59 @@
 using Microsoft.Extensions.DependencyInjection;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.NoSQL;
-using System.Text.Json;
 
 namespace InkStainedWretch.OnePageAuthorAPI
 {
-
     /// <summary>
     /// Provides factory methods for dependency injection and repository/service creation for the OnePageAuthorAPI.
     /// </summary>
     public static class ServiceFactory
     {
+    // Private static ServiceProvider for lazy loading
+    private static ServiceProvider? _serviceProvider;
+
+        // Private method to initialize ServiceProvider
+        private static ServiceProvider InitializeProvider(string endpointUri, string primaryKey, string databaseId)
+        {
+            var services = new ServiceCollection();
+            // Register CosmosClient as a singleton (only one instance injected)
+            var cosmosClient = new Microsoft.Azure.Cosmos.CosmosClient(endpointUri, primaryKey);
+            services.AddSingleton(cosmosClient);
+            // Register Database as a singleton (only one instance injected)
+            services.AddSingleton(provider => {
+                var dbManager = provider.GetRequiredService<ICosmosDatabaseManager>();
+                return dbManager.EnsureDatabaseAsync(endpointUri, primaryKey, databaseId).GetAwaiter().GetResult();
+            });
+            services.AddTransient<IContainerManager<Entities.Author>, AuthorsContainerManager>();
+            services.AddTransient<IContainerManager<Entities.Book>, BooksContainerManager>();
+            services.AddTransient<IContainerManager<Entities.Article>, ArticlesContainerManager>();
+            services.AddTransient<IContainerManager<Entities.Social>, SocialsContainerManager>();
+            services.AddTransient<ICosmosDatabaseManager, CosmosDatabaseManager>();
+            return services.BuildServiceProvider();
+        }
+        /// <summary>
+        /// Overloaded: Creates an AuthorDataService using endpointUri, primaryKey, and databaseId.
+        /// Ensures all containers exist and returns a fully initialized AuthorDataService.
+        /// </summary>
+        /// <param name="endpointUri">The Cosmos DB endpoint URI.</param>
+        /// <param name="primaryKey">The Cosmos DB primary key.</param>
+        /// <param name="databaseId">The Cosmos DB database ID.</param>
+        /// <returns>An initialized AuthorDataService instance.</returns>
+        public static IAuthorDataService CreateAuthorDataService(string endpointUri, string primaryKey, string databaseId)
+        {
+            var provider = CreateProvider(endpointUri, primaryKey, databaseId);
+            var authorsContainerManager = provider.GetRequiredService<IContainerManager<Entities.Author>>();
+            var booksContainerManager = provider.GetRequiredService<IContainerManager<Entities.Book>>();
+            var articlesContainerManager = provider.GetRequiredService<IContainerManager<Entities.Article>>();
+            var socialsContainerManager = provider.GetRequiredService<IContainerManager<Entities.Social>>();
+
+            var authorsContainer = authorsContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
+            var booksContainer = booksContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
+            var articlesContainer = articlesContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
+            var socialsContainer = socialsContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
+
+            return CreateAuthorDataService(authorsContainer, booksContainer, articlesContainer, socialsContainer);
+        }
         /// <summary>
         /// Creates and configures a ServiceProvider for dependency injection.
         /// Registers all required container managers and the Cosmos database manager.
@@ -21,25 +64,18 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// <returns>A configured ServiceProvider instance.</returns>
         public static ServiceProvider CreateProvider(string endpointUri, string primaryKey, string databaseId)
         {
-            var services = new ServiceCollection();       
-            // register cosmos client
-            services.AddSingleton(provider => {
-                var cosmosClient = new Microsoft.Azure.Cosmos.CosmosClient(endpointUri, primaryKey);
-                return cosmosClient;
-            });
-            // rgister database
-            services.AddSingleton(provider => {                
-                var dbManager = provider.GetRequiredService<ICosmosDatabaseManager>();
-                // Ensure database exists and return it
-                return dbManager.EnsureDatabaseAsync(endpointUri, primaryKey, databaseId).GetAwaiter().GetResult();
-            });
-            services.AddTransient<IAuthorDataService, AuthorDataService>();
-            services.AddTransient<IContainerManager<Entities.Author>, AuthorsContainerManager>();
-            services.AddTransient<IContainerManager<Entities.Book>, BooksContainerManager>();
-            services.AddTransient<IContainerManager<Entities.Article>, ArticlesContainerManager>();
-            services.AddTransient<IContainerManager<Entities.Social>, SocialsContainerManager>();
-            services.AddTransient<ICosmosDatabaseManager, CosmosDatabaseManager>();            
-            return services.BuildServiceProvider();
+            if (string.IsNullOrWhiteSpace(endpointUri))
+                throw new ArgumentException("endpointUri cannot be null, empty, or whitespace.", nameof(endpointUri));
+            if (string.IsNullOrWhiteSpace(primaryKey))
+                throw new ArgumentException("primaryKey cannot be null, empty, or whitespace.", nameof(primaryKey));
+            if (string.IsNullOrWhiteSpace(databaseId))
+                throw new ArgumentException("databaseId cannot be null, empty, or whitespace.", nameof(databaseId));
+
+            if (_serviceProvider == null)
+            {
+                _serviceProvider = InitializeProvider(endpointUri, primaryKey, databaseId);
+            }
+            return _serviceProvider;
         }
 
         /// <summary>
@@ -101,7 +137,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// <param name="articlesContainer">The Cosmos DB container for articles.</param>
         /// <param name="socialsContainer">The Cosmos DB container for socials.</param>
         /// <returns>An initialized AuthorDataService instance.</returns>
-        public static AuthorDataService CreateAuthorDataService(
+        public static IAuthorDataService CreateAuthorDataService(
         Microsoft.Azure.Cosmos.Container authorsContainer,
         Microsoft.Azure.Cosmos.Container booksContainer,
         Microsoft.Azure.Cosmos.Container articlesContainer,
