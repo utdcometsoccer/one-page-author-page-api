@@ -2,6 +2,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
 {
     public class Author
     {
+        /// <summary>
+        /// Indicates if this Author is the default value for a domain.
+        /// </summary>
+        public bool IsDefault { get; set; } = false;
     /// <summary>
     /// The primary key for the Author entity.
     /// </summary>
@@ -73,6 +77,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
             HeadShotURL = null;
             CopyrightText = string.Empty;
             EmailAddress = string.Empty;
+            IsDefault = false;
         }
 
         /// <summary>
@@ -89,7 +94,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
             string aboutText,
             string copyrightText,
             string emailAddress,
-            string? headShotURL = null)
+            string? headShotURL = null,
+            bool isDefault = false)
         {
             this.id = id;
             TopLevelDomain = topLevelDomain;
@@ -102,6 +108,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
             CopyrightText = copyrightText;
             EmailAddress = emailAddress;
             HeadShotURL = headShotURL;
+            IsDefault = isDefault;
         }
     }
 }
