@@ -1,11 +1,6 @@
 ﻿using System.Globalization;
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
-using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI;
-using InkStainedWretch.OnePageAuthorAPI.Entities;
-using Book = InkStainedWretch.OnePageAuthorAPI.Entities.Book;
-using Article = InkStainedWretch.OnePageAuthorAPI.Entities.Article;
 using Microsoft.Extensions.Configuration;
 
 class Program
@@ -17,8 +12,7 @@ class Program
                                 .Build();
         // Read settings
         var configJson = File.ReadAllText(Utility.GetAbsolutePath("appsettings.json"));
-        using var configDoc = JsonDocument.Parse(configJson);
-        var cosmosConfig = configDoc.RootElement.GetProperty("CosmosDb");
+        using var configDoc = JsonDocument.Parse(configJson);        
         string endpointUri = config["EndpointUri"] ?? "";
         string primaryKey = config["PrimaryKey"] ?? "";
         string databaseId = config["DatabaseId"] ?? "";
@@ -34,26 +28,8 @@ class Program
         string languageName = culture.TwoLetterISOLanguageName;
         string regionName = culture.Name.Length > 3 ? culture.Name.Substring(3).ToLowerInvariant() : "";
 
-        // Setup DI using the ServiceFactory
-        var provider = ServiceFactory.CreateProvider(endpointUri, primaryKey, databaseId);
-        var dbManager = provider.GetRequiredService<ICosmosDatabaseManager>();
-        var authorsContainerManager = provider.GetRequiredService<IContainerManager<Author>>();
-        var booksContainerManager = provider.GetRequiredService<IContainerManager<Book>>();
-        var articlesContainerManager = provider.GetRequiredService<IContainerManager<Article>>();
-        var socialsContainerManager = provider.GetRequiredService<IContainerManager<Social>>();
-
-        // Ensure containers exist
-        var authorsContainer = await authorsContainerManager.EnsureContainerAsync();
-        var booksContainer = await booksContainerManager.EnsureContainerAsync();
-        var articlesContainer = await articlesContainerManager.EnsureContainerAsync();
-        var socialsContainer = await socialsContainerManager.EnsureContainerAsync();
-
-        // Create AuthorDataService using the factory
-        var authorDataService = ServiceFactory.CreateAuthorDataService(
-            authorsContainer,
-            booksContainer,
-            articlesContainer,
-            socialsContainer);
+        // Create AuthorDataService using the new factory method
+        var authorDataService = ServiceFactory.CreateAuthorDataService(endpointUri, primaryKey, databaseId);
 
         // Query author data service
         var response = await authorDataService.GetAuthorWithDataAsync(topLevelDomain, secondLevelDomain, languageName, regionName);

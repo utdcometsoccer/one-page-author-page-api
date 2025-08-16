@@ -7,6 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>function_app</RootNamespace>
+    <UserSecretsId>20376250-abcf-43c5-a034-c7310f425e52</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
