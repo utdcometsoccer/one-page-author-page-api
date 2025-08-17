@@ -28,6 +28,9 @@ if (string.IsNullOrWhiteSpace(databaseId))
 builder.Services.AddTransient<IAuthorDataService>(_ =>
     InkStainedWretch.OnePageAuthorAPI.ServiceFactory.CreateAuthorDataService(endpointUri, primaryKey, databaseId));
 
+builder.Services.AddTransient<ILocaleDataService>(_ =>
+    InkStainedWretch.OnePageAuthorAPI.ServiceFactory.CreateLocaleDataService(endpointUri, primaryKey, databaseId));
+
 builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();

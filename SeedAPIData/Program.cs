@@ -13,9 +13,9 @@ IConfiguration config = new ConfigurationBuilder()
 
 // Read Cosmos DB settings from appsettings.json
 
-string endpointUri = config["EndpointUri"] ?? "";
-string primaryKey = config["PrimaryKey"] ?? "";
-string databaseId = config["DatabaseId"] ?? "";
+string endpointUri = config["EndpointUri"] ?? throw new InvalidOperationException("EndpointUri is not set.");
+string primaryKey = config["PrimaryKey"] ?? throw new InvalidOperationException("PrimaryKey is not set.");
+string databaseId = config["DatabaseId"] ?? throw new InvalidOperationException("DatabaseId is not set.");
 
 // Use DI factory to get all required services
 var provider = InkStainedWretch.OnePageAuthorAPI.ServiceFactory.CreateProvider(endpointUri, primaryKey, databaseId);

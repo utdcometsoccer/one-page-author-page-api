@@ -9,18 +9,17 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
     /// </summary>
     public class AuthorsContainerManager : IContainerManager<Author>
     {
-        private readonly CosmosClient _cosmosClient;
         private readonly Database _database;
         private readonly string _containerName = "Authors";
 
         /// <summary>
         /// Initializes a new instance of the AuthorsContainerManager class.
         /// </summary>
-        /// <param name="cosmosClient">The Azure Cosmos DB client.</param>
         /// <param name="database">The Azure Cosmos DB database.</param>
-        public AuthorsContainerManager(CosmosClient cosmosClient, Database database)
+        public AuthorsContainerManager(Database database)
         {
-            _cosmosClient = cosmosClient;
+            if (database == null)
+                throw new ArgumentNullException(nameof(database), "AuthorsContainerManager: The provided Database is null.");           
             _database = database;
         }
 
