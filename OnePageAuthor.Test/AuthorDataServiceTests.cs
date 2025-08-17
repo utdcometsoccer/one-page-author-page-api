@@ -7,8 +7,8 @@ namespace OnePageAuthor.Test
     public class AuthorDataServiceTests
     {
         private Mock<IAuthorRepository> _authorRepoMock;
-    private Mock<InkStainedWretch.OnePageAuthorAPI.API.IGenericRepository<InkStainedWretch.OnePageAuthorAPI.Entities.Book>> _bookRepoMock;
-    private Mock<InkStainedWretch.OnePageAuthorAPI.API.IGenericRepository<InkStainedWretch.OnePageAuthorAPI.Entities.Article>> _articleRepoMock;
+        private Mock<InkStainedWretch.OnePageAuthorAPI.API.IGenericRepository<InkStainedWretch.OnePageAuthorAPI.Entities.Book>> _bookRepoMock;
+        private Mock<InkStainedWretch.OnePageAuthorAPI.API.IGenericRepository<InkStainedWretch.OnePageAuthorAPI.Entities.Article>> _articleRepoMock;
         private Mock<IGenericRepository<Social>> _socialRepoMock;
         private AuthorDataService _service;
 

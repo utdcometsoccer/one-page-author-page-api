@@ -20,6 +20,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         /// <param name="database">The Azure Cosmos DB database.</param>
         public BooksContainerManager(CosmosClient cosmosClient, Database database)
         {
+            if (cosmosClient == null)
+                throw new ArgumentNullException(nameof(cosmosClient), "BooksContainerManager: The provided CosmosClient is null.");
+            if (database == null)
+                throw new ArgumentNullException(nameof(database), "BooksContainerManager: The provided Database is null.");
             _cosmosClient = cosmosClient;
             _database = database;
         }
