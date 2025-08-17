@@ -9,6 +9,22 @@ namespace InkStainedWretch.OnePageAuthorAPI
     /// </summary>
     public static class ServiceFactory
     {
+        /// <summary>
+        /// Creates a LocaleDataService using endpointUri, primaryKey, and databaseId.
+        /// Ensures the Locales container exists and returns a fully initialized LocaleDataService.
+        /// </summary>
+        /// <param name="endpointUri">The Cosmos DB endpoint URI.</param>
+        /// <param name="primaryKey">The Cosmos DB primary key.</param>
+        /// <param name="databaseId">The Cosmos DB database ID.</param>
+        /// <returns>An initialized ILocaleDataService instance.</returns>
+        public static ILocaleDataService CreateLocaleDataService(string endpointUri, string primaryKey, string databaseId)
+        {
+            var provider = CreateProvider(endpointUri, primaryKey, databaseId);
+            var localesContainerManager = provider.GetRequiredService<IContainerManager<Entities.Locale>>();
+            var localesContainer = localesContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
+            var localeRepo = new NoSQL.LocaleRepository(localesContainer);
+            return new API.LocaleDataService(localeRepo);
+    }
     // Private static ServiceProvider for lazy loading
     private static ServiceProvider? _serviceProvider;
 
@@ -26,9 +42,13 @@ namespace InkStainedWretch.OnePageAuthorAPI
             });
             services.AddTransient<IContainerManager<Entities.Author>, AuthorsContainerManager>();
             services.AddTransient<IContainerManager<Entities.Book>, BooksContainerManager>();
-            services.AddTransient<IContainerManager<Entities.Article>, ArticlesContainerManager>();
-            services.AddTransient<IContainerManager<Entities.Social>, SocialsContainerManager>();
-            services.AddTransient<ICosmosDatabaseManager, CosmosDatabaseManager>();
+            services.AddTransient<IContainerManager<Entities.Article>>(provider =>
+                new ArticlesContainerManager(provider.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<IContainerManager<Entities.Social>>(provider =>
+                new SocialsContainerManager(provider.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<IContainerManager<Entities.Locale>>(provider =>
+                new LocalesContainerManager(provider.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<ICosmosDatabaseManager, CosmosDatabaseManager>();            
             return services.BuildServiceProvider();
         }
         /// <summary>
@@ -44,8 +64,8 @@ namespace InkStainedWretch.OnePageAuthorAPI
             var provider = CreateProvider(endpointUri, primaryKey, databaseId);
             var authorsContainerManager = provider.GetRequiredService<IContainerManager<Entities.Author>>();
             var booksContainerManager = provider.GetRequiredService<IContainerManager<Entities.Book>>();
-            var articlesContainerManager = provider.GetRequiredService<IContainerManager<Entities.Article>>();
-            var socialsContainerManager = provider.GetRequiredService<IContainerManager<Entities.Social>>();
+                var articlesContainerManager = provider.GetRequiredService<IContainerManager<Entities.Article>>(); // Updated constructor
+                var socialsContainerManager = provider.GetRequiredService<IContainerManager<Entities.Social>>(); // Updated constructor
 
             var authorsContainer = authorsContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
             var booksContainer = booksContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
@@ -103,6 +123,10 @@ namespace InkStainedWretch.OnePageAuthorAPI
             {
                 return new NoSQL.GenericRepository<Entities.Social>((Microsoft.Azure.Cosmos.Container)container);
             }
+            if (entityType == typeof(Entities.Locale))
+            {
+                return new NoSQL.LocaleRepository((Microsoft.Azure.Cosmos.Container)container);
+            }
             throw new ArgumentException($"No repository factory for type {entityType.Name}");
         }
 
@@ -121,6 +145,10 @@ namespace InkStainedWretch.OnePageAuthorAPI
             if (typeof(TEntity) == typeof(Entities.Author) && typeof(TRepository) == typeof(NoSQL.AuthorRepository))
             {
                 return new NoSQL.AuthorRepository(container) as TRepository;
+            }
+            if (typeof(TEntity) == typeof(Entities.Locale) && typeof(TRepository) == typeof(NoSQL.LocaleRepository))
+            {
+                return new NoSQL.LocaleRepository(container) as TRepository;
             }
             if (typeof(TRepository) == typeof(NoSQL.GenericRepository<TEntity>))
             {

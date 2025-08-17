@@ -1,0 +1,13 @@
+{
+  "welcome": "Bienvenido",
+  "aboutMe": "Sobre mí",
+  "myBooks": "Mis libros",
+  "loading": "Cargando...",
+  "emailPrompt": "No dudes en ponerte en contacto:",
+  "contactMe": "Contáctame",
+  "emailLinkText": "Envíame un correo",
+  "noEmail": "No se proporcionó correo de contacto.",
+  "switchToLight": "Cambiar a tema claro",
+  "switchToDark": "Cambiar a tema oscuro",
+  "articles": "Artículos"
+}
