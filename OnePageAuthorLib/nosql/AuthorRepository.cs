@@ -18,12 +18,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 "SELECT * FROM c WHERE c.TopLevelDomain = @tld AND c.SecondLevelDomain = @sld AND c.IsDefault = true")
                 .WithParameter("@tld", topLevelDomain)
                 .WithParameter("@sld", secondLevelDomain);
-            var iterator = _container.GetItemQueryIterator<Author>(query);
             var results = new List<Author>();
-            while (iterator.HasMoreResults)
+            using (var iterator = _container.GetItemQueryIterator<Author>(query))
             {
-                var response = await iterator.ReadNextAsync();
-                results.AddRange(response.Resource);
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response.Resource);
+                }
             }
             return results;
         }
@@ -37,23 +39,21 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 "SELECT * FROM c WHERE c.TopLevelDomain = @tld AND c.SecondLevelDomain = @sld")
                 .WithParameter("@tld", topLevelDomain)
                 .WithParameter("@sld", secondLevelDomain);
-            var iterator = _container.GetItemQueryIterator<Author>(query);
             var results = new List<Author>();
-            while (iterator.HasMoreResults)
+            using (var iterator = _container.GetItemQueryIterator<Author>(query))
             {
-                var response = await iterator.ReadNextAsync();
-                results.AddRange(response.Resource);
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response.Resource);
+                }
             }
             return results;
         }
-        private readonly Container _container;
 
-        public AuthorRepository(Container container) : base(container)
-        {
-            if (container == null)
-                throw new ArgumentNullException(nameof(container), "AuthorRepository: The provided Cosmos DB container is null. Ensure you are passing a valid container instance.");
-            _container = container;
-        }
+        public AuthorRepository(Container container) : base(container){}
+
+        public AuthorRepository(IDataContainer container) : base(container) { }
 
         /// <summary>
         /// Gets authors by TopLevelDomain, SecondLevelDomain, LanguageName, and RegionName.
@@ -71,12 +71,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 .WithParameter("@sld", secondLevelDomain)
                 .WithParameter("@lang", languageName)
                 .WithParameter("@region", regionName);
-            var iterator = _container.GetItemQueryIterator<Author>(query);
             var results = new List<Author>();
-            while (iterator.HasMoreResults)
+            using (var iterator = _container.GetItemQueryIterator<Author>(query))
             {
-                var response = await iterator.ReadNextAsync();
-                results.AddRange(response.Resource);
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response.Resource);
+                }
             }
             return results;
         }
