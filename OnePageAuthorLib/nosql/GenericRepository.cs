@@ -9,21 +9,25 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
     /// <typeparam name="TEntity">The entity type.</typeparam>
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
-        private readonly Container _container;
+        protected readonly IDataContainer _container;
 
         public GenericRepository(Container container)
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container), "GenericRepository: The provided Cosmos DB container is null. Ensure you are passing a valid container instance.");
-            _container = container;
+            _container = new CosmosContainerWrapper(container);
+        }
+
+        public GenericRepository(IDataContainer container)
+        {
+            _container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
         public async Task<TEntity?> GetByIdAsync(Guid id)
         {
             try
             {
-                var response = await _container.ReadItemAsync<TEntity>(id.ToString(), new PartitionKey(id.ToString()));
-                return response.Resource;
+                return await _container.ReadItemAsync<TEntity>(id.ToString(), new PartitionKey(id.ToString()));
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -35,12 +39,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         {
             var query = new QueryDefinition("SELECT * FROM c WHERE c.AuthorID = @authorId")
                 .WithParameter("@authorId", authorId.ToString());
-            var iterator = _container.GetItemQueryIterator<TEntity>(query);
             var results = new List<TEntity>();
-            while (iterator.HasMoreResults)
+            using (var iterator = _container.GetItemQueryIterator<TEntity>(query))
             {
-                var response = await iterator.ReadNextAsync();
-                results.AddRange(response.Resource);
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response.Resource);
+                }
             }
             return results;
         }
