@@ -6,9 +6,7 @@ using InkStainedWretch.OnePageAuthorAPI.API;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
-
 builder.ConfigureFunctionsWebApplication();
-
 
 // Register IAuthorDataService using ServiceFactory and environment variables
 var config = builder.Configuration;
@@ -31,9 +29,9 @@ builder.Services.AddTransient<IAuthorDataService>(_ =>
 builder.Services.AddTransient<ILocaleDataService>(_ =>
     InkStainedWretch.OnePageAuthorAPI.ServiceFactory.CreateLocaleDataService(endpointUri, primaryKey, databaseId));
 
+// Add Application Insights telemetry for Azure Functions Worker
 builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
-
 
 builder.Build().Run();
