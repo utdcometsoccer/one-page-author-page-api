@@ -107,25 +107,28 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// <exception cref="ArgumentException">Thrown if the entity type is not supported.</exception>
         public static object CreateRepository(Type entityType, object container)
         {
+            var cosmosContainer = container is IDataContainer icc
+                ? icc
+                : new NoSQL.CosmosContainerWrapper((Microsoft.Azure.Cosmos.Container)container);
             if (entityType == typeof(Entities.Author))
             {
-                return new NoSQL.AuthorRepository((Microsoft.Azure.Cosmos.Container)container);
+                return new NoSQL.AuthorRepository(cosmosContainer);
             }
             if (entityType == typeof(Entities.Book))
             {
-                return new NoSQL.GenericRepository<Entities.Book>((Microsoft.Azure.Cosmos.Container)container);
+                return new NoSQL.GenericRepository<Entities.Book>(cosmosContainer);
             }
             if (entityType == typeof(Entities.Article))
             {
-                return new NoSQL.GenericRepository<Entities.Article>((Microsoft.Azure.Cosmos.Container)container);
+                return new NoSQL.GenericRepository<Entities.Article>(cosmosContainer);
             }
             if (entityType == typeof(Entities.Social))
             {
-                return new NoSQL.GenericRepository<Entities.Social>((Microsoft.Azure.Cosmos.Container)container);
+                return new NoSQL.GenericRepository<Entities.Social>(cosmosContainer);
             }
             if (entityType == typeof(Entities.Locale))
             {
-                return new NoSQL.LocaleRepository((Microsoft.Azure.Cosmos.Container)container);
+                return new NoSQL.LocaleRepository(cosmosContainer);
             }
             throw new ArgumentException($"No repository factory for type {entityType.Name}");
         }

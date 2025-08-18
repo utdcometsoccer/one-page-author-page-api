@@ -9,24 +9,28 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
     /// </summary>
     public class LocaleRepository : GenericRepository<Locale>, ILocaleRepository
     {
-        private readonly Container _container;
 
         public LocaleRepository(Container container) : base(container)
         {
-            if (container == null)
-                throw new ArgumentNullException(nameof(container), "LocaleRepository: The provided Cosmos DB container is null. Ensure you are passing a valid container instance.");
-            _container = container;
+           
+        }
+
+        public LocaleRepository(IDataContainer container) : base(container)
+        {
+           
         }
 
         public async Task<IList<Locale>> GetAllAsync()
         {
             var query = new QueryDefinition("SELECT * FROM c");
-            var iterator = _container.GetItemQueryIterator<Locale>(query);
             var results = new List<Locale>();
-            while (iterator.HasMoreResults)
+            using (var iterator = _container.GetItemQueryIterator<Locale>(query))
             {
-                var response = await iterator.ReadNextAsync();
-                results.AddRange(response.Resource);
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response.Resource);
+                }
             }
             return results;
         }
@@ -48,12 +52,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 query = new QueryDefinition("SELECT * FROM c WHERE c.LanguageName = @lang")
                     .WithParameter("@lang", languageName);
             }
-            var iterator = _container.GetItemQueryIterator<Locale>(query);
             var results = new List<Locale>();
-            while (iterator.HasMoreResults)
+            using (var iterator = _container.GetItemQueryIterator<Locale>(query))
             {
-                var response = await iterator.ReadNextAsync();
-                results.AddRange(response.Resource);
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response.Resource);
+                }
             }
             return results;
         }
@@ -62,14 +68,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         {
             var query = new QueryDefinition("SELECT * FROM c WHERE c.id = @id")
                 .WithParameter("@id", id);
-            var iterator = _container.GetItemQueryIterator<Locale>(query);
-            var results = new List<Locale>();
-            while (iterator.HasMoreResults)
+            using (var iterator = _container.GetItemQueryIterator<Locale>(query))
             {
-                var response = await iterator.ReadNextAsync();
-                results.AddRange(response.Resource);
+                return iterator.HasMoreResults ? (await iterator.ReadNextAsync()).FirstOrDefault() : null;
             }
-            return results.FirstOrDefault();
         }
     }
 }
