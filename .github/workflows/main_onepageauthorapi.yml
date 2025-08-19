@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy dotnet core project to Azure Function App - onepageauthorapi
 
 on:
@@ -10,13 +7,13 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'function-app' # set this to the path to your function app project
-  DOTNET_VERSION: '9.0.x' # set this to the dotnet version to use
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'function-app'
+  DOTNET_VERSION: '9.0.x'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v4
@@ -33,12 +30,23 @@ jobs:
           dotnet build --configuration Release
           dotnet publish --configuration Release --output ./output
           popd
-      
-      - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1
-        id: fa
+
+      - name: 'Zip Published Output'
+        shell: bash
+        run: |
+          cd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+          zip -r ../functionapp.zip .
+          cd ../..
+
+      - name: 'Login to Azure'
+        uses: azure/login@v2
         with:
-          app-name: 'onepageauthorapi'
-          slot-name: 'Production'
-          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          publish-profile: ${{ secrets.AZUREFUNCTIONAPP_PUBLISHPROFILE }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 'Deploy to Azure Function App using config-zip'
+        shell: bash
+        run: |
+          az functionapp deployment source config-zip \
+            --name ${{ secrets.AZURE_FUNCTIONAPP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --src '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/functionapp.zip'
