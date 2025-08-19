@@ -41,4 +41,4 @@ jobs:
           app-name: 'onepageauthorapi'
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EE17C94688C3460893070D023A0C6B0D }}
+          publish-profile: ${{ secrets.AZUREFUNCTIONAPP_PUBLISHPROFILE }}
