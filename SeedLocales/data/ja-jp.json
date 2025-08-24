@@ -1,0 +1,13 @@
+{
+  "welcome": "ようこそ",
+  "aboutMe": "私について",
+  "myBooks": "私の本",
+  "loading": "読み込み中...",
+  "emailPrompt": "お気軽にご連絡ください：",
+  "contactMe": "お問い合わせ",
+  "emailLinkText": "メールする",
+  "noEmail": "連絡用メールが提供されていません。",
+  "switchToLight": "ライトテーマに切り替え",
+  "switchToDark": "ダークテーマに切り替え",
+  "articles": "記事"
+}
