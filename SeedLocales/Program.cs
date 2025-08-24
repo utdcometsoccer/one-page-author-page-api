@@ -64,14 +64,45 @@ class Program
             }
         }
 
-        // Save all locales to Cosmos DB
+        // Save all locales to Cosmos DB (overwrite if exists)
         if (localeRepository == null)
         {
             throw new InvalidOperationException("LocaleRepository is null.");
         }
         foreach (var locale in localeList)
         {
-            await localeRepository.AddAsync(locale);
+            try
+            {
+                // Try to get existing locale by language and region
+                var existingLocales = await localeRepository.GetByLanguageAndRegionAsync(locale.LanguageName, locale.RegionName);
+                var existingLocale = existingLocales.FirstOrDefault();
+                
+                if (existingLocale != null)
+                {
+                    Console.WriteLine($"Locale {locale.LanguageName}-{locale.RegionName} already exists (id: {existingLocale.id}), updating...");
+                    // Update the existing locale with new values but keep the existing id
+                    locale.id = existingLocale.id;
+                    await localeRepository.UpdateAsync(locale);
+                }
+                else
+                {
+                    Console.WriteLine($"Adding new locale {locale.LanguageName}-{locale.RegionName} (id: {locale.id})...");
+                    await localeRepository.AddAsync(locale);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error processing locale {locale.id}: {ex.Message}");
+                // Try to add anyway in case it was a different error
+                try
+                {
+                    await localeRepository.AddAsync(locale);
+                }
+                catch (Exception addEx)
+                {
+                    Console.WriteLine($"Failed to add locale {locale.id}: {addEx.Message}");
+                }
+            }
         }
 
         // Print all locales

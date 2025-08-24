@@ -1,0 +1,13 @@
+{
+  "welcome": "歡迎",
+  "aboutMe": "關於我",
+  "myBooks": "我的書籍",
+  "loading": "載入中...",
+  "emailPrompt": "歡迎隨時聯絡：",
+  "contactMe": "聯絡我",
+  "emailLinkText": "寄信給我",
+  "noEmail": "未提供聯絡電子郵件。",
+  "switchToLight": "切換到淺色主題",
+  "switchToDark": "切換到深色主題",
+  "articles": "文章"
+}
