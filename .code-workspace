@@ -1,0 +1,35 @@
+{
+	"folders": [
+		{ "name": "Repository", "path": "." },
+		{ "name": "Library", "path": "OnePageAuthorLib" },
+		{ "name": "Function App", "path": "function-app" },
+		{ "name": "Stripe Functions", "path": "InkStainedWretchStripe" },
+		{ "name": "Unit Tests", "path": "OnePageAuthor.Test" },
+		{ "name": "Seed Locales", "path": "SeedLocales" },
+		{ "name": "Seed API Data", "path": "SeedAPIData" },
+		{ "name": "KQL", "path": "kql" }
+	],
+	"settings": {
+		// Prefer opening the solution for .NET features like test discovery and navigation
+		"dotnet.defaultSolution": "OnePageAuthorAPI.sln",
+
+		// Keep build artifacts out of the explorer and search results
+		"files.exclude": {
+			"**/bin": true,
+			"**/obj": true
+		},
+		"search.exclude": {
+			"**/bin": true,
+			"**/obj": true
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-dotnettools.csharp",
+			"ms-azuretools.vscode-azurefunctions",
+			"ms-azuretools.vscode-azureresourcegroups",
+			"ms-azuretools.vscode-azurestorage",
+			"streetsidesoftware.code-spell-checker"
+		]
+	}
+}

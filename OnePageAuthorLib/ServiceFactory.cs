@@ -24,9 +24,9 @@ namespace InkStainedWretch.OnePageAuthorAPI
             var localesContainer = localesContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
             var localeRepo = new NoSQL.LocaleRepository(localesContainer);
             return new API.LocaleDataService(localeRepo);
-    }
-    // Private static ServiceProvider for lazy loading
-    private static ServiceProvider? _serviceProvider;
+        }
+        // Private static ServiceProvider for lazy loading
+        private static ServiceProvider? _serviceProvider;
 
         // Private method to initialize ServiceProvider
         private static ServiceProvider InitializeProvider(string endpointUri, string primaryKey, string databaseId)
@@ -36,7 +36,8 @@ namespace InkStainedWretch.OnePageAuthorAPI
             var cosmosClient = new Microsoft.Azure.Cosmos.CosmosClient(endpointUri, primaryKey);
             services.AddSingleton(cosmosClient);
             // Register Database as a singleton (only one instance injected)
-            services.AddSingleton(provider => {
+            services.AddSingleton(provider =>
+            {
                 var dbManager = provider.GetRequiredService<ICosmosDatabaseManager>();
                 return dbManager.EnsureDatabaseAsync(endpointUri, primaryKey, databaseId).GetAwaiter().GetResult();
             });
@@ -48,7 +49,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 new SocialsContainerManager(provider.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
             services.AddTransient<IContainerManager<Entities.Locale>>(provider =>
                 new LocalesContainerManager(provider.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
-            services.AddTransient<ICosmosDatabaseManager, CosmosDatabaseManager>();            
+            services.AddTransient<ICosmosDatabaseManager, CosmosDatabaseManager>();
             return services.BuildServiceProvider();
         }
         /// <summary>
@@ -64,8 +65,8 @@ namespace InkStainedWretch.OnePageAuthorAPI
             var provider = CreateProvider(endpointUri, primaryKey, databaseId);
             var authorsContainerManager = provider.GetRequiredService<IContainerManager<Entities.Author>>();
             var booksContainerManager = provider.GetRequiredService<IContainerManager<Entities.Book>>();
-                var articlesContainerManager = provider.GetRequiredService<IContainerManager<Entities.Article>>(); // Updated constructor
-                var socialsContainerManager = provider.GetRequiredService<IContainerManager<Entities.Social>>(); // Updated constructor
+            var articlesContainerManager = provider.GetRequiredService<IContainerManager<Entities.Article>>(); // Updated constructor
+            var socialsContainerManager = provider.GetRequiredService<IContainerManager<Entities.Social>>(); // Updated constructor
 
             var authorsContainer = authorsContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
             var booksContainer = booksContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
