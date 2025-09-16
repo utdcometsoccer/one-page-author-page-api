@@ -76,6 +76,87 @@
 			"command": "host start",
 			"isBackground": true,
 			"problemMatcher": "$func-dotnet-watch"
+		},
+		{
+			"label": "build-sln",
+			"type": "shell",
+			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build-sln",
+			"type": "shell",
+			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build-sln",
+			"type": "shell",
+			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build-sln",
+			"type": "shell",
+			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build-sln",
+			"type": "shell",
+			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build-sln",
+			"type": "shell",
+			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build-sln",
+			"type": "shell",
+			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build-sln",
+			"type": "shell",
+			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "run-tests",
+			"type": "shell",
+			"command": "dotnet test \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo --no-build",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "test"
 		}
 	]
 }
