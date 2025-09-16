@@ -14,7 +14,7 @@ namespace OnePageAuthor.Test
         }
 
         public override IReadOnlyList<T> Resource => _resource;
-        public override string ContinuationToken => null;
+    public override string ContinuationToken => string.Empty;
         public override double RequestCharge => 0;
         public override Headers Headers => new Headers();
         public override int Count => _resource.Count;
