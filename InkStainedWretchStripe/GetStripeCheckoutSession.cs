@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
-using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 
 namespace InkStainedWretchStripe;
 

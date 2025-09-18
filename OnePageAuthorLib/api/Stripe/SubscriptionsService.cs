@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
@@ -63,11 +59,24 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                         var json = await resp.Content.ReadAsStringAsync();
                         using var doc = JsonDocument.Parse(json);
                         if (doc.RootElement.TryGetProperty("payment_intent", out var pi) &&
-                            pi.ValueKind == JsonValueKind.Object &&
-                            pi.TryGetProperty("client_secret", out var cs) &&
-                            cs.ValueKind == JsonValueKind.String)
+                            pi.ValueKind == JsonValueKind.Object)
                         {
-                            clientSecret = cs.GetString() ?? string.Empty;
+                            string? paymentIntentId = null;
+                            if (pi.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.String)
+                                paymentIntentId = idProp.GetString();
+                            string masked = paymentIntentId != null && paymentIntentId.Length >= 8
+                                ? $"{paymentIntentId[..4]}****{paymentIntentId[^4..]}"
+                                : "(set)";
+                            _logger.LogInformation("Stripe payment intent for invoice {InvoiceId}: {MaskedId}", latestInvoiceId, masked);
+
+                            if (pi.TryGetProperty("client_secret", out var cs) && cs.ValueKind == JsonValueKind.String)
+                            {
+                                clientSecret = cs.GetString() ?? string.Empty;
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Payment intent or client secret not found in invoice {InvoiceId}", latestInvoiceId);
                         }
                     }
                     catch (Exception ex)

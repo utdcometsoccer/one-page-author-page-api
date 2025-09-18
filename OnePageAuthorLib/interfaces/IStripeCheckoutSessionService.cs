@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 
 namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
