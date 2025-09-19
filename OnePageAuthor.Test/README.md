@@ -1,14 +1,15 @@
-# Build Status
+# OnePageAuthor.Test
 
+## Build Status
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 
-This project contains unit tests for the OnePageAuthor API and library.
+Unit tests for the One Page Author API and core library.
 
 ## Overview
-
 - xUnit and Moq based tests
 - Coverage for repositories, container managers, and services
 
-## Usage
-
-Run tests with `dotnet test` from the project root.
+## Quickstart
+```pwsh
+dotnet test OnePageAuthor.Test.csproj
+```

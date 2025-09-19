@@ -1,15 +1,20 @@
-# Build Status
+# function-app
 
+## Build Status
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 
-This project contains Azure Functions for the OnePageAuthor API.
+Azure Functions project related to One Page Author API.
 
 ## Overview
-
 - Azure Functions Worker
 - Cosmos DB integration
 - Application Insights telemetry
 
-## Usage
+## Quickstart
+```pwsh
+dotnet build function-app.csproj
+func start
+```
 
-See `Program.cs` for entry point and configuration details.
+## Configuration
+See `Program.cs` for required settings and bindings.
