@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using Microsoft.Extensions.Logging;
 using Stripe.Checkout;

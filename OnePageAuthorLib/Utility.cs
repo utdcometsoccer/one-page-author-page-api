@@ -1,4 +1,3 @@
-using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 
 namespace InkStainedWretch.OnePageAuthorAPI

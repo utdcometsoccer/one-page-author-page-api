@@ -1,6 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.NoSQL;
+using InkStainedWretch.OnePageAuthorLib.API.Stripe;
+using InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement;
+using InkStainedWretch.OnePageAuthorAPI.Interfaces.Authormanagement;
 
 namespace InkStainedWretch.OnePageAuthorAPI
 {
@@ -180,6 +183,99 @@ namespace InkStainedWretch.OnePageAuthorAPI
             var articleRepo = new NoSQL.GenericRepository<Entities.Article>(articlesContainer);
             var socialRepo = new NoSQL.GenericRepository<Entities.Social>(socialsContainer);
             return new AuthorDataService(authorRepo, bookRepo, articleRepo, socialRepo);
+        }
+
+        public static IServiceCollection AddStripeServices(this IServiceCollection services)
+        {
+            // Register Stripe services here
+            services.AddTransient<ICreateCustomer, CreateCustomer>();
+            services.AddScoped<IPriceService, PricesService>();
+            services.AddScoped<IPriceServiceWrapper, PricesServiceWrapper>();
+            services.AddScoped<ICheckoutSessionService, CheckoutSessionsService>();
+            services.AddScoped<ISubscriptionService, SubscriptionsService>();
+            return services;
+        }
+
+    /// <summary>
+    /// Registers Ink Stained Wretch domain services and Cosmos container managers for
+    /// author-management localization. Includes:
+    /// <list type="bullet">
+    /// <item><description><see cref="ILocalizationTextProvider"/> implementation</description></item>
+    /// <item><description>Typed <see cref="IContainerManager{T}"/> for each author management POCO (partition key: Culture)</description></item>
+    /// </list>
+    /// Call this after registering a singleton <see cref="Microsoft.Azure.Cosmos.Database"/> in DI.
+    /// </summary>
+    /// <param name="services">The DI service collection.</param>
+    /// <returns>The modified <see cref="IServiceCollection"/> for chaining.</returns>
+    public static IServiceCollection AddInkStainedWretchServices(this IServiceCollection services)
+        {
+            services.AddTransient<ILocalizationTextProvider, LocalizationTextProvider>();
+            services.AddTransient<IContainerManager<ArticleForm>, AuthorManagementContainerManager<ArticleForm>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<ArticleForm>(database, "ArticleForm");
+            });
+
+            services.AddTransient<IContainerManager<BookForm>, AuthorManagementContainerManager<BookForm>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<BookForm>(database, "BookForm");
+            });
+
+            services.AddTransient<IContainerManager<BookList>, AuthorManagementContainerManager<BookList>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<BookList>(database, "BookList");
+            });
+
+            services.AddTransient<IContainerManager<Checkout>, AuthorManagementContainerManager<Checkout>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<Checkout>(database, "Checkout");
+            });
+
+            services.AddTransient<IContainerManager<DomainRegistration>, AuthorManagementContainerManager<DomainRegistration>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<DomainRegistration>(database, "DomainRegistration");
+            });
+
+            services.AddTransient<IContainerManager<ErrorPage>, AuthorManagementContainerManager<ErrorPage>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<ErrorPage>(database, "ErrorPage");
+            });
+
+            services.AddTransient<IContainerManager<ImageManager>, AuthorManagementContainerManager<ImageManager>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<ImageManager>(database, "ImageManager");
+            });
+
+            services.AddTransient<IContainerManager<LoginRegister>, AuthorManagementContainerManager<LoginRegister>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<LoginRegister>(database, "LoginRegister");
+            });
+
+            services.AddTransient<IContainerManager<Navbar>, AuthorManagementContainerManager<Navbar>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<Navbar>(database, "Navbar");
+            });
+
+            services.AddTransient<IContainerManager<ThankYou>, AuthorManagementContainerManager<ThankYou>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<ThankYou>(database, "ThankYou");
+            });
+
+            services.AddTransient<IContainerManager<AuthorRegistration>, AuthorManagementContainerManager<AuthorRegistration>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<AuthorRegistration>(database, "AuthorRegistration");
+            });
+            return services;
         }
     }
 }
