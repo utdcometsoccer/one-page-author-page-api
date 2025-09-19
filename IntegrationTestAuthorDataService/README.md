@@ -1,17 +1,12 @@
 # IntegrationTestAuthorDataService
 
-This project contains integration tests for the AuthorDataService and its interaction with Azure Cosmos DB.
+Integration tests for the AuthorDataService and Azure Cosmos DB integration.
 
-## Build Instructions
-
-1. Open a terminal in this folder.
-2. Run:
-   ```pwsh
-   dotnet build IntegrationTestAuthorDataService.csproj
-   ```
-
-## Usage
-Run the tests to verify service and database integration:
+## Quickstart
 ```pwsh
+dotnet build IntegrationTestAuthorDataService.csproj
 dotnet test IntegrationTestAuthorDataService.csproj
 ```
+
+## Notes
+- Ensure emulator/connection settings are configured for tests that hit Cosmos DB.
