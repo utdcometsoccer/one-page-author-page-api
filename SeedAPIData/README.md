@@ -1,17 +1,12 @@
 # SeedAPIData
 
-This project is used to seed the database with initial author, book, and article data for the One Page Author API solution.
+Seeds the database with initial author, book, and article data for the One Page Author API solution.
 
-## Build Instructions
-
-1. Open a terminal in this folder.
-2. Run:
-   ```pwsh
-   dotnet build SeedAPIData.csproj
-   ```
-
-## Usage
-Run the project to populate the database:
+## Quickstart
 ```pwsh
+dotnet build SeedAPIData.csproj
 dotnet run --project SeedAPIData.csproj
 ```
+
+## Configuration
+- Provide any required connection/configuration values via environment variables or user-secrets.

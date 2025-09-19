@@ -1,14 +1,19 @@
-# Build Status
+# SeedLocales
 
+## Build Status
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 
-This project contains locale seeding logic for the OnePageAuthor API.
+Console tool to seed locale data for the One Page Author API.
 
 ## Overview
+- Seeds locale data to Azure Cosmos DB (or configured data source)
+- .NET 9 console application
 
-- Seeds locale data to Cosmos DB
-- .NET console application
+## Quickstart
+```pwsh
+dotnet build SeedLocales.csproj
+dotnet run --project SeedLocales.csproj
+```
 
-## Usage
-
-Run with `dotnet run` from the project directory.
+## Configuration
+- Provide required environment variables or app settings as expected by the code (see Program.cs if present).
