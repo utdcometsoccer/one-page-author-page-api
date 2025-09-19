@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeedLocales", "SeedLocales\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InkStainedWretchStripe", "InkStainedWretchStripe\InkStainedWretchStripe.csproj", "{59C0C343-29EB-4209-BC70-1805821AA08F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeedInkStainedWretchesLocale", "SeedInkStainedWretchesLocale\SeedInkStainedWretchesLocale.csproj", "{38674667-FBDB-4C98-B409-49EAB6624365}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InkStainedWretchFunctions", "InkStainedWretchFunctions\InkStainedWretchFunctions.csproj", "{1692AE41-4940-42EF-AAA3-2542A938E54A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +58,13 @@ Global
 		{59C0C343-29EB-4209-BC70-1805821AA08F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59C0C343-29EB-4209-BC70-1805821AA08F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59C0C343-29EB-4209-BC70-1805821AA08F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38674667-FBDB-4C98-B409-49EAB6624365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38674667-FBDB-4C98-B409-49EAB6624365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38674667-FBDB-4C98-B409-49EAB6624365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38674667-FBDB-4C98-B409-49EAB6624365}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1692AE41-4940-42EF-AAA3-2542A938E54A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1692AE41-4940-42EF-AAA3-2542A938E54A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1692AE41-4940-42EF-AAA3-2542A938E54A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1692AE41-4940-42EF-AAA3-2542A938E54A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

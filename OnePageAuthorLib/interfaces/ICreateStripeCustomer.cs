@@ -1,4 +1,3 @@
-using System;
 using Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 
