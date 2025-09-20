@@ -2,7 +2,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 
@@ -66,26 +65,14 @@ public class CreateSubscription
     /// <summary>
     /// Creates a Stripe subscription from the provided request body.
     /// </summary>
-    /// <param name="req">HTTP request with a JSON body for CreateSubscriptionRequest.</param>
+    /// <param name="req">HTTP request.</param>
     /// <returns>200 with SubscriptionCreateResponse; 400 on invalid input.</returns>
     [Function("CreateSubscription")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+    public async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+        [FromBody] CreateSubscriptionRequest payload)
     {
         _logger.LogInformation("CreateSubscription invoked.");
-
-        CreateSubscriptionRequest? payload;
-        try
-        {
-            payload = await JsonSerializer.DeserializeAsync<CreateSubscriptionRequest>(req.Body, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-        }
-        catch (JsonException jex)
-        {
-            _logger.LogWarning(jex, "Invalid JSON in request body.");
-            return new BadRequestObjectResult(new { error = "Invalid JSON body." });
-        }
 
         if (payload is null)
         {
