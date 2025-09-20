@@ -12,7 +12,7 @@ class Program
 	static async Task Main()
 	{
 		using (IHost host = Host.CreateDefaultBuilder()
-								.ConfigureServices(async services =>
+								.ConfigureServices(services =>
 								{
 									var config = new ConfigurationBuilder()
 										.AddUserSecrets<Program>()
