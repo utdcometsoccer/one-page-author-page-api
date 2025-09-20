@@ -2,7 +2,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 
@@ -30,23 +29,11 @@ public class CreateStripeCustomer
     }
 
     [Function("CreateStripeCustomer")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+        [FromBody] CreateCustomerRequest payload)
     {
         _logger.LogInformation("CreateStripeCustomer invoked.");
-
-        CreateCustomerRequest? payload;
-        try
-        {
-            payload = await JsonSerializer.DeserializeAsync<CreateCustomerRequest>(req.Body, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-        }
-        catch (JsonException jex)
-        {
-            _logger.LogWarning(jex, "Invalid JSON in request body.");
-            return new BadRequestObjectResult(new { error = "Invalid JSON body." });
-        }
 
         // Pattern matching with switch to validate payload
         IActionResult result = payload switch

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.NoSQL;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
@@ -193,6 +194,26 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<IPriceServiceWrapper, PricesServiceWrapper>();
             services.AddScoped<ICheckoutSessionService, CheckoutSessionsService>();
             services.AddScoped<ISubscriptionService, SubscriptionsService>();
+            services.AddScoped<IListSubscriptions, ListSubscriptions>();
+            services.AddScoped<ICancelSubscription, CancelSubscriptionService>();
+            services.AddScoped<IUpdateSubscription, UpdateSubscriptionService>();
+            services.AddScoped<IInvoicePreview>(sp =>
+            {
+                var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<InvoicePreviewService>>();
+                var http = new HttpClient();
+                var keyProvider = sp.GetRequiredService<IStripeApiKeyProvider>();
+                return new InvoicePreviewService(logger, http, keyProvider);
+            });
+            services.AddScoped<IStripeApiKeyProvider, StripeApiKeyProvider>();
+            services.AddScoped<IStripeInvoiceServiceHelper>(sp =>
+            {
+                var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<StripeInvoiceServiceHelper>>();
+                var http = new HttpClient();
+                var keyProvider = sp.GetRequiredService<IStripeApiKeyProvider>();
+                return new StripeInvoiceServiceHelper(logger, http, keyProvider);
+            });
+            services.AddScoped<IStripeWebhookSecretProvider, StripeWebhookSecretProvider>();
+            services.AddScoped<IStripeWebhookHandler, StripeWebhookHandler>();
             return services;
         }
 
