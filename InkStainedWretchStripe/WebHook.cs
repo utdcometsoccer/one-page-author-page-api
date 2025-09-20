@@ -2,22 +2,34 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 
 namespace InkStainedWretchStripe;
 
 public class WebHook
 {
     private readonly ILogger<WebHook> _logger;
+    private readonly IStripeWebhookHandler _handler;
 
-    public WebHook(ILogger<WebHook> logger)
+    public WebHook(ILogger<WebHook> logger, IStripeWebhookHandler handler)
     {
         _logger = logger;
+        _handler = handler;
     }
 
     [Function("WebHook")]
-    public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+    public async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WebHook")] HttpRequest req,
+        [FromBody] string payload)
     {
-        _logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult("Welcome to Azure Functions!");
+        var signature = req.Headers["Stripe-Signature"].FirstOrDefault();
+        _logger.LogInformation("Webhook invoked. Signature header present: {HasSig}", !string.IsNullOrEmpty(signature));
+
+        var result = await _handler.HandleAsync(payload, signature);
+        if (!result.Success)
+        {
+            return new BadRequestObjectResult(new { error = result.Message });
+        }
+        return new OkObjectResult(new { ok = true, message = result.Message });
     }
 }
