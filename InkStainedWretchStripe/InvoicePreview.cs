@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InkStainedWretchStripe;
 
@@ -27,6 +28,7 @@ public class InvoicePreview
     /// - Body: InvoicePreviewRequest
     /// </remarks>
     [Function("InvoicePreview")]
+    [Authorize]
     public async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
         [FromBody] InvoicePreviewRequest payload)

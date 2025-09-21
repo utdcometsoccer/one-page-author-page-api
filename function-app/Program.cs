@@ -2,13 +2,13 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using InkStainedWretch.OnePageAuthorAPI.API;
+using Microsoft.Azure.Cosmos;
+using InkStainedWretch.OnePageAuthorAPI;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 
-// Register IAuthorDataService using ServiceFactory and environment variables
 var config = builder.Configuration;
 
 string? endpointUri = config["COSMOSDB_ENDPOINT_URI"];
@@ -23,14 +23,15 @@ string? databaseId = config["COSMOSDB_DATABASE_ID"];
 if (string.IsNullOrWhiteSpace(databaseId))
     throw new InvalidOperationException("Configuration value 'COSMOSDB_DATABASE_ID' is missing or empty. Please set it to your Cosmos DB database ID.");
 
-builder.Services.AddTransient<IAuthorDataService>(_ =>
-    InkStainedWretch.OnePageAuthorAPI.ServiceFactory.CreateAuthorDataService(endpointUri, primaryKey, databaseId));
-
-builder.Services.AddTransient<ILocaleDataService>(_ =>
-    InkStainedWretch.OnePageAuthorAPI.ServiceFactory.CreateLocaleDataService(endpointUri, primaryKey, databaseId));
+// Register Cosmos and ensure Database exists
+builder.Services
+    .AddCosmosClient(endpointUri, primaryKey)
+    .AddCosmosDatabase(databaseId);
 
 // Add Application Insights telemetry for Azure Functions Worker
 builder.Services
+    .AddAuthorDataService() // Register Author data service via DI extension
+    .AddLocaleDataService() // Register Locale data service via DI extension
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 

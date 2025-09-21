@@ -7,22 +7,16 @@ using Microsoft.Extensions.Hosting;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
-
 var configuration = builder.Configuration;
-var endpointUri = configuration["COSMOSDB_ENDPOINT_URI"];
-var primaryKey = configuration["COSMOSDB_PRIMARY_KEY"];
-var databaseId = configuration["COSMOSDB_DATABASE_ID"];
-
-builder.Services.AddSingleton(s => new CosmosClient(endpointUri, primaryKey));
-builder.Services.AddSingleton(s =>
-{
-    var client = s.GetRequiredService<CosmosClient>();
-    return client.GetDatabase(databaseId);
-});
+var endpointUri = configuration["COSMOSDB_ENDPOINT_URI"]; 
+var primaryKey = configuration["COSMOSDB_PRIMARY_KEY"]; 
+var databaseId = configuration["COSMOSDB_DATABASE_ID"]; 
 
 builder.ConfigureFunctionsWebApplication();
 
 builder.Services
+    .AddCosmosClient(endpointUri!, primaryKey!)
+    .AddCosmosDatabase(databaseId!)
     .AddInkStainedWretchServices()
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();

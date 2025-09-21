@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InkStainedWretchStripe;
 
@@ -29,8 +30,9 @@ public class CancelSubscription
     /// - Response: 200 OK with CancelSubscriptionResponse
     /// </remarks>
     [Function("CancelSubscription")]
+    [Authorize]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "CancelSubscription/{subscriptionId}")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "CancelSubscription/{subscriptionId}")] HttpRequest req,
         string subscriptionId,
         [FromBody] CancelSubscriptionRequest? payload)
     {

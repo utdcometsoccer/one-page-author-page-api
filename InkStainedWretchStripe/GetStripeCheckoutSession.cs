@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InkStainedWretchStripe;
 
@@ -18,8 +19,9 @@ public class GetStripeCheckoutSession
     }
 
     [Function("GetStripeCheckoutSession")]
+    [Authorize]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetStripeCheckoutSession/{sessionId}")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "GetStripeCheckoutSession/{sessionId}")] HttpRequest req,
         string sessionId)
     {
         _logger.LogInformation("Processing request to retrieve Stripe checkout session");

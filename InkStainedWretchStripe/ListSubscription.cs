@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InkStainedWretchStripe;
 
@@ -20,6 +21,7 @@ public class ListSubscription
     }
 
     [Function("ListSubscription")]
+    [Authorize]
     public async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListSubscription/{customerId}")] HttpRequest req,
         string customerId)
