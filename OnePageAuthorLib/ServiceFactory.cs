@@ -14,20 +14,41 @@ namespace InkStainedWretch.OnePageAuthorAPI
     public static class ServiceFactory
     {
         /// <summary>
-        /// Creates a LocaleDataService using endpointUri, primaryKey, and databaseId.
-        /// Ensures the Locales container exists and returns a fully initialized LocaleDataService.
+        /// Registers a CosmosClient singleton using the provided endpoint and key.
         /// </summary>
-        /// <param name="endpointUri">The Cosmos DB endpoint URI.</param>
-        /// <param name="primaryKey">The Cosmos DB primary key.</param>
-        /// <param name="databaseId">The Cosmos DB database ID.</param>
-        /// <returns>An initialized ILocaleDataService instance.</returns>
-        public static ILocaleDataService CreateLocaleDataService(string endpointUri, string primaryKey, string databaseId)
+        /// <param name="services">Service collection.</param>
+        /// <param name="endpointUri">Cosmos DB account endpoint URI.</param>
+        /// <param name="primaryKey">Cosmos DB primary key.</param>
+        /// <returns>The IServiceCollection for chaining.</returns>
+        public static IServiceCollection AddCosmosClient(this IServiceCollection services, string endpointUri, string primaryKey)
         {
-            var provider = CreateProvider(endpointUri, primaryKey, databaseId);
-            var localesContainerManager = provider.GetRequiredService<IContainerManager<Entities.Locale>>();
-            var localesContainer = localesContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
-            var localeRepo = new NoSQL.LocaleRepository(localesContainer);
-            return new API.LocaleDataService(localeRepo);
+            if (string.IsNullOrWhiteSpace(endpointUri))
+                throw new ArgumentException("endpointUri cannot be null or empty.", nameof(endpointUri));
+            if (string.IsNullOrWhiteSpace(primaryKey))
+                throw new ArgumentException("primaryKey cannot be null or empty.", nameof(primaryKey));
+
+            services.AddSingleton(sp => new Microsoft.Azure.Cosmos.CosmosClient(endpointUri, primaryKey));
+            return services;
+        }
+
+        /// <summary>
+        /// Registers a Cosmos Database singleton by ensuring it exists using the already-registered CosmosClient.
+        /// Call after AddCosmosClient.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <param name="databaseId">Cosmos DB database id.</param>
+        /// <returns>The IServiceCollection for chaining.</returns>
+        public static IServiceCollection AddCosmosDatabase(this IServiceCollection services, string databaseId)
+        {
+            if (string.IsNullOrWhiteSpace(databaseId))
+                throw new ArgumentException("databaseId cannot be null or empty.", nameof(databaseId));
+
+            services.AddSingleton(sp =>
+            {
+                var client = sp.GetRequiredService<Microsoft.Azure.Cosmos.CosmosClient>();
+                return client.CreateDatabaseIfNotExistsAsync(databaseId).GetAwaiter().GetResult().Database;
+            });
+            return services;
         }
         // Private static ServiceProvider for lazy loading
         private static ServiceProvider? _serviceProvider;
@@ -53,31 +74,10 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 new SocialsContainerManager(provider.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
             services.AddTransient<IContainerManager<Entities.Locale>>(provider =>
                 new LocalesContainerManager(provider.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<IContainerManager<Entities.UserProfile>>(provider =>
+                new UserProfilesContainerManager(provider.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
             services.AddTransient<ICosmosDatabaseManager, CosmosDatabaseManager>();
             return services.BuildServiceProvider();
-        }
-        /// <summary>
-        /// Overloaded: Creates an AuthorDataService using endpointUri, primaryKey, and databaseId.
-        /// Ensures all containers exist and returns a fully initialized AuthorDataService.
-        /// </summary>
-        /// <param name="endpointUri">The Cosmos DB endpoint URI.</param>
-        /// <param name="primaryKey">The Cosmos DB primary key.</param>
-        /// <param name="databaseId">The Cosmos DB database ID.</param>
-        /// <returns>An initialized AuthorDataService instance.</returns>
-        public static IAuthorDataService CreateAuthorDataService(string endpointUri, string primaryKey, string databaseId)
-        {
-            var provider = CreateProvider(endpointUri, primaryKey, databaseId);
-            var authorsContainerManager = provider.GetRequiredService<IContainerManager<Entities.Author>>();
-            var booksContainerManager = provider.GetRequiredService<IContainerManager<Entities.Book>>();
-            var articlesContainerManager = provider.GetRequiredService<IContainerManager<Entities.Article>>(); // Updated constructor
-            var socialsContainerManager = provider.GetRequiredService<IContainerManager<Entities.Social>>(); // Updated constructor
-
-            var authorsContainer = authorsContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
-            var booksContainer = booksContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
-            var articlesContainer = articlesContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
-            var socialsContainer = socialsContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
-
-            return CreateAuthorDataService(authorsContainer, booksContainer, articlesContainer, socialsContainer);
         }
         /// <summary>
         /// Creates and configures a ServiceProvider for dependency injection.
@@ -135,6 +135,10 @@ namespace InkStainedWretch.OnePageAuthorAPI
             {
                 return new NoSQL.LocaleRepository(cosmosContainer);
             }
+            if (entityType == typeof(Entities.UserProfile))
+            {
+                return new NoSQL.UserProfileRepository(cosmosContainer);
+            }
             throw new ArgumentException($"No repository factory for type {entityType.Name}");
         }
 
@@ -158,6 +162,10 @@ namespace InkStainedWretch.OnePageAuthorAPI
             {
                 return new NoSQL.LocaleRepository(container) as TRepository;
             }
+            if (typeof(TEntity) == typeof(Entities.UserProfile) && typeof(TRepository) == typeof(NoSQL.UserProfileRepository))
+            {
+                return new NoSQL.UserProfileRepository(container) as TRepository;
+            }
             if (typeof(TRepository) == typeof(NoSQL.GenericRepository<TEntity>))
             {
                 return Activator.CreateInstance(typeof(NoSQL.GenericRepository<TEntity>), container) as TRepository;
@@ -165,25 +173,52 @@ namespace InkStainedWretch.OnePageAuthorAPI
             throw new ArgumentException($"No repository factory for type {typeof(TEntity).Name}");
         }
 
+
         /// <summary>
-        /// Creates an AuthorDataService instance using the provided Cosmos DB containers for authors, books, articles, and socials.
+        /// Registers AuthorDataService and its Cosmos container managers in DI.
+        /// Requires that a singleton Microsoft.Azure.Cosmos.Database and CosmosClient are already registered.
         /// </summary>
-        /// <param name="authorsContainer">The Cosmos DB container for authors.</param>
-        /// <param name="booksContainer">The Cosmos DB container for books.</param>
-        /// <param name="articlesContainer">The Cosmos DB container for articles.</param>
-        /// <param name="socialsContainer">The Cosmos DB container for socials.</param>
-        /// <returns>An initialized AuthorDataService instance.</returns>
-        public static IAuthorDataService CreateAuthorDataService(
-        Microsoft.Azure.Cosmos.Container authorsContainer,
-        Microsoft.Azure.Cosmos.Container booksContainer,
-        Microsoft.Azure.Cosmos.Container articlesContainer,
-        Microsoft.Azure.Cosmos.Container socialsContainer)
+        public static IServiceCollection AddAuthorDataService(this IServiceCollection services)
         {
-            var authorRepo = new NoSQL.AuthorRepository(authorsContainer);
-            var bookRepo = new NoSQL.GenericRepository<Entities.Book>(booksContainer);
-            var articleRepo = new NoSQL.GenericRepository<Entities.Article>(articlesContainer);
-            var socialRepo = new NoSQL.GenericRepository<Entities.Social>(socialsContainer);
-            return new AuthorDataService(authorRepo, bookRepo, articleRepo, socialRepo);
+            // Register container managers
+            services.AddTransient<IContainerManager<Entities.Author>, AuthorsContainerManager>();
+            services.AddTransient<IContainerManager<Entities.Book>>(sp =>
+                new BooksContainerManager(
+                    sp.GetRequiredService<Microsoft.Azure.Cosmos.CosmosClient>(),
+                    sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<IContainerManager<Entities.Article>>(sp =>
+                new ArticlesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<IContainerManager<Entities.Social>>(sp =>
+                new SocialsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            // Register data service (singleton is fine; containers and Cosmos SDK are thread-safe)
+            services.AddSingleton<IAuthorDataService>(sp =>
+            {
+                var authorsContainer = sp.GetRequiredService<IContainerManager<Entities.Author>>().EnsureContainerAsync().GetAwaiter().GetResult();
+                var booksContainer = sp.GetRequiredService<IContainerManager<Entities.Book>>().EnsureContainerAsync().GetAwaiter().GetResult();
+                var articlesContainer = sp.GetRequiredService<IContainerManager<Entities.Article>>().EnsureContainerAsync().GetAwaiter().GetResult();
+                var socialsContainer = sp.GetRequiredService<IContainerManager<Entities.Social>>().EnsureContainerAsync().GetAwaiter().GetResult();
+
+                var authorRepo = new NoSQL.AuthorRepository(authorsContainer);
+                var bookRepo = new NoSQL.GenericRepository<Entities.Book>(booksContainer);
+                var articleRepo = new NoSQL.GenericRepository<Entities.Article>(articlesContainer);
+                var socialRepo = new NoSQL.GenericRepository<Entities.Social>(socialsContainer);
+                return new AuthorDataService(authorRepo, bookRepo, articleRepo, socialRepo);
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Creates a UserProfileRepository by ensuring the UserProfiles container exists.
+        /// Partition key is /Upn.
+        /// </summary>
+        public static NoSQL.UserProfileRepository CreateUserProfileRepository(string endpointUri, string primaryKey, string databaseId)
+        {
+            var provider = CreateProvider(endpointUri, primaryKey, databaseId);
+            var profilesContainerManager = provider.GetRequiredService<IContainerManager<Entities.UserProfile>>();
+            var container = profilesContainerManager.EnsureContainerAsync().GetAwaiter().GetResult();
+            return new NoSQL.UserProfileRepository(container);
         }
 
         public static IServiceCollection AddStripeServices(this IServiceCollection services)
@@ -214,6 +249,15 @@ namespace InkStainedWretch.OnePageAuthorAPI
             });
             services.AddScoped<IStripeWebhookSecretProvider, StripeWebhookSecretProvider>();
             services.AddScoped<IStripeWebhookHandler, StripeWebhookHandler>();
+            return services;
+        }
+
+        /// <summary>
+        /// Registers orchestrators for Stripe flows that coordinate between identity, persistence, and Stripe APIs.
+        /// </summary>
+        public static IServiceCollection AddStripeOrchestrators(this IServiceCollection services)
+        {
+            services.AddScoped<IEnsureCustomerForUser, EnsureCustomerForUser>();
             return services;
         }
 
@@ -295,6 +339,106 @@ namespace InkStainedWretch.OnePageAuthorAPI
             {
                 var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
                 return new AuthorManagementContainerManager<AuthorRegistration>(database, "AuthorRegistration");
+            });
+            return services;
+        }
+
+        /// <summary>
+        /// Registers the Locales container and ILocaleDataService in DI.
+        /// Requires a singleton Microsoft.Azure.Cosmos.Database in DI.
+        /// </summary>
+        public static IServiceCollection AddLocaleDataService(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Locale>>(sp =>
+                new LocalesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<ILocaleDataService>(sp =>
+            {
+                var localesContainer = sp.GetRequiredService<IContainerManager<Entities.Locale>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                var localeRepo = new NoSQL.LocaleRepository(localesContainer);
+                return new API.LocaleDataService(localeRepo);
+            });
+            return services;
+        }
+
+        /// <summary>
+        /// Registers LocaleRepository in DI by ensuring the Locales container exists.
+        /// Requires Microsoft.Azure.Cosmos.Database in DI.
+        /// </summary>
+        public static IServiceCollection AddLocaleRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Locale>>(sp =>
+                new LocalesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton(sp =>
+            {
+                var localesContainer = sp.GetRequiredService<IContainerManager<Entities.Locale>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.LocaleRepository(localesContainer);
+            });
+            return services;
+        }
+
+        /// <summary>
+        /// Registers UserProfile repository in DI by ensuring the UserProfiles container exists (partition key /Upn).
+        /// Requires Microsoft.Azure.Cosmos.Database in DI.
+        /// </summary>
+        public static IServiceCollection AddUserProfileRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.UserProfile>>(sp =>
+                new UserProfilesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<API.IUserProfileRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.UserProfile>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.UserProfileRepository(container);
+            });
+            return services;
+        }
+
+        /// <summary>
+        /// Registers author-related repositories (Author, Book, Article, Social) in DI.
+        /// Requires Microsoft.Azure.Cosmos.Database and CosmosClient in DI. Ensures containers exist.
+        /// </summary>
+        public static IServiceCollection AddAuthorRepositories(this IServiceCollection services)
+        {
+            // Ensure the container managers are available
+            services.AddTransient<IContainerManager<Entities.Author>, AuthorsContainerManager>();
+            services.AddTransient<IContainerManager<Entities.Book>>(sp =>
+                new BooksContainerManager(
+                    sp.GetRequiredService<Microsoft.Azure.Cosmos.CosmosClient>(),
+                    sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<IContainerManager<Entities.Article>>(sp =>
+                new ArticlesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<IContainerManager<Entities.Social>>(sp =>
+                new SocialsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            // Register concrete repositories as singletons after ensuring containers
+            services.AddSingleton(sp =>
+            {
+                var c = sp.GetRequiredService<IContainerManager<Entities.Author>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.AuthorRepository(c);
+            });
+            services.AddSingleton(sp =>
+            {
+                var c = sp.GetRequiredService<IContainerManager<Entities.Book>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.GenericRepository<Entities.Book>(c);
+            });
+            services.AddSingleton(sp =>
+            {
+                var c = sp.GetRequiredService<IContainerManager<Entities.Article>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.GenericRepository<Entities.Article>(c);
+            });
+            services.AddSingleton(sp =>
+            {
+                var c = sp.GetRequiredService<IContainerManager<Entities.Social>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.GenericRepository<Entities.Social>(c);
             });
             return services;
         }

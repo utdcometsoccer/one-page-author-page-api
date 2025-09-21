@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InkStainedWretchStripe;
 
@@ -19,8 +20,9 @@ public class GetStripePriceInformation
     }
 
     [Function("GetStripePriceInformation")]
+    [Authorize]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
         [FromBody] PriceListRequest request)
     {
         _logger.LogInformation("Processing POST request to get Stripe price information");

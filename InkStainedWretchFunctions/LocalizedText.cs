@@ -35,7 +35,7 @@ public class LocalizedText
     /// <param name="culture">Route parameter representing the culture (e.g. en-US).</param>
     /// <returns>200 with JSON payload of localized text; 400 if culture is invalid or retrieval fails.</returns>
     public async Task<HttpResponseData> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "localizedtext/{culture}")] HttpRequestData req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "localizedtext/{culture}")] HttpRequestData req,
         string culture)
     {
         _logger.LogInformation($"Received request for culture: {culture}");
