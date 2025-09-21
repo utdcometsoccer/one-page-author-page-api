@@ -43,7 +43,7 @@ namespace OnePageAuthor.Test.Stripe
         {
             var secret = "whsec_test";
             var payload = "{\"type\":\"invoice.payment_succeeded\"}";
-            var ts = 123L;
+            var ts = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var sig = ComputeStripeSig(secret, payload, ts);
             var handler = new StripeWebhookHandler(new NullLogger<StripeWebhookHandler>(), new StubSecretProvider(secret));
             var result = await handler.HandleAsync(payload, sig);
@@ -87,7 +87,7 @@ namespace OnePageAuthor.Test.Stripe
         {
             var secret = "whsec_test";
             var payload = $"{{ \"type\": \"{eventType}\", \"data\": {{ \"object\": {objectJson} }} }}";
-            var sig = ComputeStripeSig(secret, payload, 100);
+            var sig = ComputeStripeSig(secret, payload, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
             var handler = new StripeWebhookHandler(new NullLogger<StripeWebhookHandler>(), new StubSecretProvider(secret));
             var result = await handler.HandleAsync(payload, sig);
             Assert.True(result.Success);
@@ -100,7 +100,7 @@ namespace OnePageAuthor.Test.Stripe
             var secret = "whsec_test";
             var handler = new StripeWebhookHandler(new NullLogger<StripeWebhookHandler>(), new StubSecretProvider(secret));
             var payload = "{ \"type\": \"product.created\", \"data\": { \"object\": { \"id\": \"prod_1\" } } }";
-            var sig = ComputeStripeSig(secret, payload, 200);
+            var sig = ComputeStripeSig(secret, payload, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
             var result = await handler.HandleAsync(payload, sig);
             Assert.True(result.Success);
             Assert.StartsWith("Unhandled:", result.Message);

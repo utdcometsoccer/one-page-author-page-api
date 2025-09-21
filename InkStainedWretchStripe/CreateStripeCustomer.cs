@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Linq;
+using InkStainedWretch.OnePageAuthorAPI.API;
 
 namespace InkStainedWretchStripe;
 
@@ -20,30 +24,40 @@ namespace InkStainedWretchStripe;
 public class CreateStripeCustomer
 {
     private readonly ILogger<CreateStripeCustomer> _logger;
-    private readonly ICreateCustomer _createStripeCustomer;
+    private readonly IEnsureCustomerForUser _ensureCustomerForUser;
 
-    public CreateStripeCustomer(ILogger<CreateStripeCustomer> logger, ICreateCustomer createStripeCustomer)
+    public CreateStripeCustomer(ILogger<CreateStripeCustomer> logger, IEnsureCustomerForUser ensureCustomerForUser)
     {
         _logger = logger;
-        _createStripeCustomer = createStripeCustomer;
+        _ensureCustomerForUser = ensureCustomerForUser;
     }
 
     [Function("CreateStripeCustomer")]
-    public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+    [Authorize]
+    public async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
         [FromBody] CreateCustomerRequest payload)
     {
         _logger.LogInformation("CreateStripeCustomer invoked.");
-
-        // Pattern matching with switch to validate payload
-        IActionResult result = payload switch
+        var user = req.HttpContext.User;
+        if (payload is null)
         {
-            null => new BadRequestObjectResult(new { error = "Request body is required." }),
-            { Email: var e } when string.IsNullOrWhiteSpace(e) => new BadRequestObjectResult(new { error = "Email is required." }),
-            _ => new OkObjectResult(_createStripeCustomer.Execute(payload))
-        };
+            return new BadRequestObjectResult(new { error = "Request body is required." });
+        }
+        if (string.IsNullOrWhiteSpace(payload.Email))
+        {
+            return new BadRequestObjectResult(new { error = "Email is required." });
+        }
 
-        // TODO: Integrate with Stripe SDK here to create a customer
-        return result;
+        try
+        {
+            var response = await _ensureCustomerForUser.EnsureAsync(user, payload);
+            return new OkObjectResult(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to ensure Stripe customer for current user.");
+            return new ObjectResult(new { error = ex.Message }) { StatusCode = StatusCodes.Status500InternalServerError };
+        }
     }
 }
