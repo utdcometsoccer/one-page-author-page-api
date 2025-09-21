@@ -17,28 +17,18 @@ string endpointUri = config["EndpointUri"] ?? throw new InvalidOperationExceptio
 string primaryKey = config["PrimaryKey"] ?? throw new InvalidOperationException("PrimaryKey is not set.");
 string databaseId = config["DatabaseId"] ?? throw new InvalidOperationException("DatabaseId is not set.");
 
-// Use DI factory to get all required services
-var provider = InkStainedWretch.OnePageAuthorAPI.ServiceFactory.CreateProvider(endpointUri, primaryKey, databaseId);
-var dbManager = provider.GetRequiredService<ICosmosDatabaseManager>();
-var authorsContainerManager = provider.GetRequiredService<IContainerManager<Author>>();
-var booksContainerManager = provider.GetRequiredService<IContainerManager<Book>>();
-var articlesContainerManager = provider.GetRequiredService<IContainerManager<Article>>();
-var socialsContainerManager = provider.GetRequiredService<IContainerManager<Social>>();
+// Build a DI container using new extensions and resolve repositories
+var services = new ServiceCollection();
+services
+    .AddCosmosClient(endpointUri, primaryKey)
+    .AddCosmosDatabase(databaseId)
+    .AddAuthorRepositories();
 
-// Use DI-managed CosmosDatabaseManager
-var database = await dbManager.EnsureDatabaseAsync(endpointUri, primaryKey, databaseId);
-
-// Use DI-managed container managers
-var authorsContainer = await authorsContainerManager.EnsureContainerAsync();
-var booksContainer = await booksContainerManager.EnsureContainerAsync();
-var articlesContainer = await articlesContainerManager.EnsureContainerAsync();
-var socialsContainer = await socialsContainerManager.EnsureContainerAsync();
-
-// Create repositories
-var authorRepository = ServiceFactory.CreateRepository<InkStainedWretch.OnePageAuthorAPI.NoSQL.AuthorRepository, Author>(authorsContainer);
-var bookRepository = ServiceFactory.CreateRepository<InkStainedWretch.OnePageAuthorAPI.NoSQL.GenericRepository<Book>, Book>(booksContainer);
-var articleRepository = ServiceFactory.CreateRepository<InkStainedWretch.OnePageAuthorAPI.NoSQL.GenericRepository<Article>, Article>(articlesContainer);
-var socialRepository = ServiceFactory.CreateRepository<InkStainedWretch.OnePageAuthorAPI.NoSQL.GenericRepository<Social>, Social>(socialsContainer);
+var provider = services.BuildServiceProvider();
+var authorRepository = provider.GetRequiredService<InkStainedWretch.OnePageAuthorAPI.NoSQL.AuthorRepository>();
+var bookRepository = provider.GetRequiredService<InkStainedWretch.OnePageAuthorAPI.NoSQL.GenericRepository<Book>>();
+var articleRepository = provider.GetRequiredService<InkStainedWretch.OnePageAuthorAPI.NoSQL.GenericRepository<Article>>();
+var socialRepository = provider.GetRequiredService<InkStainedWretch.OnePageAuthorAPI.NoSQL.GenericRepository<Social>>();
 
 // Use the source data folder relative to the project directory
 string dataRoot = Utility.GetDataRoot();

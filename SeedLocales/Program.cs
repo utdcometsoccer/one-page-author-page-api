@@ -17,17 +17,14 @@ class Program
         string primaryKey = config["PrimaryKey"] ?? throw new InvalidOperationException("PrimaryKey is not set.");
         string databaseId = config["DatabaseId"] ?? throw new InvalidOperationException("DatabaseId is not set.");
 
-        // Use DI factory to get required services
-        var provider = InkStainedWretch.OnePageAuthorAPI.ServiceFactory.CreateProvider(endpointUri, primaryKey, databaseId);
-        var dbManager = provider.GetRequiredService<ICosmosDatabaseManager>();
-        var localesContainerManager = provider.GetRequiredService<IContainerManager<Locale>>();
-
-        // Ensure database and container exist
-        var database = await dbManager.EnsureDatabaseAsync(endpointUri, primaryKey, databaseId);
-        var localesContainer = await localesContainerManager.EnsureContainerAsync();
-
-        // Create repository
-        var localeRepository = InkStainedWretch.OnePageAuthorAPI.ServiceFactory.CreateRepository<InkStainedWretch.OnePageAuthorAPI.NoSQL.LocaleRepository, Locale>(localesContainer);
+        // Build DI using extensions and resolve repository
+        var services = new ServiceCollection();
+        services
+            .AddCosmosClient(endpointUri, primaryKey)
+            .AddCosmosDatabase(databaseId)
+            .AddLocaleRepository();
+        var provider = services.BuildServiceProvider();
+        var localeRepository = provider.GetRequiredService<InkStainedWretch.OnePageAuthorAPI.NoSQL.LocaleRepository>();
 
         string dataRoot = Utility.GetDataRoot();
         if (!Directory.Exists(dataRoot))

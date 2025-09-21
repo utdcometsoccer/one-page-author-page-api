@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InkStainedWretchStripe;
 
@@ -68,8 +69,9 @@ public class CreateSubscription
     /// <param name="req">HTTP request.</param>
     /// <returns>200 with SubscriptionCreateResponse; 400 on invalid input.</returns>
     [Function("CreateSubscription")]
+    [Authorize]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
         [FromBody] CreateSubscriptionRequest payload)
     {
         _logger.LogInformation("CreateSubscription invoked.");
