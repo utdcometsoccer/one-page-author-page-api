@@ -26,6 +26,7 @@ namespace OnePageAuthor.Test
                 return Task.FromResult((T)item!);
             }
             public Task<ItemResponse<T>> CreateItemAsync<T>(T item) => throw new NotImplementedException();
+            public Task<ItemResponse<T>> CreateItemAsync<T>(T item, PartitionKey partitionKey) => throw new NotImplementedException();
             public Task<ItemResponse<T>> ReplaceItemAsync<T>(T item, string id, PartitionKey partitionKey) => throw new NotImplementedException();
             public Task DeleteItemAsync<T>(string id, PartitionKey partitionKey) => throw new NotImplementedException();
         }

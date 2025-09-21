@@ -21,19 +21,11 @@ class Program
 									string primaryKey = config["PrimaryKey"] ?? throw new InvalidOperationException("PrimaryKey is not set.");
 									string databaseId = config["DatabaseId"] ?? throw new InvalidOperationException("DatabaseId is not set.");
 
-									// Register CosmosClient as a Singleton
-									services.AddSingleton(serviceProvider =>
-									{
-										return new CosmosClient(endpointUri, primaryKey);
-									});									
-									services.AddTransient<Microsoft.Azure.Cosmos.Database>(ServiceProvider =>
-									{
-										var cosmosClient = ServiceProvider.GetRequiredService<CosmosClient>();
-										var database = cosmosClient.GetDatabase(databaseId);
-										return database;
-									});
-									// Read Cosmos DB settings from environment variables or config
-									services.AddInkStainedWretchServices();
+									// Register Cosmos via extensions and domain services
+									services
+										.AddCosmosClient(endpointUri, primaryKey)
+										.AddCosmosDatabase(databaseId)
+										.AddInkStainedWretchServices();
 								})
 								.Build())
 		{

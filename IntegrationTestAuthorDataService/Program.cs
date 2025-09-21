@@ -2,6 +2,9 @@
 using System.Text.Json;
 using InkStainedWretch.OnePageAuthorAPI;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Azure.Cosmos;
+using InkStainedWretch.OnePageAuthorAPI.API;
 
 class Program
 {
@@ -28,8 +31,14 @@ class Program
         string languageName = culture.TwoLetterISOLanguageName;
         string regionName = culture.Name.Length > 3 ? culture.Name.Substring(3).ToLowerInvariant() : "";
 
-        // Create AuthorDataService using the new factory method
-        var authorDataService = ServiceFactory.CreateAuthorDataService(endpointUri, primaryKey, databaseId);
+        // Build a minimal DI container using the DI extensions
+        var services = new ServiceCollection();
+        services
+            .AddCosmosClient(endpointUri, primaryKey)
+            .AddCosmosDatabase(databaseId)
+            .AddAuthorDataService();
+        var provider = services.BuildServiceProvider();
+        var authorDataService = provider.GetRequiredService<IAuthorDataService>();
 
         // Query author data service
         var response = await authorDataService.GetAuthorWithDataAsync(topLevelDomain, secondLevelDomain, languageName, regionName);

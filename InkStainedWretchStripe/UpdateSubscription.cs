@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InkStainedWretchStripe;
 
@@ -27,8 +28,9 @@ public class UpdateSubscription
     /// - Body: UpdateSubscriptionRequest
     /// </remarks>
     [Function("UpdateSubscription")]
+    [Authorize]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "UpdateSubscription/{subscriptionId}")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "UpdateSubscription/{subscriptionId}")] HttpRequest req,
         string subscriptionId,
         [FromBody] UpdateSubscriptionRequest payload)
     {
