@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorAPI.API.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
+using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using Microsoft.Extensions.Logging;
 using Stripe;
@@ -12,12 +14,16 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         private readonly ILogger<EnsureCustomerForUser> _logger;
         private readonly IUserProfileRepository _profiles;
         private readonly ICreateCustomer _creator;
+        private readonly IImageStorageTierRepository _tierRepository;
+        private readonly IImageStorageTierMembershipRepository _membershipRepository;
 
-        public EnsureCustomerForUser(ILogger<EnsureCustomerForUser> logger, IUserProfileRepository profiles, ICreateCustomer creator)
+        public EnsureCustomerForUser(ILogger<EnsureCustomerForUser> logger, IUserProfileRepository profiles, ICreateCustomer creator, IImageStorageTierRepository tierRepository, IImageStorageTierMembershipRepository membershipRepository)
         {
             _logger = logger;
             _profiles = profiles;
             _creator = creator;
+            _tierRepository = tierRepository;
+            _membershipRepository = membershipRepository;
         }
 
         public async Task<CreateCustomerResponse> EnsureAsync(ClaimsPrincipal user, CreateCustomerRequest request)
@@ -63,9 +69,56 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 profile.StripeCustomerId = id;
                 await _profiles.UpdateAsync(profile);
                 _logger.LogInformation("Linked UPN {Upn} to Stripe customer {CustomerId}", upn, id);
+
+                // Enroll the new customer in the free image storage tier if available
+                if (!string.IsNullOrWhiteSpace(profile.id))
+                {
+                    await EnrollInFreeTierAsync(profile.id);
+                }
             }
 
             return response ?? new CreateCustomerResponse();
+        }
+
+        private async Task EnrollInFreeTierAsync(string userProfileId)
+        {
+            try
+            {
+                // Check if user already has a tier membership
+                var existingMembership = await _membershipRepository.GetForUserAsync(userProfileId);
+                if (existingMembership != null)
+                {
+                    _logger.LogInformation("User {UserProfileId} already has image storage tier membership", userProfileId);
+                    return;
+                }
+
+                // Find the free tier (cost = 0)
+                var allTiers = await _tierRepository.GetAllAsync();
+                var freeTier = allTiers.FirstOrDefault(t => t.CostInDollars == 0);
+
+                if (freeTier == null)
+                {
+                    _logger.LogWarning("No free image storage tier found (CostInDollars = 0)");
+                    return;
+                }
+
+                // Create membership for the user
+                var membership = new ImageStorageTierMembership
+                {
+                    id = Guid.NewGuid().ToString(),
+                    TierId = freeTier.id,
+                    UserProfileId = userProfileId
+                };
+
+                await _membershipRepository.AddAsync(membership);
+                _logger.LogInformation("Enrolled user {UserProfileId} in free image storage tier {TierId} ({TierName})", 
+                    userProfileId, freeTier.id, freeTier.Name);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to enroll user {UserProfileId} in free image storage tier", userProfileId);
+                // Don't throw - this is a nice-to-have feature and shouldn't break customer creation
+            }
         }
     }
 }

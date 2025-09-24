@@ -51,6 +51,7 @@ builder.Services
     .AddCosmosClient(endpointUri!, primaryKey!)
     .AddCosmosDatabase(databaseId!)
     .AddUserProfileRepository()
+    .AddImageApiRepositories()
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights()
     .AddStripeServices()

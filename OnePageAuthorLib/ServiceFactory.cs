@@ -442,5 +442,61 @@ namespace InkStainedWretch.OnePageAuthorAPI
             });
             return services;
         }
+
+        /// <summary>
+        /// Registers Image API repositories and ensures containers exist for tiers, memberships, and images.
+        /// </summary>
+        public static IServiceCollection AddImageApiRepositories(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.ImageAPI.ImageStorageTier>>(sp =>
+                new ImageStorageTiersContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<IContainerManager<Entities.ImageAPI.ImageStorageTierMembership>>(sp =>
+                new ImageStorageTierMembershipsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<IContainerManager<Entities.ImageAPI.Image>>(sp =>
+                new NoSQL.ImageAPI.ImagesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            // Register custom repositories as singletons after ensuring containers
+            services.AddSingleton<API.ImageAPI.IImageStorageTierRepository>(sp =>
+            {
+                var c = sp.GetRequiredService<IContainerManager<Entities.ImageAPI.ImageStorageTier>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.ImageStorageTierRepository(c);
+            });
+
+            services.AddSingleton<API.ImageAPI.IImageStorageTierMembershipRepository>(sp =>
+            {
+                var c = sp.GetRequiredService<IContainerManager<Entities.ImageAPI.ImageStorageTierMembership>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.ImageStorageTierMembershipRepository(c);
+            });
+            
+            services.AddSingleton<InkStainedWretch.OnePageAuthorAPI.API.ImageAPI.IImageStorageTierRepository>(sp =>
+            {
+                var c = sp.GetRequiredService<IContainerManager<Entities.ImageAPI.ImageStorageTier>>();
+                var container = c.EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.ImageStorageTierRepository(container);
+            });
+
+            services.AddSingleton<InkStainedWretch.OnePageAuthorAPI.API.ImageAPI.IImageRepository>(sp =>
+            {
+                var c = sp.GetRequiredService<IContainerManager<Entities.ImageAPI.Image>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.ImageAPI.ImageRepository(c);
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Image API business services for upload, user images, and deletion operations.
+        /// </summary>
+        public static IServiceCollection AddImageApiServices(this IServiceCollection services)
+        {
+            services.AddTransient<API.ImageServices.IImageUploadService, API.ImageServices.ImageUploadService>();
+            services.AddTransient<API.ImageServices.IUserImageService, API.ImageServices.UserImageService>();
+            services.AddTransient<API.ImageServices.IImageDeleteService, API.ImageServices.ImageDeleteService>();
+
+            return services;
+        }
     }
 }
