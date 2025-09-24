@@ -18,6 +18,7 @@ builder.Services
     .AddCosmosClient(endpointUri!, primaryKey!)
     .AddCosmosDatabase(databaseId!)
     .AddInkStainedWretchServices()
+    .AddPenguinRandomHouseServices()
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 

@@ -3,6 +3,7 @@ using System.Net.Http;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.NoSQL;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
+using InkStainedWretch.OnePageAuthorLib.API.Penguin;
 using InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces.Authormanagement;
 
@@ -496,6 +497,20 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddTransient<API.ImageServices.IUserImageService, API.ImageServices.UserImageService>();
             services.AddTransient<API.ImageServices.IImageDeleteService, API.ImageServices.ImageDeleteService>();
 
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Penguin Random House API services for external API integration.
+        /// </summary>
+        public static IServiceCollection AddPenguinRandomHouseServices(this IServiceCollection services)
+        {
+            // Register configuration
+            services.AddSingleton<IPenguinRandomHouseConfig, PenguinRandomHouseConfig>();
+            
+            // Register HTTP client and service
+            services.AddHttpClient<IPenguinRandomHouseService, PenguinRandomHouseService>();
+            
             return services;
         }
     }
