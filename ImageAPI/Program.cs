@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using InkStainedWretch.OnePageAuthorAPI;
+using InkStainedWretch.OnePageAuthorAPI.API;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
@@ -58,8 +60,26 @@ builder.Services.AddAuthorization(options =>
 // Note: In Functions isolated v2, calling ConfigureFunctionsWebApplication wires the ASP.NET Core pipeline.
 // Authentication/Authorization middleware are added automatically when services are registered above.
 
+// Cosmos + repositories
+var endpointUri = Environment.GetEnvironmentVariable("COSMOSDB_ENDPOINT_URI"); 
+var primaryKey = Environment.GetEnvironmentVariable("COSMOSDB_PRIMARY_KEY"); 
+var databaseId = Environment.GetEnvironmentVariable("COSMOSDB_DATABASE_ID"); 
+
 builder.Services
+    .AddCosmosClient(endpointUri!, primaryKey!)
+    .AddCosmosDatabase(databaseId!)
+    .AddImageApiRepositories()
+    .AddImageApiServices()
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
+
+// Azure Blob Storage
+builder.Services.AddSingleton(sp =>
+{
+    var connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
+    if (string.IsNullOrWhiteSpace(connectionString))
+        throw new InvalidOperationException("Azure Storage connection string is not configured");
+    return new Azure.Storage.Blobs.BlobServiceClient(connectionString);
+});
 
 builder.Build().Run();
