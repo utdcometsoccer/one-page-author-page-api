@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
-using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Linq;
 using InkStainedWretch.OnePageAuthorAPI.API;
@@ -25,21 +24,29 @@ public class CreateStripeCustomer
 {
     private readonly ILogger<CreateStripeCustomer> _logger;
     private readonly IEnsureCustomerForUser _ensureCustomerForUser;
+    private readonly IJwtValidationService _jwtValidationService;
 
-    public CreateStripeCustomer(ILogger<CreateStripeCustomer> logger, IEnsureCustomerForUser ensureCustomerForUser)
+    public CreateStripeCustomer(ILogger<CreateStripeCustomer> logger, IEnsureCustomerForUser ensureCustomerForUser, IJwtValidationService jwtValidationService)
     {
         _logger = logger;
         _ensureCustomerForUser = ensureCustomerForUser;
+        _jwtValidationService = jwtValidationService;
     }
 
     [Function("CreateStripeCustomer")]
-    [Authorize]
     public async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
         [FromBody] CreateCustomerRequest payload)
     {
         _logger.LogInformation("CreateStripeCustomer invoked.");
-        var user = req.HttpContext.User;
+        
+        // Validate JWT token and get authenticated user
+        var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+        if (authError != null)
+        {
+            return authError;
+        }
+        
         if (payload is null)
         {
             return new BadRequestObjectResult(new { error = "Request body is required." });
@@ -51,7 +58,8 @@ public class CreateStripeCustomer
 
         try
         {
-            var response = await _ensureCustomerForUser.EnsureAsync(user, payload);
+            // Use the authenticated user from JWT validation
+            var response = await _ensureCustomerForUser.EnsureAsync(authenticatedUser!, payload);
             return new OkObjectResult(response);
         }
         catch (Exception ex)
