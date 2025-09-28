@@ -1,4 +1,13 @@
 {
+    "AuthorRegistration": {
+    "authorListTitle": "Información del autor",
+    "languageLabel": "Idioma: ",
+    "regionLabel": "Región: ",
+    "editAuthor": "Editar",
+    "deleteAuthor": "Eliminar",
+    "addAuthor": "Agregar autor",
+    "continue": "Continuar"
+    },
     "LoginRegister": {
         "loginHeader": {
             "title": "Iniciar sesión",
@@ -84,6 +93,11 @@
     "formTitle": "Completa tu compra",
     "errorMessage": "Ocurrió un error durante el pago. Por favor, inténtalo de nuevo.",
     "buttonLabel": "Suscribirse"
+    },
+    "AuthGuard": {
+        "title": "Autenticación requerida",
+        "message": "Por favor, inicia sesión para acceder a este contenido. Necesitas autenticarte para ver y gestionar tu información de autor.",
+        "buttonLabel": "Iniciar sesión con Microsoft"
     },
     "DomainInput": {
         "label": "Dominio:",

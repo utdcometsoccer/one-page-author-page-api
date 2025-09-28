@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.NoSQL;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
@@ -340,6 +339,11 @@ namespace InkStainedWretch.OnePageAuthorAPI
             {
                 var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
                 return new AuthorManagementContainerManager<AuthorRegistration>(database, "AuthorRegistration");
+            });
+            services.AddTransient<IContainerManager<AuthGuard>, AuthorManagementContainerManager<AuthGuard>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<AuthGuard>(database, "AuthGuard");
             });
             return services;
         }

@@ -56,6 +56,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
             result.BookList = await QueryLanguageResolutionAsync<BookList>("BookList", specific, language);
             result.BookForm = await QueryLanguageResolutionAsync<BookForm>("BookForm", specific, language);
             result.ArticleForm = await QueryLanguageResolutionAsync<ArticleForm>("ArticleForm", specific, language);
+            result.AuthGuard = await QueryLanguageResolutionAsync<AuthGuard>("AuthGuard", specific, language);
             // Add additional POCOs as needed
 
             return result;

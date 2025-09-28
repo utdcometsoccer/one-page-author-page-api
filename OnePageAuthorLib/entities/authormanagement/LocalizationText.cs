@@ -16,6 +16,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
         public BookList BookList { get; set; } = new BookList();
         public BookForm BookForm { get; set; } = new BookForm();
         public ArticleForm ArticleForm { get; set; } = new ArticleForm();
-        // Add additional POCOs as needed
+        public AuthGuard AuthGuard { get; set; } = new AuthGuard();
     }
 }
