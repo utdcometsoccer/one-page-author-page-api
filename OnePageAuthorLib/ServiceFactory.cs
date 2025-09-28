@@ -345,6 +345,16 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
                 return new AuthorManagementContainerManager<AuthGuard>(database, "AuthGuard");
             });
+            services.AddTransient<IContainerManager<PenguinRandomHouseAuthorList>, AuthorManagementContainerManager<PenguinRandomHouseAuthorList>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<PenguinRandomHouseAuthorList>(database, "PenguinRandomHouseAuthorList");
+            });
+            services.AddTransient<IContainerManager<PenguinRandomHouseAuthorDetail>, AuthorManagementContainerManager<PenguinRandomHouseAuthorDetail>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<PenguinRandomHouseAuthorDetail>(database, "PenguinRandomHouseAuthorDetail");
+            });
             return services;
         }
 
