@@ -1,4 +1,13 @@
 {
+    "AuthorRegistration": {
+    "authorListTitle": "معلومات المؤلف",
+    "languageLabel": "اللغة: ",
+    "regionLabel": "المنطقة: ",
+    "editAuthor": "تعديل",
+    "deleteAuthor": "حذف",
+    "addAuthor": "إضافة مؤلف",
+    "continue": "متابعة"
+    },
     "LoginRegister": {
         "loginHeader": {
             "title": "تسجيل الدخول",
@@ -66,6 +75,11 @@
     "formTitle": "أكمل عملية الشراء",
     "errorMessage": "حدث خطأ أثناء الدفع. يرجى المحاولة مرة أخرى.",
     "buttonLabel": "اشترك"
+    },
+    "AuthGuard": {
+        "title": "المصادقة مطلوبة",
+        "message": "يرجى تسجيل الدخول للوصول إلى هذا المحتوى. تحتاج للمصادقة لعرض وإدارة معلومات المؤلف الخاصة بك.",
+        "buttonLabel": "تسجيل الدخول باستخدام مايكروسوفت"
     },
     "DomainInput": {
         "label": "النطاق:",
