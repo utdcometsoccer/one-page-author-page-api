@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using System.Security.Claims;
 using ImageAPI;
@@ -35,34 +36,86 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
                 _userProfileServiceMock.Object);
         }
 
+        private static Mock<HttpRequest> CreateAuthenticatedRequest(string userProfileId)
+        {
+            var httpContext = new DefaultHttpContext();
+            var identity = new ClaimsIdentity(authenticationType: "test");
+            identity.AddClaim(new Claim("oid", userProfileId));
+            httpContext.User = new ClaimsPrincipal(identity);
+
+            var headers = new HeaderDictionary();
+            headers["Authorization"] = "Bearer valid-jwt-token";
+
+            var request = new Mock<HttpRequest>();
+            request.Setup(x => x.HttpContext).Returns(httpContext);
+            request.Setup(x => x.Headers).Returns(headers);
+
+            return request;
+        }
+
+        private void SetupSuccessfulAuth(string userProfileId)
+        {
+            var identity = new ClaimsIdentity(authenticationType: "test");
+            identity.AddClaim(new Claim("oid", userProfileId));
+            identity.AddClaim(new Claim("upn", $"{userProfileId}@test.com"));
+            var principal = new ClaimsPrincipal(identity);
+
+            _jwtValidationServiceMock.Setup(x => x.ValidateTokenAsync("valid-jwt-token"))
+                .ReturnsAsync(principal);
+                
+            var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile 
+            { 
+                Oid = userProfileId, 
+                Upn = $"{userProfileId}@test.com" 
+            };
+            _userProfileServiceMock.Setup(x => x.EnsureUserProfileAsync(principal))
+                .ReturnsAsync(userProfile);
+        }
+
         [Fact]
         public async Task Run_WithUnauthenticatedUser_ReturnsUnauthorized()
         {
             // Arrange
             var httpContext = new DefaultHttpContext();
-            httpContext.User = new ClaimsPrincipal(new ClaimsIdentity()); // Not authenticated
+            var headers = new HeaderDictionary();
+            // No Authorization header
 
             var request = new Mock<HttpRequest>();
             request.Setup(x => x.HttpContext).Returns(httpContext);
+            request.Setup(x => x.Headers).Returns(headers);
 
             // Act
             var result = await _uploadFunction.Run(request.Object);
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            Assert.IsType<UnauthorizedObjectResult>(result);
         }
 
         [Fact]
         public async Task Run_WithNoUserProfileId_ReturnsUnauthorized()
         {
             // Arrange
+            var identity = new ClaimsIdentity(authenticationType: "test");
+            identity.AddClaim(new Claim("name", "Test User")); // No 'oid' claim
+            var principal = new ClaimsPrincipal(identity);
+
+            _jwtValidationServiceMock.Setup(x => x.ValidateTokenAsync("valid-jwt-token"))
+                .ReturnsAsync(principal);
+
+            var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile 
+            { 
+                Upn = "test@test.com" 
+            };
+            _userProfileServiceMock.Setup(x => x.EnsureUserProfileAsync(principal))
+                .ReturnsAsync(userProfile);
+
             var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("name", "Test User"));
-            httpContext.User = new ClaimsPrincipal(identity);
+            var headers = new HeaderDictionary();
+            headers["Authorization"] = "Bearer valid-jwt-token";
 
             var request = new Mock<HttpRequest>();
             request.Setup(x => x.HttpContext).Returns(httpContext);
+            request.Setup(x => x.Headers).Returns(headers);
 
             // Act
             var result = await _uploadFunction.Run(request.Object);
@@ -75,14 +128,11 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
         public async Task Run_WithNoFormFiles_ReturnsBadRequest()
         {
             // Arrange
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("oid", "user-123"));
-            httpContext.User = new ClaimsPrincipal(identity);
+            var userProfileId = "user-123";
+            SetupSuccessfulAuth(userProfileId);
 
+            var request = CreateAuthenticatedRequest(userProfileId);
             var formCollection = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
             request.Setup(x => x.HasFormContentType).Returns(true);
             request.Setup(x => x.Form).Returns(formCollection);
 
@@ -99,10 +149,8 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
         public async Task Run_WithInvalidFileType_ReturnsBadRequest()
         {
             // Arrange
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("oid", "user-123"));
-            httpContext.User = new ClaimsPrincipal(identity);
+            var userProfileId = "user-123";
+            SetupSuccessfulAuth(userProfileId);
 
             var fileMock = new Mock<IFormFile>();
             fileMock.Setup(x => x.Length).Returns(1024);
@@ -112,8 +160,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var fileCollection = new FormFileCollection { fileMock.Object };
             var formCollection = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>(), fileCollection);
 
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
+            var request = CreateAuthenticatedRequest(userProfileId);
             request.Setup(x => x.HasFormContentType).Returns(true);
             request.Setup(x => x.Form).Returns(formCollection);
 
@@ -142,10 +189,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
         {
             // Arrange
             var userProfileId = "user-123";
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
+            SetupSuccessfulAuth(userProfileId);
 
             var fileMock = new Mock<IFormFile>();
             fileMock.Setup(x => x.Length).Returns(1024);
@@ -155,8 +199,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var fileCollection = new FormFileCollection { fileMock.Object };
             var formCollection = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>(), fileCollection);
 
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
+            var request = CreateAuthenticatedRequest(userProfileId);
             request.Setup(x => x.HasFormContentType).Returns(true);
             request.Setup(x => x.Form).Returns(formCollection);
 
@@ -186,11 +229,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Arrange
             var userProfileId = "user-123";
             var tierId = "tier-123";
-
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
+            SetupSuccessfulAuth(userProfileId);
 
             // File is 6MB, exceeds Starter tier limit of 5MB
             var fileMock = new Mock<IFormFile>();
@@ -201,8 +240,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var fileCollection = new FormFileCollection { fileMock.Object };
             var formCollection = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>(), fileCollection);
 
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
+            var request = CreateAuthenticatedRequest(userProfileId);
             request.Setup(x => x.HasFormContentType).Returns(true);
             request.Setup(x => x.Form).Returns(formCollection);
 
@@ -250,11 +288,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Arrange
             var userProfileId = "user-123";
             var tierId = "tier-123";
-
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
+            SetupSuccessfulAuth(userProfileId);
 
             var fileMock = new Mock<IFormFile>();
             fileMock.Setup(x => x.Length).Returns(1024 * 1024); // 1MB file
@@ -264,8 +298,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var fileCollection = new FormFileCollection { fileMock.Object };
             var formCollection = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>(), fileCollection);
 
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
+            var request = CreateAuthenticatedRequest(userProfileId);
             request.Setup(x => x.HasFormContentType).Returns(true);
             request.Setup(x => x.Form).Returns(formCollection);
 
@@ -313,11 +346,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Arrange
             var userProfileId = "user-123";
             var tierId = "tier-123";
-
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
+            SetupSuccessfulAuth(userProfileId);
 
             var fileMock = new Mock<IFormFile>();
             fileMock.Setup(x => x.Length).Returns(1024 * 1024); // 1MB file
@@ -327,8 +356,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var fileCollection = new FormFileCollection { fileMock.Object };
             var formCollection = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>(), fileCollection);
 
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
+            var request = CreateAuthenticatedRequest(userProfileId);
             request.Setup(x => x.HasFormContentType).Returns(true);
             request.Setup(x => x.Form).Returns(formCollection);
 
@@ -376,11 +404,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Arrange
             var userProfileId = "user-123";
             var tierId = "tier-123";
-
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
+            SetupSuccessfulAuth(userProfileId);
 
             var fileMock = new Mock<IFormFile>();
             fileMock.Setup(x => x.Length).Returns(1024);
@@ -390,8 +414,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var fileCollection = new FormFileCollection { fileMock.Object };
             var formCollection = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>(), fileCollection);
 
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
+            var request = CreateAuthenticatedRequest(userProfileId);
             request.Setup(x => x.HasFormContentType).Returns(true);
             request.Setup(x => x.Form).Returns(formCollection);
 

@@ -36,15 +36,56 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
                 _userProfileServiceMock.Object);
         }
 
-        [Fact]
-        public async Task Run_WithUnauthenticatedUser_ReturnsUnauthorized()
+        private static Mock<HttpRequest> CreateAuthenticatedRequest(string userProfileId, Dictionary<string, StringValues>? queryParams = null)
         {
-            // Arrange
             var httpContext = new DefaultHttpContext();
-            httpContext.User = new ClaimsPrincipal(new ClaimsIdentity()); // Not authenticated
+            var identity = new ClaimsIdentity(authenticationType: "test");
+            identity.AddClaim(new Claim("oid", userProfileId));
+            httpContext.User = new ClaimsPrincipal(identity);
+
+            var headers = new HeaderDictionary();
+            headers["Authorization"] = "Bearer valid-jwt-token";
 
             var request = new Mock<HttpRequest>();
             request.Setup(x => x.HttpContext).Returns(httpContext);
+            request.Setup(x => x.Headers).Returns(headers);
+            request.Setup(x => x.Query).Returns(new QueryCollection(queryParams ?? new Dictionary<string, StringValues>()));
+            request.Setup(x => x.Path).Returns(new PathString("/Delete"));
+
+            return request;
+        }
+
+        private void SetupSuccessfulAuth(string userProfileId)
+        {
+            var identity = new ClaimsIdentity(authenticationType: "test");
+            identity.AddClaim(new Claim("oid", userProfileId));
+            identity.AddClaim(new Claim("upn", $"{userProfileId}@test.com"));
+            var principal = new ClaimsPrincipal(identity);
+
+            _jwtValidationServiceMock.Setup(x => x.ValidateTokenAsync("valid-jwt-token"))
+                .ReturnsAsync(principal);
+                
+            var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile 
+            { 
+                Oid = userProfileId, 
+                Upn = $"{userProfileId}@test.com" 
+            };
+            _userProfileServiceMock.Setup(x => x.EnsureUserProfileAsync(principal))
+                .ReturnsAsync(userProfile);
+        }
+
+        [Fact]
+        public async Task Run_WithUnauthenticatedUser_ReturnsUnauthorized()
+        {
+            // Arrange - Create request without Authorization header
+            var httpContext = new DefaultHttpContext();
+            httpContext.User = new ClaimsPrincipal(new ClaimsIdentity()); // Not authenticated
+
+            var headers = new HeaderDictionary(); // No Authorization header
+
+            var request = new Mock<HttpRequest>();
+            request.Setup(x => x.HttpContext).Returns(httpContext);
+            request.Setup(x => x.Headers).Returns(headers);
             request.Setup(x => x.Query).Returns(new QueryCollection(new Dictionary<string, StringValues>
             {
                 { "id", "image-123" }
@@ -54,7 +95,8 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var result = await _deleteFunction.Run(request.Object);
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+            Assert.NotNull(unauthorizedResult.Value);
         }
 
         [Fact]
@@ -62,15 +104,9 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
         {
             // Arrange
             var userProfileId = "user-123";
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity(authenticationType: "test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
+            SetupSuccessfulAuth(userProfileId);
 
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
-            request.Setup(x => x.Query).Returns(new QueryCollection());
-            request.Setup(x => x.Path).Returns(new PathString("/Delete"));
+            var request = CreateAuthenticatedRequest(userProfileId);
 
             var serviceResult = new ImageDeleteResult
             {
@@ -98,18 +134,12 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Arrange
             var userProfileId = "user-123";
             var imageId = "non-existent-image";
+            SetupSuccessfulAuth(userProfileId);
 
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity(authenticationType: "test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
-
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
-            request.Setup(x => x.Query).Returns(new QueryCollection(new Dictionary<string, StringValues>
+            var request = CreateAuthenticatedRequest(userProfileId, new Dictionary<string, StringValues>
             {
                 { "id", imageId }
-            }));
+            });
 
             var serviceResult = new ImageDeleteResult
             {
@@ -136,36 +166,13 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
         {
             // Arrange
             var userProfileId = "user-123";
-            var otherUserProfileId = "other-user-456";
             var imageId = "789e0123-456f-78g9-h012-345678901234";
+            SetupSuccessfulAuth(userProfileId);
 
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity(authenticationType: "test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
-
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
-            request.Setup(x => x.Query).Returns(new QueryCollection(new Dictionary<string, StringValues>
+            var request = CreateAuthenticatedRequest(userProfileId, new Dictionary<string, StringValues>
             {
                 { "id", imageId }
-            }));
-
-            var images = new List<Image>
-            {
-                new Image
-                {
-                    id = imageId,
-                    UserProfileId = otherUserProfileId, // Belongs to different user
-                    Name = "test.jpg",
-                    Url = "https://storage.blob.core.windows.net/images/test.jpg",
-                    Size = 1024,
-                    ContentType = "image/jpeg",
-                    ContainerName = "images",
-                    BlobName = "other-user-456/test.jpg",
-                    UploadedAt = DateTime.UtcNow
-                }
-            };
+            });
 
             var serviceResult = new ImageDeleteResult
             {
@@ -193,40 +200,12 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Arrange
             var userProfileId = "user-123";
             var imageId = "123e4567-e89b-12d3-a456-426614174000";
+            SetupSuccessfulAuth(userProfileId);
 
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity(authenticationType: "test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
-
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
-            request.Setup(x => x.Query).Returns(new QueryCollection(new Dictionary<string, StringValues>
+            var request = CreateAuthenticatedRequest(userProfileId, new Dictionary<string, StringValues>
             {
                 { "id", imageId }
-            }));
-
-            var image = new Image
-            {
-                id = imageId,
-                UserProfileId = userProfileId,
-                Name = "test.jpg",
-                Url = "https://storage.blob.core.windows.net/images/test.jpg",
-                Size = 1024,
-                ContentType = "image/jpeg",
-                ContainerName = "images",
-                BlobName = "user-123/test.jpg",
-                UploadedAt = DateTime.UtcNow
-            };
-
-            var membership = new ImageStorageTierMembership
-            {
-                id = "membership-123",
-                TierId = "tier-123",
-                UserProfileId = userProfileId,
-                StorageUsedInBytes = 2048,
-                BandwidthUsedInBytes = 1024
-            };
+            });
 
             var serviceResult = new ImageDeleteResult
             {
@@ -253,31 +232,12 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Arrange
             var userProfileId = "user-123";
             var invalidImageId = "not-a-guid";
+            SetupSuccessfulAuth(userProfileId);
 
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity(authenticationType: "test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
-
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
-            request.Setup(x => x.Query).Returns(new QueryCollection(new Dictionary<string, StringValues>
+            var request = CreateAuthenticatedRequest(userProfileId, new Dictionary<string, StringValues>
             {
                 { "id", invalidImageId }
-            }));
-
-            var image = new Image
-            {
-                id = invalidImageId,
-                UserProfileId = userProfileId,
-                Name = "test.jpg",
-                Url = "https://storage.blob.core.windows.net/images/test.jpg",
-                Size = 1024,
-                ContentType = "image/jpeg",
-                ContainerName = "images",
-                BlobName = "user-123/test.jpg",
-                UploadedAt = DateTime.UtcNow
-            };
+            });
 
             var serviceResult = new ImageDeleteResult
             {
@@ -305,31 +265,12 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Arrange
             var userProfileId = "user-123";
             var imageId = "456e7890-f12a-34b5-c678-901234567890";
+            SetupSuccessfulAuth(userProfileId);
 
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity(authenticationType: "test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
-
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
-            request.Setup(x => x.Query).Returns(new QueryCollection(new Dictionary<string, StringValues>
+            var request = CreateAuthenticatedRequest(userProfileId, new Dictionary<string, StringValues>
             {
                 { "id", imageId }
-            }));
-
-            var image = new Image
-            {
-                id = imageId,
-                UserProfileId = userProfileId,
-                Name = "test.jpg",
-                Url = "https://storage.blob.core.windows.net/images/test.jpg",
-                Size = 1024,
-                ContentType = "image/jpeg",
-                ContainerName = "images",
-                BlobName = "user-123/test.jpg",
-                UploadedAt = DateTime.UtcNow
-            };
+            });
 
             var serviceResult = new ImageDeleteResult
             {
