@@ -9,6 +9,8 @@ using InkStainedWretch.OnePageAuthorAPI.API.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
+using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorAPI.Authentication;
 
 namespace OnePageAuthor.Test.ImageAPI.Functions
 {
@@ -16,16 +18,22 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
     {
         private readonly Mock<ILogger<global::ImageAPI.User>> _loggerMock;
         private readonly Mock<IUserImageService> _userImageServiceMock;
+        private readonly Mock<IJwtValidationService> _jwtValidationServiceMock;
+        private readonly Mock<IUserProfileService> _userProfileServiceMock;
         private readonly global::ImageAPI.User _userFunction;
 
         public UserTests()
         {
             _loggerMock = new Mock<ILogger<global::ImageAPI.User>>();
             _userImageServiceMock = new Mock<IUserImageService>();
+            _jwtValidationServiceMock = new Mock<IJwtValidationService>();
+            _userProfileServiceMock = new Mock<IUserProfileService>();
 
             _userFunction = new global::ImageAPI.User(
                 _loggerMock.Object,
-                _userImageServiceMock.Object);
+                _userImageServiceMock.Object,
+                _jwtValidationServiceMock.Object,
+                _userProfileServiceMock.Object);
         }
 
         [Fact]

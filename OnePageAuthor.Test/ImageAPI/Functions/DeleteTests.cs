@@ -10,6 +10,8 @@ using InkStainedWretch.OnePageAuthorAPI.API.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
+using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure;
@@ -20,16 +22,22 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
     {
         private readonly Mock<ILogger<Delete>> _loggerMock;
         private readonly Mock<IImageDeleteService> _imageDeleteServiceMock;
+        private readonly Mock<IJwtValidationService> _jwtValidationServiceMock;
+        private readonly Mock<IUserProfileService> _userProfileServiceMock;
         private readonly Delete _deleteFunction;
 
         public DeleteTests()
         {
             _loggerMock = new Mock<ILogger<Delete>>();
             _imageDeleteServiceMock = new Mock<IImageDeleteService>();
+            _jwtValidationServiceMock = new Mock<IJwtValidationService>();
+            _userProfileServiceMock = new Mock<IUserProfileService>();
 
             _deleteFunction = new Delete(
                 _loggerMock.Object,
-                _imageDeleteServiceMock.Object);
+                _imageDeleteServiceMock.Object,
+                _jwtValidationServiceMock.Object,
+                _userProfileServiceMock.Object);
         }
 
         [Fact]

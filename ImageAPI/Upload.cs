@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
+using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using ImageAPI.Models;
 using System.Security.Claims;
 
@@ -17,11 +19,15 @@ public class Upload
 {
     private readonly ILogger<Upload> _logger;
     private readonly IImageUploadService _imageUploadService;
+    private readonly IJwtValidationService _jwtValidationService;
+    private readonly IUserProfileService _userProfileService;
 
-    public Upload(ILogger<Upload> logger, IImageUploadService imageUploadService)
+    public Upload(ILogger<Upload> logger, IImageUploadService imageUploadService, IJwtValidationService jwtValidationService, IUserProfileService userProfileService)
     {
         _logger = logger;
         _imageUploadService = imageUploadService;
+        _jwtValidationService = jwtValidationService;
+        _userProfileService = userProfileService;
     }
 
     [Function("Upload")]
@@ -30,17 +36,28 @@ public class Upload
     {
         _logger.LogInformation("Image upload function invoked.");
 
+        // Validate JWT token and get authenticated user
+        var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+        if (authError != null)
+        {
+            return authError;
+        }
+
         try
         {
-            // Get authenticated user
-            var user = req.HttpContext.User;
-            if (user?.Identity?.IsAuthenticated != true)
-            {
-                return new UnauthorizedResult();
-            }
+            // Ensure user profile exists
+            await _userProfileService.EnsureUserProfileAsync(authenticatedUser!);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "User profile validation failed for Upload");
+            return new UnauthorizedObjectResult(new ErrorResponse { Error = "User profile validation failed" });
+        }
 
+        try
+        {
             // Extract user ID from claims
-            var userProfileId = user.FindFirst("oid")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userProfileId = authenticatedUser!.FindFirst("oid")?.Value ?? authenticatedUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userProfileId))
             {
                 _logger.LogWarning("User profile ID not found in claims.");
