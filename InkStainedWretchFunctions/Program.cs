@@ -8,9 +8,9 @@ using Microsoft.Extensions.Hosting;
 var builder = FunctionsApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
-var endpointUri = configuration["COSMOSDB_ENDPOINT_URI"]; 
-var primaryKey = configuration["COSMOSDB_PRIMARY_KEY"]; 
-var databaseId = configuration["COSMOSDB_DATABASE_ID"]; 
+var endpointUri = configuration["COSMOSDB_ENDPOINT_URI"];
+var primaryKey = configuration["COSMOSDB_PRIMARY_KEY"];
+var databaseId = configuration["COSMOSDB_DATABASE_ID"];
 
 builder.ConfigureFunctionsWebApplication();
 

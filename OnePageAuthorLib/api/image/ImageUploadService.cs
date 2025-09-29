@@ -122,10 +122,10 @@ public class ImageUploadService : IImageUploadService
             // Upload file to Azure Blob Storage
             var containerName = "images";
             var blobName = $"{userProfileId}/{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-            
+
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
             await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
-            
+
             var blobClient = containerClient.GetBlobClient(blobName);
 
             using var stream = file.OpenReadStream();
@@ -167,7 +167,7 @@ public class ImageUploadService : IImageUploadService
             membership.BandwidthUsedInBytes += file.Length; // Upload counts toward bandwidth usage
             await _membershipRepository.UpdateAsync(membership);
 
-            _logger.LogInformation("Image uploaded successfully. User: {UserProfileId}, Image: {ImageId}, Size: {Size} bytes", 
+            _logger.LogInformation("Image uploaded successfully. User: {UserProfileId}, Image: {ImageId}, Size: {Size} bytes",
                 userProfileId, imageRecord.id, file.Length);
 
             // Return success response

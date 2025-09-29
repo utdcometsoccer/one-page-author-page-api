@@ -5,12 +5,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
     /// <summary>
     /// Entity representing a locale, inherits from LocaleResponse and adds an id property.
     /// </summary>
-        public class Locale : LocaleResponse
-        {
-            /// <summary>
-            /// Indicates whether this locale is the default.
-            /// </summary>
-            public bool IsDefault { get; set; } = false;
+    public class Locale : LocaleResponse
+    {
+        /// <summary>
+        /// Indicates whether this locale is the default.
+        /// </summary>
+        public bool IsDefault { get; set; } = false;
 
         public string LanguageName { get; set; }
         public string RegionName { get; set; }

@@ -7,6 +7,7 @@ using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using System.Security.Claims;
 using System.Linq;
 using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorAPI.Authentication;
 
 namespace InkStainedWretchStripe;
 
@@ -39,14 +40,14 @@ public class CreateStripeCustomer
         [FromBody] CreateCustomerRequest payload)
     {
         _logger.LogInformation("CreateStripeCustomer invoked.");
-        
+
         // Validate JWT token and get authenticated user
         var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
         if (authError != null)
         {
             return authError;
         }
-        
+
         if (payload is null)
         {
             return new BadRequestObjectResult(new { error = "Request body is required." });

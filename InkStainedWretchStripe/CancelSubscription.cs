@@ -2,10 +2,10 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
-using Microsoft.AspNetCore.Authorization;
+using InkStainedWretch.OnePageAuthorAPI.Authentication;
+using InkStainedWretch.OnePageAuthorAPI.API;
 
 namespace InkStainedWretchStripe;
 
@@ -13,11 +13,15 @@ public class CancelSubscription
 {
     private readonly ILogger<CancelSubscription> _logger;
     private readonly ICancelSubscription _canceller;
+    private readonly IJwtValidationService _jwtValidationService;
+    private readonly IUserProfileService _userProfileService;
 
-    public CancelSubscription(ILogger<CancelSubscription> logger, ICancelSubscription canceller)
+    public CancelSubscription(ILogger<CancelSubscription> logger, ICancelSubscription canceller, IJwtValidationService jwtValidationService, IUserProfileService userProfileService)
     {
         _logger = logger;
         _canceller = canceller;
+        _jwtValidationService = jwtValidationService;
+        _userProfileService = userProfileService;
     }
 
     /// <summary>
@@ -30,7 +34,6 @@ public class CancelSubscription
     /// - Response: 200 OK with CancelSubscriptionResponse
     /// </remarks>
     [Function("CancelSubscription")]
-    [Authorize]
     public async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = "CancelSubscription/{subscriptionId}")] HttpRequest req,
         string subscriptionId,
@@ -42,6 +45,24 @@ public class CancelSubscription
         }
 
         _logger.LogInformation("CancelSubscription invoked for {SubscriptionId}", subscriptionId);
+
+        // Validate JWT token and get authenticated user
+        var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+        if (authError != null)
+        {
+            return authError;
+        }
+
+        try
+        {
+            // Ensure user profile exists
+            await _userProfileService.EnsureUserProfileAsync(authenticatedUser!);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "User profile validation failed for CancelSubscription");
+            return new UnauthorizedObjectResult(new { error = "User profile validation failed" });
+        }
 
         var result = await _canceller.CancelAsync(subscriptionId, payload);
         return new OkObjectResult(result);

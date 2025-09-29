@@ -77,10 +77,10 @@ try
             // Try to find existing tier by name (since we partition by Name)
             var query = new Microsoft.Azure.Cosmos.QueryDefinition("SELECT * FROM c WHERE c.Name = @name")
                 .WithParameter("@name", tier.Name);
-            
+
             var container = app.Services.GetRequiredService<IContainerManager<ImageStorageTier>>();
             var cosmosContainer = await container.EnsureContainerAsync();
-            
+
             using var iterator = cosmosContainer.GetItemQueryIterator<ImageStorageTier>(query);
             var existing = new List<ImageStorageTier>();
             while (iterator.HasMoreResults)
@@ -96,7 +96,7 @@ try
             else
             {
                 await repository.AddAsync(tier);
-                logger.LogInformation("Added tier: {TierName} - ${Cost}/month, {Storage}GB storage, {Bandwidth}GB bandwidth", 
+                logger.LogInformation("Added tier: {TierName} - ${Cost}/month, {Storage}GB storage, {Bandwidth}GB bandwidth",
                     tier.Name, tier.CostInDollars, tier.StorageInGB, tier.BandwidthInGB);
             }
         }

@@ -61,10 +61,10 @@ namespace OnePageAuthor.Test.Stripe
             Assert.Equal(90.12m, dto.TotalDecimal);
         }
 
-                [Fact]
-                        public void Rest_Mapper_Extracts_Line_PriceId()
-                {
-                                var json = @"{
+        [Fact]
+        public void Rest_Mapper_Extracts_Line_PriceId()
+        {
+            var json = @"{
             ""id"": ""in_test"",
             ""currency"": ""usd"",
             ""amount_due"": 500,
@@ -82,10 +82,10 @@ namespace OnePageAuthor.Test.Stripe
                 ]
             }
         }";
-                        var resp = InvoicePreviewServiceTestAccessor.MapFromJson_ForTest(json);
-                        Assert.Equal("in_test", resp.InvoiceId);
-                        Assert.Single(resp.Lines);
-                        Assert.Equal("price_123", resp.Lines[0].PriceId);
-                }
+            var resp = InvoicePreviewServiceTestAccessor.MapFromJson_ForTest(json);
+            Assert.Equal("in_test", resp.InvoiceId);
+            Assert.Single(resp.Lines);
+            Assert.Equal("price_123", resp.Lines[0].PriceId);
+        }
     }
 }

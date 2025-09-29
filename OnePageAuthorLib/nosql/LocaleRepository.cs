@@ -12,12 +12,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
 
         public LocaleRepository(Container container) : base(container)
         {
-           
+
         }
 
         public LocaleRepository(IDataContainer container) : base(container)
         {
-           
+
         }
 
         public async Task<IList<Locale>> GetAllAsync()

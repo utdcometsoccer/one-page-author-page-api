@@ -1,0 +1,4478 @@
+[
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "857815c5-c96e-440a-88c9-6052965eea11"
+    },
+    "FileName": "ImageDeleteService.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\api\\image\\ImageDeleteService.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 55,
+        "CharNumber": 121,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 23 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 63,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 67,
+        "CharNumber": 113,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 23 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 82,
+        "CharNumber": 126,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "076994ad-9a5b-4116-86ce-fcd095d037ba"
+    },
+    "FileName": "ImageUploadService.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\api\\image\\ImageUploadService.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 125,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 128,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 170,
+        "CharNumber": 127,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "cc02b57e-6eff-4fd7-a997-f441dc61e9f1"
+    },
+    "FileName": "LocaleDataService.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\api\\LocaleDataService.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 15,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "6ba460bd-c04c-43b4-9e5a-e0f75c23939e"
+    },
+    "FileName": "LocaleResponse.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\api\\LocaleResponse.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 8,
+        "CharNumber": 6,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 12,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 40,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 17,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 18,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 18,
+        "CharNumber": 40,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 22,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 23,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 23,
+        "CharNumber": 40,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 27,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 28,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 28,
+        "CharNumber": 40,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 32,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 33,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 33,
+        "CharNumber": 44,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 37,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 38,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 38,
+        "CharNumber": 42,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 42,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 43,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 43,
+        "CharNumber": 46,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 47,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 48,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 48,
+        "CharNumber": 40,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 52,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 53,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 53,
+        "CharNumber": 46,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 57,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 58,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 58,
+        "CharNumber": 45,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 62,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 63,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "dd2d8f84-6955-4172-ba0b-3b764ddb3862"
+    },
+    "FileName": "CreateCustomer.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\api\\Stripe\\CreateCustomer.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 28,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 29,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 422 characters with \u0027\\s\\s\\s\\s///\\sCreates\\san\\sinitialized\\s\u003Csee\\scref=\u0022CreateCustomerResponse\u0022/\u003E\\sfrom\\sthe\\sprovided\\srequest.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Cparam\\sname=\u0022request\u0022\u003EThe\\sinput\\spayload.\\sMust\\snot\\sbe\\snull.\u003C/param\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Cexception\\scref=\u0022ArgumentNullException\u0022\u003EThrown\\swhen\\s\u003Cparamref\\sname=\u0022request\u0022/\u003E\\sis\\snull.\u003C/exception\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Creturns\u003EAn\\sinitialized\\sresponse\\swith\\sa\\s\u003Csee\\scref=\u0022Customer\u0022/\u003E\\scontaining\\sthe\\sprovided\\semail.\u003C/returns\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 34,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 40,
+        "CharNumber": 14,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 42,
+        "CharNumber": 17,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 1 characters."
+      },
+      {
+        "LineNumber": 42,
+        "CharNumber": 78,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 67,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 35 characters with \u0027\\r\\n\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 69,
+        "CharNumber": 53,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "2a045d61-28c9-4792-943f-2963f31217a3"
+    },
+    "FileName": "EnsureCustomerForUser.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\api\\Stripe\\EnsureCustomerForUser.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 114,
+        "CharNumber": 121,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 23 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "ab79fa9e-897a-42e8-87b3-6d47b757df0e"
+    },
+    "FileName": "IStripeInvoiceServiceHelper.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\api\\Stripe\\IStripeInvoiceServiceHelper.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 17,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 18,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "114c6734-da93-4e8e-b214-6de8c94cd7f0"
+    },
+    "FileName": "ListSubscriptions.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\api\\Stripe\\ListSubscriptions.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 7,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 8,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 100 characters with \u0027\\s\\s\\s\\s///\\sService\\sfor\\slisting\\sStripe\\ssubscriptions\\sfollowing\\sStripe\u0027s\\ssample\\spatterns.\\r\\n\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 10,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 11,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 12,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 15,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 16,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 17,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 19,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 20,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 700 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s///\\sLists\\sStripe\\ssubscriptions\\swith\\soptional\\sfilters.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Cparam\\sname=\u0022customerId\u0022\u003EOptional\\sStripe\\scustomer\\sID\\sto\\sfilter\\ssubscriptions.\u003C/param\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Cparam\\sname=\u0022status\u0022\u003EOptional\\ssubscription\\sstatus\\sfilter\\s(e.g.,\\s\u0022all\u0022,\\s\u0022active\u0022,\\s\u0022trialing\u0022,\\s\u0022past_due\u0022).\u003C/param\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Cparam\\sname=\u0022limit\u0022\u003EOptional\\spage\\ssize\\s(default\\s100).\u003C/param\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Cparam\\sname=\u0022startingAfter\u0022\u003ECursor\\sfor\\spagination\\s(id\\sof\\sthe\\slast\\sitem\\sin\\sthe\\sprevious\\spage).\u003C/param\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Cparam\\sname=\u0022expandLatestInvoicePaymentIntent\u0022\u003EWhether\\sto\\sexpand\\slatest\\sinvoice\u0027s\\spayment\\sintent\\sfor\\seach\\sitem.\u003C/param\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Creturns\u003EA\\s\u003Csee\\scref=\u0022SubscriptionsResponse\u0022/\u003E\\scontaining\\sthe\\sStripe\\ssubscriptions\\slist.\u003C/returns\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 28,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 29,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 30,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 31,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 32,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 33,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 34,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 35,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 36,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 37,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 39,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 40,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 41,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 42,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 43,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 44,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 45,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 47,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 48,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 49,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 50,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 52,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 53,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 54,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 55,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 57,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 58,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 59,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 60,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 62,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 63,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 64,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 65,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 67,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 69,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 71,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 72,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 73,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 74,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 75,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 76,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 77,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 78,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 79,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 80,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 81,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 82,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 83,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 84,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 85,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 86,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 87,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 88,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 89,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "c318a7da-294b-4f49-ba38-6bb8ec3926eb"
+    },
+    "FileName": "JwtAuthenticationHelper.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\Authentication\\JwtAuthenticationHelper.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 21,
+        "CharNumber": 29,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 11 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 22,
+        "CharNumber": 52,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 11 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 42,
+        "CharNumber": 98,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 23 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 48,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 49,
+        "CharNumber": 80,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 14 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 50,
+        "CharNumber": 97,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 52,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 59,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 66,
+        "CharNumber": 79,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 74,
+        "CharNumber": 83,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "e2f0fcce-ee4e-49a0-b7b5-99cf0dce5445"
+    },
+    "FileName": "JwtDebugHelper.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\Authentication\\JwtDebugHelper.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 21,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 24,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 28,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 33,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 42,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 69,
+        "CharNumber": 24,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 11 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 83,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "e8b177c7-376d-4131-91ba-de317ef6057c"
+    },
+    "FileName": "JwtValidationService.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\Authentication\\JwtValidationService.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 44,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 45,
+        "CharNumber": 48,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 14 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 51,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 52,
+        "CharNumber": 46,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 14 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 56,
+        "CharNumber": 39,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 23 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 77,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 78,
+        "CharNumber": 57,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 14 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 81,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 102,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 113,
+        "CharNumber": 31,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 15 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 115,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 132,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 133,
+        "CharNumber": 86,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 15 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 135,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "df92deb2-0eee-414c-940d-f6db67b7d5bd"
+    },
+    "FileName": "TokenIntrospectionService.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\Authentication\\TokenIntrospectionService.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 33,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 67,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 69,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 100,
+        "CharNumber": 106,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "db6efc28-d78c-4a80-8f55-970f88ff2471"
+    },
+    "FileName": "TokenValidationTest.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\Authentication\\TokenValidationTest.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 59,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "a0d4f2a5-ffbd-4412-9022-e4b712192c6b"
+    },
+    "FileName": "Article.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Article.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 8,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 9,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 65 characters with \u0027\\s\\s\\s\\s///\\sThe\\sprimary\\skey\\sfor\\sthe\\sArticle\\sentity.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 11,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 63,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 14 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 73,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "01b4d437-8da1-44af-8041-ddccac019cba"
+    },
+    "FileName": "Author.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Author.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 9,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 10,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 64 characters with \u0027\\s\\s\\s\\s///\\sThe\\sprimary\\skey\\sfor\\sthe\\sAuthor\\sentity.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 12,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "6a319d4d-49be-42d4-b901-c4aa4f9565b3"
+    },
+    "FileName": "LocalizationTextProvider.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\authormanagement\\LocalizationTextProvider.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 8,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 26,
+        "CharNumber": 10,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 12 characters with \u0027\\r\\n\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 29,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 817 characters with \u0027\\s\\s\\s\\s///\\sRetrieves\\slocalized\\stext\\svalues\\sfor\\sthe\\sspecified\\sculture\\sacross\\sall\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\sregistered\\sauthor-management\\scontainers.\\sResolution\\sorder\\sper\\ssegment:\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s1.\\sExact\\sculture\\s(e.g.\\sen-GB)\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s2.\\sFirst\\sdocument\\swhose\\sCulture\\sbegins\\swith\\sthe\\ssame\\slanguage\\scode\\s\u002B\\s\u0027-\u0027\\s(e.g.\\sen-US\\sif\\sen-GB\\smissing)\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s3.\\sNeutral\\slanguage\\s(exact\\slanguage\\sonly,\\se.g.\\sen)\\sif\\sstored\\sas\\ssuch\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s4.\\sEmpty\\splaceholder\\sobject\\s(never\\snull)\\swith\\sCulture\\sset\\sto\\srequested\\sspecific\\sculture\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Cparam\\sname=\u0022culture\u0022\u003ECulture\\scode\\s(e.g.\\s\u0022en-US\u0022).\\sMust\\sbe\\sa\\svalid\\s.NET\\sculture.\u003C/param\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Creturns\u003EA\\spopulated\\s\u003Csee\\scref=\u0022LocalizationText\u0022/\u003E\\sinstance.\u003C/returns\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Cexception\\scref=\u0022ArgumentException\u0022\u003EThrown\\swhen\\s\u003Cparamref\\sname=\u0022culture\u0022/\u003E\\sis\\snull/empty\\sor\\sinvalid.\u003C/exception\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 39,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "5c0ac48d-bf4a-45e7-bde8-7b26b0e28049"
+    },
+    "FileName": "PenguinRandomHouseAuthorList.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\authormanagement\\PenguinRandomHouseAuthorList.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 9,
+        "CharNumber": 6,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 14 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "03304e36-690a-4931-9da9-3a08d2f24cfd"
+    },
+    "FileName": "Book.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Book.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 9,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 10,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 62 characters with \u0027\\s\\s\\s\\s///\\sThe\\sprimary\\skey\\sfor\\sthe\\sBook\\sentity.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 12,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 15,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 125 characters with \u0027\\s\\s\\s\\s///\\sThe\\sunique\\sidentifier\\sfor\\sthe\\sauthor,\\smust\\smatch\\sthe\\sformat\\sgenerated\\sby\\sAuthor.UniqueIdentifier().\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 17,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "96711ac5-09fc-4c0e-a300-6cfc0e310d71"
+    },
+    "FileName": "Locale.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Locale.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 4,
+        "CharNumber": 2,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\r\\n\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 8,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 9,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 10,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 11,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 83 characters with \u0027///\\sIndicates\\swhether\\sthis\\slocale\\sis\\sthe\\sdefault.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "4e27ea99-5413-469a-83de-fde21016cd86"
+    },
+    "FileName": "Social.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Social.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 9,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 10,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 64 characters with \u0027\\s\\s\\s\\s///\\sThe\\sprimary\\skey\\sfor\\sthe\\sSocial\\sentity.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 12,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 15,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 125 characters with \u0027\\s\\s\\s\\s///\\sThe\\sunique\\sidentifier\\sfor\\sthe\\sauthor,\\smust\\smatch\\sthe\\sformat\\sgenerated\\sby\\sAuthor.UniqueIdentifier().\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 17,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "5487bb8a-7c34-434f-be81-373943eaa592"
+    },
+    "FileName": "CreateSubscriptionRequest.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Stripe\\CreateSubscriptionRequest.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 3,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 4,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 95 characters with \u0027\\s\\s\\s\\s///\\sRepresents\\sthe\\spayload\\sfor\\screating\\sa\\ssubscription\\sfrom\\sa\\sStripe\\sprice.\\r\\n\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 6,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 7,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 8,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 9,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 80 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s///\\sThe\\sStripe\\sPrice\\sID\\sto\\ssubscribe\\sto\\s(e.g.,\\sprice_...).\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 11,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 110 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s///\\sThe\\sStripe\\sCustomer\\sID\\s(e.g.,\\scus_...).\\sRequired\\sby\\sStripe\\sto\\screate\\sa\\ssubscription.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 16,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 17,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "40b1e83e-051b-4b18-9c2e-d1e724c1f82e"
+    },
+    "FileName": "InvoicePreviewDTOs.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Stripe\\InvoicePreviewDTOs.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 11,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 12,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "79a5447b-b437-4e0e-b60a-3f1ae59ce8f8"
+    },
+    "FileName": "PriceDTOs.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Stripe\\PriceDTOs.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 41,
+        "CharNumber": 58,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 15 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "72d3df9c-4b30-42dd-ab6b-24d392d6dc11"
+    },
+    "FileName": "SubscriptionCreateResponse.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Stripe\\SubscriptionCreateResponse.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 3,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 4,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 105 characters with \u0027\\s\\s\\s\\s///\\sResponse\\sfor\\screating\\sa\\ssubscription,\\sreturning\\sidentifiers\\sneeded\\sby\\sthe\\sclient.\\r\\n\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 6,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 7,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 8,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 9,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 69 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s///\\sThe\\sStripe\\sSubscription\\sID\\s(e.g.,\\ssub_...).\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 11,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 87 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s///\\sThe\\sclient\\ssecret\\sassociated\\swith\\sthe\\ssubscription\u0027s\\spayment.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 16,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 17,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "ab30859b-807c-43af-9e29-34601e23b38f"
+    },
+    "FileName": "SubscriptionPlan.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Stripe\\SubscriptionPlan.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 11,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 12,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 119 characters with \u0027\\s\\s\\s\\s///\\sAn\\sidentifier\\scopied\\sfrom\\sthe\\ssource\\s(e.g.,\\sStripe\\sPrice\\sId)\\sthat\\swill\\sbe\\sserialized\\sas\\s\u0022id\u0022.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 15,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "80bba105-d6dc-4698-88cf-cc5407482761"
+    },
+    "FileName": "SubscriptionsResponse.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\entities\\Stripe\\SubscriptionsResponse.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 5,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 6,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 88 characters with \u0027\\s\\s\\s\\s///\\sRepresents\\sthe\\sresult\\sof\\sa\\srequest\\sto\\slist\\sStripe\\ssubscriptions.\\r\\n\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 8,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 9,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 10,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 11,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 76 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s///\\sThe\\sStripe\\ssubscriptions\\slist\\sreturned\\sby\\sthe\\sAPI.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 15,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 16,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 96 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s///\\sOptional\\sconvenience\\swrapper\\sfor\\sclients\\sthat\\sprefer\\sa\\ssimplified\\sDTO.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 18,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 19,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "8c999a05-2dd4-4bd9-9c11-f819bcf883f6"
+    },
+    "FileName": "ILocaleRepository.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\interfaces\\ILocaleRepository.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 10,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 11,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 51 characters with \u0027\\s\\s\\s\\s///\\sGets\\sall\\slocales\\s(async).\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "07e6e41e-8b64-4e29-a820-bdb737eb76b4"
+    },
+    "FileName": "IStripeCheckoutSessionService.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\interfaces\\IStripeCheckoutSessionService.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 10,
+        "CharNumber": 6,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "9a70fbae-d7eb-401c-9276-2dcb48d0df78"
+    },
+    "FileName": "ArticlesContainerManager.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\nosql\\ArticlesContainerManager.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 13,
+        "CharNumber": 61,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 12 characters with \u0027\\r\\n\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 20,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "02a339ee-8886-46fd-91bd-659bd13472f4"
+    },
+    "FileName": "AuthorManagementContainerManager.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\nosql\\AuthorManagementContainerManager.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 27,
+        "CharNumber": 10,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 13 characters with \u0027\\r\\n\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "67c97103-f429-42ba-a020-46507da9268f"
+    },
+    "FileName": "AuthorRepository.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\nosql\\AuthorRepository.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 54,
+        "CharNumber": 71,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\u0027."
+      },
+      {
+        "LineNumber": 54,
+        "CharNumber": 72,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "8a04978d-0f13-4f01-a066-46ea9fbd0aa3"
+    },
+    "FileName": "AuthorsContainerManager.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\nosql\\AuthorsContainerManager.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 22,
+        "CharNumber": 126,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 25 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "bc0f0ba0-ee5f-4660-857b-17b487a0381e"
+    },
+    "FileName": "LocaleRepository.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\nosql\\LocaleRepository.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 15,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 21 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 20,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 21 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "69e4d664-aef4-497a-b77c-2c3400a282bc"
+    },
+    "FileName": "LocalesContainerManager.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\nosql\\LocalesContainerManager.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 13,
+        "CharNumber": 60,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 12 characters with \u0027\\r\\n\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 20,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "1b62cab1-befd-4364-abf3-4550d8ebc494"
+    },
+    "FileName": "SocialsContainerManager.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\nosql\\SocialsContainerManager.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 13,
+        "CharNumber": 60,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 12 characters with \u0027\\r\\n\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 20,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "5fcc224d-e396-4640-9b79-b0afcd804936"
+    },
+    "FileName": "ServiceFactory.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\ServiceFactory.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 264,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 265,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 710 characters with \u0027\\s\\s\\s\\s///\\sRegisters\\sInk\\sStained\\sWretch\\sdomain\\sservices\\sand\\sCosmos\\scontainer\\smanagers\\sfor\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\sauthor-management\\slocalization.\\sIncludes:\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Clist\\stype=\u0022bullet\u0022\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Citem\u003E\u003Cdescription\u003E\u003Csee\\scref=\u0022ILocalizationTextProvider\u0022/\u003E\\simplementation\u003C/description\u003E\u003C/item\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Citem\u003E\u003Cdescription\u003ETyped\\s\u003Csee\\scref=\u0022IContainerManager{T}\u0022/\u003E\\sfor\\seach\\sauthor\\smanagement\\sPOCO\\s(partition\\skey:\\sCulture)\u003C/description\u003E\u003C/item\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/list\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\sCall\\sthis\\safter\\sregistering\\sa\\ssingleton\\s\u003Csee\\scref=\u0022Microsoft.Azure.Cosmos.Database\u0022/\u003E\\sin\\sDI.\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Cparam\\sname=\u0022services\u0022\u003EThe\\sDI\\sservice\\scollection.\u003C/param\u003E\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s///\\s\u003Creturns\u003EThe\\smodified\\s\u003Csee\\scref=\u0022IServiceCollection\u0022/\u003E\\sfor\\schaining.\u003C/returns\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 275,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 487,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 524,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 525,
+        "CharNumber": 48,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 14 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 527,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 540,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 541,
+        "CharNumber": 48,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 14 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 542,
+        "CharNumber": 103,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 33 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 544,
+        "CharNumber": 108,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 33 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 546,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "8c88b875-b124-4c8c-aa9b-a45c4dac3ef6"
+      },
+      "Id": "6235b598-bdb4-467f-b4b0-df937a1b9a61"
+    },
+    "FileName": "Utility.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorLib\\Utility.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 16,
+        "CharNumber": 10,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 12 characters with \u0027\\r\\n\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 23,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 36,
+        "CharNumber": 28,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 1 characters."
+      },
+      {
+        "LineNumber": 37,
+        "CharNumber": 23,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 7 characters."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "6bd5111b-1122-4449-9eee-093576a4ef89"
+      },
+      "Id": "7b31d1ef-bdf8-473e-871f-ea56632950d1"
+    },
+    "FileName": "Program.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\IntegrationTestAuthorDataService\\Program.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 18,
+        "CharNumber": 62,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "484ed1e7-26b2-449f-bb1d-a863133a07ff"
+      },
+      "Id": "4e8ee26d-4f0d-4319-ae64-f3de503947e1"
+    },
+    "FileName": "AuthorDataServiceTests.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthor.Test\\AuthorDataServiceTests.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 41,
+        "CharNumber": 79,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "484ed1e7-26b2-449f-bb1d-a863133a07ff"
+      },
+      "Id": "c6ee455a-8508-4037-a947-37af023ba77f"
+    },
+    "FileName": "AuthorRepositoryTests.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthor.Test\\AuthorRepositoryTests.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 21,
+        "CharNumber": 36,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "484ed1e7-26b2-449f-bb1d-a863133a07ff"
+      },
+      "Id": "3cd4c17d-ca39-48cb-aca9-b4d0528c9b2d"
+    },
+    "FileName": "BooksContainerManagerTests.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthor.Test\\BooksContainerManagerTests.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 25,
+        "CharNumber": 36,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 26,
+        "CharNumber": 36,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 27,
+        "CharNumber": 22,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 28,
+        "CharNumber": 22,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "484ed1e7-26b2-449f-bb1d-a863133a07ff"
+      },
+      "Id": "32bb9401-c731-4ff4-96f5-c5591bbea156"
+    },
+    "FileName": "GenericRepositoryTests.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthor.Test\\GenericRepositoryTests.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 21,
+        "CharNumber": 32,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "484ed1e7-26b2-449f-bb1d-a863133a07ff"
+      },
+      "Id": "7d22b42d-cd11-4505-bddd-a61e7ffaff23"
+    },
+    "FileName": "UserTests.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthor.Test\\ImageAPI\\Functions\\UserTests.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 117,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 119,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 120,
+        "CharNumber": 60,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 14 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 125,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "484ed1e7-26b2-449f-bb1d-a863133a07ff"
+      },
+      "Id": "e0d9c494-f1d2-4e38-bc5e-bec04063a62e"
+    },
+    "FileName": "LocalFeedResponse.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthor.Test\\LocalFeedResponse.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 17,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "484ed1e7-26b2-449f-bb1d-a863133a07ff"
+      },
+      "Id": "74b6692a-d393-4d3b-bd15-f6c439921c70"
+    },
+    "FileName": "InvoicePreviewTests.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthor.Test\\Stripe\\InvoicePreviewTests.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 64,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 8 characters."
+      },
+      {
+        "LineNumber": 65,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 16 characters."
+      },
+      {
+        "LineNumber": 66,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 8 characters."
+      },
+      {
+        "LineNumber": 67,
+        "CharNumber": 13,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 20 characters."
+      },
+      {
+        "LineNumber": 85,
+        "CharNumber": 13,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 12 characters."
+      },
+      {
+        "LineNumber": 86,
+        "CharNumber": 13,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 12 characters."
+      },
+      {
+        "LineNumber": 87,
+        "CharNumber": 13,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 12 characters."
+      },
+      {
+        "LineNumber": 88,
+        "CharNumber": 13,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 12 characters."
+      },
+      {
+        "LineNumber": 89,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 8 characters."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "484ed1e7-26b2-449f-bb1d-a863133a07ff"
+      },
+      "Id": "24595f2c-231c-4c80-b093-17f44b1e4158"
+    },
+    "FileName": "Microsoft.NET.Test.Sdk.Program.cs",
+    "FilePath": "C:\\Users\\Idahosa\\.nuget\\packages\\microsoft.net.test.sdk\\17.14.1\\build\\net8.0\\Microsoft.NET.Test.Sdk.Program.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 4,
+        "CharNumber": 29,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\u0027."
+      },
+      {
+        "LineNumber": 4,
+        "CharNumber": 60,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\u0027."
+      },
+      {
+        "LineNumber": 4,
+        "CharNumber": 61,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\u0027."
+      },
+      {
+        "LineNumber": 4,
+        "CharNumber": 62,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Insert \u0027\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "34b87dcc-2154-42c9-bfbd-d905c2cf17aa"
+      },
+      "Id": "a003faef-8480-4442-8508-1f4706234a34"
+    },
+    "FileName": "GetAuthorData.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\function-app\\GetAuthorData.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 11,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 15,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 16,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 17,
+        "CharNumber": 5,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 28,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 29,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 30,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 31,
+        "CharNumber": 13,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 32,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      },
+      {
+        "LineNumber": 33,
+        "CharNumber": 9,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Delete 4 characters."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "e54e0f57-de1f-4c0d-920a-cbdec01c7cd2"
+      },
+      "Id": "ecff0d6a-88e9-479b-8252-b1b1a284d6ca"
+    },
+    "FileName": "Program.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\SeedLocales\\Program.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 76,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 34 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "2a4b157f-9439-48af-857d-88754393a08e"
+      },
+      "Id": "9d6b6c67-7b19-41ef-9d5a-8edf35cfbae6"
+    },
+    "FileName": "CreateStripeCheckoutSession.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\InkStainedWretchStripe\\CreateStripeCheckoutSession.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 31,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 32,
+        "CharNumber": 57,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 38,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "2a4b157f-9439-48af-857d-88754393a08e"
+      },
+      "Id": "83a2d351-8c32-4f74-9f99-8e02d164059e"
+    },
+    "FileName": "CreateStripeCustomer.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\InkStainedWretchStripe\\CreateStripeCustomer.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 43,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 44,
+        "CharNumber": 57,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 50,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 18 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "2a4b157f-9439-48af-857d-88754393a08e"
+      },
+      "Id": "ba582e41-95b5-4d92-8b89-39c23caa0eae"
+    },
+    "FileName": "Program.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\InkStainedWretchStripe\\Program.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 45,
+        "CharNumber": 51,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 46,
+        "CharNumber": 49,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 47,
+        "CharNumber": 49,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\r\\n\\r\\n\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "6dda9f39-0cc0-4467-af65-b33833468434"
+      },
+      "Id": "d37138f3-9a8f-4dc7-b27e-d700ad91b9fa"
+    },
+    "FileName": "Program.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\SeedInkStainedWretchesLocale\\Program.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 12,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 15,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 16,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 17,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 9 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 18,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 19,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 20,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 9 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 21,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 9 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 22,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 9 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 24,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 9 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 25,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 9 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 26,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 27,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 28,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 29,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 30,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 31,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 33,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 34,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 35,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 36,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 37,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 38,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 39,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 41,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 42,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 44,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 45,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 46,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 47,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 48,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 49,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 51,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 52,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 53,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 55,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 57,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 58,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 59,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 61,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 62,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 63,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 64,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 65,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 67,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 68,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 69,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 70,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 71,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 72,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 73,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 74,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 75,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 76,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 77,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 78,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 79,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 80,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 81,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 82,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 83,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 85,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 86,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 87,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 88,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 89,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 90,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 91,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 92,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 93,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 94,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 95,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 96,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 97,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 98,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 99,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 101,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 102,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 103,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 104,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 105,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 106,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 107,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 108,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 110,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 111,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 112,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 113,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 114,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 115,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 116,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 117,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 118,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 119,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 120,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 121,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 122,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 123,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 125,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 126,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 127,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 128,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 129,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 130,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 131,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 133,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 134,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 135,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 136,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 137,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 138,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 139,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 140,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 141,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 142,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 143,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 144,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 145,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 146,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 147,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 148,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 149,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 150,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 151,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 152,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 153,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 154,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 155,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 156,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 157,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 158,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 159,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 160,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 161,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 162,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 163,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 164,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 166,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 167,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 168,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 169,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 170,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 171,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 172,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 9 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 173,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 174,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 176,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 177,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 178,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 179,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 180,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 181,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 182,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 184,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 185,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 186,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 187,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 188,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 189,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 190,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 191,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 192,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 193,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 194,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 195,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 196,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 197,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 198,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 200,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 201,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 92 characters with \u0027\\s\\s\\s\\s///\\sCheck\\sif\\sdata\\salready\\sexists\\sfor\\sa\\sspecific\\sculture\\sin\\sthe\\scontainer\\r\\n\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 203,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 204,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 205,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 206,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 207,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 208,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 209,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 210,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 212,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 213,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 213,
+        "CharNumber": 71,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 215,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 217,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 218,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 219,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 220,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 222,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 223,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 224,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 225,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 227,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 228,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 229,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 230,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 231,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 232,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 233,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 234,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 236,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 237,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 158 characters with \u0027\\s\\s\\s\\s///\\sCheck\\sif\\sa\\sspecific\\sindividual\\sitem\\salready\\sexists\\sin\\sthe\\scontainer\\r\\n\\s\\s\\s\\s///\\sThis\\smethod\\schecks\\sfor\\sexact\\smatches\\sbased\\son\\skey\\sproperties\\r\\n\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 240,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 241,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 242,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 243,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 244,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 245,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 246,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 248,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 249,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 250,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 252,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 253,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 254,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 255,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 257,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 258,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 260,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 261,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 262,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 263,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 264,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 265,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 266,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 267,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 268,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 270,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 271,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 272,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 274,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 275,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 276,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 277,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 278,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 280,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 281,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 282,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 283,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 284,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 285,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 286,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 287,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 288,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 289,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 290,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 6 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 291,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 292,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 293,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 295,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 296,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 297,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 298,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 299,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 300,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 10 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 302,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 303,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 304,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 306,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 307,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 309,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 310,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 311,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 312,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 313,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 314,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 315,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 316,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 317,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 318,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 319,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 320,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 322,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 323,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 78 characters with \u0027\\s\\s\\s\\s///\\sExecute\\sa\\scount\\squery\\sagainst\\sthe\\srepository\\scontainer\\r\\n\\s\\s\\s\\s///\\s\u003C/summary\u003E\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 325,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 326,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 327,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 328,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 329,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 330,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 330,
+        "CharNumber": 71,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 7 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 332,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 334,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 335,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 336,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 4 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 337,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 339,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 340,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 341,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 342,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 8 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 344,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 345,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 346,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 347,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 348,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 349,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 2 characters with \u0027\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 350,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 1 characters with \u0027\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "3e66e9be-d766-45c8-8a1c-f3c0a02abbe8"
+      },
+      "Id": "40f9159c-500b-4df3-beff-84514cdde050"
+    },
+    "FileName": "PenguinRandomHouseFunction.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\InkStainedWretchFunctions\\PenguinRandomHouseFunction.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 63,
+        "CharNumber": 96,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 64,
+        "CharNumber": 18,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 23 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 65,
+        "CharNumber": 41,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 147,
+        "CharNumber": 96,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 148,
+        "CharNumber": 18,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 23 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 149,
+        "CharNumber": 41,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "3e66e9be-d766-45c8-8a1c-f3c0a02abbe8"
+      },
+      "Id": "2ff4706b-525f-43ee-8682-8c07cba60304"
+    },
+    "FileName": "Program.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\InkStainedWretchFunctions\\Program.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 11,
+        "CharNumber": 58,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 12,
+        "CharNumber": 56,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 56,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\r\\n\\r\\n\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "0f8d6428-1f46-425d-a85c-39b670ee2f04"
+      },
+      "Id": "cfabfe39-39b3-403f-8088-4937d4940033"
+    },
+    "FileName": "Delete.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\ImageAPI\\Delete.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 81,
+        "CharNumber": 117,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 15 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 82,
+        "CharNumber": 14,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 83,
+        "CharNumber": 70,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 15 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "0f8d6428-1f46-425d-a85c-39b670ee2f04"
+      },
+      "Id": "d1cc7a79-f7d9-432f-8ae8-0bac24688421"
+    },
+    "FileName": "Program.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\ImageAPI\\Program.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 64,
+        "CharNumber": 79,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 65,
+        "CharNumber": 77,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 3 characters with \u0027\\r\\n\u0027."
+      },
+      {
+        "LineNumber": 66,
+        "CharNumber": 77,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 5 characters with \u0027\\r\\n\\r\\n\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "0f8d6428-1f46-425d-a85c-39b670ee2f04"
+      },
+      "Id": "3b4a6f5d-bef1-423e-bbf0-8a2757173fe5"
+    },
+    "FileName": "Upload.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\ImageAPI\\Upload.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 80,
+        "CharNumber": 115,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 15 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 81,
+        "CharNumber": 14,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 82,
+        "CharNumber": 70,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 15 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "0f8d6428-1f46-425d-a85c-39b670ee2f04"
+      },
+      "Id": "f0e6180a-6514-4993-b454-1ee8c9d5650c"
+    },
+    "FileName": "User.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\ImageAPI\\User.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 69,
+        "CharNumber": 125,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 15 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 70,
+        "CharNumber": 14,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 19 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 71,
+        "CharNumber": 70,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 15 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "c530df78-971d-437e-86cb-e4bb03c81a63"
+      },
+      "Id": "60b31c5d-73dc-4a18-a3bb-f69d8ef7f5e1"
+    },
+    "FileName": "Program.cs",
+    "FilePath": "C:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\SeedImageStorageTiers\\Program.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 80,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 83,
+        "CharNumber": 1,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 26 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      },
+      {
+        "LineNumber": 99,
+        "CharNumber": 126,
+        "DiagnosticId": "WHITESPACE",
+        "FormatDescription": "Fix whitespace formatting. Replace 23 characters with \u0027\\r\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\u0027."
+      }
+    ]
+  }
+]

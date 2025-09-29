@@ -38,7 +38,7 @@ namespace InkStainedWretch.OnePageAuthorLib.Entities.Stripe
         public long? RecurringIntervalCount { get; set; }
         public decimal AmountDecimal => UnitAmount.HasValue ? (decimal)UnitAmount.Value / 100 : 0;
         public string FormattedAmount => $"{AmountDecimal:0.00} {Currency?.ToUpper()}";
-        public string RecurringDescription => IsRecurring 
+        public string RecurringDescription => IsRecurring
             ? $"{RecurringIntervalCount} {RecurringInterval}{(RecurringIntervalCount > 1 ? "s" : "")}"
             : "One-time";
         public DateTime CreatedDate { get; set; }

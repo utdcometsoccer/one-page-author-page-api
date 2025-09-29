@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
-namespace InkStainedWretchStripe;
+namespace InkStainedWretch.OnePageAuthorAPI.Authentication;
 
 /// <summary>
 /// Helper class for JWT authentication in Azure Functions
@@ -18,8 +18,8 @@ public static class JwtAuthenticationHelper
     /// <param name="logger">Logger for authentication events</param>
     /// <returns>Authenticated user principal if valid, or error result if invalid/missing</returns>
     public static async Task<(ClaimsPrincipal? user, IActionResult? errorResult)> ValidateJwtTokenAsync(
-        HttpRequest request, 
-        IJwtValidationService jwtValidationService, 
+        HttpRequest request,
+        IJwtValidationService jwtValidationService,
         ILogger logger)
     {
         try
@@ -39,31 +39,31 @@ public static class JwtAuthenticationHelper
 
             if (!authHeader.StartsWith("Bearer "))
             {
-                logger.LogWarning("Invalid Authorization header format. Header: {HeaderPreview}", 
+                logger.LogWarning("Invalid Authorization header format. Header: {HeaderPreview}",
                     authHeader.Length > 20 ? $"{authHeader[..20]}..." : authHeader);
                 return (null, new UnauthorizedObjectResult(new { error = "Authorization header must start with 'Bearer '" }));
             }
 
             var token = authHeader.Substring("Bearer ".Length).Trim();
-            
+
             // Log token info for debugging (without exposing the actual token)
-            logger.LogDebug("Extracted token - Length: {TokenLength}, Segments: {SegmentCount}", 
+            logger.LogDebug("Extracted token - Length: {TokenLength}, Segments: {SegmentCount}",
                 token.Length, token.Split('.').Length);
-            
+
             if (string.IsNullOrWhiteSpace(token))
             {
                 logger.LogWarning("Token is empty after Bearer prefix removal");
                 return (null, new UnauthorizedObjectResult(new { error = "Token is empty" }));
             }
             var authenticatedUser = await jwtValidationService.ValidateTokenAsync(token);
-            
+
             if (authenticatedUser == null)
             {
                 logger.LogWarning("Invalid JWT token provided");
                 return (null, new UnauthorizedObjectResult(new { error = "Invalid or expired token" }));
             }
 
-            logger.LogInformation("User authenticated successfully: {UserId}", 
+            logger.LogInformation("User authenticated successfully: {UserId}",
                 authenticatedUser.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Unknown");
 
             return (authenticatedUser, null);
@@ -71,8 +71,8 @@ public static class JwtAuthenticationHelper
         catch (Exception ex)
         {
             logger.LogError(ex, "Unexpected error during JWT token validation");
-            return (null, new ObjectResult(new { error = "Authentication error" }) 
-                { StatusCode = StatusCodes.Status500InternalServerError });
+            return (null, new ObjectResult(new { error = "Authentication error" })
+            { StatusCode = StatusCodes.Status500InternalServerError });
         }
     }
 }

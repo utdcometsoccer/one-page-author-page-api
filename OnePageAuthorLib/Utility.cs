@@ -20,7 +20,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// </summary>
         /// <param name="price">The Stripe price DTO to map.</param>
         /// <returns>A populated <see cref="SubscriptionPlan"/> derived from the Stripe price.</returns>
-    public static SubscriptionPlan MapToSubscriptionPlan(PriceDto price)
+        public static SubscriptionPlan MapToSubscriptionPlan(PriceDto price)
         {
             if (price == null) throw new ArgumentNullException(nameof(price));
 
@@ -33,8 +33,8 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 durationYears = price.RecurringInterval?.ToLowerInvariant() switch
                 {
                     "month" => (int)Math.Ceiling(count / 12.0),
-                    "year"  => count,
-                    _        => 1
+                    "year" => count,
+                    _ => 1
                 };
             }
 

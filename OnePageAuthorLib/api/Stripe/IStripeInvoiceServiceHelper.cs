@@ -14,8 +14,8 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     public class StripeInvoiceServiceHelper : IStripeInvoiceServiceHelper
     {
         private readonly ILogger<StripeInvoiceServiceHelper> _logger;
-    private readonly HttpClient _http;
-    private readonly IStripeApiKeyProvider _apiKeyProvider;
+        private readonly HttpClient _http;
+        private readonly IStripeApiKeyProvider _apiKeyProvider;
 
         public StripeInvoiceServiceHelper(ILogger<StripeInvoiceServiceHelper> logger, HttpClient http, IStripeApiKeyProvider apiKeyProvider)
         {

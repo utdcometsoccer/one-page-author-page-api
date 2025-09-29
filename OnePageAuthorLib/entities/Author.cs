@@ -6,10 +6,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         /// Indicates if this Author is the default value for a domain.
         /// </summary>
         public bool IsDefault { get; set; } = false;
-    /// <summary>
-    /// The primary key for the Author entity.
-    /// </summary>
-    public string id { get; set; }
+        /// <summary>
+        /// The primary key for the Author entity.
+        /// </summary>
+        public string id { get; set; }
 
         /// <summary>
         /// The top-level domain (e.g., "com", "org").

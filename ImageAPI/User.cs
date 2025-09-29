@@ -66,9 +66,9 @@ public class User
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to retrieve user images.");
-            return new ObjectResult(new ErrorResponse { Error = "Internal server error occurred while retrieving images." }) 
-            { 
-                StatusCode = StatusCodes.Status500InternalServerError 
+            return new ObjectResult(new ErrorResponse { Error = "Internal server error occurred while retrieving images." })
+            {
+                StatusCode = StatusCodes.Status500InternalServerError
             };
         }
     }

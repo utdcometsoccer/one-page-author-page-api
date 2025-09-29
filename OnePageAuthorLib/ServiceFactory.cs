@@ -261,18 +261,27 @@ namespace InkStainedWretch.OnePageAuthorAPI
             return services;
         }
 
-    /// <summary>
-    /// Registers Ink Stained Wretch domain services and Cosmos container managers for
-    /// author-management localization. Includes:
-    /// <list type="bullet">
-    /// <item><description><see cref="ILocalizationTextProvider"/> implementation</description></item>
-    /// <item><description>Typed <see cref="IContainerManager{T}"/> for each author management POCO (partition key: Culture)</description></item>
-    /// </list>
-    /// Call this after registering a singleton <see cref="Microsoft.Azure.Cosmos.Database"/> in DI.
-    /// </summary>
-    /// <param name="services">The DI service collection.</param>
-    /// <returns>The modified <see cref="IServiceCollection"/> for chaining.</returns>
-    public static IServiceCollection AddInkStainedWretchServices(this IServiceCollection services)
+        /// <summary>
+        /// Registers user profile services for user identity management.
+        /// </summary>
+        public static IServiceCollection AddUserProfileServices(this IServiceCollection services)
+        {
+            services.AddScoped<API.IUserProfileService, API.UserProfileService>();
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Ink Stained Wretch domain services and Cosmos container managers for
+        /// author-management localization. Includes:
+        /// <list type="bullet">
+        /// <item><description><see cref="ILocalizationTextProvider"/> implementation</description></item>
+        /// <item><description>Typed <see cref="IContainerManager{T}"/> for each author management POCO (partition key: Culture)</description></item>
+        /// </list>
+        /// Call this after registering a singleton <see cref="Microsoft.Azure.Cosmos.Database"/> in DI.
+        /// </summary>
+        /// <param name="services">The DI service collection.</param>
+        /// <returns>The modified <see cref="IServiceCollection"/> for chaining.</returns>
+        public static IServiceCollection AddInkStainedWretchServices(this IServiceCollection services)
         {
             services.AddTransient<ILocalizationTextProvider, LocalizationTextProvider>();
             services.AddTransient<IContainerManager<ArticleForm>, AuthorManagementContainerManager<ArticleForm>>(servicesProvider =>
@@ -484,7 +493,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
                     .EnsureContainerAsync().GetAwaiter().GetResult();
                 return new NoSQL.ImageStorageTierMembershipRepository(c);
             });
-            
+
             services.AddSingleton<InkStainedWretch.OnePageAuthorAPI.API.ImageAPI.IImageStorageTierRepository>(sp =>
             {
                 var c = sp.GetRequiredService<IContainerManager<Entities.ImageAPI.ImageStorageTier>>();
@@ -521,10 +530,29 @@ namespace InkStainedWretch.OnePageAuthorAPI
         {
             // Register configuration
             services.AddSingleton<IPenguinRandomHouseConfig, PenguinRandomHouseConfig>();
-            
+
             // Register HTTP client and service
             services.AddHttpClient<IPenguinRandomHouseService, PenguinRandomHouseService>();
-            
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers JWT authentication services including validation and token introspection.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <returns>The IServiceCollection for chaining.</returns>
+        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services)
+        {
+            // Register HTTP client for token introspection
+            services.AddHttpClient();
+
+            // Register authentication services
+            services.AddScoped<InkStainedWretch.OnePageAuthorAPI.Authentication.IJwtValidationService,
+                              InkStainedWretch.OnePageAuthorAPI.Authentication.JwtValidationService>();
+            services.AddScoped<InkStainedWretch.OnePageAuthorAPI.Authentication.ITokenIntrospectionService,
+                              InkStainedWretch.OnePageAuthorAPI.Authentication.TokenIntrospectionService>();
+
             return services;
         }
     }

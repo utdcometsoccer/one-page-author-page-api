@@ -18,7 +18,8 @@ namespace OnePageAuthor.Test
         {
             var cosmosMock = new Mock<IDataContainer>();
             var authorId = Guid.NewGuid();
-            var author = new Author {
+            var author = new Author
+            {
                 id = authorId.ToString(),
                 AuthorName = "Test Author",
                 TopLevelDomain = "com",

@@ -11,7 +11,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         /// <summary>
         /// Creates a Stripe Checkout Session for the provided request.
         /// </summary>
-    Task<CreateCheckoutSessionResponse> CreateAsync(CreateCheckoutSessionRequest request);
+        Task<CreateCheckoutSessionResponse> CreateAsync(CreateCheckoutSessionRequest request);
 
         /// <summary>
         /// Retrieves a Stripe Checkout Session details by its identifier.

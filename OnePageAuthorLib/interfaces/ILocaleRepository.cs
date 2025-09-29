@@ -7,10 +7,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
     /// </summary>
     public interface ILocaleRepository : IGenericRepository<Locale>
     {
-    /// <summary>
-    /// Gets all locales (async).
-    /// </summary>
-    Task<IList<Locale>> GetAllAsync();
+        /// <summary>
+        /// Gets all locales (async).
+        /// </summary>
+        Task<IList<Locale>> GetAllAsync();
 
         /// <summary>
         /// Gets locales by language name and optional region name (async).

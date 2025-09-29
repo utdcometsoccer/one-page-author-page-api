@@ -52,7 +52,7 @@ public class ImageDeleteService : IImageDeleteService
             // Verify the image belongs to the authenticated user
             if (image.UserProfileId != userProfileId)
             {
-                _logger.LogWarning("User {UserProfileId} attempted to delete image {ImageId} owned by {OwnerProfileId}", 
+                _logger.LogWarning("User {UserProfileId} attempted to delete image {ImageId} owned by {OwnerProfileId}",
                     userProfileId, imageId, image.UserProfileId);
                 return ServiceResult.Failure<ImageDeleteResult>("Image not found.", 404);
             }
@@ -60,11 +60,11 @@ public class ImageDeleteService : IImageDeleteService
             // Delete from Azure Blob Storage
             var containerClient = _blobServiceClient.GetBlobContainerClient(image.ContainerName);
             var blobClient = containerClient.GetBlobClient(image.BlobName);
-            
+
             var deleteResult = await blobClient.DeleteIfExistsAsync();
             if (!deleteResult.Value)
             {
-                _logger.LogWarning("Blob {BlobName} in container {ContainerName} was not found during deletion", 
+                _logger.LogWarning("Blob {BlobName} in container {ContainerName} was not found during deletion",
                     image.BlobName, image.ContainerName);
             }
 
@@ -79,7 +79,7 @@ public class ImageDeleteService : IImageDeleteService
                 await _membershipRepository.UpdateAsync(membership);
             }
 
-            _logger.LogInformation("Image deleted successfully. User: {UserProfileId}, Image: {ImageId}, Size: {Size} bytes", 
+            _logger.LogInformation("Image deleted successfully. User: {UserProfileId}, Image: {ImageId}, Size: {Size} bytes",
                 userProfileId, image.id, image.Size);
 
             var result = ServiceResult.Success<ImageDeleteResult>(200);

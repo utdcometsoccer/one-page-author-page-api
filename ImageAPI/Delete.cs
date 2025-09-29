@@ -78,9 +78,9 @@ public class Delete
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to delete image {ImageId}", id);
-            return new ObjectResult(new ErrorResponse { Error = "Internal server error occurred during deletion." }) 
-            { 
-                StatusCode = StatusCodes.Status500InternalServerError 
+            return new ObjectResult(new ErrorResponse { Error = "Internal server error occurred during deletion." })
+            {
+                StatusCode = StatusCodes.Status500InternalServerError
             };
         }
     }

@@ -73,7 +73,7 @@ class Program
                 // Try to get existing locale by language and region
                 var existingLocales = await localeRepository.GetByLanguageAndRegionAsync(locale.LanguageName, locale.RegionName);
                 var existingLocale = existingLocales.FirstOrDefault();
-                
+
                 if (existingLocale != null)
                 {
                     Console.WriteLine($"Locale {locale.LanguageName}-{locale.RegionName} already exists (id: {existingLocale.id}), updating...");

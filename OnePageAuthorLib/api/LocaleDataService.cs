@@ -12,7 +12,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             _localeRepository = localeRepository ?? throw new ArgumentNullException(nameof(localeRepository));
         }
 
-    public async Task<List<Locale>> GetLocalesAsync(string? languageName = null, string? regionName = null)
+        public async Task<List<Locale>> GetLocalesAsync(string? languageName = null, string? regionName = null)
         {
             // Default case: both null
             if (string.IsNullOrWhiteSpace(languageName) && string.IsNullOrWhiteSpace(regionName))

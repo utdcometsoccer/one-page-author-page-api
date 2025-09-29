@@ -38,7 +38,8 @@ namespace OnePageAuthor.Test
         public async Task GetAuthorWithDataAsync_ReturnsAuthorResponse_WhenAuthorFound()
         {
             var authorId = Guid.NewGuid().ToString();
-            var author = new InkStainedWretch.OnePageAuthorAPI.Entities.Author {
+            var author = new InkStainedWretch.OnePageAuthorAPI.Entities.Author
+            {
                 id = authorId,
                 TopLevelDomain = "com",
                 SecondLevelDomain = "example",

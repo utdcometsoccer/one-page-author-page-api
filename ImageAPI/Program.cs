@@ -61,9 +61,9 @@ builder.Services.AddAuthorization(options =>
 // Authentication/Authorization middleware are added automatically when services are registered above.
 
 // Cosmos + repositories
-var endpointUri = Environment.GetEnvironmentVariable("COSMOSDB_ENDPOINT_URI"); 
-var primaryKey = Environment.GetEnvironmentVariable("COSMOSDB_PRIMARY_KEY"); 
-var databaseId = Environment.GetEnvironmentVariable("COSMOSDB_DATABASE_ID"); 
+var endpointUri = Environment.GetEnvironmentVariable("COSMOSDB_ENDPOINT_URI");
+var primaryKey = Environment.GetEnvironmentVariable("COSMOSDB_PRIMARY_KEY");
+var databaseId = Environment.GetEnvironmentVariable("COSMOSDB_DATABASE_ID");
 
 builder.Services
     .AddCosmosClient(endpointUri!, primaryKey!)

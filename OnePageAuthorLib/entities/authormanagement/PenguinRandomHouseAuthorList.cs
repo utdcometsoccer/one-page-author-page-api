@@ -6,7 +6,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
     /// Inherits from AuthorManagementBase to include Culture and id properties for localization support.
     /// </summary>
     public class PenguinRandomHouseAuthorList : AuthorManagementBase
-    {    
+    {
         /// <summary>
         /// The main title displayed at the top of the author list interface
         /// </summary>

@@ -8,11 +8,11 @@ namespace InkStainedWretch.OnePageAuthorLib.Entities.Stripe
     /// </summary>
     public class SubscriptionPlan
     {
-    /// <summary>
-    /// An identifier copied from the source (e.g., Stripe Price Id) that will be serialized as "id".
-    /// </summary>
-    [JsonPropertyName("id")]
-    public string Id { get; set; } = string.Empty;
+        /// <summary>
+        /// An identifier copied from the source (e.g., Stripe Price Id) that will be serialized as "id".
+        /// </summary>
+        [JsonPropertyName("id")]
+        public string Id { get; set; } = string.Empty;
 
         /// <summary>
         /// A short label for the plan, e.g., "Basic".

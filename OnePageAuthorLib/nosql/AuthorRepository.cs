@@ -51,7 +51,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             return results;
         }
 
-        public AuthorRepository(Container container) : base(container){}
+        public AuthorRepository(Container container) : base(container) { }
 
         public AuthorRepository(IDataContainer container) : base(container) { }
 

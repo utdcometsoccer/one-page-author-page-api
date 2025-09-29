@@ -22,10 +22,10 @@ namespace OnePageAuthor.Test
             var containerResponseMock = new Mock<ContainerResponse>();
             containerResponseMock.Setup(cr => cr.Container).Returns(containerMock.Object);
             databaseMock.Setup(db => db.CreateContainerIfNotExistsAsync(
-                It.IsAny<string>(), 
-                It.IsAny<string>(), 
-                null, 
-                null, 
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                null,
+                null,
                 CancellationToken.None))
                 .ReturnsAsync(containerResponseMock.Object);
             var manager = new BooksContainerManager(cosmosClientMock.Object, databaseMock.Object);

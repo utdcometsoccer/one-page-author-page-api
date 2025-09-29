@@ -41,24 +41,21 @@ Console.WriteLine($"Azure AD Tenant ID configured: {maskedTenantId}");
 Console.WriteLine($"Azure AD Audience configured: {maskedAudience}");
 Console.WriteLine($"Azure AD Authority configured: {maskedAuthority}");
 
-// Add JWT validation service
-builder.Services.AddScoped<IJwtValidationService, JwtValidationService>();
-builder.Services.AddScoped<ITokenIntrospectionService, TokenIntrospectionService>();
-builder.Services.AddHttpClient(); // For token introspection service
-
 // Cosmos + repositories for user profiles
-var endpointUri = config["COSMOSDB_ENDPOINT_URI"]; 
-var primaryKey = config["COSMOSDB_PRIMARY_KEY"]; 
-var databaseId = config["COSMOSDB_DATABASE_ID"]; 
+var endpointUri = config["COSMOSDB_ENDPOINT_URI"];
+var primaryKey = config["COSMOSDB_PRIMARY_KEY"];
+var databaseId = config["COSMOSDB_DATABASE_ID"];
 
 builder.Services
     .AddCosmosClient(endpointUri!, primaryKey!)
     .AddCosmosDatabase(databaseId!)
     .AddUserProfileRepository()
     .AddImageApiRepositories()
+    .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights()
     .AddStripeServices()
-    .AddStripeOrchestrators();
+    .AddStripeOrchestrators()
+    .AddUserProfileServices();
 
 builder.Build().Run();

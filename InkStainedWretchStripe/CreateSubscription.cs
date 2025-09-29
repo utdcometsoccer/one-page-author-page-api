@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
-using Microsoft.AspNetCore.Authorization;
+using InkStainedWretch.OnePageAuthorAPI.Authentication;
+using InkStainedWretch.OnePageAuthorAPI.API;
+using System.Security.Claims;
 
 namespace InkStainedWretchStripe;
 
@@ -56,11 +58,15 @@ public class CreateSubscription
 {
     private readonly ILogger<CreateSubscription> _logger;
     private readonly ISubscriptionService _subscriptions;
+    private readonly IJwtValidationService _jwtValidationService;
+    private readonly IUserProfileService _userProfileService;
 
-    public CreateSubscription(ILogger<CreateSubscription> logger, ISubscriptionService subscriptions)
+    public CreateSubscription(ILogger<CreateSubscription> logger, ISubscriptionService subscriptions, IJwtValidationService jwtValidationService, IUserProfileService userProfileService)
     {
         _logger = logger;
         _subscriptions = subscriptions;
+        _jwtValidationService = jwtValidationService;
+        _userProfileService = userProfileService;
     }
 
     /// <summary>
@@ -69,12 +75,29 @@ public class CreateSubscription
     /// <param name="req">HTTP request.</param>
     /// <returns>200 with SubscriptionCreateResponse; 400 on invalid input.</returns>
     [Function("CreateSubscription")]
-    [Authorize]
     public async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
         [FromBody] CreateSubscriptionRequest payload)
     {
         _logger.LogInformation("CreateSubscription invoked.");
+
+        // Validate JWT token and get authenticated user
+        var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+        if (authError != null)
+        {
+            return authError;
+        }
+
+        try
+        {
+            // Ensure user profile exists
+            await _userProfileService.EnsureUserProfileAsync(authenticatedUser!);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "User profile validation failed for CreateSubscription");
+            return new UnauthorizedObjectResult(new { error = "User profile validation failed" });
+        }
 
         if (payload is null)
         {

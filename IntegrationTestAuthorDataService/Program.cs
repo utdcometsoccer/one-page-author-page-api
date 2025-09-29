@@ -15,7 +15,7 @@ class Program
                                 .Build();
         // Read settings
         var configJson = File.ReadAllText(Utility.GetAbsolutePath("appsettings.json"));
-        using var configDoc = JsonDocument.Parse(configJson);        
+        using var configDoc = JsonDocument.Parse(configJson);
         string endpointUri = config["EndpointUri"] ?? "";
         string primaryKey = config["PrimaryKey"] ?? "";
         string databaseId = config["DatabaseId"] ?? "";

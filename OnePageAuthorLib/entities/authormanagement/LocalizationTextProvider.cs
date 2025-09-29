@@ -5,7 +5,7 @@ using Microsoft.Azure.Cosmos;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
 {
-    
+
     /// <summary>
     /// Default implementation of <see cref="ILocalizationTextProvider"/> that aggregates
     /// localized UI fragments from individual Cosmos DB containers into a single
@@ -26,12 +26,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
         }
 
         /// <summary>
-    /// Retrieves localized text values for the specified culture across all
-    /// registered author-management containers. Resolution order per segment:
-    /// 1. Exact culture (e.g. en-GB)
-    /// 2. First document whose Culture begins with the same language code + '-' (e.g. en-US if en-GB missing)
-    /// 3. Neutral language (exact language only, e.g. en) if stored as such
-    /// 4. Empty placeholder object (never null) with Culture set to requested specific culture
+        /// Retrieves localized text values for the specified culture across all
+        /// registered author-management containers. Resolution order per segment:
+        /// 1. Exact culture (e.g. en-GB)
+        /// 2. First document whose Culture begins with the same language code + '-' (e.g. en-US if en-GB missing)
+        /// 3. Neutral language (exact language only, e.g. en) if stored as such
+        /// 4. Empty placeholder object (never null) with Culture set to requested specific culture
         /// </summary>
         /// <param name="culture">Culture code (e.g. "en-US"). Must be a valid .NET culture.</param>
         /// <returns>A populated <see cref="LocalizationText"/> instance.</returns>

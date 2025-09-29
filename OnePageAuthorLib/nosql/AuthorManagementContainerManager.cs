@@ -24,7 +24,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 partitionKeyPath: "/Culture"
             );
             return containerResponse.Container;
-        }       
+        }
     }
 
 }

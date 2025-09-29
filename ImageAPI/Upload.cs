@@ -77,9 +77,9 @@ public class Upload
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to upload image.");
-            return new ObjectResult(new ErrorResponse { Error = "Internal server error occurred during upload." }) 
-            { 
-                StatusCode = StatusCodes.Status500InternalServerError 
+            return new ObjectResult(new ErrorResponse { Error = "Internal server error occurred during upload." })
+            {
+                StatusCode = StatusCodes.Status500InternalServerError
             };
         }
     }

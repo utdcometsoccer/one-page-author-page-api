@@ -114,15 +114,15 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var responseList = Assert.IsAssignableFrom<List<InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models.UserImageResponse>>(okResult.Value);
-            
+
             Assert.Equal(2, responseList.Count);
-            
+
             // Verify sorting by upload date (newest first)
             Assert.Equal("image-1", responseList[0].Id);
             Assert.Equal("recent.jpg", responseList[0].Name);
             Assert.Equal(2048, responseList[0].Size);
             Assert.Equal(now, responseList[0].UploadedAt);
-            
+
             Assert.Equal("image-2", responseList[1].Id);
             Assert.Equal("older.png", responseList[1].Name);
             Assert.Equal(1024, responseList[1].Size);

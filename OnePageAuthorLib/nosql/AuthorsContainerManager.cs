@@ -19,7 +19,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         public AuthorsContainerManager(Database database)
         {
             if (database == null)
-                throw new ArgumentNullException(nameof(database), "AuthorsContainerManager: The provided Database is null.");           
+                throw new ArgumentNullException(nameof(database), "AuthorsContainerManager: The provided Database is null.");
             _database = database;
         }
 

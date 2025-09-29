@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Net.Http;
 
-namespace InkStainedWretchStripe;
+namespace InkStainedWretch.OnePageAuthorAPI.Authentication;
 
 public interface ITokenIntrospectionService
 {
@@ -30,7 +30,7 @@ public class TokenIntrospectionService : ITokenIntrospectionService
         {
             // First, try to determine if this is a JWT or opaque token
             var tokenSegments = token.Split('.');
-            
+
             if (tokenSegments.Length == 3)
             {
                 _logger.LogDebug("Token appears to be JWT format, attempting JWT validation");
@@ -64,9 +64,9 @@ public class TokenIntrospectionService : ITokenIntrospectionService
             // Use Microsoft Graph /me endpoint to validate token and get user info
             var request = new HttpRequestMessage(HttpMethod.Get, "https://graph.microsoft.com/v1.0/me");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            
+
             var response = await _httpClient.SendAsync(request);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogWarning("Microsoft Graph validation failed with status: {StatusCode}", response.StatusCode);
@@ -97,7 +97,7 @@ public class TokenIntrospectionService : ITokenIntrospectionService
             var identity = new ClaimsIdentity(claims, "Bearer");
             var principal = new ClaimsPrincipal(identity);
 
-            _logger.LogInformation("Token validated successfully via Microsoft Graph for user: {UserId}", 
+            _logger.LogInformation("Token validated successfully via Microsoft Graph for user: {UserId}",
                 principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Unknown");
 
             return principal;

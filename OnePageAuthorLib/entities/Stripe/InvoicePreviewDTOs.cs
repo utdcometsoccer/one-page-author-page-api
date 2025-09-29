@@ -8,8 +8,8 @@ namespace InkStainedWretch.OnePageAuthorLib.Entities.Stripe
         public string? PriceId { get; set; }
         public long? Quantity { get; set; }
         public string? Currency { get; set; }
-    // Match Stripe.NET enum for proration; optional
-    public string? ProrationBehavior { get; set; }
+        // Match Stripe.NET enum for proration; optional
+        public string? ProrationBehavior { get; set; }
     }
 
     public class InvoicePreviewResponse

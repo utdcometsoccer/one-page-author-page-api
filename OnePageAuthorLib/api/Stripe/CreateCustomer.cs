@@ -25,13 +25,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         {
             _logger = logger;
         }
-    /// <summary>
-    /// Creates an initialized <see cref="CreateCustomerResponse"/> from the provided request.
-    /// </summary>
+        /// <summary>
+        /// Creates an initialized <see cref="CreateCustomerResponse"/> from the provided request.
+        /// </summary>
         /// <param name="request">The input payload. Must not be null.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="request"/> is null.</exception>
         /// <returns>An initialized response with a <see cref="Customer"/> containing the provided email.</returns>
-    public CreateCustomerResponse Execute(CreateCustomerRequest request)
+        public CreateCustomerResponse Execute(CreateCustomerRequest request)
         {
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
@@ -39,7 +39,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             try
             {
                 // Create the customer service
-                 // First, check if a customer with this email already exists
+                // First, check if a customer with this email already exists
                 var service = new CustomerService();
 
                 // First, check if a customer with this email already exists
@@ -64,7 +64,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 };
 
 
-               
+
 
                 // Create the actual Stripe customer
                 var customer = service.Create(options);

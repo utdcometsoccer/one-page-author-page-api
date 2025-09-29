@@ -60,9 +60,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 response.Headers.Add("Content-Type", "application/json");
 
                 // Write the raw JSON response
-                var jsonString = JsonSerializer.Serialize(jsonResult, new JsonSerializerOptions 
-                { 
-                    WriteIndented = true 
+                var jsonString = JsonSerializer.Serialize(jsonResult, new JsonSerializerOptions
+                {
+                    WriteIndented = true
                 });
                 await response.WriteStringAsync(jsonString);
 
@@ -144,9 +144,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 response.Headers.Add("Content-Type", "application/json");
 
                 // Write the raw JSON response
-                var jsonString = JsonSerializer.Serialize(jsonResult, new JsonSerializerOptions 
-                { 
-                    WriteIndented = true 
+                var jsonString = JsonSerializer.Serialize(jsonResult, new JsonSerializerOptions
+                {
+                    WriteIndented = true
                 });
                 await response.WriteStringAsync(jsonString);
 

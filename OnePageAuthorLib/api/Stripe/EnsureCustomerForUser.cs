@@ -111,7 +111,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 };
 
                 await _membershipRepository.AddAsync(membership);
-                _logger.LogInformation("Enrolled user {UserProfileId} in free image storage tier {TierId} ({TierName})", 
+                _logger.LogInformation("Enrolled user {UserProfileId} in free image storage tier {TierId} ({TierName})",
                     userProfileId, freeTier.id, freeTier.Name);
             }
             catch (Exception ex)

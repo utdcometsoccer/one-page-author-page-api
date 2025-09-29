@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace InkStainedWretchStripe;
+namespace InkStainedWretch.OnePageAuthorAPI.Authentication;
 
 public interface IJwtValidationService
 {
@@ -41,19 +41,19 @@ public class JwtValidationService : IJwtValidationService
 
             // Check if token has the correct number of segments (should be 3 for JWS)
             var tokenParts = token.Split('.');
-            
+
             // Handle opaque tokens (1 segment)
             if (tokenParts.Length == 1)
             {
                 _logger.LogInformation("Token appears to be opaque (1 segment), using introspection service");
                 return await _tokenIntrospectionService.IntrospectTokenAsync(token);
             }
-            
+
             // Handle JWT tokens (3 segments)
             if (tokenParts.Length != 3)
             {
                 _logger.LogWarning("JWT validation failed: Token has {SegmentCount} segments, expected 3. Token preview: {TokenPreview}",
-                    tokenParts.Length, 
+                    tokenParts.Length,
                     token.Length > 50 ? $"{token[..25]}...{token[^25..]}" : token);
                 return null;
             }
@@ -74,11 +74,11 @@ public class JwtValidationService : IJwtValidationService
         catch (SecurityTokenValidationException ex)
         {
             _logger.LogWarning(ex, "JWT token validation failed: {Message}", ex.Message);
-            
+
             // Add detailed token analysis for debugging
             var tokenAnalysis = JwtDebugHelper.AnalyzeToken(token);
             _logger.LogDebug("Token Analysis:\n{TokenAnalysis}", tokenAnalysis);
-            
+
             return null;
         }
         catch (Exception ex)
@@ -99,7 +99,7 @@ public class JwtValidationService : IJwtValidationService
                                     ? $"https://login.microsoftonline.com/{tenantId}/v2.0/.well-known/openid-configuration"
                                     : null);
         var authority = openIdMetadataUrl is null ? "" : openIdMetadataUrl.Replace("/.well-known/openid-configuration", "");
-        
+
         if (string.IsNullOrWhiteSpace(openIdMetadataUrl) || string.IsNullOrWhiteSpace(audience))
         {
             _logger.LogError("JWT validation failed: Authority or Audience not configured properly. OpenIdMetadataUrl: {OpenIdMetadataUrl}, Audience: {Audience}",
@@ -110,9 +110,9 @@ public class JwtValidationService : IJwtValidationService
         // Get OpenID Connect configuration for token validation
         //var openIdConnectUrl = $"{authority.TrimEnd('/')}/.well-known/openid_connect_configuration";
         var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-            openIdMetadataUrl, 
+            openIdMetadataUrl,
             new OpenIdConnectConfigurationRetriever());
-        
+
         var openIdConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None);
 
         var validationParameters = new TokenValidationParameters
@@ -129,10 +129,10 @@ public class JwtValidationService : IJwtValidationService
 
         _logger.LogDebug("Attempting to validate JWT token with {SegmentCount} segments", 3);
         var principal = _tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
-        
-        _logger.LogInformation("JWT token validated successfully for user: {UserId}", 
+
+        _logger.LogInformation("JWT token validated successfully for user: {UserId}",
             principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Unknown");
-        
+
         return principal;
     }
 }

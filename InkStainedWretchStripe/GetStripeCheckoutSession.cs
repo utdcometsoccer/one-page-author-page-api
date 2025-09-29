@@ -3,7 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
-using Microsoft.AspNetCore.Authorization;
+using InkStainedWretch.OnePageAuthorAPI.Authentication;
+using InkStainedWretch.OnePageAuthorAPI.API;
+using System.Security.Claims;
 
 namespace InkStainedWretchStripe;
 
@@ -11,20 +13,41 @@ public class GetStripeCheckoutSession
 {
     private readonly ILogger<GetStripeCheckoutSession> _logger;
     private readonly ICheckoutSessionService _checkoutService;
+    private readonly IJwtValidationService _jwtValidationService;
+    private readonly IUserProfileService _userProfileService;
 
-    public GetStripeCheckoutSession(ILogger<GetStripeCheckoutSession> logger, ICheckoutSessionService checkoutService)
+    public GetStripeCheckoutSession(ILogger<GetStripeCheckoutSession> logger, ICheckoutSessionService checkoutService, IJwtValidationService jwtValidationService, IUserProfileService userProfileService)
     {
         _logger = logger;
         _checkoutService = checkoutService;
+        _jwtValidationService = jwtValidationService;
+        _userProfileService = userProfileService;
     }
 
     [Function("GetStripeCheckoutSession")]
-    [Authorize]
     public async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = "GetStripeCheckoutSession/{sessionId}")] HttpRequest req,
         string sessionId)
     {
         _logger.LogInformation("Processing request to retrieve Stripe checkout session");
+
+        // Validate JWT token and get authenticated user
+        var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+        if (authError != null)
+        {
+            return authError;
+        }
+
+        try
+        {
+            // Ensure user profile exists
+            await _userProfileService.EnsureUserProfileAsync(authenticatedUser!);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "User profile validation failed for GetStripeCheckoutSession");
+            return new UnauthorizedObjectResult(new { error = "User profile validation failed" });
+        }
 
         if (string.IsNullOrWhiteSpace(sessionId))
         {

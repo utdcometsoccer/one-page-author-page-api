@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text;
 
-namespace InkStainedWretchStripe;
+namespace InkStainedWretch.OnePageAuthorAPI.Authentication;
 
 /// <summary>
 /// Utility class for debugging JWT tokens
@@ -18,19 +18,19 @@ public static class JwtDebugHelper
 
         var segments = token.Split('.');
         var analysis = new StringBuilder();
-        
+
         analysis.AppendLine($"Token Length: {token.Length}");
         analysis.AppendLine($"Segment Count: {segments.Length} (Expected: 3)");
-        
+
         if (segments.Length != 3)
         {
             analysis.AppendLine("❌ INVALID: JWT must have exactly 3 segments (header.payload.signature)");
-            
+
             for (int i = 0; i < segments.Length; i++)
             {
                 analysis.AppendLine($"  Segment {i + 1}: Length={segments[i].Length}, Preview={segments[i][..Math.Min(10, segments[i].Length)]}...");
             }
-            
+
             return analysis.ToString();
         }
 
@@ -39,7 +39,7 @@ public static class JwtDebugHelper
         {
             var segment = segments[i];
             analysis.AppendLine($"Segment {i + 1} ({GetSegmentName(i)}): Length={segment.Length}");
-            
+
             if (i < 2) // Header and payload are base64url encoded JSON
             {
                 try
@@ -66,7 +66,7 @@ public static class JwtDebugHelper
     private static string GetSegmentName(int index) => index switch
     {
         0 => "Header",
-        1 => "Payload", 
+        1 => "Payload",
         2 => "Signature",
         _ => "Unknown"
     };
@@ -80,7 +80,7 @@ public static class JwtDebugHelper
 
         // Replace URL-safe characters
         base64Url = base64Url.Replace('-', '+').Replace('_', '/');
-        
+
         var bytes = Convert.FromBase64String(base64Url);
         return Encoding.UTF8.GetString(bytes);
     }
