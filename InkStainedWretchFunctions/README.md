@@ -1,6 +1,10 @@
 # InkStainedWretchFunctions
 
-Azure Functions (Isolated Worker, .NET 9) exposing localized UI text aggregated from Cosmos DB.
+[![Build Status](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml/badge.svg)](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml)
+[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
+[![Azure Functions](https://img.shields.io/badge/Azure%20Functions-v4-orange.svg)](https://docs.microsoft.com/en-us/azure/azure-functions/)
+
+Azure Functions application providing domain registration management, external API integrations, and localized UI text services.
 
 ## Overview
 Provides a single endpoint to retrieve all localized fragments for a given culture with robust fallback.

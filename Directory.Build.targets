@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  
+  <!-- Custom MSBuild target to generate API documentation -->
+  <Target Name="GenerateApiDocumentation" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    
+    <PropertyGroup>
+      <DocumentationScriptPath>$(MSBuildProjectDirectory)\..\Generate-ApiDocumentation.ps1</DocumentationScriptPath>
+      <DocumentationOutputPath>$(MSBuildProjectDirectory)\..\API-Documentation.md</DocumentationOutputPath>
+    </PropertyGroup>
+    
+    <!-- Only run this target from the main solution build, not individual project builds -->
+    <PropertyGroup>
+      <RunDocumentationGeneration Condition="'$(MSBuildProjectName)' == 'ImageAPI' AND '$(BuildingProject)' != 'true'">true</RunDocumentationGeneration>
+    </PropertyGroup>
+    
+    <Message Text="Checking if API documentation should be generated..." Importance="normal" />
+    <Message Text="Project: $(MSBuildProjectName)" Importance="normal" />
+    <Message Text="Configuration: $(Configuration)" Importance="normal" />
+    <Message Text="Run Documentation: $(RunDocumentationGeneration)" Importance="normal" />
+    
+    <!-- Generate API documentation if conditions are met -->
+    <Exec 
+      Command="pwsh.exe -ExecutionPolicy Bypass -File &quot;$(DocumentationScriptPath)&quot; -OutputPath &quot;$(DocumentationOutputPath)&quot;"
+      Condition="'$(RunDocumentationGeneration)' == 'true'"
+      ContinueOnError="false"
+      IgnoreExitCode="false" 
+      WorkingDirectory="$(MSBuildProjectDirectory)\.." />
+    
+    <Message 
+      Text="API documentation generated at: $(DocumentationOutputPath)" 
+      Importance="high" 
+      Condition="'$(RunDocumentationGeneration)' == 'true'" />
+    
+  </Target>
+  
+  <!-- Custom target that can be called explicitly to generate documentation -->
+  <Target Name="BuildApiDocumentation">
+    
+    <PropertyGroup>
+      <DocumentationScriptPath>$(MSBuildProjectDirectory)\..\Generate-ApiDocumentation.ps1</DocumentationScriptPath>
+      <DocumentationOutputPath>$(MSBuildProjectDirectory)\..\API-Documentation.md</DocumentationOutputPath>
+    </PropertyGroup>
+    
+    <Message Text="Explicitly generating API documentation..." Importance="high" />
+    
+    <Exec 
+      Command="pwsh.exe -ExecutionPolicy Bypass -File &quot;$(DocumentationScriptPath)&quot; -OutputPath &quot;$(DocumentationOutputPath)&quot;"
+      ContinueOnError="false"
+      IgnoreExitCode="false" 
+      WorkingDirectory="$(MSBuildProjectDirectory)\.." />
+    
+    <Message Text="API documentation generated at: $(DocumentationOutputPath)" Importance="high" />
+    
+  </Target>
+  
+</Project>

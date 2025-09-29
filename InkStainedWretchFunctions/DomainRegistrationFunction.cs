@@ -44,9 +44,104 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// <summary>
         /// Creates a new domain registration for the authenticated user.
         /// </summary>
-        /// <param name="req">HTTP request</param>
-        /// <param name="payload">Domain registration request payload</param>
-        /// <returns>Created domain registration or error response</returns>
+        /// <param name="req">HTTP request containing the domain registration data</param>
+        /// <param name="payload">Domain registration request payload with domain details</param>
+        /// <returns>
+        /// <list type="table">
+        /// <item>
+        /// <term>201 Created</term>
+        /// <description>Domain registration created successfully - returns DomainRegistrationResponse</description>
+        /// </item>
+        /// <item>
+        /// <term>400 Bad Request</term>
+        /// <description>Invalid request body or missing required fields</description>
+        /// </item>
+        /// <item>
+        /// <term>401 Unauthorized</term>
+        /// <description>Invalid or missing JWT token</description>
+        /// </item>
+        /// <item>
+        /// <term>409 Conflict</term>
+        /// <description>Domain already registered</description>
+        /// </item>
+        /// <item>
+        /// <term>500 Internal Server Error</term>
+        /// <description>Unexpected server error during registration</description>
+        /// </item>
+        /// </list>
+        /// </returns>
+        /// <example>
+        /// <para><strong>TypeScript Example:</strong></para>
+        /// <code>
+        /// interface CreateDomainRequest {
+        ///   DomainName: string;           // e.g., "example.com"
+        ///   RegistrationPeriodYears: number; // 1-10 years
+        ///   AutoRenew: boolean;           // true for auto-renewal
+        ///   PrivacyProtection: boolean;   // true for privacy protection
+        ///   ContactInfo: {
+        ///     FirstName: string;
+        ///     LastName: string;
+        ///     Email: string;
+        ///     Phone: string;
+        ///     Address: {
+        ///       Street: string;
+        ///       City: string;
+        ///       State: string;
+        ///       PostalCode: string;
+        ///       Country: string;
+        ///     };
+        ///   };
+        /// }
+        /// 
+        /// const registerDomain = async (domain: CreateDomainRequest, token: string) => {
+        ///   const response = await fetch('/api/domain-registrations', {
+        ///     method: 'POST',
+        ///     headers: {
+        ///       'Authorization': `Bearer ${token}`,
+        ///       'Content-Type': 'application/json'
+        ///     },
+        ///     body: JSON.stringify(domain)
+        ///   });
+        /// 
+        ///   if (response.ok) {
+        ///     return await response.json();
+        ///   } else if (response.status === 409) {
+        ///     throw new Error('Domain is already registered');
+        ///   } else if (response.status === 400) {
+        ///     const error = await response.json();
+        ///     throw new Error(`Invalid request: ${error.error}`);
+        ///   }
+        /// 
+        ///   throw new Error('Domain registration failed');
+        /// };
+        /// 
+        /// // Usage
+        /// try {
+        ///   const result = await registerDomain({
+        ///     DomainName: "myblog.com",
+        ///     RegistrationPeriodYears: 2,
+        ///     AutoRenew: true,
+        ///     PrivacyProtection: true,
+        ///     ContactInfo: {
+        ///       FirstName: "John",
+        ///       LastName: "Doe",
+        ///       Email: "john@example.com",
+        ///       Phone: "+1234567890",
+        ///       Address: {
+        ///         Street: "123 Main St",
+        ///         City: "Anytown",
+        ///         State: "CA",
+        ///         PostalCode: "12345",
+        ///         Country: "US"
+        ///       }
+        ///     }
+        ///   }, userToken);
+        ///   console.log('Domain registered:', result);
+        /// } catch (error) {
+        ///   console.error('Registration failed:', error.message);
+        /// }
+        /// </code>
+        /// </example>
         [Function("CreateDomainRegistration")]
         public async Task<IActionResult> CreateDomainRegistration(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "domain-registrations")] HttpRequest req,
@@ -123,8 +218,99 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// <summary>
         /// Gets all domain registrations for the authenticated user.
         /// </summary>
-        /// <param name="req">HTTP request</param>
-        /// <returns>List of domain registrations or error response</returns>
+        /// <param name="req">HTTP request (no additional parameters required)</param>
+        /// <returns>
+        /// <list type="table">
+        /// <item>
+        /// <term>200 OK</term>
+        /// <description>Array of user's domain registrations with full details</description>
+        /// </item>
+        /// <item>
+        /// <term>401 Unauthorized</term>
+        /// <description>Invalid or missing JWT token</description>
+        /// </item>
+        /// <item>
+        /// <term>500 Internal Server Error</term>
+        /// <description>Unexpected server error during retrieval</description>
+        /// </item>
+        /// </list>
+        /// </returns>
+        /// <example>
+        /// <para><strong>TypeScript Example:</strong></para>
+        /// <code>
+        /// interface DomainRegistration {
+        ///   Id: string;
+        ///   DomainName: string;
+        ///   RegistrationDate: string;     // ISO 8601 datetime
+        ///   ExpirationDate: string;       // ISO 8601 datetime
+        ///   AutoRenew: boolean;
+        ///   PrivacyProtection: boolean;
+        ///   Status: string;               // "Active", "Pending", "Expired", etc.
+        ///   NameServers: string[];
+        ///   ContactInfo: {
+        ///     FirstName: string;
+        ///     LastName: string;
+        ///     Email: string;
+        ///     Phone: string;
+        ///   };
+        /// }
+        /// 
+        /// const fetchUserDomains = async (token: string): Promise&lt;DomainRegistration[]&gt; => {
+        ///   const response = await fetch('/api/domain-registrations', {
+        ///     method: 'GET',
+        ///     headers: {
+        ///       'Authorization': `Bearer ${token}`,
+        ///       'Content-Type': 'application/json'
+        ///     }
+        ///   });
+        /// 
+        ///   if (response.ok) {
+        ///     return await response.json();
+        ///   } else if (response.status === 401) {
+        ///     throw new Error('Unauthorized - invalid or missing token');
+        ///   }
+        /// 
+        ///   throw new Error('Failed to fetch domain registrations');
+        /// };
+        /// 
+        /// // Usage with React/TypeScript
+        /// const DomainList: React.FC = () => {
+        ///   const [domains, setDomains] = useState&lt;DomainRegistration[]&gt;([]);
+        ///   const [loading, setLoading] = useState(true);
+        /// 
+        ///   useEffect(() => {
+        ///     const loadDomains = async () => {
+        ///       try {
+        ///         const userDomains = await fetchUserDomains(userToken);
+        ///         setDomains(userDomains);
+        ///       } catch (error) {
+        ///         console.error('Failed to load domains:', error);
+        ///       } finally {
+        ///         setLoading(false);
+        ///       }
+        ///     };
+        /// 
+        ///     loadDomains();
+        ///   }, [userToken]);
+        /// 
+        ///   if (loading) return &lt;div&gt;Loading domains...&lt;/div&gt;;
+        /// 
+        ///   return (
+        ///     &lt;div&gt;
+        ///       &lt;h2&gt;My Domains ({domains.length})&lt;/h2&gt;
+        ///       {domains.map(domain =&gt; (
+        ///         &lt;div key={domain.Id} className="domain-card"&gt;
+        ///           &lt;h3&gt;{domain.DomainName}&lt;/h3&gt;
+        ///           &lt;p&gt;Status: {domain.Status}&lt;/p&gt;
+        ///           &lt;p&gt;Expires: {new Date(domain.ExpirationDate).toLocaleDateString()}&lt;/p&gt;
+        ///           &lt;p&gt;Auto-renew: {domain.AutoRenew ? 'Yes' : 'No'}&lt;/p&gt;
+        ///         &lt;/div&gt;
+        ///       ))}
+        ///     &lt;/div&gt;
+        ///   );
+        /// };
+        /// </code>
+        /// </example>
         [Function("GetDomainRegistrations")]
         public async Task<IActionResult> GetDomainRegistrations(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "domain-registrations")] HttpRequest req)

@@ -8,6 +8,9 @@
     <Nullable>enable</Nullable>
     <RootNamespace>function_app</RootNamespace>
     <UserSecretsId>20376250-abcf-43c5-a034-c7310f425e52</UserSecretsId>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\Debug\net9.0\function-app.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

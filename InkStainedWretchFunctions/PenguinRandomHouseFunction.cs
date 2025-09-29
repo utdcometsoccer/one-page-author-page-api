@@ -32,11 +32,119 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         }
 
         /// <summary>
-        /// Searches for authors by name and returns the unmodified JSON response from Penguin Random House API
+        /// Searches for authors by name and returns the unmodified JSON response from Penguin Random House API.
         /// </summary>
-        /// <param name="req">HTTP request</param>
-        /// <param name="authorName">Author name from route parameter</param>
-        /// <returns>Unmodified JSON response from the API</returns>
+        /// <param name="req">HTTP request with authentication</param>
+        /// <param name="authorName">Author name from route parameter to search for</param>
+        /// <returns>
+        /// <list type="table">
+        /// <item>
+        /// <term>200 OK</term>
+        /// <description>Unmodified JSON response from Penguin Random House API</description>
+        /// </item>
+        /// <item>
+        /// <term>400 Bad Request</term>
+        /// <description>Invalid or missing author name</description>
+        /// </item>
+        /// <item>
+        /// <term>401 Unauthorized</term>
+        /// <description>Invalid or missing JWT token</description>
+        /// </item>
+        /// <item>
+        /// <term>404 Not Found</term>
+        /// <description>No authors found with the specified name</description>
+        /// </item>
+        /// <item>
+        /// <term>500 Internal Server Error</term>
+        /// <description>Error calling Penguin Random House API</description>
+        /// </item>
+        /// </list>
+        /// </returns>
+        /// <example>
+        /// <para><strong>TypeScript Example:</strong></para>
+        /// <code>
+        /// interface PenguinAuthor {
+        ///   authorId: string;
+        ///   authorName: string;
+        ///   authorUrl: string;
+        ///   books?: Array&lt;{
+        ///     isbn: string;
+        ///     title: string;
+        ///     publishDate: string;
+        ///   }&gt;;
+        /// }
+        /// 
+        /// const searchAuthors = async (authorName: string, token: string): Promise&lt;PenguinAuthor[]&gt; => {
+        ///   // URL encode the author name for safe transmission
+        ///   const encodedName = encodeURIComponent(authorName.trim());
+        ///   
+        ///   const response = await fetch(`/api/penguin/authors/${encodedName}`, {
+        ///     method: 'GET',
+        ///     headers: {
+        ///       'Authorization': `Bearer ${token}`,
+        ///       'Content-Type': 'application/json'
+        ///     }
+        ///   });
+        /// 
+        ///   if (response.ok) {
+        ///     return await response.json();
+        ///   } else if (response.status === 404) {
+        ///     return []; // No authors found
+        ///   } else if (response.status === 401) {
+        ///     throw new Error('Unauthorized - invalid or missing token');
+        ///   }
+        /// 
+        ///   throw new Error('Failed to search authors');
+        /// };
+        /// 
+        /// // Usage with React/TypeScript
+        /// const AuthorSearch: React.FC = () => {
+        ///   const [searchTerm, setSearchTerm] = useState('');
+        ///   const [authors, setAuthors] = useState&lt;PenguinAuthor[]&gt;([]);
+        ///   const [loading, setLoading] = useState(false);
+        /// 
+        ///   const handleSearch = async (e: React.FormEvent) => {
+        ///     e.preventDefault();
+        ///     if (!searchTerm.trim()) return;
+        /// 
+        ///     setLoading(true);
+        ///     try {
+        ///       const results = await searchAuthors(searchTerm, userToken);
+        ///       setAuthors(results);
+        ///     } catch (error) {
+        ///       console.error('Search failed:', error);
+        ///     } finally {
+        ///       setLoading(false);
+        ///     }
+        ///   };
+        /// 
+        ///   return (
+        ///     &lt;div&gt;
+        ///       &lt;form onSubmit={handleSearch}&gt;
+        ///         &lt;input
+        ///           type="text"
+        ///           value={searchTerm}
+        ///           onChange={(e) =&gt; setSearchTerm(e.target.value)}
+        ///           placeholder="Enter author name..."
+        ///         /&gt;
+        ///         &lt;button type="submit" disabled={loading}&gt;
+        ///           {loading ? 'Searching...' : 'Search'}
+        ///         &lt;/button&gt;
+        ///       &lt;/form&gt;
+        /// 
+        ///       &lt;div&gt;
+        ///         {authors.map(author =&gt; (
+        ///           &lt;div key={author.authorId}&gt;
+        ///             &lt;h3&gt;{author.authorName}&lt;/h3&gt;
+        ///             &lt;a href={author.authorUrl} target="_blank"&gt;View Profile&lt;/a&gt;
+        ///           &lt;/div&gt;
+        ///         ))}
+        ///       &lt;/div&gt;
+        ///     &lt;/div&gt;
+        ///   );
+        /// };
+        /// </code>
+        /// </example>
         [Function("SearchPenguinAuthors")]
         public async Task<IActionResult> SearchAuthors(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "penguin/authors/{authorName}")] HttpRequest req,
@@ -117,11 +225,114 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         }
 
         /// <summary>
-        /// Gets titles by author key and returns the unmodified JSON response from Penguin Random House API
+        /// Gets titles by author key and returns the unmodified JSON response from Penguin Random House API.
         /// </summary>
-        /// <param name="req">HTTP request</param>
-        /// <param name="authorKey">Author key from route parameter</param>
-        /// <returns>Unmodified JSON response from the API</returns>
+        /// <param name="req">HTTP request with authentication</param>
+        /// <param name="authorKey">Author key from route parameter (obtained from search results)</param>
+        /// <returns>
+        /// <list type="table">
+        /// <item>
+        /// <term>200 OK</term>
+        /// <description>Unmodified JSON response from Penguin Random House API with book titles</description>
+        /// </item>
+        /// <item>
+        /// <term>400 Bad Request</term>
+        /// <description>Invalid or missing author key</description>
+        /// </item>
+        /// <item>
+        /// <term>401 Unauthorized</term>
+        /// <description>Invalid or missing JWT token</description>
+        /// </item>
+        /// <item>
+        /// <term>404 Not Found</term>
+        /// <description>No titles found for the specified author</description>
+        /// </item>
+        /// <item>
+        /// <term>500 Internal Server Error</term>
+        /// <description>Error calling Penguin Random House API</description>
+        /// </item>
+        /// </list>
+        /// </returns>
+        /// <example>
+        /// <para><strong>TypeScript Example:</strong></para>
+        /// <code>
+        /// interface PenguinBook {
+        ///   isbn: string;
+        ///   title: string;
+        ///   subtitle?: string;
+        ///   description: string;
+        ///   publishDate: string;
+        ///   price: number;
+        ///   currency: string;
+        ///   coverImageUrl?: string;
+        ///   genres: string[];
+        ///   pageCount?: number;
+        /// }
+        /// 
+        /// const getAuthorTitles = async (authorKey: string, token: string): Promise&lt;PenguinBook[]&gt; => {
+        ///   const response = await fetch(`/api/penguin/authors/${authorKey}/titles`, {
+        ///     method: 'GET',
+        ///     headers: {
+        ///       'Authorization': `Bearer ${token}`,
+        ///       'Content-Type': 'application/json'
+        ///     }
+        ///   });
+        /// 
+        ///   if (response.ok) {
+        ///     return await response.json();
+        ///   } else if (response.status === 404) {
+        ///     return []; // No titles found
+        ///   } else if (response.status === 401) {
+        ///     throw new Error('Unauthorized - invalid or missing token');
+        ///   }
+        /// 
+        ///   throw new Error('Failed to fetch author titles');
+        /// };
+        /// 
+        /// // Usage with React/TypeScript
+        /// const AuthorBooks: React.FC&lt;{ authorKey: string }&gt; = ({ authorKey }) => {
+        ///   const [books, setBooks] = useState&lt;PenguinBook[]&gt;([]);
+        ///   const [loading, setLoading] = useState(true);
+        /// 
+        ///   useEffect(() => {
+        ///     const loadBooks = async () => {
+        ///       try {
+        ///         const authorBooks = await getAuthorTitles(authorKey, userToken);
+        ///         setBooks(authorBooks);
+        ///       } catch (error) {
+        ///         console.error('Failed to load books:', error);
+        ///       } finally {
+        ///         setLoading(false);
+        ///       }
+        ///     };
+        /// 
+        ///     loadBooks();
+        ///   }, [authorKey, userToken]);
+        /// 
+        ///   if (loading) return &lt;div&gt;Loading books...&lt;/div&gt;;
+        /// 
+        ///   return (
+        ///     &lt;div&gt;
+        ///       &lt;h2&gt;Books ({books.length})&lt;/h2&gt;
+        ///       &lt;div className="books-grid"&gt;
+        ///         {books.map(book =&gt; (
+        ///           &lt;div key={book.isbn} className="book-card"&gt;
+        ///             {book.coverImageUrl &amp;&amp; (
+        ///               &lt;img src={book.coverImageUrl} alt={book.title} /&gt;
+        ///             )}
+        ///             &lt;h3&gt;{book.title}&lt;/h3&gt;
+        ///             {book.subtitle &amp;&amp; &lt;h4&gt;{book.subtitle}&lt;/h4&gt;}
+        ///             &lt;p&gt;{book.description}&lt;/p&gt;
+        ///             &lt;p&gt;Published: {new Date(book.publishDate).toLocaleDateString()}&lt;/p&gt;
+        ///             &lt;p&gt;Price: ${book.price} {book.currency}&lt;/p&gt;
+        ///           &lt;/div&gt;
+        ///         ))}
+        ///       &lt;/div&gt;
+        ///     &lt;/div&gt;
+        ///   );
+        /// };
+        /// </code>
+        /// </example>
         [Function("GetPenguinTitlesByAuthor")]
         public async Task<IActionResult> GetTitlesByAuthor(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "penguin/authors/{authorKey}/titles")] HttpRequest req,

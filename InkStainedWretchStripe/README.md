@@ -1,6 +1,11 @@
 # InkStainedWretchStripe
 
-Azure Functions (Isolated Worker, .NET 9) exposing Stripe-backed endpoints for checkout, customers, subscriptions, price info, and webhooks.
+[![Build Status](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml/badge.svg)](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml)
+[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
+[![Azure Functions](https://img.shields.io/badge/Azure%20Functions-v4-orange.svg)](https://docs.microsoft.com/en-us/azure/azure-functions/)
+[![Stripe](https://img.shields.io/badge/Stripe-API-blueviolet.svg)](https://stripe.com/docs)
+
+Azure Functions app providing Stripe payment processing integration for subscription management, checkout sessions, and webhook handling.
 
 ## Overview
 This project provides HTTP-triggered Azure Functions to integrate with Stripe using services defined in `OnePageAuthorLib`.
