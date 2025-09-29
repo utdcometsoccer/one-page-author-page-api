@@ -17,6 +17,7 @@ builder.Services
     .AddCosmosClient(endpointUri!, primaryKey!)
     .AddCosmosDatabase(databaseId!)
     .AddUserProfileRepository()
+    .AddAuthorDataService() // Add Author data service for GetAuthors function
     .AddInkStainedWretchServices()
     .AddPenguinRandomHouseServices()
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib

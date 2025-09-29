@@ -74,6 +74,44 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             return response;
         }
 
+        public async Task<List<AuthorApiResponse>> GetAuthorsByDomainAsync(string topLevelDomain, string secondLevelDomain)
+        {
+            var authors = await _authorRepository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
+            if (authors == null || !authors.Any())
+                return new List<AuthorApiResponse>();
+
+            var authorApiResponses = new List<AuthorApiResponse>();
+
+            foreach (var author in authors)
+            {
+                var books = await _bookRepository.GetByAuthorIdAsync(Guid.Parse(author.id));
+                var articles = await _articleRepository.GetByAuthorIdAsync(Guid.Parse(author.id));
+                var socials = await _socialRepository.GetByAuthorIdAsync(Guid.Parse(author.id));
+
+                var response = new AuthorApiResponse
+                {
+                    id = author.id,
+                    AuthorName = author.AuthorName,
+                    LanguageName = author.LanguageName,
+                    RegionName = author.RegionName,
+                    EmailAddress = author.EmailAddress,
+                    WelcomeText = author.WelcomeText,
+                    AboutText = author.AboutText,
+                    HeadShotURL = author.HeadShotURL ?? string.Empty,
+                    CopyrightText = author.CopyrightText,
+                    TopLevelDomain = author.TopLevelDomain,
+                    SecondLevelDomain = author.SecondLevelDomain,
+                    Articles = ConvertToApiArticles(articles.ToList()),
+                    Books = ConvertToApiBooks(books.ToList()),
+                    Socials = socials.Select(s => new SocialLink { Name = s.Name, Url = s.URL.ToString() }).ToList()
+                };
+                
+                authorApiResponses.Add(response);
+            }
+
+            return authorApiResponses;
+        }
+
         public static List<API.Book> ConvertToApiBooks(List<Entities.Book> entityBooks)
         {
             var apiBooks = new List<API.Book>();
