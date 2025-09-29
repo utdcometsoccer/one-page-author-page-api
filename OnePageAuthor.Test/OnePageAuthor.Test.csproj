@@ -30,7 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OnePageAuthorLib\OnePageAuthorLib.csproj" />
     <ProjectReference Include="..\ImageAPI\ImageAPI.csproj" />
-    <ProjectReference Include="..\function-app\function-app.csproj" />
+    <ProjectReference Include="..\InkStainedWretchFunctions\InkStainedWretchFunctions.csproj" />
   </ItemGroup>
 
 </Project>
