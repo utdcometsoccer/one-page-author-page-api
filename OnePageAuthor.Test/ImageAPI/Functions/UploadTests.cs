@@ -9,6 +9,8 @@ using InkStainedWretch.OnePageAuthorAPI.API.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
+using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure;
@@ -19,16 +21,22 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
     {
         private readonly Mock<ILogger<Upload>> _loggerMock;
         private readonly Mock<IImageUploadService> _imageUploadServiceMock;
+        private readonly Mock<IJwtValidationService> _jwtValidationServiceMock;
+        private readonly Mock<IUserProfileService> _userProfileServiceMock;
         private readonly Upload _uploadFunction;
 
         public UploadTests()
         {
             _loggerMock = new Mock<ILogger<Upload>>();
             _imageUploadServiceMock = new Mock<IImageUploadService>();
+            _jwtValidationServiceMock = new Mock<IJwtValidationService>();
+            _userProfileServiceMock = new Mock<IUserProfileService>();
 
             _uploadFunction = new Upload(
                 _loggerMock.Object,
-                _imageUploadServiceMock.Object);
+                _imageUploadServiceMock.Object,
+                _jwtValidationServiceMock.Object,
+                _userProfileServiceMock.Object);
         }
 
         [Fact]

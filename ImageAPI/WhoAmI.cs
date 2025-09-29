@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using System.Linq;
 
 namespace ImageAPI;
@@ -10,21 +12,39 @@ namespace ImageAPI;
 public class WhoAmI
 {
     private readonly ILogger<WhoAmI> _logger;
+    private readonly IJwtValidationService _jwtValidationService;
+    private readonly IUserProfileService _userProfileService;
 
-    public WhoAmI(ILogger<WhoAmI> logger)
+    public WhoAmI(ILogger<WhoAmI> logger, IJwtValidationService jwtValidationService, IUserProfileService userProfileService)
     {
         _logger = logger;
+        _jwtValidationService = jwtValidationService;
+        _userProfileService = userProfileService;
     }
 
     [Function("WhoAmI")]
     [Authorize(Policy = "RequireScope.Read")]
-    public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
     {
-        var user = req.HttpContext?.User;
-        if (user?.Identity?.IsAuthenticated != true)
+        // Validate JWT token and get authenticated user
+        var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+        if (authError != null)
         {
-            return new UnauthorizedResult();
+            return authError;
         }
+
+        try
+        {
+            // Ensure user profile exists (optional for WhoAmI, just for consistency)
+            await _userProfileService.EnsureUserProfileAsync(authenticatedUser!);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "User profile validation failed for WhoAmI - continuing anyway");
+            // Don't return error for WhoAmI, just log and continue
+        }
+
+        var user = authenticatedUser!;
 
         string GetClaim(params string[] types)
             => types.Select(t => user.FindFirst(t)?.Value).FirstOrDefault(v => !string.IsNullOrEmpty(v)) ?? string.Empty;

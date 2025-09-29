@@ -68,8 +68,11 @@ var databaseId = Environment.GetEnvironmentVariable("COSMOSDB_DATABASE_ID");
 builder.Services
     .AddCosmosClient(endpointUri!, primaryKey!)
     .AddCosmosDatabase(databaseId!)
+    .AddUserProfileRepository()
     .AddImageApiRepositories()
     .AddImageApiServices()
+    .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
+    .AddUserProfileServices()
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
