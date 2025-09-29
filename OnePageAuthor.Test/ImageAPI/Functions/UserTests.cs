@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using System.Security.Claims;
 using ImageAPI.Models;
@@ -33,34 +34,86 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
                 _userProfileServiceMock.Object);
         }
 
+        private static Mock<HttpRequest> CreateAuthenticatedRequest(string userProfileId)
+        {
+            var httpContext = new DefaultHttpContext();
+            var identity = new ClaimsIdentity(authenticationType: "test");
+            identity.AddClaim(new Claim("oid", userProfileId));
+            httpContext.User = new ClaimsPrincipal(identity);
+
+            var headers = new HeaderDictionary();
+            headers["Authorization"] = "Bearer valid-jwt-token";
+
+            var request = new Mock<HttpRequest>();
+            request.Setup(x => x.HttpContext).Returns(httpContext);
+            request.Setup(x => x.Headers).Returns(headers);
+
+            return request;
+        }
+
+        private void SetupSuccessfulAuth(string userProfileId)
+        {
+            var identity = new ClaimsIdentity(authenticationType: "test");
+            identity.AddClaim(new Claim("oid", userProfileId));
+            identity.AddClaim(new Claim("upn", $"{userProfileId}@test.com"));
+            var principal = new ClaimsPrincipal(identity);
+
+            _jwtValidationServiceMock.Setup(x => x.ValidateTokenAsync("valid-jwt-token"))
+                .ReturnsAsync(principal);
+                
+            var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile 
+            { 
+                Oid = userProfileId, 
+                Upn = $"{userProfileId}@test.com" 
+            };
+            _userProfileServiceMock.Setup(x => x.EnsureUserProfileAsync(principal))
+                .ReturnsAsync(userProfile);
+        }
+
         [Fact]
         public async Task Run_WithUnauthenticatedUser_ReturnsUnauthorized()
         {
             // Arrange
             var httpContext = new DefaultHttpContext();
-            httpContext.User = new ClaimsPrincipal(new ClaimsIdentity()); // Not authenticated
+            var headers = new HeaderDictionary();
+            // No Authorization header
 
             var request = new Mock<HttpRequest>();
             request.Setup(x => x.HttpContext).Returns(httpContext);
+            request.Setup(x => x.Headers).Returns(headers);
 
             // Act
             var result = await _userFunction.Run(request.Object);
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            Assert.IsType<UnauthorizedObjectResult>(result);
         }
 
         [Fact]
         public async Task Run_WithNoUserProfileId_ReturnsUnauthorized()
         {
             // Arrange
+            var identity = new ClaimsIdentity(authenticationType: "test");
+            identity.AddClaim(new Claim("name", "Test User")); // No 'oid' claim
+            var principal = new ClaimsPrincipal(identity);
+
+            _jwtValidationServiceMock.Setup(x => x.ValidateTokenAsync("valid-jwt-token"))
+                .ReturnsAsync(principal);
+
+            var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile 
+            { 
+                Upn = "test@test.com" 
+            };
+            _userProfileServiceMock.Setup(x => x.EnsureUserProfileAsync(principal))
+                .ReturnsAsync(userProfile);
+
             var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("name", "Test User"));
-            httpContext.User = new ClaimsPrincipal(identity);
+            var headers = new HeaderDictionary();
+            headers["Authorization"] = "Bearer valid-jwt-token";
 
             var request = new Mock<HttpRequest>();
             request.Setup(x => x.HttpContext).Returns(httpContext);
+            request.Setup(x => x.Headers).Returns(headers);
 
             // Act
             var result = await _userFunction.Run(request.Object);
@@ -74,13 +127,9 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
         {
             // Arrange
             var userProfileId = "user-123";
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
+            SetupSuccessfulAuth(userProfileId);
 
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
+            var request = CreateAuthenticatedRequest(userProfileId);
 
             var now = DateTime.UtcNow;
             var userImages = new List<InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models.UserImageResponse>
@@ -139,13 +188,9 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
         {
             // Arrange
             var userProfileId = "user-123";
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
+            SetupSuccessfulAuth(userProfileId);
 
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
+            var request = CreateAuthenticatedRequest(userProfileId);
 
             var serviceResult = new UserImagesResult
             {
@@ -171,13 +216,9 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
         {
             // Arrange
             var userProfileId = "user-123";
-            var httpContext = new DefaultHttpContext();
-            var identity = new ClaimsIdentity("test");
-            identity.AddClaim(new Claim("oid", userProfileId));
-            httpContext.User = new ClaimsPrincipal(identity);
+            SetupSuccessfulAuth(userProfileId);
 
-            var request = new Mock<HttpRequest>();
-            request.Setup(x => x.HttpContext).Returns(httpContext);
+            var request = CreateAuthenticatedRequest(userProfileId);
 
             _userImageServiceMock.Setup(x => x.GetUserImagesAsync(userProfileId))
                 .ThrowsAsync(new Exception("Database error"));
