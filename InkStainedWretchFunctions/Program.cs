@@ -17,8 +17,11 @@ builder.ConfigureFunctionsWebApplication();
 builder.Services
     .AddCosmosClient(endpointUri!, primaryKey!)
     .AddCosmosDatabase(databaseId!)
+    .AddUserProfileRepository()
     .AddInkStainedWretchServices()
     .AddPenguinRandomHouseServices()
+    .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
+    .AddUserProfileServices()
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
