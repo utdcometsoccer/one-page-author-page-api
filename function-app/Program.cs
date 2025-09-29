@@ -32,7 +32,6 @@ builder.Services
 builder.Services
     .AddAuthorDataService() // Register Author data service via DI extension
     .AddLocaleDataService() // Register Locale data service via DI extension
-    .AddJwtAuthentication() // Register JWT authentication services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
