@@ -1,9 +1,14 @@
 using System.Net;
 using System.Text.Json;
 using InkStainedWretch.OnePageAuthorLib.API.Penguin;
+using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Functions
 {
@@ -14,13 +19,19 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
     {
         private readonly IPenguinRandomHouseService _penguinService;
         private readonly ILogger<PenguinRandomHouseFunction> _logger;
+        private readonly IJwtValidationService _jwtValidationService;
+        private readonly IUserProfileService _userProfileService;
 
         public PenguinRandomHouseFunction(
             IPenguinRandomHouseService penguinService,
-            ILogger<PenguinRandomHouseFunction> logger)
+            ILogger<PenguinRandomHouseFunction> logger,
+            IJwtValidationService jwtValidationService,
+            IUserProfileService userProfileService)
         {
             _penguinService = penguinService ?? throw new ArgumentNullException(nameof(penguinService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _jwtValidationService = jwtValidationService ?? throw new ArgumentNullException(nameof(jwtValidationService));
+            _userProfileService = userProfileService ?? throw new ArgumentNullException(nameof(userProfileService));
         }
 
         /// <summary>
@@ -30,11 +41,29 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// <param name="authorName">Author name from route parameter</param>
         /// <returns>Unmodified JSON response from the API</returns>
         [Function("SearchPenguinAuthors")]
-        public async Task<HttpResponseData> SearchAuthors(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "penguin/authors/{authorName}")] HttpRequestData req,
+        public async Task<IActionResult> SearchAuthors(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "penguin/authors/{authorName}")] HttpRequest req,
             string authorName)
         {
             _logger.LogInformation("SearchPenguinAuthors function processed a request.");
+
+            // Validate JWT token and get authenticated user
+            var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+            if (authError != null)
+            {
+                return authError;
+            }
+
+            try
+            {
+                // Ensure user profile exists
+                await _userProfileService.EnsureUserProfileAsync(authenticatedUser!);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "User profile validation failed for SearchPenguinAuthors");
+                return new UnauthorizedObjectResult(new { error = "User profile validation failed" });
+            }
 
             try
             {
@@ -42,9 +71,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 if (string.IsNullOrEmpty(authorName))
                 {
                     _logger.LogWarning("No author name provided in route parameter");
-                    var badRequestResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-                    await badRequestResponse.WriteStringAsync("Author name is required in the route parameter.");
-                    return badRequestResponse;
+                    return new BadRequestObjectResult(new { error = "Author name is required in the route parameter." });
                 }
 
                 // URL decode the author name in case it has special characters
@@ -55,40 +82,40 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 // Call the Penguin Random House API
                 using var jsonResult = await _penguinService.SearchAuthorsAsync(authorName);
 
-                // Create response with the unmodified JSON
-                var response = req.CreateResponse(HttpStatusCode.OK);
-                response.Headers.Add("Content-Type", "application/json");
-
-                // Write the raw JSON response
+                // Return the JSON result as an OK response
                 var jsonString = JsonSerializer.Serialize(jsonResult, new JsonSerializerOptions
                 {
                     WriteIndented = true
                 });
-                await response.WriteStringAsync(jsonString);
 
                 _logger.LogInformation("Successfully returned Penguin Random House API response for author: {AuthorName}", authorName);
-                return response;
+                return new ContentResult
+                {
+                    Content = jsonString,
+                    ContentType = "application/json",
+                    StatusCode = 200
+                };
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning(ex, "Invalid request parameters");
-                var badRequestResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-                await badRequestResponse.WriteStringAsync($"Invalid request: {ex.Message}");
-                return badRequestResponse;
+                return new BadRequestObjectResult(new { error = $"Invalid request: {ex.Message}" });
             }
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "Error calling Penguin Random House API");
-                var errorResponse = req.CreateResponse(HttpStatusCode.BadGateway);
-                await errorResponse.WriteStringAsync($"External API error: {ex.Message}");
-                return errorResponse;
+                return new ObjectResult(new { error = $"External API error: {ex.Message}" })
+                {
+                    StatusCode = 502 // Bad Gateway
+                };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error in SearchPenguinAuthors function");
-                var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-                await errorResponse.WriteStringAsync("An unexpected error occurred");
-                return errorResponse;
+                return new ObjectResult(new { error = "An unexpected error occurred" })
+                {
+                    StatusCode = 500 // Internal Server Error
+                };
             }
         }
 
@@ -99,11 +126,29 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// <param name="authorKey">Author key from route parameter</param>
         /// <returns>Unmodified JSON response from the API</returns>
         [Function("GetPenguinTitlesByAuthor")]
-        public async Task<HttpResponseData> GetTitlesByAuthor(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "penguin/authors/{authorKey}/titles")] HttpRequestData req,
+        public async Task<IActionResult> GetTitlesByAuthor(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "penguin/authors/{authorKey}/titles")] HttpRequest req,
             string authorKey)
         {
             _logger.LogInformation("GetPenguinTitlesByAuthor function processed a request.");
+
+            // Validate JWT token and get authenticated user
+            var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+            if (authError != null)
+            {
+                return authError;
+            }
+
+            try
+            {
+                // Ensure user profile exists
+                await _userProfileService.EnsureUserProfileAsync(authenticatedUser!);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "User profile validation failed for GetPenguinTitlesByAuthor");
+                return new UnauthorizedObjectResult(new { error = "User profile validation failed" });
+            }
 
             try
             {
@@ -111,18 +156,15 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 if (string.IsNullOrEmpty(authorKey))
                 {
                     _logger.LogWarning("No author key provided in route parameter");
-                    var badRequestResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-                    await badRequestResponse.WriteStringAsync("Author key is required in the route parameter.");
-                    return badRequestResponse;
+                    return new BadRequestObjectResult(new { error = "Author key is required in the route parameter." });
                 }
 
                 // URL decode the author key in case it has special characters
                 authorKey = Uri.UnescapeDataString(authorKey);
 
                 // Get optional parameters from query string
-                var query = System.Web.HttpUtility.ParseQueryString(req.Url.Query);
-                var rowsParam = query["rows"] ?? "10";
-                var startParam = query["start"] ?? "0";
+                var rowsParam = req.Query["rows"].FirstOrDefault() ?? "10";
+                var startParam = req.Query["start"].FirstOrDefault() ?? "0";
 
                 if (!int.TryParse(rowsParam, out var rows) || rows <= 0)
                 {
@@ -139,40 +181,40 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 // Call the Penguin Random House API
                 using var jsonResult = await _penguinService.GetTitlesByAuthorAsync(authorKey, rows, start);
 
-                // Create response with the unmodified JSON
-                var response = req.CreateResponse(HttpStatusCode.OK);
-                response.Headers.Add("Content-Type", "application/json");
-
-                // Write the raw JSON response
+                // Return the JSON result as an OK response
                 var jsonString = JsonSerializer.Serialize(jsonResult, new JsonSerializerOptions
                 {
                     WriteIndented = true
                 });
-                await response.WriteStringAsync(jsonString);
 
                 _logger.LogInformation("Successfully returned Penguin Random House API response for author key: {AuthorKey}", authorKey);
-                return response;
+                return new ContentResult
+                {
+                    Content = jsonString,
+                    ContentType = "application/json",
+                    StatusCode = 200
+                };
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning(ex, "Invalid request parameters");
-                var badRequestResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-                await badRequestResponse.WriteStringAsync($"Invalid request: {ex.Message}");
-                return badRequestResponse;
+                return new BadRequestObjectResult(new { error = $"Invalid request: {ex.Message}" });
             }
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "Error calling Penguin Random House API");
-                var errorResponse = req.CreateResponse(HttpStatusCode.BadGateway);
-                await errorResponse.WriteStringAsync($"External API error: {ex.Message}");
-                return errorResponse;
+                return new ObjectResult(new { error = $"External API error: {ex.Message}" })
+                {
+                    StatusCode = 502 // Bad Gateway
+                };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error in GetPenguinTitlesByAuthor function");
-                var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-                await errorResponse.WriteStringAsync("An unexpected error occurred");
-                return errorResponse;
+                return new ObjectResult(new { error = "An unexpected error occurred" })
+                {
+                    StatusCode = 500 // Internal Server Error
+                };
             }
         }
     }
