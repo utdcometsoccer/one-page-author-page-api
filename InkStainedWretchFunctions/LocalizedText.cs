@@ -27,13 +27,13 @@ public class LocalizedText
         _provider = provider;
     }
 
-    [Function("LocalizedText")]
     /// <summary>
     /// Handles HTTP GET requests for localized text.
     /// </summary>
     /// <param name="req">The incoming HTTP request.</param>
     /// <param name="culture">Route parameter representing the culture (e.g. en-US).</param>
     /// <returns>200 with JSON payload of localized text; 400 if culture is invalid or retrieval fails.</returns>
+    [Function("LocalizedText")]
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "localizedtext/{culture}")] HttpRequestData req,
         string culture)

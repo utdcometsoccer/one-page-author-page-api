@@ -1,6 +1,9 @@
 # SeedInkStainedWretchesLocale
 
-Console tool to seed Cosmos DB containers with localized UI content from JSON files named `inkstainedwretch.<language>-<country>.json`.
+[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
+[![Build Status](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml/badge.svg)](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml)
+
+Specialized console application for seeding InkStainedWretch-specific localization data from JSON files into Cosmos DB containers.
 
 ## Overview
 - Discovers files under `data/` at runtime (copied to output by the project).

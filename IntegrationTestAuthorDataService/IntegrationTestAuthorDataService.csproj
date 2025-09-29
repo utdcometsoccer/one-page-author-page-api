@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\OnePageAuthorLib\OnePageAuthorLib.csproj" />
@@ -10,6 +10,9 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\Debug\net9.0\IntegrationTestAuthorDataService.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
     <UserSecretsId>IntegrationTestAuthorDataService</UserSecretsId>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
@@ -18,3 +21,4 @@
   </PropertyGroup>
 
 </Project>
+
