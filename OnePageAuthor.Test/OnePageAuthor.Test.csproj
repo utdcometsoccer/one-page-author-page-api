@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OnePageAuthorLib\OnePageAuthorLib.csproj" />
     <ProjectReference Include="..\ImageAPI\ImageAPI.csproj" />
+    <ProjectReference Include="..\function-app\function-app.csproj" />
   </ItemGroup>
 
 </Project>
