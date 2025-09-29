@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
-using System.Linq;
 
 namespace ImageAPI;
 

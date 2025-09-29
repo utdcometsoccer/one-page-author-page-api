@@ -6,7 +6,6 @@ using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.API;
-using System.Security.Claims;
 
 namespace InkStainedWretchStripe;
 

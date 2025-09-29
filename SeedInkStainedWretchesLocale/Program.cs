@@ -1,11 +1,9 @@
 ﻿using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using InkStainedWretch.OnePageAuthorAPI;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Azure.Cosmos;
 
 class Program
 {

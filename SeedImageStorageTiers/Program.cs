@@ -2,7 +2,6 @@ using InkStainedWretch.OnePageAuthorAPI;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
-using InkStainedWretch.OnePageAuthorAPI.NoSQL;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

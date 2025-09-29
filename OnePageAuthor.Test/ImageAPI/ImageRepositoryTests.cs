@@ -2,7 +2,6 @@ using Microsoft.Azure.Cosmos;
 using Moq;
 using InkStainedWretch.OnePageAuthorAPI.NoSQL.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
-using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.NoSQL;
 
 namespace OnePageAuthor.Test.ImageAPI

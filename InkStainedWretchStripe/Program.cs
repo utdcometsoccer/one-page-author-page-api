@@ -4,9 +4,6 @@ using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Stripe;
-using Microsoft.Azure.Functions.Worker.Middleware;
-using Microsoft.Extensions.Logging;
-using InkStainedWretchStripe;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 var config = builder.Configuration;

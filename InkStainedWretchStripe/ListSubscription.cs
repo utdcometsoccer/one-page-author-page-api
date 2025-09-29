@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
-using System;
 using Microsoft.AspNetCore.Authorization;
 
 namespace InkStainedWretchStripe;

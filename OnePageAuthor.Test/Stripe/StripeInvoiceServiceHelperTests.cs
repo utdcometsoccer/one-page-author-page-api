@@ -1,6 +1,4 @@
 using System.Net;
-using System.Net.Http;
-using System.Threading;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using Microsoft.Extensions.Logging.Abstractions;
 

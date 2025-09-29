@@ -6,15 +6,11 @@ using Moq;
 using System.Security.Claims;
 using ImageAPI;
 using ImageAPI.Models;
-using InkStainedWretch.OnePageAuthorAPI.API.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Azure;
 
 namespace OnePageAuthor.Test.ImageAPI.Functions
 {
