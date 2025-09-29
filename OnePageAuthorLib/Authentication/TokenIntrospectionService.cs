@@ -2,7 +2,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using System.Text.Json;
-using System.Net.Http;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Authentication;
 

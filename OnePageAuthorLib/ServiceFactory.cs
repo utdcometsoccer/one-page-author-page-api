@@ -555,5 +555,33 @@ namespace InkStainedWretch.OnePageAuthorAPI
 
             return services;
         }
+
+        /// <summary>
+        /// Registers domain registration services for domain management.
+        /// </summary>
+        public static IServiceCollection AddDomainRegistrationServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IDomainRegistrationService, API.DomainRegistrationService>();
+            return services;
+        }
+
+        /// <summary>
+        /// Registers domain registration repository and container manager.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddDomainRegistrationRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.DomainRegistration>>(sp =>
+                new DomainRegistrationsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<Interfaces.IDomainRegistrationRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.DomainRegistration>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.DomainRegistrationRepository(container);
+            });
+
+            return services;
+        }
     }
 }

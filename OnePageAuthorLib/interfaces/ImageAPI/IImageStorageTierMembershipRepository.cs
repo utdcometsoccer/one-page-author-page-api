@@ -1,4 +1,3 @@
-using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
 
 namespace InkStainedWretch.OnePageAuthorAPI.API.ImageAPI

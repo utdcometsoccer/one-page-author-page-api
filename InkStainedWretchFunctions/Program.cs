@@ -1,5 +1,4 @@
 using InkStainedWretch.OnePageAuthorAPI;
-using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +21,8 @@ builder.Services
     .AddPenguinRandomHouseServices()
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
     .AddUserProfileServices()
+    .AddDomainRegistrationRepository() // Add domain registration repository
+    .AddDomainRegistrationServices() // Add domain registration services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 

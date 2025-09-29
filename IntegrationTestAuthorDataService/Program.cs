@@ -3,7 +3,6 @@ using System.Text.Json;
 using InkStainedWretch.OnePageAuthorAPI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Azure.Cosmos;
 using InkStainedWretch.OnePageAuthorAPI.API;
 
 class Program

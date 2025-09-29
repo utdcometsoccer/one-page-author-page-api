@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
 

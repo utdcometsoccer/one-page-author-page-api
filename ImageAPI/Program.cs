@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using InkStainedWretch.OnePageAuthorAPI;
-using InkStainedWretch.OnePageAuthorAPI.API;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();

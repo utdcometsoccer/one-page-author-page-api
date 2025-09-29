@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.API;
-using System.Security.Claims;
 
 namespace InkStainedWretchStripe;
 

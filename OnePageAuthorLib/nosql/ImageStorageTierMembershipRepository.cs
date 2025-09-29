@@ -1,4 +1,3 @@
-using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
 using Microsoft.Azure.Cosmos;

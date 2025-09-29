@@ -1,14 +1,11 @@
-using System.Net;
 using System.Text.Json;
 using InkStainedWretch.OnePageAuthorLib.API.Penguin;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Security.Claims;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Functions
 {
