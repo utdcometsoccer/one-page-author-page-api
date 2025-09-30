@@ -24,6 +24,8 @@ builder.Services
     .AddUserProfileServices()
     .AddDomainRegistrationRepository() // Add domain registration repository
     .AddDomainRegistrationServices() // Add domain registration services
+    .AddStateProvinceRepository() // Add StateProvince repository
+    .AddStateProvinceServices() // Add StateProvince services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 

@@ -12,13 +12,16 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
     {
         private readonly ILogger<DomainRegistrationService> _logger;
         private readonly IDomainRegistrationRepository _repository;
+        private readonly IUserIdentityService _userIdentityService;
 
         public DomainRegistrationService(
             ILogger<DomainRegistrationService> logger,
-            IDomainRegistrationRepository repository)
+            IDomainRegistrationRepository repository,
+            IUserIdentityService userIdentityService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _userIdentityService = userIdentityService ?? throw new ArgumentNullException(nameof(userIdentityService));
         }
 
         public async Task<DomainRegistration> CreateDomainRegistrationAsync(
@@ -26,7 +29,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             Domain domain, 
             ContactInformation contactInformation)
         {
-            var upn = GetUserUpn(user);
+            var upn = _userIdentityService.GetUserUpn(user);
             
             // Validate domain information first
             ValidateDomain(domain);
@@ -42,7 +45,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
         public async Task<IEnumerable<DomainRegistration>> GetUserDomainRegistrationsAsync(ClaimsPrincipal user)
         {
-            var upn = GetUserUpn(user);
+            var upn = _userIdentityService.GetUserUpn(user);
             
             _logger.LogInformation("Retrieving domain registrations for user {Upn}", upn);
             
@@ -51,7 +54,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
         public async Task<DomainRegistration?> GetDomainRegistrationByIdAsync(ClaimsPrincipal user, string registrationId)
         {
-            var upn = GetUserUpn(user);
+            var upn = _userIdentityService.GetUserUpn(user);
             
             _logger.LogInformation("Retrieving domain registration {RegistrationId} for user {Upn}", 
                 registrationId, upn);
@@ -64,7 +67,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             string registrationId, 
             DomainRegistrationStatus status)
         {
-            var upn = GetUserUpn(user);
+            var upn = _userIdentityService.GetUserUpn(user);
             
             _logger.LogInformation("Updating domain registration {RegistrationId} status to {Status} for user {Upn}", 
                 registrationId, status, upn);
@@ -80,18 +83,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             existingRegistration.Status = status;
             
             return await _repository.UpdateAsync(existingRegistration);
-        }
-
-        private static string GetUserUpn(ClaimsPrincipal user)
-        {
-            if (!user.Identity?.IsAuthenticated == true)
-                throw new InvalidOperationException("User is not authenticated");
-
-            var upn = user.FindFirst("upn")?.Value ?? user.FindFirst("email")?.Value;
-            if (string.IsNullOrWhiteSpace(upn))
-                throw new InvalidOperationException("User UPN or email claim is required");
-
-            return upn;
         }
 
         private static void ValidateDomain(Domain domain)

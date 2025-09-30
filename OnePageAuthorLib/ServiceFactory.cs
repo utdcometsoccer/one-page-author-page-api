@@ -561,6 +561,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// </summary>
         public static IServiceCollection AddDomainRegistrationServices(this IServiceCollection services)
         {
+            services.AddScoped<Interfaces.IUserIdentityService, API.UserIdentityService>();
             services.AddScoped<Interfaces.IDomainRegistrationService, API.DomainRegistrationService>();
             return services;
         }
@@ -581,6 +582,34 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 return new NoSQL.DomainRegistrationRepository(container);
             });
 
+            return services;
+        }
+
+        /// <summary>
+        /// Registers StateProvince repository and container manager.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddStateProvinceRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.StateProvince>>(sp =>
+                new NoSQL.StateProvincesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<API.IStateProvinceRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.StateProvince>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.StateProvinceRepository(container);
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers StateProvince services for state/province management.
+        /// </summary>
+        public static IServiceCollection AddStateProvinceServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IStateProvinceService, API.StateProvinceService>();
             return services;
         }
     }
