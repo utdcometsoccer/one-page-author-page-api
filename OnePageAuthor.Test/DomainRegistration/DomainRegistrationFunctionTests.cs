@@ -1,7 +1,6 @@
 using Moq;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using InkStainedWretch.OnePageAuthorAPI.Functions;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;

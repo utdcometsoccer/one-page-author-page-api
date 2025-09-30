@@ -11,13 +11,19 @@ namespace OnePageAuthor.Test.DomainRegistration
     {
         private readonly Mock<ILogger<DomainRegistrationService>> _loggerMock;
         private readonly Mock<IDomainRegistrationRepository> _repositoryMock;
+        private readonly Mock<IUserIdentityService> _userIdentityServiceMock;
         private readonly DomainRegistrationService _service;
 
         public DomainRegistrationServiceTests()
         {
             _loggerMock = new Mock<ILogger<DomainRegistrationService>>();
             _repositoryMock = new Mock<IDomainRegistrationRepository>();
-            _service = new DomainRegistrationService(_loggerMock.Object, _repositoryMock.Object);
+            _userIdentityServiceMock = new Mock<IUserIdentityService>();
+            _service = new DomainRegistrationService(_loggerMock.Object, _repositoryMock.Object, _userIdentityServiceMock.Object);
+
+            // Setup default behavior for user identity service
+            _userIdentityServiceMock.Setup(x => x.GetUserUpn(It.IsAny<ClaimsPrincipal>()))
+                                   .Returns("test@example.com");
         }
 
         private static ClaimsPrincipal CreateTestUser(string upn = "test@example.com", string oid = "test-oid-123")
@@ -188,6 +194,9 @@ namespace OnePageAuthor.Test.DomainRegistration
             var domain = CreateTestDomain();
             var contactInfo = CreateTestContactInfo();
 
+            _userIdentityServiceMock.Setup(x => x.GetUserUpn(It.IsAny<ClaimsPrincipal>()))
+                                   .Throws(new InvalidOperationException("User is not authenticated"));
+
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() => 
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
@@ -202,6 +211,9 @@ namespace OnePageAuthor.Test.DomainRegistration
             var user = new ClaimsPrincipal(identity);
             var domain = CreateTestDomain();
             var contactInfo = CreateTestContactInfo();
+
+            _userIdentityServiceMock.Setup(x => x.GetUserUpn(It.IsAny<ClaimsPrincipal>()))
+                                   .Throws(new InvalidOperationException("User UPN or email claim is required"));
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() => 
@@ -344,5 +356,122 @@ namespace OnePageAuthor.Test.DomainRegistration
             _repositoryMock.Verify(r => r.GetByIdAsync(registrationId, "test@example.com"), Times.Once);
             _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()), Times.Never);
         }
+
+        #region User Identity Integration Tests
+
+        [Fact]
+        public async Task CreateDomainRegistrationAsync_ThrowsException_UserIdentityServiceThrows()
+        {
+            // Arrange
+            var user = CreateTestUser();
+            var domain = CreateTestDomain();
+            var contactInfo = CreateTestContactInfo();
+
+            _userIdentityServiceMock.Setup(x => x.GetUserUpn(It.IsAny<ClaimsPrincipal>()))
+                                   .Throws(new InvalidOperationException("User is not authenticated"));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
+
+            Assert.Equal("User is not authenticated", exception.Message);
+            _userIdentityServiceMock.Verify(x => x.GetUserUpn(user), Times.Once);
+            _repositoryMock.Verify(r => r.CreateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task GetUserDomainRegistrationsAsync_ThrowsException_UserIdentityServiceThrows()
+        {
+            // Arrange
+            var user = CreateTestUser();
+
+            _userIdentityServiceMock.Setup(x => x.GetUserUpn(It.IsAny<ClaimsPrincipal>()))
+                                   .Throws(new InvalidOperationException("User UPN or email claim is required"));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _service.GetUserDomainRegistrationsAsync(user));
+
+            Assert.Equal("User UPN or email claim is required", exception.Message);
+            _userIdentityServiceMock.Verify(x => x.GetUserUpn(user), Times.Once);
+            _repositoryMock.Verify(r => r.GetByUserAsync(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task GetDomainRegistrationByIdAsync_ThrowsException_UserIdentityServiceThrows()
+        {
+            // Arrange
+            var user = CreateTestUser();
+            var registrationId = "test-id-123";
+
+            _userIdentityServiceMock.Setup(x => x.GetUserUpn(It.IsAny<ClaimsPrincipal>()))
+                                   .Throws(new InvalidOperationException("User is not authenticated"));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _service.GetDomainRegistrationByIdAsync(user, registrationId));
+
+            Assert.Equal("User is not authenticated", exception.Message);
+            _userIdentityServiceMock.Verify(x => x.GetUserUpn(user), Times.Once);
+            _repositoryMock.Verify(r => r.GetByIdAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task UpdateDomainRegistrationStatusAsync_ThrowsException_UserIdentityServiceThrows()
+        {
+            // Arrange
+            var user = CreateTestUser();
+            var registrationId = "test-id-123";
+            var status = DomainRegistrationStatus.Completed;
+
+            _userIdentityServiceMock.Setup(x => x.GetUserUpn(It.IsAny<ClaimsPrincipal>()))
+                                   .Throws(new InvalidOperationException("User is not authenticated"));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _service.UpdateDomainRegistrationStatusAsync(user, registrationId, status));
+
+            Assert.Equal("User is not authenticated", exception.Message);
+            _userIdentityServiceMock.Verify(x => x.GetUserUpn(user), Times.Once);
+            _repositoryMock.Verify(r => r.GetByIdAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task CreateDomainRegistrationAsync_UsesCorrectUpnFromIdentityService()
+        {
+            // Arrange
+            var user = CreateTestUser();
+            var domain = CreateTestDomain();
+            var contactInfo = CreateTestContactInfo();
+            var expectedUpn = "different@domain.com";
+
+            _userIdentityServiceMock.Setup(x => x.GetUserUpn(It.IsAny<ClaimsPrincipal>()))
+                                   .Returns(expectedUpn);
+
+            var expectedRegistration = new InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration
+            {
+                id = "test-id-123",
+                Upn = expectedUpn,
+                Domain = domain,
+                ContactInformation = contactInfo,
+                CreatedAt = DateTime.UtcNow,
+                Status = DomainRegistrationStatus.Pending
+            };
+
+            _repositoryMock.Setup(r => r.CreateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()))
+                          .ReturnsAsync(expectedRegistration);
+
+            // Act
+            var result = await _service.CreateDomainRegistrationAsync(user, domain, contactInfo);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(expectedUpn, result.Upn);
+            _userIdentityServiceMock.Verify(x => x.GetUserUpn(user), Times.Once);
+            _repositoryMock.Verify(r => r.CreateAsync(It.Is<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                dr => dr.Upn == expectedUpn)), Times.Once);
+        }
+
+        #endregion
     }
 }

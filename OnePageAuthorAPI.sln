@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageAPI", "ImageAPI\ImageA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeedImageStorageTiers", "SeedImageStorageTiers\SeedImageStorageTiers.csproj", "{B1234567-1234-4567-8901-234567890123}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnePageAuthor.DataSeeder", "OnePageAuthor.DataSeeder\OnePageAuthor.DataSeeder.csproj", "{291018C5-842B-45F5-A68F-C92761D77CF3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,5 +80,9 @@ Global
 		{B1234567-1234-4567-8901-234567890123}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1234567-1234-4567-8901-234567890123}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1234567-1234-4567-8901-234567890123}.Release|Any CPU.Build.0 = Release|Any CPU
+		{291018C5-842B-45F5-A68F-C92761D77CF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{291018C5-842B-45F5-A68F-C92761D77CF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{291018C5-842B-45F5-A68F-C92761D77CF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{291018C5-842B-45F5-A68F-C92761D77CF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
