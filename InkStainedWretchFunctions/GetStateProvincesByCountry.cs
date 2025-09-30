@@ -70,16 +70,6 @@ public class GetStateProvincesByCountry
             return errorResult;
         }
 
-        // Check if user has the required scope for StateProvince reading
-        if (user != null && !HasRequiredScope(user))
-        {
-            _logger.LogWarning("User does not have required StateProvince.Read scope");
-            return new ObjectResult(new { error = "Insufficient permissions" })
-            {
-                StatusCode = StatusCodes.Status403Forbidden
-            };
-        }
-
         try
         {
             // Get StateProvinces by country and culture
@@ -125,15 +115,4 @@ public class GetStateProvincesByCountry
         }
     }
 
-    /// <summary>
-    /// Checks if the user has the required scope for StateProvince operations.
-    /// </summary>
-    /// <param name="user">The claims principal representing the authenticated user.</param>
-    /// <returns>True if the user has the required scope, false otherwise.</returns>
-    private static bool HasRequiredScope(ClaimsPrincipal user)
-    {
-        // Check for StateProvince.Read scope or a general Read scope
-        var scopes = user.FindAll("scope").Select(c => c.Value);
-        return scopes.Any(s => s.Contains("StateProvince.Read") || s.Contains("Read") || s.Contains("User.Read"));
-    }
 }

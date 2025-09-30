@@ -102,10 +102,7 @@ This document describes the new Azure Functions added to the InkStainedWretchFun
 
 ## Security
 
-Both functions require JWT authentication and check for the following scopes:
-- `StateProvince.Read`
-- `Read` (general read permission)
-- `User.Read` (fallback permission)
+Both functions require JWT authentication but do not enforce specific scopes, allowing any authenticated user to access StateProvince data.
 
 ## Supported Data
 
