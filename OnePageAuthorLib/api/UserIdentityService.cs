@@ -22,12 +22,28 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 throw new InvalidOperationException("User is not authenticated");
 
             // Try to get UPN first, then fall back to email if UPN is missing or empty
-            var upn = user.FindFirst("upn")?.Value ?? user.FindFirst("email")?.Value ?? user.FindFirst(nameClaimType)?.Value ?? user.FindFirst(emailClaimType)?.Value ?? user.Identity?.Name;
+            var upn = GetNonEmptyClaimValue(user, "upn") 
+                     ?? GetNonEmptyClaimValue(user, "email")
+                     ?? GetNonEmptyClaimValue(user, nameClaimType)
+                     ?? GetNonEmptyClaimValue(user, emailClaimType)
+                     ?? (string.IsNullOrWhiteSpace(user.Identity?.Name) ? null : user.Identity.Name);
 
             if (string.IsNullOrWhiteSpace(upn))
                 throw new InvalidOperationException("User UPN or email claim is required");
 
             return upn;
+        }
+
+        /// <summary>
+        /// Helper method to get a claim value that is not null or whitespace.
+        /// </summary>
+        /// <param name="user">The claims principal</param>
+        /// <param name="claimType">The type of claim to retrieve</param>
+        /// <returns>The claim value if it exists and is not empty/whitespace, otherwise null</returns>
+        private static string? GetNonEmptyClaimValue(ClaimsPrincipal user, string claimType)
+        {
+            var claimValue = user.FindFirst(claimType)?.Value;
+            return string.IsNullOrWhiteSpace(claimValue) ? null : claimValue;
         }
     }
 }
