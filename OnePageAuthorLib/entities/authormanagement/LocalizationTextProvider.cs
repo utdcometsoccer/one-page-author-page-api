@@ -105,7 +105,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
         }
 
         /// <summary>
-        /// <summary>
         /// Attempts resolution by: exact culture -> first matching language-region -> neutral language -> empty.
         /// </summary>
         private async Task<T> QueryLanguageResolutionAsync<T>(string containerName, string specific, string language) where T : AuthorManagementBase, new()

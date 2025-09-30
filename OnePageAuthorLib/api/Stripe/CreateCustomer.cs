@@ -9,7 +9,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     /// </summary>
     /// <remarks>
     /// This class does not perform any remote Stripe calls. It simply maps the request into an initialized
-    /// <see cref="CreateStripeCustomerResponse"/> instance. Upstream orchestrators can replace or decorate this
+    /// <see cref="CreateCustomerResponse"/> instance. Upstream orchestrators can replace or decorate this
     /// implementation to invoke the actual Stripe SDK.
     /// </remarks>
     public class CreateCustomer : ICreateCustomer

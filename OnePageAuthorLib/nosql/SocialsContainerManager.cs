@@ -15,7 +15,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         /// <summary>
         /// Initializes a new instance of the SocialsContainerManager class.
         /// </summary>
-        /// <param name="cosmosClient">The Azure Cosmos DB client.</param>
         /// <param name="database">The Azure Cosmos DB database.</param>
         public SocialsContainerManager(Database database)
         {
