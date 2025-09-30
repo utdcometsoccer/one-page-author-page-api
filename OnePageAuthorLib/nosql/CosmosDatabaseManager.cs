@@ -9,6 +9,22 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
     /// </summary>
     public class CosmosDatabaseManager : ICosmosDatabaseManager
     {
+        private readonly CosmosClient? _cosmosClient;
+
+        /// <summary>
+        /// Initializes a new instance of the CosmosDatabaseManager class.
+        /// </summary>
+        public CosmosDatabaseManager() { }
+
+        /// <summary>
+        /// Initializes a new instance of the CosmosDatabaseManager class with a CosmosClient.
+        /// </summary>
+        /// <param name="cosmosClient">The Azure Cosmos DB client.</param>
+        public CosmosDatabaseManager(CosmosClient cosmosClient)
+        {
+            _cosmosClient = cosmosClient ?? throw new ArgumentNullException(nameof(cosmosClient));
+        }
+
         /// <summary>
         /// Creates an Azure Cosmos NoSQL database if it does not exist.
         /// </summary>
@@ -16,15 +32,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         /// <param name="primaryKey">The primary key for the Cosmos DB account.</param>
         /// <param name="databaseId">The name of the database to create or access.</param>
         /// <returns>The Cosmos DB Database object.</returns>
-        private readonly CosmosClient? _cosmosClient;
-
-        public CosmosDatabaseManager() { }
-
-        public CosmosDatabaseManager(CosmosClient cosmosClient)
-        {
-            _cosmosClient = cosmosClient ?? throw new ArgumentNullException(nameof(cosmosClient));
-        }
-
         public async Task<Database> EnsureDatabaseAsync(string endpointUri, string primaryKey, string databaseId)
         {
             if (string.IsNullOrWhiteSpace(endpointUri))

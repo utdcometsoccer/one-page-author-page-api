@@ -16,14 +16,18 @@ namespace InkStainedWretchStripe;
 /// Expects a JSON body containing customer details. Validates the presence and format of required fields.
 /// Returns appropriate HTTP responses for validation errors or successful customer creation.
 /// </remarks>
-/// <param name="logger">Logger instance for logging function activity.</param>
-/// <param name="createStripeCustomer">Service responsible for executing Stripe customer creation logic.</param>
 public class CreateStripeCustomer
 {
     private readonly ILogger<CreateStripeCustomer> _logger;
     private readonly IEnsureCustomerForUser _ensureCustomerForUser;
     private readonly IJwtValidationService _jwtValidationService;
 
+    /// <summary>
+    /// Initializes a new instance of the CreateStripeCustomer class.
+    /// </summary>
+    /// <param name="logger">Logger instance for logging function activity.</param>
+    /// <param name="ensureCustomerForUser">Service responsible for executing Stripe customer creation logic.</param>
+    /// <param name="jwtValidationService">Service for JWT token validation.</param>
     public CreateStripeCustomer(ILogger<CreateStripeCustomer> logger, IEnsureCustomerForUser ensureCustomerForUser, IJwtValidationService jwtValidationService)
     {
         _logger = logger;

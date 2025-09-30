@@ -37,7 +37,7 @@ namespace InkStainedWretchStripe;
 /// export async function createSubscription(
 ///   baseUrl: string,
 ///   payload: CreateSubscriptionRequest
-/// ): Promise<SubscriptionCreateResponse> {
+/// ): Promise&lt;SubscriptionCreateResponse&gt; {
 ///   const res = await fetch(`${baseUrl}/api/CreateSubscription`, {
 ///     method: "POST",
 ///     headers: { "Content-Type": "application/json" },
@@ -72,6 +72,7 @@ public class CreateSubscription
     /// Creates a Stripe subscription from the provided request body.
     /// </summary>
     /// <param name="req">HTTP request.</param>
+    /// <param name="payload">The subscription creation request containing PriceId and CustomerId.</param>
     /// <returns>200 with SubscriptionCreateResponse; 400 on invalid input.</returns>
     [Function("CreateSubscription")]
     public async Task<IActionResult> Run(
