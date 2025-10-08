@@ -612,5 +612,14 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<Interfaces.IStateProvinceService, API.StateProvinceService>();
             return services;
         }
+
+        /// <summary>
+        /// Registers Azure Front Door services for domain management.
+        /// </summary>
+        public static IServiceCollection AddFrontDoorServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IFrontDoorService, API.FrontDoorService>();
+            return services;
+        }
     }
 }
