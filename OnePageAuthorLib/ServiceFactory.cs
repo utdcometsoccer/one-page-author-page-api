@@ -612,5 +612,14 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<Interfaces.IStateProvinceService, API.StateProvinceService>();
             return services;
         }
+
+        /// <summary>
+        /// Registers DNS zone service for Azure DNS zone management.
+        /// </summary>
+        public static IServiceCollection AddDnsZoneService(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IDnsZoneService, API.DnsZoneService>();
+            return services;
+        }
     }
 }
