@@ -619,6 +619,10 @@ namespace InkStainedWretch.OnePageAuthorAPI
         public static IServiceCollection AddDnsZoneService(this IServiceCollection services)
         {
             services.AddScoped<Interfaces.IDnsZoneService, API.DnsZoneService>();
+            return services;
+        }
+
+        /// <summary>
         /// Registers Azure Front Door services for domain management.
         /// </summary>
         public static IServiceCollection AddFrontDoorServices(this IServiceCollection services)
