@@ -630,5 +630,14 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<Interfaces.IFrontDoorService, API.FrontDoorService>();
             return services;
         }
+
+        /// <summary>
+        /// Registers Google Domains service for domain registration via Google Domains API.
+        /// </summary>
+        public static IServiceCollection AddGoogleDomainsService(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IGoogleDomainsService, API.GoogleDomainsService>();
+            return services;
+        }
     }
 }
