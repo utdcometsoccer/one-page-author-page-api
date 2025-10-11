@@ -9,14 +9,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
     /// Cosmos DB trigger function that creates DNS zones when domain registrations are added or modified.
     /// Uses a unique lease collection to avoid conflicts with other triggers on the same container.
     /// </summary>
-    public class DomainRegistrationTriggerFunction
+    public class CreateDnsZoneFunction
     {
-        private readonly ILogger<DomainRegistrationTriggerFunction> _logger;
+        private readonly ILogger<CreateDnsZoneFunction> _logger;
         private readonly IDnsZoneService _dnsZoneService;
         private readonly IDomainRegistrationService _domainRegistrationService;
 
-        public DomainRegistrationTriggerFunction(
-            ILogger<DomainRegistrationTriggerFunction> logger,
+        public CreateDnsZoneFunction(
+            ILogger<CreateDnsZoneFunction> logger,
             IDnsZoneService dnsZoneService,
             IDomainRegistrationService domainRegistrationService)
         {
@@ -30,7 +30,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// Creates Azure DNS zones for newly registered domains.
         /// </summary>
         /// <param name="input">List of domain registrations that were added or modified</param>
-        [Function("DomainRegistrationTrigger")]
+        [Function("CreateDnsZone")]
         public async Task Run(
             [CosmosDBTrigger(
                 databaseName: "%COSMOSDB_DATABASE_ID%",

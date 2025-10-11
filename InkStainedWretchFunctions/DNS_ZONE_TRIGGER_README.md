@@ -1,6 +1,6 @@
 # DNS Zone Creation Trigger Function
 
-This document describes the `DomainRegistrationTriggerFunction`, a Cosmos DB triggered Azure Function that automatically creates Azure DNS zones when domain registrations are added to the DomainRegistrations container.
+This document describes the `CreateDnsZoneFunction`, a Cosmos DB triggered Azure Function that automatically creates Azure DNS zones when domain registrations are added to the DomainRegistrations container.
 
 ## Overview
 
@@ -10,7 +10,7 @@ The function uses the Cosmos DB change feed to monitor the `DomainRegistrations`
 
 ### Components
 
-1. **DomainRegistrationTriggerFunction** (InkStainedWretchFunctions)
+1. **CreateDnsZoneFunction** (InkStainedWretchFunctions)
    - Azure Function with Cosmos DB trigger
    - Monitors the `DomainRegistrations` container
    - Uses a unique lease collection with prefix `DnsZone` to avoid conflicts
@@ -166,7 +166,7 @@ traces
 // Find errors in domain registration processing
 traces
 | where severityLevel == 3 // Error
-| where operation_Name == "DomainRegistrationTrigger"
+| where operation_Name == "CreateDnsZone"
 | project timestamp, message
 | order by timestamp desc
 ```

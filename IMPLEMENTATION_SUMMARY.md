@@ -28,8 +28,8 @@ This implementation adds a durable Azure Function that automatically creates Azu
 
 ### 2. Cosmos DB Trigger Function (InkStainedWretchFunctions)
 
-#### DomainRegistrationTriggerFunction
-- **Location**: `InkStainedWretchFunctions/DomainRegistrationTriggerFunction.cs`
+#### CreateDnsZoneFunction
+- **Location**: `InkStainedWretchFunctions/CreateDnsZoneFunction.cs`
 - **Purpose**: Monitors DomainRegistrations container and triggers DNS zone creation
 - **Key Features**:
   - Cosmos DB change feed trigger
@@ -170,7 +170,7 @@ The Function App's Managed Identity needs:
 ## File Changes Summary
 
 - **New Files**: 4
-  - DomainRegistrationTriggerFunction.cs
+  - CreateDnsZoneFunction.cs
   - DnsZoneService.cs
   - IDnsZoneService.cs
   - DnsZoneServiceTests.cs
