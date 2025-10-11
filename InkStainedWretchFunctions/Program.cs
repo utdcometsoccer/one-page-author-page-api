@@ -26,6 +26,7 @@ builder.Services
     .AddDomainRegistrationServices() // Add domain registration services
     .AddStateProvinceRepository() // Add StateProvince repository
     .AddStateProvinceServices() // Add StateProvince services
+    .AddDnsZoneService() // Add DNS zone service for domain registration triggers
     .AddFrontDoorServices() // Add Azure Front Door services for domain management
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
