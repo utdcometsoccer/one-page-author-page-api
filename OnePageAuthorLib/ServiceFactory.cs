@@ -612,5 +612,32 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<Interfaces.IStateProvinceService, API.StateProvinceService>();
             return services;
         }
+
+        /// <summary>
+        /// Registers DNS zone service for Azure DNS zone management.
+        /// </summary>
+        public static IServiceCollection AddDnsZoneService(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IDnsZoneService, API.DnsZoneService>();
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Azure Front Door services for domain management.
+        /// </summary>
+        public static IServiceCollection AddFrontDoorServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IFrontDoorService, API.FrontDoorService>();
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Google Domains service for domain registration via Google Domains API.
+        /// </summary>
+        public static IServiceCollection AddGoogleDomainsService(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IGoogleDomainsService, API.GoogleDomainsService>();
+            return services;
+        }
     }
 }
