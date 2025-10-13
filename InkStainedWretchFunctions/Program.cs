@@ -20,6 +20,7 @@ builder.Services
     .AddAuthorDataService() // Add Author data service for GetAuthors function
     .AddInkStainedWretchServices()
     .AddPenguinRandomHouseServices()
+    .AddAmazonProductServices() // Add Amazon Product API services
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
     .AddUserProfileServices()
     .AddDomainRegistrationRepository() // Add domain registration repository
