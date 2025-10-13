@@ -113,6 +113,11 @@ namespace OnePageAuthorAPI.DataSeeder
             // Add Egyptian governorates in Arabic and English
             allData.AddRange(GetEgyptianGovernorates());
 
+            // Delete all existing StateProvince entries first
+            _logger.LogInformation("Deleting all existing StateProvince entries...");
+            var deletedCount = await _stateProvinceService.DeleteAllStateProvincesAsync();
+            _logger.LogInformation("Deleted {DeletedCount} existing StateProvince entries", deletedCount);
+
             _logger.LogInformation("Seeding {Count} StateProvince entries...", allData.Count);
 
             int successCount = 0;
@@ -122,11 +127,13 @@ namespace OnePageAuthorAPI.DataSeeder
             {
                 try
                 {
-                    // Check if this exact entry already exists
-                    var existing = await _stateProvinceService.GetStateProvinceByCodeAsync(stateProvince.Code!);
-                    if (existing != null && existing.Culture == stateProvince.Culture)
+                    // Skip entries with missing required data
+                    if (string.IsNullOrWhiteSpace(stateProvince.Country) || 
+                        string.IsNullOrWhiteSpace(stateProvince.Culture) || 
+                        string.IsNullOrWhiteSpace(stateProvince.Code))
                     {
-                        _logger.LogDebug("Skipping existing entry: {Code} ({Culture})", stateProvince.Code, stateProvince.Culture);
+                        _logger.LogWarning("Skipping entry with missing data: Country={Country}, Culture={Culture}, Code={Code}", 
+                            stateProvince.Country, stateProvince.Culture, stateProvince.Code);
                         continue;
                     }
 

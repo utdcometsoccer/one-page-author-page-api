@@ -1,9 +1,7 @@
 namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
 {
-    public class ChooseCulture
-    {
-        public string id { get; set; } = Guid.NewGuid().ToString();
-        public string Culture { get; set; } = string.Empty;
+    public class ChooseCulture : AuthorManagementBase
+    {    
         public string title { get; set; } = string.Empty;
         public string subtitle { get; set; } = string.Empty;
         public string legend { get; set; } = string.Empty;
