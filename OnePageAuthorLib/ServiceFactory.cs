@@ -3,6 +3,7 @@ using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.NoSQL;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.API.Penguin;
+using InkStainedWretch.OnePageAuthorLib.API.Amazon;
 using InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces.Authormanagement;
 
@@ -533,6 +534,20 @@ namespace InkStainedWretch.OnePageAuthorAPI
 
             // Register HTTP client and service
             services.AddHttpClient<IPenguinRandomHouseService, PenguinRandomHouseService>();
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Amazon Product Advertising API services for external API integration.
+        /// </summary>
+        public static IServiceCollection AddAmazonProductServices(this IServiceCollection services)
+        {
+            // Register configuration
+            services.AddSingleton<IAmazonProductConfig, AmazonProductConfig>();
+
+            // Register HTTP client and service
+            services.AddHttpClient<IAmazonProductService, AmazonProductService>();
 
             return services;
         }
