@@ -111,11 +111,18 @@ $Projects = @(
         XmlPath = "./IntegrationTestAuthorDataService/bin/Debug/net9.0/IntegrationTestAuthorDataService.xml"
         Description = "Integration testing utility for author data service validation"
         Type = "TestUtility"
+    },
+    @{
+        Name = "OnePageAuthor.DataSeeder"
+        Path = "./OnePageAuthor.DataSeeder"
+        XmlPath = "./OnePageAuthor.DataSeeder/bin/Debug/net9.0/OnePageAuthor.DataSeeder.xml"
+        Description = "Data seeding utility for StateProvince and other core data"
+        Type = "Utility"
     }
 )
 
 # Function to ensure XML documentation is enabled for a project
-function Ensure-XmlDocumentation {
+function Enable-XmlDocumentation {
     param(
         [string]$ProjectPath,
         [string]$ProjectName
@@ -138,8 +145,13 @@ function Ensure-XmlDocumentation {
         $newContent = $content -replace $pattern, $replacement
         
         if ($newContent -ne $content) {
-            Set-Content -Path $csprojPath -Value $newContent -Encoding UTF8
-            Write-Host "    ✅ Updated $ProjectName.csproj with XML documentation settings" -ForegroundColor Green
+            try {
+                Set-Content -Path $csprojPath -Value $newContent -Encoding UTF8
+                Write-Host "    ✅ Updated $ProjectName.csproj with XML documentation settings" -ForegroundColor Green
+            }
+            catch {
+                Write-Warning "Failed to update $ProjectName.csproj: $($_.Exception.Message)"
+            }
         }
     }
 }
@@ -151,23 +163,35 @@ foreach ($project in $Projects) {
     Write-Host "  Processing $($project.Name)..." -ForegroundColor Cyan
     
     # Ensure XML documentation is enabled
-    Ensure-XmlDocumentation -ProjectPath $project.Path -ProjectName $project.Name
+    Enable-XmlDocumentation -ProjectPath $project.Path -ProjectName $project.Name
     
     # Build the project
-    Push-Location $project.Path
-    try {
-        dotnet build --configuration Debug --verbosity minimal
-        if ($LASTEXITCODE -ne 0) {
-            Write-Warning "Build failed for $($project.Name) - continuing with other projects"
+    if (Test-Path $project.Path) {
+        Push-Location $project.Path
+        try {
+            Write-Host "    Building $($project.Name)..." -ForegroundColor Gray
+            $buildOutput = dotnet build --configuration Debug --verbosity minimal 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                Write-Warning "Build failed for $($project.Name):"
+                Write-Warning "$buildOutput"
+                Write-Host "    Continuing with other projects..." -ForegroundColor Yellow
+            } else {
+                Write-Host "    ✅ Build successful for $($project.Name)" -ForegroundColor Green
+            }
         }
-    }
-    finally {
-        Pop-Location
+        catch {
+            Write-Warning "Build error for $($project.Name): $($_.Exception.Message)"
+        }
+        finally {
+            Pop-Location
+        }
+    } else {
+        Write-Warning "Project path not found: $($project.Path)"
     }
 }
 
 # Function to parse XML documentation
-function Parse-XmlDocumentation {
+function Get-XmlDocumentation {
     param(
         [string]$XmlPath,
         [string]$ProjectName
@@ -181,7 +205,11 @@ function Parse-XmlDocumentation {
     Write-Host "  Parsing $ProjectName documentation..." -ForegroundColor Cyan
     
     try {
-        [xml]$xmlContent = Get-Content $XmlPath -Encoding UTF8
+        [xml]$xmlContent = Get-Content $XmlPath -Encoding UTF8 -ErrorAction Stop
+        if (-not $xmlContent.doc -or -not $xmlContent.doc.members) {
+            Write-Warning "Invalid XML structure in $ProjectName documentation - skipping"
+            return @()
+        }
         $members = $xmlContent.doc.members.member
         
         $parsedMembers = @()
@@ -242,7 +270,7 @@ function Parse-XmlDocumentation {
 }
 
 # Generate markdown documentation
-function Generate-MarkdownContent {
+function New-MarkdownContent {
     param(
         [array]$AllMembers
     )
@@ -267,13 +295,13 @@ This comprehensive API documentation covers all Azure Functions and endpoints av
 
 All API endpoints require authentication using JWT Bearer tokens. Include the token in the Authorization header:
 
-``````http
+```http
 Authorization: Bearer <your-jwt-token>
-``````
+```
 
 ### TypeScript Authentication Helper
 
-``````typescript
+```typescript
 class ApiClient {
   private baseUrl: string;
   private token: string;
@@ -322,7 +350,7 @@ class ApiClient {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
 }
-``````
+```
 
 "@
 
@@ -473,58 +501,6 @@ class ApiClient {
             }
         }
     }
-        
-        # Group by class first, then methods
-        $classes = $projectMembers | Where-Object { $_.Type -eq "Class" }
-        $methods = $projectMembers | Where-Object { $_.Type -eq "Method" }
-        
-        foreach ($class in $classes) {
-            $className = ($class.Name -split '\.')[-1]  # Get just the class name
-            $markdown += "### $className`n`n"
-            
-            if ($class.Summary) {
-                $markdown += "$($class.Summary)`n`n"
-            }
-            
-            if ($class.Remarks) {
-                $markdown += "$($class.Remarks)`n`n"
-            }
-            
-            # Find methods for this class
-            $classMethods = $methods | Where-Object { $_.Name -like "*$className*" }
-            
-            foreach ($method in $classMethods) {
-                $methodName = ($method.Name -split '\.')[-1] -replace '\(.*\)', ''
-                $markdown += "#### $methodName`n`n"
-                
-                if ($method.Summary) {
-                    $markdown += "**Description:** $($method.Summary)`n`n"
-                }
-                
-                if ($method.Parameters -and $method.Parameters.Count -gt 0) {
-                    $markdown += "**Parameters:**`n"
-                    foreach ($param in $method.Parameters) {
-                        $markdown += "- ``$($param.Name)``: $($param.Description)`n"
-                    }
-                    $markdown += "`n"
-                }
-                
-                if ($method.Returns) {
-                    $markdown += "**Returns:** $($method.Returns)`n`n"
-                }
-                
-                if ($method.Remarks) {
-                    $markdown += "$($method.Remarks)`n`n"
-                }
-                
-                if ($method.Examples) {
-                    $markdown += "$($method.Examples)`n`n"
-                }
-                
-                $markdown += "---`n`n"
-            }
-        }
-    }
     
     # Add common error handling section
     $markdown += @"
@@ -533,11 +509,11 @@ class ApiClient {
 
 All API endpoints return consistent error responses:
 
-``````json
+```json
 {
   "error": "Descriptive error message"
 }
-``````
+```
 
 ### Common HTTP Status Codes
 
@@ -556,7 +532,7 @@ All API endpoints return consistent error responses:
 
 ### TypeScript Error Handling
 
-``````typescript
+```typescript
 interface ApiError {
   error: string;
   details?: any;
@@ -593,7 +569,7 @@ try {
     }
   }
 }
-``````
+```
 
 ## Rate Limiting
 
@@ -626,23 +602,33 @@ try {
     $allMembers = @()
     
     foreach ($project in $Projects) {
-        $members = Parse-XmlDocumentation -XmlPath $project.XmlPath -ProjectName $project.Name
+        $members = Get-XmlDocumentation -XmlPath $project.XmlPath -ProjectName $project.Name
         $allMembers += $members
     }
     
     Write-Host "✏️  Generating markdown documentation..." -ForegroundColor Yellow
     
-    $markdownContent = Generate-MarkdownContent -AllMembers $allMembers
+    $markdownContent = New-MarkdownContent -AllMembers $allMembers
     
     # Write the documentation file
-    $resolvedPath = Resolve-Path $OutputPath -ErrorAction SilentlyContinue
-    if (-not $resolvedPath) {
-        $OutputPath = Join-Path (Get-Location) (Split-Path $OutputPath -Leaf)
-    } else {
-        $OutputPath = $resolvedPath.Path
+    try {
+        # Ensure the output directory exists
+        $outputDir = Split-Path $OutputPath -Parent
+        if ($outputDir -and -not (Test-Path $outputDir)) {
+            New-Item -Path $outputDir -ItemType Directory -Force | Out-Null
+        }
+        
+        # Convert relative path to absolute if needed
+        if (-not [System.IO.Path]::IsPathRooted($OutputPath)) {
+            $OutputPath = Join-Path (Get-Location) $OutputPath
+        }
+        
+        $markdownContent | Out-File -FilePath $OutputPath -Encoding UTF8 -Force
     }
-    
-    $markdownContent | Out-File -FilePath $OutputPath -Encoding UTF8
+    catch {
+        Write-Error "Failed to write documentation file: $($_.Exception.Message)"
+        throw
+    }
     
     Write-Host "✅ API documentation generated successfully!" -ForegroundColor Green
     Write-Host "📁 Output file: $OutputPath" -ForegroundColor Green

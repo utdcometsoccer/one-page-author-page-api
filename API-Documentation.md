@@ -1,6 +1,6 @@
 # OnePageAuthor API Documentation
 
-*Generated on 2025-09-29 13:20:30 UTC*
+*Generated on 2025-10-13 14:59:21 UTC*
 
 This comprehensive API documentation covers all Azure Functions and endpoints available in the OnePageAuthor system.
 
@@ -17,13 +17,13 @@ This comprehensive API documentation covers all Azure Functions and endpoints av
 
 All API endpoints require authentication using JWT Bearer tokens. Include the token in the Authorization header:
 
-```http
+`http
 Authorization: Bearer <your-jwt-token>
-```
+`
 
 ### TypeScript Authentication Helper
 
-```typescript
+`	ypescript
 class ApiClient {
   private baseUrl: string;
   private token: string;
@@ -72,28 +72,32 @@ class ApiClient {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
 }
-```
+`
 
 
-## ImageAPI
+## Azure Functions API
 
-Image management API for uploading, retrieving, and deleting user images
+The following Azure Functions provide the core API endpoints for the OnePageAuthor system:
 
-### FunctionExecutorHostBuilderExtensions
+### function-app
+
+Main application functions for author data and localization services
+
+#### FunctionExecutorHostBuilderExtensions
 
 System.Xml.XmlElement
 
-#### IHostBuilder)
+##### IHostBuilder)
 
 **Description:** Configures an optimized function executor to the invocation pipeline.
 
 ---
 
-### FunctionExecutorAutoStartup
+#### FunctionExecutorAutoStartup
 
 System.Xml.XmlElement
 
-#### IHostBuilder)
+##### IHostBuilder)
 
 **Description:** System.Xml.XmlElement
 
@@ -102,35 +106,35 @@ System.Xml.XmlElement
 
 ---
 
-### GeneratedFunctionMetadataProvider
+#### GeneratedFunctionMetadataProvider
 
 System.Xml.XmlElement
 
-#### String)
+##### String)
 
 ---
 
-#### IHostBuilder)
+##### IHostBuilder)
 
 **Description:** Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
 
 ---
 
-### WorkerHostBuilderFunctionMetadataProviderExtension
+#### WorkerHostBuilderFunctionMetadataProviderExtension
 
 System.Xml.XmlElement
 
-#### IHostBuilder)
+##### IHostBuilder)
 
 **Description:** Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
 
 ---
 
-### FunctionMetadataProviderAutoStartup
+#### FunctionMetadataProviderAutoStartup
 
 System.Xml.XmlElement
 
-#### IHostBuilder)
+##### IHostBuilder)
 
 **Description:** System.Xml.XmlElement
 
@@ -139,19 +143,92 @@ System.Xml.XmlElement
 
 ---
 
+### ImageAPI
 
+Image management API for uploading, retrieving, and deleting user images
 
-## InkStainedWretchFunctions
+#### FunctionExecutorHostBuilderExtensions
+
+System.Xml.XmlElement
+
+##### IHostBuilder)
+
+**Description:** Configures an optimized function executor to the invocation pipeline.
+
+---
+
+#### FunctionExecutorAutoStartup
+
+System.Xml.XmlElement
+
+##### IHostBuilder)
+
+**Description:** System.Xml.XmlElement
+
+**Parameters:**
+- `hostBuilder`: The instance to use for service registration.
+
+---
+
+#### GeneratedFunctionMetadataProvider
+
+System.Xml.XmlElement
+
+##### String)
+
+---
+
+##### IHostBuilder)
+
+**Description:** Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
+---
+
+#### WorkerHostBuilderFunctionMetadataProviderExtension
+
+System.Xml.XmlElement
+
+##### IHostBuilder)
+
+**Description:** Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
+---
+
+#### FunctionMetadataProviderAutoStartup
+
+System.Xml.XmlElement
+
+##### IHostBuilder)
+
+**Description:** System.Xml.XmlElement
+
+**Parameters:**
+- `hostBuilder`: The instance to use for service registration.
+
+---
+
+### InkStainedWretchFunctions
 
 Core application functions for domain registration and external API integration
 
-### DomainRegistrationFunction
+#### CreateDnsZoneFunction
+
+Cosmos DB trigger function that creates DNS zones when domain registrations are added or modified. Uses a unique lease collection to avoid conflicts with other triggers on the same container.
+
+##### DomainRegistration})
+
+**Description:** Triggered when documents are inserted or updated in the DomainRegistrations container. Creates Azure DNS zones for newly registered domains.
+
+**Parameters:**
+- `input`: List of domain registrations that were added or modified
+
+---
+
+#### DomainRegistrationFunction
 
 HTTP endpoint to create and manage domain registrations.
 
-System.Xml.XmlElement
-
-#### CreateDomainRegistrationRequest)
+##### CreateDomainRegistrationRequest)
 
 **Description:** Creates a new domain registration for the authenticated user.
 
@@ -165,7 +242,7 @@ System.Xml.XmlElement
 
 ---
 
-#### HttpRequest)
+##### HttpRequest)
 
 **Description:** Gets all domain registrations for the authenticated user.
 
@@ -178,7 +255,7 @@ System.Xml.XmlElement
 
 ---
 
-#### String)
+##### String)
 
 **Description:** Gets a specific domain registration by ID for the authenticated user.
 
@@ -190,11 +267,46 @@ System.Xml.XmlElement
 
 ---
 
-### PenguinRandomHouseFunction
+##### DomainRegistration})
+
+**Description:** Processes changes to domain registrations and registers domains via Google Domains API.
+
+**Parameters:**
+- `input`: List of changed domain registrations from Cosmos DB
+
+---
+
+#### DomainRegistrationTriggerFunction
+
+Azure Function triggered by changes to the DomainRegistrations Cosmos DB container. Processes new domain registrations and adds them to Azure Front Door if they don't already exist.
+
+##### DomainRegistration})
+
+**Description:** Processes changes to domain registrations and adds new domains to Azure Front Door.
+
+**Parameters:**
+- `input`: List of changed domain registrations from Cosmos DB
+
+---
+
+#### GoogleDomainRegistrationFunction
+
+Azure Function triggered by changes to the DomainRegistrations Cosmos DB container. Registers domains using the Google Domains API when new registrations are created.
+
+##### DomainRegistration})
+
+**Description:** Processes changes to domain registrations and registers domains via Google Domains API.
+
+**Parameters:**
+- `input`: List of changed domain registrations from Cosmos DB
+
+---
+
+#### PenguinRandomHouseFunction
 
 Azure Function for calling Penguin Random House API
 
-#### String)
+##### String)
 
 **Description:** Searches for authors by name and returns the unmodified JSON response from Penguin Random House API.
 
@@ -208,7 +320,7 @@ System.Xml.XmlElement
 
 ---
 
-#### String)
+##### String)
 
 **Description:** Gets titles by author key and returns the unmodified JSON response from Penguin Random House API.
 
@@ -222,11 +334,57 @@ System.Xml.XmlElement
 
 ---
 
-### LocalizedText
+#### GetStateProvinces
+
+Azure Function for retrieving StateProvince data by culture.
+
+##### String)
+
+**Description:** Gets states and provinces by culture code.
+
+**Parameters:**
+- `req`: The HTTP request.
+- `culture`: The culture code (e.g., "en-US", "fr-CA", "es-MX").
+
+**Returns:** List of StateProvince entities for the specified culture.
+
+---
+
+##### String)
+
+**Description:** Gets states and provinces by country code and culture.
+
+**Parameters:**
+- `req`: The HTTP request.
+- `countryCode`: The two-letter country code (e.g., "US", "CA", "MX").
+- `culture`: The culture code (e.g., "en-US", "fr-CA", "es-MX").
+
+**Returns:** List of StateProvince entities for the specified country and culture.
+
+---
+
+#### GetStateProvincesByCountry
+
+Azure Function for retrieving StateProvince data by country and culture.
+
+##### String)
+
+**Description:** Gets states and provinces by country code and culture.
+
+**Parameters:**
+- `req`: The HTTP request.
+- `countryCode`: The two-letter country code (e.g., "US", "CA", "MX").
+- `culture`: The culture code (e.g., "en-US", "fr-CA", "es-MX").
+
+**Returns:** List of StateProvince entities for the specified country and culture.
+
+---
+
+#### LocalizedText
 
 System.Xml.XmlElement
 
-#### ILocalizationTextProvider)
+##### ILocalizationTextProvider)
 
 **Description:** System.Xml.XmlElement
 
@@ -236,7 +394,7 @@ System.Xml.XmlElement
 
 ---
 
-#### String)
+##### String)
 
 **Description:** Handles HTTP GET requests for localized text.
 
@@ -248,21 +406,21 @@ System.Xml.XmlElement
 
 ---
 
-### FunctionExecutorHostBuilderExtensions
+#### FunctionExecutorHostBuilderExtensions
 
 System.Xml.XmlElement
 
-#### IHostBuilder)
+##### IHostBuilder)
 
 **Description:** Configures an optimized function executor to the invocation pipeline.
 
 ---
 
-### FunctionExecutorAutoStartup
+#### FunctionExecutorAutoStartup
 
 System.Xml.XmlElement
 
-#### IHostBuilder)
+##### IHostBuilder)
 
 **Description:** System.Xml.XmlElement
 
@@ -271,35 +429,35 @@ System.Xml.XmlElement
 
 ---
 
-### GeneratedFunctionMetadataProvider
+#### GeneratedFunctionMetadataProvider
 
 System.Xml.XmlElement
 
-#### String)
+##### String)
 
 ---
 
-#### IHostBuilder)
+##### IHostBuilder)
 
 **Description:** Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
 
 ---
 
-### WorkerHostBuilderFunctionMetadataProviderExtension
+#### WorkerHostBuilderFunctionMetadataProviderExtension
 
 System.Xml.XmlElement
 
-#### IHostBuilder)
+##### IHostBuilder)
 
 **Description:** Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
 
 ---
 
-### FunctionMetadataProviderAutoStartup
+#### FunctionMetadataProviderAutoStartup
 
 System.Xml.XmlElement
 
-#### IHostBuilder)
+##### IHostBuilder)
 
 **Description:** System.Xml.XmlElement
 
@@ -307,17 +465,91 @@ System.Xml.XmlElement
 - `hostBuilder`: The instance to use for service registration.
 
 ---
+
+### InkStainedWretchStripe
+
+Stripe payment processing functions for subscription management and billing
+
+#### FunctionExecutorHostBuilderExtensions
+
+System.Xml.XmlElement
+
+##### IHostBuilder)
+
+**Description:** Configures an optimized function executor to the invocation pipeline.
+
+---
+
+#### FunctionExecutorAutoStartup
+
+System.Xml.XmlElement
+
+##### IHostBuilder)
+
+**Description:** System.Xml.XmlElement
+
+**Parameters:**
+- `hostBuilder`: The instance to use for service registration.
+
+---
+
+#### GeneratedFunctionMetadataProvider
+
+System.Xml.XmlElement
+
+##### String)
+
+---
+
+##### IHostBuilder)
+
+**Description:** Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
+---
+
+#### WorkerHostBuilderFunctionMetadataProviderExtension
+
+System.Xml.XmlElement
+
+##### IHostBuilder)
+
+**Description:** Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
+---
+
+#### FunctionMetadataProviderAutoStartup
+
+System.Xml.XmlElement
+
+##### IHostBuilder)
+
+**Description:** System.Xml.XmlElement
+
+**Parameters:**
+- `hostBuilder`: The instance to use for service registration.
+
+---
+
+
+
+## Testing & Validation
+
+The following projects provide comprehensive testing coverage:
+
+### OnePageAuthor.Test
+
+Unit and integration tests for the OnePageAuthor application
 
 
 ## Error Handling
 
 All API endpoints return consistent error responses:
 
-```json
+`json
 {
   "error": "Descriptive error message"
 }
-```
+`
 
 ### Common HTTP Status Codes
 
@@ -336,7 +568,7 @@ All API endpoints return consistent error responses:
 
 ### TypeScript Error Handling
 
-```typescript
+`	ypescript
 interface ApiError {
   error: string;
   details?: any;
@@ -373,7 +605,7 @@ try {
     }
   }
 }
-```
+`
 
 ## Rate Limiting
 
@@ -385,12 +617,12 @@ API endpoints may be rate-limited based on subscription tier:
 
 Rate limit headers are included in responses:
 
-```
+`
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 99
 X-RateLimit-Reset: 1640995200
-```
+`
 
 ---
 
-*This documentation is automatically generated from source code XML comments. Last updated: 2025-09-29 13:20:30 UTC*
+*This documentation is automatically generated from source code XML comments. Last updated: 2025-10-13 14:59:21 UTC*
