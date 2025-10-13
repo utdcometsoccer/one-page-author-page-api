@@ -586,7 +586,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
-        /// Registers StateProvince repository and container manager.
+        /// Registers StateProvince repository services for state/province management.
         /// Call this after registering a singleton Database in DI.
         /// </summary>
         public static IServiceCollection AddStateProvinceRepository(this IServiceCollection services)
@@ -594,11 +594,20 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddTransient<IContainerManager<Entities.StateProvince>>(sp =>
                 new NoSQL.StateProvincesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
 
+            // Register the old Guid-based repository for backward compatibility
             services.AddSingleton<API.IStateProvinceRepository>(sp =>
             {
                 var container = sp.GetRequiredService<IContainerManager<Entities.StateProvince>>()
                     .EnsureContainerAsync().GetAwaiter().GetResult();
                 return new NoSQL.StateProvinceRepository(container);
+            });
+
+            // Register the new string-based repository
+            services.AddSingleton<API.IStringStateProvinceRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.StateProvince>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.StringStateProvinceRepository(container);
             });
 
             return services;

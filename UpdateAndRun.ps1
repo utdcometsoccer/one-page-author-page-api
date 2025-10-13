@@ -168,7 +168,7 @@ foreach ($Project in $Projects) {
             param($ProjectPath, $ProjectName, $Port)
             Set-Location $ProjectPath
             Write-Host "Starting $ProjectName in $ProjectPath on port $Port"
-            func start --port $Port
+            func start --port $Port --cors * 
         } -ArgumentList $ProjectPath, $Project.Name, $Port -Name $Project.Name
         
         $RunningJobs += @{

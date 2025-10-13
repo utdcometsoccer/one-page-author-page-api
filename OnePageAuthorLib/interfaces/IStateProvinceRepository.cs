@@ -49,5 +49,28 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         /// <param name="culture">The culture code (e.g., "en-US", "fr-CA").</param>
         /// <returns>List of StateProvince entities for the specified country and culture.</returns>
         Task<IList<StateProvince>> GetByCountryAndCultureAsync(string countryCode, string culture);
+
+        /// <summary>
+        /// Gets a specific state or province by country code, culture, and code.
+        /// </summary>
+        /// <param name="countryCode">The two-letter country code (e.g., "US", "CA").</param>
+        /// <param name="culture">The culture code (e.g., "en-US", "fr-CA").</param>
+        /// <param name="code">The state/province code (e.g., "CA" for California, "ON" for Ontario).</param>
+        /// <returns>The matching StateProvince entity, or null if not found.</returns>
+        Task<StateProvince?> GetByCountryCultureAndCodeAsync(string countryCode, string culture, string code);
+
+        /// <summary>
+        /// Gets a specific state or province by culture and code (across all countries).
+        /// </summary>
+        /// <param name="culture">The culture code (e.g., "en-US", "fr-CA").</param>
+        /// <param name="code">The state/province code (e.g., "CA" for California, "ON" for Ontario).</param>
+        /// <returns>The matching StateProvince entity, or null if not found. If multiple matches exist across countries, returns the first one found.</returns>
+        Task<StateProvince?> GetByCultureAndCodeAsync(string culture, string code);
+
+        /// <summary>
+        /// Gets all state or province entities in the container.
+        /// </summary>
+        /// <returns>List of all StateProvince entities.</returns>
+        Task<IList<StateProvince>> GetAllAsync();
     }
 }

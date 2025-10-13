@@ -1,67 +1,46 @@
 using InkStainedWretch.OnePageAuthorAPI.Entities;
 
-namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
+namespace InkStainedWretch.OnePageAuthorAPI.API
 {
     /// <summary>
-    /// Service interface for managing StateProvince operations.
+    /// Interface for StateProvinceRepository using string-based IDs, supports querying by code and name.
     /// </summary>
-    public interface IStateProvinceService
+    public interface IStringStateProvinceRepository : IStringGenericRepository<StateProvince>
     {
         /// <summary>
         /// Gets a state or province by its ISO 3166-2 code.
         /// </summary>
         /// <param name="code">The ISO 3166-2 code (e.g., "US-CA" for California).</param>
         /// <returns>The matching StateProvince entity, or null if not found.</returns>
-        Task<StateProvince?> GetStateProvinceByCodeAsync(string code);
+        Task<StateProvince?> GetByCodeAsync(string code);
 
         /// <summary>
         /// Gets states or provinces by name (partial match, case-insensitive).
         /// </summary>
         /// <param name="name">The name or partial name of the state/province.</param>
         /// <returns>List of matching StateProvince entities.</returns>
-        Task<IList<StateProvince>> SearchStateProvincesByNameAsync(string name);
+        Task<IList<StateProvince>> GetByNameAsync(string name);
 
         /// <summary>
         /// Gets all states or provinces for a specific country code.
         /// </summary>
         /// <param name="countryCode">The two-letter country code (e.g., "US", "CA").</param>
         /// <returns>List of StateProvince entities for the specified country.</returns>
-        Task<IList<StateProvince>> GetStateProvincesByCountryAsync(string countryCode);
+        Task<IList<StateProvince>> GetByCountryAsync(string countryCode);
 
         /// <summary>
-        /// Validates if a state or province code is valid and exists.
+        /// Checks if a state or province code exists in the database.
         /// </summary>
-        /// <param name="code">The ISO 3166-2 code to validate.</param>
-        /// <returns>True if the code is valid and exists, false otherwise.</returns>
-        Task<bool> ValidateStateProvinceCodeAsync(string code);
-
-        /// <summary>
-        /// Creates a new state or province.
-        /// </summary>
-        /// <param name="stateProvince">The StateProvince entity to create.</param>
-        /// <returns>The created StateProvince entity.</returns>
-        Task<StateProvince> CreateStateProvinceAsync(StateProvince stateProvince);
-
-        /// <summary>
-        /// Updates an existing state or province.
-        /// </summary>
-        /// <param name="stateProvince">The StateProvince entity to update.</param>
-        /// <returns>The updated StateProvince entity.</returns>
-        Task<StateProvince> UpdateStateProvinceAsync(StateProvince stateProvince);
-
-        /// <summary>
-        /// Deletes a state or province by its ID.
-        /// </summary>
-        /// <param name="id">The ID of the StateProvince to delete.</param>
-        /// <returns>True if deletion was successful, false otherwise.</returns>
-        Task<bool> DeleteStateProvinceAsync(string id);
+        /// <param name="code">The ISO 3166-2 code to check.</param>
+        /// <returns>True if the code exists, false otherwise.</returns>
+        Task<bool> ExistsByCodeAsync(string code);
 
         /// <summary>
         /// Gets states or provinces by culture code.
         /// </summary>
         /// <param name="culture">The culture code (e.g., "en-US", "fr-CA").</param>
         /// <returns>List of StateProvince entities for the specified culture.</returns>
-        Task<IList<StateProvince>> GetStateProvincesByCultureAsync(string culture);
+        Task<IList<StateProvince>> GetByCultureAsync(string culture);
 
         /// <summary>
         /// Gets states or provinces by country code and culture.
@@ -69,7 +48,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="countryCode">The two-letter country code (e.g., "US", "CA").</param>
         /// <param name="culture">The culture code (e.g., "en-US", "fr-CA").</param>
         /// <returns>List of StateProvince entities for the specified country and culture.</returns>
-        Task<IList<StateProvince>> GetStateProvincesByCountryAndCultureAsync(string countryCode, string culture);
+        Task<IList<StateProvince>> GetByCountryAndCultureAsync(string countryCode, string culture);
 
         /// <summary>
         /// Gets a specific state or province by country code, culture, and code.
@@ -78,7 +57,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="culture">The culture code (e.g., "en-US", "fr-CA").</param>
         /// <param name="code">The state/province code (e.g., "CA" for California, "ON" for Ontario).</param>
         /// <returns>The matching StateProvince entity, or null if not found.</returns>
-        Task<StateProvince?> GetStateProvinceByCountryCultureAndCodeAsync(string countryCode, string culture, string code);
+        Task<StateProvince?> GetByCountryCultureAndCodeAsync(string countryCode, string culture, string code);
 
         /// <summary>
         /// Gets a specific state or province by culture and code (across all countries).
@@ -86,18 +65,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="culture">The culture code (e.g., "en-US", "fr-CA").</param>
         /// <param name="code">The state/province code (e.g., "CA" for California, "ON" for Ontario).</param>
         /// <returns>The matching StateProvince entity, or null if not found. If multiple matches exist across countries, returns the first one found.</returns>
-        Task<StateProvince?> GetStateProvinceByCultureAndCodeAsync(string culture, string code);
-
-        /// <summary>
-        /// Gets all state or province entities.
-        /// </summary>
-        /// <returns>List of all StateProvince entities.</returns>
-        Task<IList<StateProvince>> GetAllStateProvincesAsync();
-
-        /// <summary>
-        /// Deletes all state or province entities.
-        /// </summary>
-        /// <returns>The number of entities deleted.</returns>
-        Task<int> DeleteAllStateProvincesAsync();
+        Task<StateProvince?> GetByCultureAndCodeAsync(string culture, string code);
     }
 }

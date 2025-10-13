@@ -1,9 +1,7 @@
 namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
 {
-    public class SocialList
+    public class SocialList : AuthorManagementBase
     {
-        public string id { get; set; } = Guid.NewGuid().ToString();
-        public string Culture { get; set; } = string.Empty;
         public string title { get; set; } = string.Empty;
         public string url { get; set; } = string.Empty;
         public string edit { get; set; } = string.Empty;

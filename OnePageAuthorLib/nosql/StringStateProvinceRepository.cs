@@ -5,15 +5,15 @@ using InkStainedWretch.OnePageAuthorAPI.API;
 namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
 {
     /// <summary>
-    /// Repository for StateProvince entities, supports querying by code and name.
+    /// Repository for StateProvince entities using string-based IDs, supports querying by code and name.
     /// </summary>
-    public class StateProvinceRepository : GenericRepository<StateProvince>, IStateProvinceRepository
+    public class StringStateProvinceRepository : StringGenericRepository<StateProvince>, IStringStateProvinceRepository
     {
         /// <summary>
-        /// Initializes a new instance of the StateProvinceRepository class.
+        /// Initializes a new instance of the StringStateProvinceRepository class.
         /// </summary>
         /// <param name="container">The Cosmos DB container for StateProvince entities.</param>
-        public StateProvinceRepository(Container container) : base(container)
+        public StringStateProvinceRepository(Container container) : base(container)
         {
         }
 
@@ -52,8 +52,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 return new List<StateProvince>();
 
             var query = new QueryDefinition(
-                "SELECT * FROM c WHERE CONTAINS(UPPER(c.Name), @name)")
-                .WithParameter("@name", name.ToUpperInvariant());
+                "SELECT * FROM c WHERE CONTAINS(UPPER(c.Name), UPPER(@name))")
+                .WithParameter("@name", name);
 
             var results = new List<StateProvince>();
             using var iterator = _container.GetItemQueryIterator<StateProvince>(query);
@@ -219,25 +219,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Gets all state or province entities in the container.
-        /// </summary>
-        /// <returns>List of all StateProvince entities.</returns>
-        public async Task<IList<StateProvince>> GetAllAsync()
-        {
-            var query = new QueryDefinition("SELECT * FROM c");
-            var results = new List<StateProvince>();
-            
-            using var iterator = _container.GetItemQueryIterator<StateProvince>(query);
-            while (iterator.HasMoreResults)
-            {
-                var response = await iterator.ReadNextAsync();
-                results.AddRange(response.Resource);
-            }
-
-            return results;
         }
     }
 }

@@ -9,11 +9,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
     /// </summary>
     public class StateProvinceService : IStateProvinceService
     {
-        private readonly IStateProvinceRepository _repository;
+        private readonly IStringStateProvinceRepository _repository;
         private readonly ILogger<StateProvinceService> _logger;
 
         public StateProvinceService(
-            IStateProvinceRepository repository,
+            IStringStateProvinceRepository repository,
             ILogger<StateProvinceService> logger)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -211,15 +211,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException("ID cannot be null or empty", nameof(id));
             
-            // Convert string ID to Guid if possible
-            if (!Guid.TryParse(id, out var guidId))
-                throw new ArgumentException("ID must be a valid Guid", nameof(id));
-
+            
             _logger.LogInformation("Deleting StateProvince with ID: {Id}", id);
             
             try
             {
-                return await _repository.DeleteAsync(guidId);
+                return await _repository.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -317,6 +314,154 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving StateProvinces for country: {CountryCode} and culture: {Culture}", countryCode, culture);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets a specific state or province by country code, culture, and code.
+        /// </summary>
+        /// <param name="countryCode">The two-letter country code (e.g., "US", "CA").</param>
+        /// <param name="culture">The culture code (e.g., "en-US", "fr-CA").</param>
+        /// <param name="code">The state/province code (e.g., "CA" for California, "ON" for Ontario).</param>
+        /// <returns>The matching StateProvince entity, or null if not found.</returns>
+        public async Task<StateProvince?> GetStateProvinceByCountryCultureAndCodeAsync(string countryCode, string culture, string code)
+        {
+            if (string.IsNullOrWhiteSpace(countryCode))
+            {
+                _logger.LogWarning("GetStateProvinceByCountryCultureAndCodeAsync called with null or empty countryCode");
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(culture))
+            {
+                _logger.LogWarning("GetStateProvinceByCountryCultureAndCodeAsync called with null or empty culture");
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                _logger.LogWarning("GetStateProvinceByCountryCultureAndCodeAsync called with null or empty code");
+                return null;
+            }
+
+            // Validate country code format (should be 2 letters)
+            if (countryCode.Length != 2)
+            {
+                _logger.LogWarning("Invalid country code format: {CountryCode}. Expected 2-letter code.", countryCode);
+                return null;
+            }
+
+            // Validate culture format (should be language-region, e.g., "en-US")
+            if (!culture.Contains('-') || culture.Length < 5)
+            {
+                _logger.LogWarning("Invalid culture code format: {Culture}. Expected format like 'en-US'.", culture);
+                return null;
+            }
+
+            _logger.LogInformation("Retrieving StateProvince for country: {CountryCode}, culture: {Culture}, and code: {Code}", countryCode, culture, code);
+            
+            try
+            {
+                return await _repository.GetByCountryCultureAndCodeAsync(countryCode, culture, code);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving StateProvince for country: {CountryCode}, culture: {Culture}, and code: {Code}", countryCode, culture, code);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets a specific state or province by culture and code (across all countries).
+        /// </summary>
+        /// <param name="culture">The culture code (e.g., "en-US", "fr-CA").</param>
+        /// <param name="code">The state/province code (e.g., "CA" for California, "ON" for Ontario).</param>
+        /// <returns>The matching StateProvince entity, or null if not found. If multiple matches exist across countries, returns the first one found.</returns>
+        public async Task<StateProvince?> GetStateProvinceByCultureAndCodeAsync(string culture, string code)
+        {
+            if (string.IsNullOrWhiteSpace(culture))
+            {
+                _logger.LogWarning("GetStateProvinceByCultureAndCodeAsync called with null or empty culture");
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                _logger.LogWarning("GetStateProvinceByCultureAndCodeAsync called with null or empty code");
+                return null;
+            }
+
+            // Validate culture format (should be language-region, e.g., "en-US")
+            if (!culture.Contains('-') || culture.Length < 5)
+            {
+                _logger.LogWarning("Invalid culture code format: {Culture}. Expected format like 'en-US'.", culture);
+                return null;
+            }
+
+            _logger.LogInformation("Retrieving StateProvince for culture: {Culture} and code: {Code}", culture, code);
+            
+            try
+            {
+                return await _repository.GetByCultureAndCodeAsync(culture, code);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving StateProvince for culture: {Culture} and code: {Code}", culture, code);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets all state or province entities.
+        /// </summary>
+        /// <returns>List of all StateProvince entities.</returns>
+        public async Task<IList<StateProvince>> GetAllStateProvincesAsync()
+        {
+            _logger.LogInformation("Retrieving all StateProvinces");
+            
+            try
+            {
+                return await _repository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving all StateProvinces");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Deletes all state or province entities.
+        /// </summary>
+        /// <returns>The number of entities deleted.</returns>
+        public async Task<int> DeleteAllStateProvincesAsync()
+        {
+            _logger.LogInformation("Deleting all StateProvinces");
+            
+            try
+            {
+                var allStateProvinces = await _repository.GetAllAsync();
+                int deletedCount = 0;
+
+                foreach (var stateProvince in allStateProvinces)
+                {
+                    if (!string.IsNullOrEmpty(stateProvince.id))
+                    {
+                        var deleted = await DeleteStateProvinceAsync(stateProvince.id);
+                        if (deleted)
+                        {
+                            deletedCount++;
+                        }
+                    }
+                }
+
+                _logger.LogInformation("Deleted {DeletedCount} StateProvinces", deletedCount);
+                return deletedCount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting all StateProvinces");
                 throw;
             }
         }

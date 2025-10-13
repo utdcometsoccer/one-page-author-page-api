@@ -1,9 +1,7 @@
 namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
 {
-    public class OpenLibraryAuthorForm
+    public class OpenLibraryAuthorForm : AuthorManagementBase
     {
-        public string id { get; set; } = Guid.NewGuid().ToString();
-        public string Culture { get; set; } = string.Empty;
         public string legend { get; set; } = string.Empty;
         public string key { get; set; } = string.Empty;
         public string text { get; set; } = string.Empty;
