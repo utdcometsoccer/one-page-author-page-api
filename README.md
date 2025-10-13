@@ -8,6 +8,7 @@ A .NET 9 solution providing APIs and utilities for the One Page Author platform.
 - Cosmos DB repositories and DI extensions
 - Stripe integration (customers, prices, subscriptions, invoices, webhooks)
 - Entra ID JWT auth for protected functions
+- External API integrations (Penguin Random House, Amazon Product Advertising API)
 - Clean DI with reusable IServiceCollection extensions
 - Organized seeders for author data and locales
 - Thorough test coverage with xUnit
@@ -42,6 +43,24 @@ Environment variables (or local.settings.json for Functions apps):
 - `AAD_CLIENT_ID` — Alternative to AAD_AUDIENCE
 - `AAD_AUTHORITY` — Optional, e.g. `https://login.microsoftonline.com/<tenantId>/v2.0`
 - (If using webhooks) `STRIPE_WEBHOOK_SECRET` — Endpoint secret for signature verification
+
+### External API Integration (Optional)
+
+For Penguin Random House API integration:
+- `PENGUIN_RANDOM_HOUSE_API_URL` — Base URL for Penguin Random House API
+- `PENGUIN_RANDOM_HOUSE_API_KEY` — API key for authentication
+- `PENGUIN_RANDOM_HOUSE_API_DOMAIN` — Domain for API requests (e.g., "PRH.US")
+- `PENGUIN_RANDOM_HOUSE_SEARCH_API` — Search API endpoint template
+- `PENGUIN_RANDOM_HOUSE_LIST_TITLES_BY_AUTHOR_API` — List titles endpoint template
+- `PENGUIN_RANDOM_HOUSE_URL` — Base URL for Penguin Random House website
+
+For Amazon Product Advertising API integration:
+- `AMAZON_PRODUCT_ACCESS_KEY` — AWS Access Key ID
+- `AMAZON_PRODUCT_SECRET_KEY` — AWS Secret Access Key
+- `AMAZON_PRODUCT_PARTNER_TAG` — Amazon Associates Partner Tag (e.g., "yourtag-20")
+- `AMAZON_PRODUCT_REGION` — AWS region (e.g., "us-east-1")
+- `AMAZON_PRODUCT_MARKETPLACE` — Amazon marketplace domain (e.g., "www.amazon.com")
+- `AMAZON_PRODUCT_API_ENDPOINT` — API endpoint URL
 
 ### Example local.settings.json (Functions apps)
 
@@ -143,8 +162,10 @@ dotnet test OnePageAuthorAPI.sln -c Debug
 ## Project index
 - OnePageAuthorLib — Core library of entities, repositories, and services
    - ./OnePageAuthorLib/README.md
-- InkStainedWretchFunctions — Functions app exposing localized text API
+- InkStainedWretchFunctions — Functions app exposing localized text API and external integrations
    - ./InkStainedWretchFunctions/README.md
+   - ./InkStainedWretchFunctions/README_PenguinAPI.md — Penguin Random House API integration
+   - ./InkStainedWretchFunctions/README_AmazonAPI.md — Amazon Product Advertising API integration
 - InkStainedWretchStripe — Functions app integrating with Stripe
    - ./InkStainedWretchStripe/README.md
 - function-app — Additional Functions host (infrastructure/experiments)
