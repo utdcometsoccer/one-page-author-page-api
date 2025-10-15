@@ -1,4 +1,5 @@
 using InkStainedWretch.OnePageAuthorAPI;
+using InkStainedWretch.OnePageAuthorAPI.Functions.Testing;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +31,7 @@ builder.Services
     .AddDnsZoneService() // Add DNS zone service for domain registration triggers
     .AddFrontDoorServices() // Add Azure Front Door services for domain management
     .AddGoogleDomainsService() // Add Google Domains service for domain registration
+    .AddTestingServices() // Add testing services for mock implementations and test harnesses
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 

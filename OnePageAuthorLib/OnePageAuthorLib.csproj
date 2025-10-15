@@ -13,7 +13,7 @@
     <PackageReference Include="Azure.Identity" Version="1.17.0" />
     <PackageReference Include="Azure.ResourceManager.Dns" Version="1.2.0-beta.2" />
     <PackageReference Include="Azure.ResourceManager.Cdn" Version="1.5.0" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.25.1" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
     <PackageReference Include="Google.Cloud.Domains.V1" Version="2.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
