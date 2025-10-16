@@ -2,7 +2,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using InkStainedWretch.OnePageAuthorAPI.Functions.Testing;
 using System.Text.Json;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses

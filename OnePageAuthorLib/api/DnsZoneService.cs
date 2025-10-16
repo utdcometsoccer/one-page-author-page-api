@@ -3,7 +3,6 @@ using Azure.Core;
 using Azure.Identity;
 using Azure.ResourceManager;
 using Azure.ResourceManager.Dns;
-using Azure.ResourceManager.Resources;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 using Microsoft.Extensions.Configuration;
