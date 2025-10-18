@@ -2,18 +2,10 @@ using InkStainedWretch.OnePageAuthorAPI;
 using InkStainedWretch.OnePageAuthorAPI.Functions.Testing;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = FunctionsApplication.CreateBuilder(args);
-
-// Add User Secrets support for development
-// This allows secrets to be stored securely outside of source code
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddUserSecrets<Program>();
-}
 
 var configuration = builder.Configuration;
 var endpointUri = configuration["COSMOSDB_ENDPOINT_URI"];
@@ -44,6 +36,3 @@ builder.Services
     .ConfigureFunctionsApplicationInsights();
 
 builder.Build().Run();
-
-// Program class needed for User Secrets generic type parameter
-public partial class Program { }

@@ -4,8 +4,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
-using InkStainedWretch.OnePageAuthorAPI.Entities;
-using System.Security.Claims;
 
 namespace InkStainedWretchFunctions;
 
