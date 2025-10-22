@@ -206,7 +206,7 @@ public class Upload
             var file = req.Form.Files[0];
 
             // Use the image upload service
-            var result = await _imageUploadService.UploadImageAsync(file, userProfileId);
+            var result = await _imageUploadService.UploadImageAsync(file, userProfileId, authenticatedUser);
 
             // Convert service result to HTTP response
             if (result.IsSuccess)
