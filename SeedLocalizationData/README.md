@@ -31,10 +31,15 @@ This application seeds localization data for specific InkStainedWretch author ma
 
 ## Quickstart
 ```pwsh
-# Configure user secrets (see Configuration section below)
-dotnet user-secrets set "EndpointUri" "https://<your-account>.documents.azure.com:443/" --project SeedLocalizationData
-dotnet user-secrets set "PrimaryKey" "<your-primary-key>" --project SeedLocalizationData
-dotnet user-secrets set "DatabaseId" "<your-database-id>" --project SeedLocalizationData
+# Option 1: Copy secrets from SeedInkStainedWretchesLocale (if already configured)
+.\Copy-LocalizationSeederSecrets.ps1
+
+# Option 2: Configure secrets manually (if starting fresh)
+cd SeedLocalizationData
+dotnet user-secrets set "EndpointUri" "https://<your-account>.documents.azure.com:443/"
+dotnet user-secrets set "PrimaryKey" "<your-primary-key>"
+dotnet user-secrets set "DatabaseId" "<your-database-id>"
+cd ..
 
 # Build and run
 dotnet build SeedLocalizationData/SeedLocalizationData.csproj
@@ -47,7 +52,17 @@ Read from user secrets (recommended) or environment variables:
 - `PrimaryKey`: The Cosmos DB primary key
 - `DatabaseId`: The Cosmos DB database ID
 
-Example using user secrets:
+### Option 1: Copy secrets from SeedInkStainedWretchesLocale (Recommended)
+If you already have secrets configured in `SeedInkStainedWretchesLocale`, use the PowerShell script to copy them:
+```pwsh
+# Preview what would be copied
+.\Copy-LocalizationSeederSecrets.ps1 -WhatIf
+
+# Copy the secrets
+.\Copy-LocalizationSeederSecrets.ps1
+```
+
+### Option 2: Configure secrets manually
 ```pwsh
 cd SeedLocalizationData
 dotnet user-secrets set "EndpointUri" "https://your-account.documents.azure.com:443/"
