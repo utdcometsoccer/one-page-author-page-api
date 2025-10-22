@@ -365,6 +365,61 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
                 return new AuthorManagementContainerManager<PenguinRandomHouseAuthorDetail>(database, "PenguinRandomHouseAuthorDetail");
             });
+            services.AddTransient<IContainerManager<ArticleList>, AuthorManagementContainerManager<ArticleList>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<ArticleList>(database, "ArticleList");
+            });
+            services.AddTransient<IContainerManager<AuthorDocList>, AuthorManagementContainerManager<AuthorDocList>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<AuthorDocList>(database, "AuthorDocList");
+            });
+            services.AddTransient<IContainerManager<AuthorMainForm>, AuthorManagementContainerManager<AuthorMainForm>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<AuthorMainForm>(database, "AuthorMainForm");
+            });
+            services.AddTransient<IContainerManager<ChooseCulture>, AuthorManagementContainerManager<ChooseCulture>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<ChooseCulture>(database, "ChooseCulture");
+            });
+            services.AddTransient<IContainerManager<ChooseSubscription>, AuthorManagementContainerManager<ChooseSubscription>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<ChooseSubscription>(database, "ChooseSubscription");
+            });
+            services.AddTransient<IContainerManager<CountdownIndicator>, AuthorManagementContainerManager<CountdownIndicator>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<CountdownIndicator>(database, "CountdownIndicator");
+            });
+            services.AddTransient<IContainerManager<DomainInput>, AuthorManagementContainerManager<DomainInput>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<DomainInput>(database, "DomainInput");
+            });
+            services.AddTransient<IContainerManager<DomainRegistrationsList>, AuthorManagementContainerManager<DomainRegistrationsList>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<DomainRegistrationsList>(database, "DomainRegistrationsList");
+            });
+            services.AddTransient<IContainerManager<OpenLibraryAuthorForm>, AuthorManagementContainerManager<OpenLibraryAuthorForm>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<OpenLibraryAuthorForm>(database, "OpenLibraryAuthorForm");
+            });
+            services.AddTransient<IContainerManager<SocialForm>, AuthorManagementContainerManager<SocialForm>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<SocialForm>(database, "SocialForm");
+            });
+            services.AddTransient<IContainerManager<SocialList>, AuthorManagementContainerManager<SocialList>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<SocialList>(database, "SocialList");
+            });
             return services;
         }
 
