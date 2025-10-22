@@ -78,72 +78,103 @@
 			"problemMatcher": "$func-dotnet-watch"
 		},
 		{
-			"label": "build-sln",
-			"type": "shell",
-			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
-			"problemMatcher": [
-				"$msCompile"
+			"label": "build-imageapi",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
 			],
-			"group": "build"
+			"type": "process",
+			"group": "build",
+			"problemMatcher": "$msCompile",
+			"options": {
+				"cwd": "${workspaceFolder}/ImageAPI"
+			}
+		},
+		{
+			"label": "build-inkstainedwretchfunctions",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"type": "process",
+			"group": "build",
+			"problemMatcher": "$msCompile",
+			"options": {
+				"cwd": "${workspaceFolder}/InkStainedWretchFunctions"
+			}
+		},
+		{
+			"label": "build-inkstainedwretchstripe",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"type": "process",
+			"group": "build",
+			"problemMatcher": "$msCompile",
+			"options": {
+				"cwd": "${workspaceFolder}/InkStainedWretchStripe"
+			}
+		},
+		{
+			"label": "build-all-apis",
+			"dependsOrder": "parallel",
+			"dependsOn": [
+				"build-imageapi",
+				"build-inkstainedwretchfunctions",
+				"build-inkstainedwretchstripe"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"type": "shell",
+			"label": "func-imageapi",
+			"dependsOn": "build-imageapi",
+			"command": "func",
+			"args": ["host", "start"],
+			"options": {
+				"cwd": "${workspaceFolder}/ImageAPI"
+			},
+			"isBackground": true,
+			"problemMatcher": "$func-dotnet-watch"
+		},
+		{
+			"type": "shell",
+			"label": "func-inkstainedwretchfunctions",
+			"dependsOn": "build-inkstainedwretchfunctions",
+			"command": "func",
+			"args": ["host", "start"],
+			"options": {
+				"cwd": "${workspaceFolder}/InkStainedWretchFunctions"
+			},
+			"isBackground": true,
+			"problemMatcher": "$func-dotnet-watch"
+		},
+		{
+			"type": "shell",
+			"label": "func-inkstainedwretchstripe",
+			"dependsOn": "build-inkstainedwretchstripe",
+			"command": "func",
+			"args": ["host", "start"],
+			"options": {
+				"cwd": "${workspaceFolder}/InkStainedWretchStripe"
+			},
+			"isBackground": true,
+			"problemMatcher": "$func-dotnet-watch"
 		},
 		{
 			"label": "build-sln",
 			"type": "shell",
-			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
-			"problemMatcher": [
-				"$msCompile"
-			],
-			"group": "build"
-		},
-		{
-			"label": "build-sln",
-			"type": "shell",
-			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
-			"problemMatcher": [
-				"$msCompile"
-			],
-			"group": "build"
-		},
-		{
-			"label": "build-sln",
-			"type": "shell",
-			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
-			"problemMatcher": [
-				"$msCompile"
-			],
-			"group": "build"
-		},
-		{
-			"label": "build-sln",
-			"type": "shell",
-			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
-			"problemMatcher": [
-				"$msCompile"
-			],
-			"group": "build"
-		},
-		{
-			"label": "build-sln",
-			"type": "shell",
-			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
-			"problemMatcher": [
-				"$msCompile"
-			],
-			"group": "build"
-		},
-		{
-			"label": "build-sln",
-			"type": "shell",
-			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
-			"problemMatcher": [
-				"$msCompile"
-			],
-			"group": "build"
-		},
-		{
-			"label": "build-sln",
-			"type": "shell",
-			"command": "dotnet build \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo",
+			"command": "dotnet build \"${workspaceFolder}\\OnePageAuthorAPI.sln\" -nologo",
 			"problemMatcher": [
 				"$msCompile"
 			],
@@ -152,11 +183,12 @@
 		{
 			"label": "run-tests",
 			"type": "shell",
-			"command": "dotnet test \"c:\\Users\\Idahosa\\source\\repos\\one-page-author-page-api\\OnePageAuthorAPI.sln\" -nologo --no-build",
+			"command": "dotnet test \"${workspaceFolder}\\OnePageAuthorAPI.sln\" -nologo --no-build",
 			"problemMatcher": [
 				"$msCompile"
 			],
-			"group": "test"
+			"group": "test",
+			"dependsOn": "build-sln"
 		}
 	]
 }
