@@ -40,7 +40,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API.ImageServices
 
             // Get all tiers
             var allTiers = await _tierRepository.GetAllAsync();
-            if (!allTiers.Any())
+            if (allTiers == null || !allTiers.Any())
             {
                 _logger.LogError("No image storage tiers found in database");
                 return null;
