@@ -6,6 +6,43 @@
             "type": "coreclr",
             "request": "attach",
             "processId": "${command:azureFunctions.pickProcess}"
+        },
+        {
+            "name": "Debug ImageAPI",
+            "type": "coreclr",
+            "request": "attach",
+            "preLaunchTask": "func-imageapi",
+            "processId": "${command:azureFunctions.pickProcess}"
+        },
+        {
+            "name": "Debug InkStainedWretchFunctions", 
+            "type": "coreclr",
+            "request": "attach",
+            "preLaunchTask": "func-inkstainedwretchfunctions",
+            "processId": "${command:azureFunctions.pickProcess}"
+        },
+        {
+            "name": "Debug InkStainedWretchStripe",
+            "type": "coreclr",
+            "request": "attach", 
+            "preLaunchTask": "func-inkstainedwretchstripe",
+            "processId": "${command:azureFunctions.pickProcess}"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Launch All APIs",
+            "configurations": [
+                "Debug ImageAPI",
+                "Debug InkStainedWretchFunctions", 
+                "Debug InkStainedWretchStripe"
+            ],
+            "stopAll": true,
+            "presentation": {
+                "hidden": false,
+                "group": "All Services",
+                "order": 1
+            }
         }
     ]
 }
