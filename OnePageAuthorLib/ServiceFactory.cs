@@ -728,5 +728,33 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<Interfaces.IGoogleDomainsService, API.GoogleDomainsService>();
             return services;
         }
+
+        /// <summary>
+        /// Registers Language repository services for language management.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddLanguageRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Language>>(sp =>
+                new NoSQL.LanguagesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<API.ILanguageRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.Language>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.LanguageRepository(container);
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Language services for language management.
+        /// </summary>
+        public static IServiceCollection AddLanguageServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.ILanguageService, API.LanguageService>();
+            return services;
+        }
     }
 }

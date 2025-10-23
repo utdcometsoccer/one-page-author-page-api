@@ -1,0 +1,32 @@
+[
+  {
+    "Code": "en",
+    "Name": "Anglais",
+    "RequestLanguage": "fr"
+  },
+  {
+    "Code": "es",
+    "Name": "Espagnol",
+    "RequestLanguage": "fr"
+  },
+  {
+    "Code": "fr",
+    "Name": "Français",
+    "RequestLanguage": "fr"
+  },
+  {
+    "Code": "ar",
+    "Name": "Arabe",
+    "RequestLanguage": "fr"
+  },
+  {
+    "Code": "zh-cn",
+    "Name": "Chinois (Simplifié)",
+    "RequestLanguage": "fr"
+  },
+  {
+    "Code": "zh-tw",
+    "Name": "Chinois (Traditionnel)",
+    "RequestLanguage": "fr"
+  }
+]
