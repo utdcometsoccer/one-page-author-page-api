@@ -11,13 +11,15 @@ namespace OnePageAuthor.Test.ImageAPI.Services
     {
         private readonly Mock<ILogger<ImageStorageTierService>> _loggerMock;
         private readonly Mock<IImageStorageTierRepository> _tierRepositoryMock;
+        private readonly Mock<IImageStorageTierMembershipRepository> _membershipRepositoryMock;
         private readonly ImageStorageTierService _tierService;
 
         public ImageStorageTierServiceTests()
         {
             _loggerMock = new Mock<ILogger<ImageStorageTierService>>();
             _tierRepositoryMock = new Mock<IImageStorageTierRepository>();
-            _tierService = new ImageStorageTierService(_loggerMock.Object, _tierRepositoryMock.Object);
+            _membershipRepositoryMock = new Mock<IImageStorageTierMembershipRepository>();
+            _tierService = new ImageStorageTierService(_loggerMock.Object, _tierRepositoryMock.Object, _membershipRepositoryMock.Object);
         }
 
         [Fact]

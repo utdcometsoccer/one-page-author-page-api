@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.10" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.10" />
-    <PackageReference Include="Microsoft.Graph" Version="5.94.0" />
+    <PackageReference Include="Microsoft.Graph" Version="5.95.0" />
   </ItemGroup>
 
   <ItemGroup>
