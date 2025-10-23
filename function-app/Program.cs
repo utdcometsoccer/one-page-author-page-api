@@ -22,6 +22,11 @@ string? databaseId = config["COSMOSDB_DATABASE_ID"];
 if (string.IsNullOrWhiteSpace(databaseId))
     throw new InvalidOperationException("Configuration value 'COSMOSDB_DATABASE_ID' is missing or empty. Please set it to your Cosmos DB database ID.");
 
+// Log Cosmos DB configuration (masked for security)
+Console.WriteLine($"Cosmos DB Endpoint configured: {Utility.MaskUrl(endpointUri)}");
+Console.WriteLine($"Cosmos DB Primary Key configured: {Utility.MaskSensitiveValue(primaryKey)}");
+Console.WriteLine($"Cosmos DB Database ID configured: {databaseId}");
+
 // Register Cosmos and ensure Database exists
 builder.Services
     .AddCosmosClient(endpointUri, primaryKey)

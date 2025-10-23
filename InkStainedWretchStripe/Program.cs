@@ -9,10 +9,7 @@ var builder = FunctionsApplication.CreateBuilder(args);
 var config = builder.Configuration;
 StripeConfiguration.ApiKey = config["STRIPE_API_KEY"] ?? throw new InvalidOperationException("Configuration value 'STRIPE_API_KEY' is missing or empty. Please set it to your Stripe API key.");
 // Masked confirmation log (do not log full secret)
-var masked = StripeConfiguration.ApiKey?.Length >= 8
-    ? $"{StripeConfiguration.ApiKey[..4]}****{StripeConfiguration.ApiKey[^4..]}"
-    : "(set)";
-Console.WriteLine($"Stripe API key configured: {masked}");
+Console.WriteLine($"Stripe API key configured: {Utility.MaskSensitiveValue(StripeConfiguration.ApiKey)}");
 
 builder.ConfigureFunctionsWebApplication();
 
@@ -22,26 +19,19 @@ var audience = config["AAD_AUDIENCE"] ?? config["AAD_CLIENT_ID"];
 var authority = config["AAD_AUTHORITY"] ?? (string.IsNullOrWhiteSpace(tenantId) ? null : $"https://login.microsoftonline.com/{tenantId}/v2.0");
 
 // Masked confirmation logs (do not log full sensitive values)
-var maskedTenantId = !string.IsNullOrWhiteSpace(tenantId) && tenantId.Length >= 8
-    ? $"{tenantId[..4]}****{tenantId[^4..]}"
-    : (string.IsNullOrWhiteSpace(tenantId) ? "(not set)" : "(set)");
-
-var maskedAudience = !string.IsNullOrWhiteSpace(audience) && audience.Length >= 8
-    ? $"{audience[..4]}****{audience[^4..]}"
-    : (string.IsNullOrWhiteSpace(audience) ? "(not set)" : "(set)");
-
-var maskedAuthority = !string.IsNullOrWhiteSpace(authority) && authority.Length >= 12
-    ? $"{authority[..8]}****{authority[^4..]}"
-    : (string.IsNullOrWhiteSpace(authority) ? "(not set)" : "(set)");
-
-Console.WriteLine($"Azure AD Tenant ID configured: {maskedTenantId}");
-Console.WriteLine($"Azure AD Audience configured: {maskedAudience}");
-Console.WriteLine($"Azure AD Authority configured: {maskedAuthority}");
+Console.WriteLine($"Azure AD Tenant ID configured: {Utility.MaskSensitiveValue(tenantId)}");
+Console.WriteLine($"Azure AD Audience configured: {Utility.MaskSensitiveValue(audience)}");
+Console.WriteLine($"Azure AD Authority configured: {Utility.MaskUrl(authority)}");
 
 // Cosmos + repositories for user profiles
 var endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
 var primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
 var databaseId = config["COSMOSDB_DATABASE_ID"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
+
+// Masked confirmation logs for Cosmos DB configuration
+Console.WriteLine($"Cosmos DB Endpoint configured: {Utility.MaskUrl(endpointUri)}");
+Console.WriteLine($"Cosmos DB Primary Key configured: {Utility.MaskSensitiveValue(primaryKey)}");
+Console.WriteLine($"Cosmos DB Database ID configured: {databaseId}");
 
 builder.Services
     .AddCosmosClient(endpointUri, primaryKey)

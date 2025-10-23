@@ -21,6 +21,12 @@ class Program
         string databaseId = config["COSMOSDB_DATABASE_ID"] ?? config["DatabaseId"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
         string authorDomain = configDoc.RootElement.GetProperty("AuthorDomain").GetString() ?? "";
 
+        // Log configuration (masked for security)
+        Console.WriteLine("Starting Integration Test for Author Data Service...");
+        Console.WriteLine($"Cosmos DB Endpoint configured: {Utility.MaskUrl(endpointUri)}");
+        Console.WriteLine($"Cosmos DB Database ID configured: {databaseId}");
+        Console.WriteLine($"Author Domain configured: {authorDomain}");
+
         // Parse author domain
         var domainParts = authorDomain.Split('.');
         string secondLevelDomain = domainParts.Length > 1 ? domainParts[0] : "";

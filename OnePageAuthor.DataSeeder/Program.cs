@@ -62,6 +62,11 @@ namespace OnePageAuthorAPI.DataSeeder
                         ?? Environment.GetEnvironmentVariable("COSMOS_DB_DATABASE")
                         ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
+                    // Log configuration (masked for security)
+                    Console.WriteLine("Starting StateProvince Data Seeding...");
+                    Console.WriteLine($"Cosmos DB Endpoint configured: {Utility.MaskUrl(cosmosEndpoint)}");
+                    Console.WriteLine($"Cosmos DB Database ID configured: {databaseId}");
+
                     // Register Azure Cosmos DB services
                     services.AddCosmosClient(cosmosEndpoint, cosmosKey);
                     services.AddCosmosDatabase(databaseId);

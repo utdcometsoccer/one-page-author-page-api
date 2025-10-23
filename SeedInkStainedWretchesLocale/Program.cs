@@ -21,6 +21,11 @@ class Program
                                     string primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? config["PrimaryKey"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
                                     string databaseId = config["COSMOSDB_DATABASE_ID"] ?? config["DatabaseId"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
+                                    // Log configuration (masked for security)
+                                    Console.WriteLine("Starting InkStainedWretches Locale Seeding...");
+                                    Console.WriteLine($"Cosmos DB Endpoint configured: {Utility.MaskUrl(endpointUri)}");
+                                    Console.WriteLine($"Cosmos DB Database ID configured: {databaseId}");
+
                                     // Register Cosmos via extensions and domain services
                                     services
                                         .AddCosmosClient(endpointUri, primaryKey)

@@ -17,6 +17,11 @@ string endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? config["EndpointUri"] ??
 string primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? config["PrimaryKey"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
 string databaseId = config["COSMOSDB_DATABASE_ID"] ?? config["DatabaseId"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
+// Log configuration (masked for security)
+Console.WriteLine("Starting API Data Seeding...");
+Console.WriteLine($"Cosmos DB Endpoint configured: {Utility.MaskUrl(endpointUri)}");
+Console.WriteLine($"Cosmos DB Database ID configured: {databaseId}");
+
 // Build a DI container using new extensions and resolve repositories
 var services = new ServiceCollection();
 services

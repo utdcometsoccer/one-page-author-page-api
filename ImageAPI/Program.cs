@@ -14,6 +14,11 @@ var tenantId = Environment.GetEnvironmentVariable("AAD_TENANT_ID");
 var audience = Environment.GetEnvironmentVariable("AAD_AUDIENCE") ?? Environment.GetEnvironmentVariable("AAD_CLIENT_ID");
 var authority = Environment.GetEnvironmentVariable("AAD_AUTHORITY") ?? (string.IsNullOrWhiteSpace(tenantId) ? null : $"https://login.microsoftonline.com/{tenantId}/v2.0");
 
+// Log Azure AD configuration (masked for security)
+Console.WriteLine($"Azure AD Tenant ID configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(tenantId)}");
+Console.WriteLine($"Azure AD Audience configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(audience)}");
+Console.WriteLine($"Azure AD Authority configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(authority)}");
+
 // Add AuthN/Z
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -64,6 +69,11 @@ var endpointUri = Environment.GetEnvironmentVariable("COSMOSDB_ENDPOINT_URI") ??
 var primaryKey = Environment.GetEnvironmentVariable("COSMOSDB_PRIMARY_KEY") ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
 var databaseId = Environment.GetEnvironmentVariable("COSMOSDB_DATABASE_ID") ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
+// Log Cosmos DB configuration (masked for security)
+Console.WriteLine($"Cosmos DB Endpoint configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(endpointUri)}");
+Console.WriteLine($"Cosmos DB Primary Key configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(primaryKey)}");
+Console.WriteLine($"Cosmos DB Database ID configured: {databaseId}");
+
 builder.Services
     .AddCosmosClient(endpointUri, primaryKey)
     .AddCosmosDatabase(databaseId)
@@ -79,6 +89,10 @@ builder.Services
 builder.Services.AddSingleton(sp =>
 {
     var connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING") ?? throw new InvalidOperationException("AZURE_STORAGE_CONNECTION_STRING is required");
+    
+    // Log Azure Storage configuration (masked for security)
+    Console.WriteLine($"Azure Storage Connection String configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(connectionString)}");
+    
     return new Azure.Storage.Blobs.BlobServiceClient(connectionString);
 });
 
