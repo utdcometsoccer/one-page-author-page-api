@@ -11,13 +11,14 @@ class Program
     {
         IConfiguration config = new ConfigurationBuilder()
                                 .AddUserSecrets<Program>()
+                                .AddEnvironmentVariables()
                                 .Build();
-        // Read settings
+        // Read settings - standardize configuration keys and add validation
         var configJson = File.ReadAllText(Utility.GetAbsolutePath("appsettings.json"));
         using var configDoc = JsonDocument.Parse(configJson);
-        string endpointUri = config["EndpointUri"] ?? "";
-        string primaryKey = config["PrimaryKey"] ?? "";
-        string databaseId = config["DatabaseId"] ?? "";
+        string endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? config["EndpointUri"] ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
+        string primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? config["PrimaryKey"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
+        string databaseId = config["COSMOSDB_DATABASE_ID"] ?? config["DatabaseId"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
         string authorDomain = configDoc.RootElement.GetProperty("AuthorDomain").GetString() ?? "";
 
         // Parse author domain

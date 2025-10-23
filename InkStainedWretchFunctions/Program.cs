@@ -16,15 +16,15 @@ if (builder.Environment.IsDevelopment())
 }
 
 var configuration = builder.Configuration;
-var endpointUri = configuration["COSMOSDB_ENDPOINT_URI"];
-var primaryKey = configuration["COSMOSDB_PRIMARY_KEY"];
-var databaseId = configuration["COSMOSDB_DATABASE_ID"];
+var endpointUri = configuration["COSMOSDB_ENDPOINT_URI"] ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
+var primaryKey = configuration["COSMOSDB_PRIMARY_KEY"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
+var databaseId = configuration["COSMOSDB_DATABASE_ID"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
 builder.ConfigureFunctionsWebApplication();
 
 builder.Services
-    .AddCosmosClient(endpointUri!, primaryKey!)
-    .AddCosmosDatabase(databaseId!)
+    .AddCosmosClient(endpointUri, primaryKey)
+    .AddCosmosDatabase(databaseId)
     .AddUserProfileRepository()
     .AddAuthorDataService() // Add Author data service for GetAuthors function
     .AddInkStainedWretchServices()
