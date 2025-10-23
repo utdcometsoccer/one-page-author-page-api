@@ -65,5 +65,33 @@ namespace InkStainedWretch.OnePageAuthorAPI
 
             return plan;
         }
+
+        /// <summary>
+        /// Masks sensitive configuration values for safe logging.
+        /// Shows first 4 and last 4 characters with asterisks in between.
+        /// </summary>
+        /// <param name="value">The sensitive value to mask</param>
+        /// <param name="notSetText">Text to show when value is null or empty</param>
+        /// <returns>Masked string safe for logging</returns>
+        public static string MaskSensitiveValue(string? value, string notSetText = "(not set)")
+        {
+            if (string.IsNullOrWhiteSpace(value)) return notSetText;
+            if (value.Length < 8) return "(set)";
+            return $"{value[..4]}****{value[^4..]}";
+        }
+
+        /// <summary>
+        /// Masks URLs and endpoints for safe logging.
+        /// Shows first 8 and last 4 characters with asterisks in between to provide more context for debugging.
+        /// </summary>
+        /// <param name="value">The URL or endpoint to mask</param>
+        /// <param name="notSetText">Text to show when value is null or empty</param>
+        /// <returns>Masked string safe for logging</returns>
+        public static string MaskUrl(string? value, string notSetText = "(not set)")
+        {
+            if (string.IsNullOrWhiteSpace(value)) return notSetText;
+            if (value.Length < 12) return "(set)";
+            return $"{value[..8]}****{value[^4..]}";
+        }
     }
 }

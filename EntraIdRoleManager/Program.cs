@@ -46,10 +46,12 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 try
 {
     logger.LogInformation("Starting Entra ID Role Manager for Personal Microsoft Account Apps...");
-    logger.LogInformation("Configuration:");
-    logger.LogInformation("  Management App ID: {ManagementClientId}", managementClientId);
-    logger.LogInformation("  Target App ID: {TargetClientId}", targetClientId);
-    logger.LogInformation("  Tenant ID: {TenantId}", tenantId);
+    logger.LogInformation("Configuration (masked for security):");
+    logger.LogInformation("  Management App ID: {ManagementClientId}", Utility.MaskSensitiveValue(managementClientId));
+    logger.LogInformation("  Target App ID: {TargetClientId}", Utility.MaskSensitiveValue(targetClientId));
+    logger.LogInformation("  Tenant ID: {TenantId}", Utility.MaskSensitiveValue(tenantId));
+    logger.LogInformation("  Cosmos DB Endpoint: {EndpointUri}", Utility.MaskUrl(endpointUri));
+    logger.LogInformation("  Cosmos DB Database ID: {DatabaseId}", databaseId);
 
     // Create Graph client using management app credentials
     var credential = new ClientSecretCredential(tenantId, managementClientId, managementClientSecret);

@@ -35,6 +35,9 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 try
 {
     logger.LogInformation("Starting ImageStorageTier seeding...");
+    logger.LogInformation("Configuration (masked for security):");
+    logger.LogInformation("  Cosmos DB Endpoint: {EndpointUri}", Utility.MaskUrl(endpointUri));
+    logger.LogInformation("  Cosmos DB Database ID: {DatabaseId}", databaseId);
 
     // Get the repository
     var repository = app.Services.GetRequiredService<IImageStorageTierRepository>();
