@@ -114,7 +114,7 @@ if ($secrets.Count -eq 0) {
 
 # Copy secrets to target project
 if ($WhatIf) {
-    Write-Host "📝 WHAT-IF MODE: Would copy the following secrets to $targetProject:" -ForegroundColor Yellow
+    Write-Host "📝 WHAT-IF MODE`: Would copy the following secrets to $targetProject`:" -ForegroundColor Yellow
     Write-Host ""
     foreach ($key in $secrets.Keys) {
         $displayValue = $secrets[$key]

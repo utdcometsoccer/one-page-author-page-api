@@ -56,22 +56,20 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
             result.Checkout = await QueryLanguageResolutionAsync<Checkout>("Checkout", specific, language);
             result.ChooseCulture = await QueryLanguageResolutionAsync<ChooseCulture>("ChooseCulture", specific, language);
             result.ChooseSubscription = await QueryLanguageResolutionAsync<ChooseSubscription>("ChooseSubscription", specific, language);
+            result.CountdownIndicator = await QueryLanguageResolutionAsync<CountdownIndicator>("CountdownIndicator", specific, language);
+            result.DomainInput = await QueryLanguageResolutionAsync<DomainInput>("DomainInput", specific, language);
             result.DomainRegistration = await QueryLanguageResolutionAsync<DomainRegistration>("DomainRegistration", specific, language);
+            result.DomainRegistrationsList = await QueryLanguageResolutionAsync<DomainRegistrationsList>("DomainRegistrationsList", specific, language);
             result.ErrorPage = await QueryLanguageResolutionAsync<ErrorPage>("ErrorPage", specific, language);
             result.ImageManager = await QueryLanguageResolutionAsync<ImageManager>("ImageManager", specific, language);
             result.LoginRegister = await QueryLanguageResolutionAsync<LoginRegister>("LoginRegister", specific, language);
             result.Navbar = await QueryLanguageResolutionAsync<Navbar>("Navbar", specific, language);
+            result.OpenLibraryAuthorForm = await QueryLanguageResolutionAsync<OpenLibraryAuthorForm>("OpenLibraryAuthorForm", specific, language);
             result.PenguinRandomHouseAuthorDetail = await QueryLanguageResolutionAsync<PenguinRandomHouseAuthorDetail>("PenguinRandomHouseAuthorDetail", specific, language);
             result.PenguinRandomHouseAuthorList = await QueryLanguageResolutionAsync<PenguinRandomHouseAuthorList>("PenguinRandomHouseAuthorList", specific, language);
-            result.ThankYou = await QueryLanguageResolutionAsync<ThankYou>("ThankYou", specific, language);
-            
-            // Now that all classes inherit from AuthorManagementBase, query them properly from Cosmos DB
-            result.CountdownIndicator = await QueryLanguageResolutionAsync<CountdownIndicator>("CountdownIndicator", specific, language);
-            result.DomainInput = await QueryLanguageResolutionAsync<DomainInput>("DomainInput", specific, language);
-            result.DomainRegistrationsList = await QueryLanguageResolutionAsync<DomainRegistrationsList>("DomainRegistrationsList", specific, language);
-            result.OpenLibraryAuthorForm = await QueryLanguageResolutionAsync<OpenLibraryAuthorForm>("OpenLibraryAuthorForm", specific, language);
             result.SocialForm = await QueryLanguageResolutionAsync<SocialForm>("SocialForm", specific, language);
             result.SocialList = await QueryLanguageResolutionAsync<SocialList>("SocialList", specific, language);
+            result.ThankYou = await QueryLanguageResolutionAsync<ThankYou>("ThankYou", specific, language);
 
             return result;
         }

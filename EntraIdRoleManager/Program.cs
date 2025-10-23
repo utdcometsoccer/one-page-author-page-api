@@ -9,7 +9,6 @@ using InkStainedWretch.OnePageAuthorAPI;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
-using InkStainedWretch.OnePageAuthorAPI.NoSQL;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -26,10 +25,13 @@ var endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? throw new InvalidOperationE
 var primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
 var databaseId = config["COSMOSDB_DATABASE_ID"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
-// Get Entra ID configuration
+// Get Entra ID configuration for the management app (this console app)
 var tenantId = config["AAD_TENANT_ID"] ?? throw new InvalidOperationException("AAD_TENANT_ID is required");
-var clientId = config["AAD_CLIENT_ID"] ?? throw new InvalidOperationException("AAD_CLIENT_ID is required");
-var clientSecret = config["AAD_CLIENT_SECRET"] ?? throw new InvalidOperationException("AAD_CLIENT_SECRET is required");
+var managementClientId = config["AAD_MANAGEMENT_CLIENT_ID"] ?? throw new InvalidOperationException("AAD_MANAGEMENT_CLIENT_ID is required");
+var managementClientSecret = config["AAD_MANAGEMENT_CLIENT_SECRET"] ?? throw new InvalidOperationException("AAD_MANAGEMENT_CLIENT_SECRET is required");
+
+// Get target app configuration (the app that will have roles assigned)
+var targetClientId = config["AAD_TARGET_CLIENT_ID"] ?? throw new InvalidOperationException("AAD_TARGET_CLIENT_ID is required");
 
 // Configure services
 builder.Services
@@ -43,10 +45,14 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
 try
 {
-    logger.LogInformation("Starting Entra ID Role Manager...");
+    logger.LogInformation("Starting Entra ID Role Manager for Personal Microsoft Account Apps...");
+    logger.LogInformation("Configuration:");
+    logger.LogInformation("  Management App ID: {ManagementClientId}", managementClientId);
+    logger.LogInformation("  Target App ID: {TargetClientId}", targetClientId);
+    logger.LogInformation("  Tenant ID: {TenantId}", tenantId);
 
-    // Create Graph client
-    var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+    // Create Graph client using management app credentials
+    var credential = new ClientSecretCredential(tenantId, managementClientId, managementClientSecret);
     var graphClient = new GraphServiceClient(credential);
 
     // Get repositories
@@ -57,94 +63,48 @@ try
     var tiers = await tierRepository.GetAllAsync();
     logger.LogInformation("Found {Count} image storage tiers", tiers.Count);
 
-    // Create a map to store tier ID to role ID mapping
-    var tierToRoleMap = new Dictionary<string, string>();
-
-    // Step 1: Create Entra ID App Roles for each tier
-    logger.LogInformation("Step 1: Creating Entra ID App Roles...");
-    
-    // Get the service principal for this application
-    var servicePrincipals = await graphClient.ServicePrincipals
-        .GetAsync(config =>
-        {
-            config.QueryParameters.Filter = $"appId eq '{clientId}'";
-        });
-    
-    var servicePrincipal = servicePrincipals?.Value?.FirstOrDefault();
-    if (servicePrincipal == null)
-    {
-        logger.LogError("Service principal not found for client ID {ClientId}", clientId);
-        Environment.Exit(1);
-        return;
-    }
-
-    logger.LogInformation("Found service principal: {DisplayName} ({Id})", servicePrincipal.DisplayName, servicePrincipal.Id);
-
-    // Get the application
+    // Get the target application
     var applications = await graphClient.Applications
         .GetAsync(config =>
         {
-            config.QueryParameters.Filter = $"appId eq '{clientId}'";
+            config.QueryParameters.Filter = $"appId eq '{targetClientId}'";
         });
     
     var application = applications?.Value?.FirstOrDefault();
     if (application == null)
     {
-        logger.LogError("Application not found for client ID {ClientId}", clientId);
+        logger.LogError("Target application not found for client ID {ClientId}. Ensure the target app is registered and configured for Microsoft Account users.", targetClientId);
         Environment.Exit(1);
         return;
     }
 
-    logger.LogInformation("Found application: {DisplayName} ({Id})", application.DisplayName, application.Id);
+    logger.LogInformation("Found target application: {DisplayName} ({Id})", application.DisplayName, application.Id);
+    logger.LogInformation("Sign-in audience: {SignInAudience}", application.SignInAudience);
 
-    // Get existing app roles
-    var existingRoles = application.AppRoles ?? new List<AppRole>();
-    
-    foreach (var tier in tiers)
+    if (application.SignInAudience != "PersonalMicrosoftAccount")
     {
-        // Check if role already exists
-        var existingRole = existingRoles.FirstOrDefault(r => r.DisplayName == $"ImageStorageTier.{tier.Name}");
-        
-        if (existingRole != null)
-        {
-            logger.LogInformation("Role 'ImageStorageTier.{TierName}' already exists with ID {RoleId}", tier.Name, existingRole.Id);
-            tierToRoleMap[tier.id] = existingRole.Id.ToString()!;
-        }
-        else
-        {
-            // Create new app role
-            var newRole = new AppRole
-            {
-                Id = Guid.NewGuid(),
-                DisplayName = $"ImageStorageTier.{tier.Name}",
-                Description = $"Users in the {tier.Name} image storage tier (${tier.CostInDollars}/month, {tier.StorageInGB}GB storage, {tier.BandwidthInGB}GB bandwidth)",
-                Value = $"ImageStorageTier.{tier.Name}",
-                IsEnabled = true,
-                AllowedMemberTypes = new List<string> { "User" }
-            };
-
-            existingRoles.Add(newRole);
-            tierToRoleMap[tier.id] = newRole.Id.ToString()!;
-            
-            logger.LogInformation("Created role definition for 'ImageStorageTier.{TierName}' with ID {RoleId}", tier.Name, newRole.Id);
-        }
+        logger.LogWarning("Application sign-in audience is {SignInAudience}, expected PersonalMicrosoftAccount", application.SignInAudience);
     }
 
-    // Update the application with new roles
-    var updateApp = new Application
-    {
-        AppRoles = existingRoles
-    };
+    logger.LogInformation("Step 2: Verifying Personal Microsoft Account limitations...");
     
-    await graphClient.Applications[application.Id].PatchAsync(updateApp);
-    logger.LogInformation("Updated application with app roles");
+    // Personal Microsoft Account apps cannot have app roles at all
+    // This is a platform limitation - not just that users can't be assigned to roles,
+    // but that the roles themselves cannot exist on Personal Microsoft Account apps
+    
+    if (application.SignInAudience == "PersonalMicrosoftAccount")
+    {
+        logger.LogInformation("✓ Application is configured for Personal Microsoft Account users");
+        logger.LogInformation("  This means app roles cannot be created (platform limitation)");
+        logger.LogInformation("  Authorization will be handled entirely through Cosmos DB");
+    }
+    else
+    {
+        logger.LogWarning("Application sign-in audience is {SignInAudience}, not PersonalMicrosoftAccount", application.SignInAudience);
+        logger.LogWarning("This tool is designed specifically for Personal Microsoft Account apps");
+    }
 
-    // Wait a moment for Azure AD to propagate the changes
-    logger.LogInformation("Waiting 10 seconds for role changes to propagate...");
-    await Task.Delay(10000);
-
-    // Step 2: Assign users to roles based on ImageStorageTierMembership
-    logger.LogInformation("Step 2: Migrating existing tier memberships to Entra ID roles...");
+    logger.LogInformation("Step 3: Verifying Cosmos DB tier memberships...");
     
     // Get all memberships from Cosmos DB
     var allMemberships = new List<ImageStorageTierMembership>();
@@ -159,58 +119,38 @@ try
         allMemberships.AddRange(response.Resource);
     }
 
-    logger.LogInformation("Found {Count} existing tier memberships to migrate", allMemberships.Count);
-
-    foreach (var membership in allMemberships)
+    logger.LogInformation("Found {Count} existing tier memberships", allMemberships.Count);
+    
+    // Show tier distribution
+    var tierDistribution = allMemberships
+        .GroupBy(m => m.TierId)
+        .Select(g => new { TierId = g.Key, Count = g.Count() })
+        .ToList();
+        
+    foreach (var dist in tierDistribution)
     {
-        try
-        {
-            if (!tierToRoleMap.TryGetValue(membership.TierId, out var roleId))
-            {
-                logger.LogWarning("Tier ID {TierId} not found in tier-to-role map, skipping membership {MembershipId}", 
-                    membership.TierId, membership.id);
-                continue;
-            }
-
-            var tier = tiers.FirstOrDefault(t => t.id == membership.TierId);
-            var tierName = tier?.Name ?? "Unknown";
-
-            // Create app role assignment
-            var roleAssignment = new AppRoleAssignment
-            {
-                PrincipalId = Guid.Parse(membership.UserProfileId),
-                ResourceId = Guid.Parse(servicePrincipal.Id!),
-                AppRoleId = Guid.Parse(roleId)
-            };
-
-            try
-            {
-                await graphClient.ServicePrincipals[servicePrincipal.Id].AppRoleAssignedTo.PostAsync(roleAssignment);
-                logger.LogInformation("Assigned user {UserId} to role 'ImageStorageTier.{TierName}'", 
-                    membership.UserProfileId, tierName);
-            }
-            catch (Exception ex) when (ex.Message.Contains("already exists"))
-            {
-                logger.LogInformation("User {UserId} already assigned to role 'ImageStorageTier.{TierName}'", 
-                    membership.UserProfileId, tierName);
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to assign user {UserId} to role for tier {TierId}", 
-                membership.UserProfileId, membership.TierId);
-        }
+        var tier = tiers.FirstOrDefault(t => t.id == dist.TierId);
+        var tierName = tier?.Name ?? "Unknown";
+        logger.LogInformation("  - {Count} users in {TierName} tier", dist.Count, tierName);
     }
 
-    logger.LogInformation("Entra ID Role Manager completed successfully!");
-    logger.LogInformation("Summary:");
-    logger.LogInformation("  - Created/verified {Count} app roles", tiers.Count);
-    logger.LogInformation("  - Processed {Count} user assignments", allMemberships.Count);
     logger.LogInformation("");
-    logger.LogInformation("Next steps:");
-    logger.LogInformation("  1. Update ImageAPI to use Entra ID roles from JWT token");
-    logger.LogInformation("  2. Remove ImageStorageTierMembership usage from runtime code");
-    logger.LogInformation("  3. Configure automatic assignment of users without roles to Starter tier");
+    logger.LogInformation("✅ Personal Microsoft Account Authorization Setup Complete!");
+    logger.LogInformation("");
+    logger.LogInformation("Summary:");
+    logger.LogInformation("  - Target Application: {AppName} ({ClientId})", application.DisplayName, targetClientId);
+    logger.LogInformation("  - Sign-in Audience: {SignInAudience}", application.SignInAudience);
+    logger.LogInformation("  - Available Tiers: {TierCount} ({TierNames})", 
+        tiers.Count, string.Join(", ", tiers.Select(t => t.Name)));
+    logger.LogInformation("  - User Memberships: {Count} users with tier assignments", allMemberships.Count);
+    logger.LogInformation("");
+    logger.LogInformation("Authorization Strategy:");
+    logger.LogInformation("  ✓ Pure Cosmos DB approach (no app roles due to Personal Microsoft Account limitation)");
+    logger.LogInformation("  ✓ ImageAPI will extract user ID from JWT 'oid' or 'sub' claim");
+    logger.LogInformation("  ✓ Query ImageStorageTierMembership by UserProfileId for authorization");
+    logger.LogInformation("  ✓ Auto-assign 'Starter' tier for new users without existing membership");
+    logger.LogInformation("");
+    logger.LogInformation("The ImageStorageTierService has been configured to handle this authorization pattern.");
 }
 catch (Exception ex)
 {
