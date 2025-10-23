@@ -770,7 +770,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
             {
                 var container = sp.GetRequiredService<IContainerManager<Entities.Language>>()
                     .EnsureContainerAsync().GetAwaiter().GetResult();
-                return new NoSQL.LanguageRepository(container);
+                return new NoSQL.StringLanguageRepository(container);
             });
 
             return services;
