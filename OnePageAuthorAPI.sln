@@ -28,6 +28,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnePageAuthor.DataSeeder", "OnePageAuthor.DataSeeder\OnePageAuthor.DataSeeder.csproj", "{291018C5-842B-45F5-A68F-C92761D77CF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntraIdRoleManager", "EntraIdRoleManager\EntraIdRoleManager.csproj", "{9C8F78F3-94A1-4C60-869E-57FCAC64A796}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeedLocalizationData", "SeedLocalizationData\SeedLocalizationData.csproj", "{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -195,6 +196,18 @@ Global
 		{9C8F78F3-94A1-4C60-869E-57FCAC64A796}.Release|x64.Build.0 = Release|Any CPU
 		{9C8F78F3-94A1-4C60-869E-57FCAC64A796}.Release|x86.ActiveCfg = Release|Any CPU
 		{9C8F78F3-94A1-4C60-869E-57FCAC64A796}.Release|x86.Build.0 = Release|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Debug|x64.Build.0 = Debug|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Debug|x86.Build.0 = Debug|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Release|x64.ActiveCfg = Release|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Release|x64.Build.0 = Release|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Release|x86.ActiveCfg = Release|Any CPU
+		{92031FF9-0B4B-4D8B-B31B-7B0B8DE020A5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

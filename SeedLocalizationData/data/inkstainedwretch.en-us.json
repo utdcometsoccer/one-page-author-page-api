@@ -1,0 +1,259 @@
+{
+    "AuthorRegistration": {
+        "authorListTitle": "Author Information",
+        "languageLabel": "Language: ",
+        "regionLabel": "Region: ",
+        "editAuthor": "Edit",
+        "deleteAuthor": "Delete",
+        "addAuthor": "Add Author",
+        "continue": "Continue"
+    },
+    "LoginRegister": {
+        "loginHeader": {
+            "title": "Login",
+            "subtitle": "Sign in to your account."
+        },
+        "loginButton": {
+            "label": "Sign in with Microsoft"
+        },
+        "logoutButton": {
+            "label": "Sign out"
+        },
+        "countdownIndicator": {
+            "text": "Redirecting to Domain Registration in {countdown} seconds..."
+        }
+    },
+    "ThankYou": {
+        "title": "Thank You",
+        "message": "Thank you for your purchase!"
+    },
+    "Navbar": {
+        "brand": "Ink Stained Wretches",
+        "navigation": "Navigation",
+        "close": "Close",
+        "navItems": {
+            "chooseCulture": {
+                "label": "Culture",
+                "description": "Choose Language & Region"
+            },
+            "login": {
+                "label": "Login",
+                "description": "Sign In / Sign Up"
+            },
+            "domainRegistration": {
+                "label": "Domain",
+                "description": "Register Domain"
+            },
+            "authorPage": {
+                "label": "Author",
+                "description": "Author Page"
+            },
+            "subscribe": {
+                "label": "Subscribe",
+                "description": "Choose a Subscription Plan and Checkout"
+            },
+            "thankYou": {
+                "label": "Success",
+                "description": "Thank You"
+            }
+        }
+    },
+    "DomainRegistration": {
+        "title": "Domain Registration",
+        "subtitle": "Register your domain and contact information.",
+        "submit": "Submit",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "address": "Address",
+        "address2": "Address 2",
+        "city": "City",
+        "state": "State / Province:",
+        "country": "Country:",
+        "zipCode": "Zip Code",
+        "emailAddress": "Email Address",
+        "telephoneNumber": "Telephone Number"
+    },
+    "ErrorPage": {
+        "title": "Error",
+        "devMessage": "Something went wrong during development.",
+        "details": "Detailed Error Information:",
+        "tryAgain": "Try Again",
+        "userMessage": "We're sorry, but something went wrong. Please try again later.",
+        "return": "Return to App"
+    },
+    "ImageManager": {
+        "title": "Your Uploaded Images",
+        "loading": "Loading...",
+        "select": "Select",
+        "delete": "Delete",
+        "refresh": "Refresh"
+    },
+    "Checkout": {
+    "selectPlan": "Please select a subscription plan to continue.",
+    "formTitle": "Complete your purchase",
+    "errorMessage": "An error occurred during payment. Please try again.",
+    "buttonLabel": "Subscribe"
+    },
+    "AuthGuard": {
+        "title": "Authentication Required",
+        "message": "Please sign in to access this content. You'll need to authenticate to view and manage your author information.",
+        "buttonLabel": "Sign in with Microsoft"
+    },
+    "DomainInput": {
+        "label": "Domain:",
+        "placeholder": "example.com",
+        "error": "Invalid domain format.",
+        "success": "Domain format is valid and available!"
+    },
+    "SocialList": {
+        "title": "Social Links",
+        "url": "URL:",
+        "edit": "Edit",
+        "delete": "Delete",
+        "addSocial": "Add Social Link"
+    },
+    "CountdownIndicator": {
+        "redirecting": "Redirecting in {countdown} seconds..."
+    },
+    "ChooseCulture": {
+        "title": "Choose Your Language and Region",
+        "subtitle": "Select your preferred language and region for the best experience.",
+        "legend": "Select Language and Country",
+        "languageLabel": "Language: ",
+        "countryLabel": "Country:",
+        "continue": "Continue",
+        "cancel": "Cancel",
+        "cookieConsent": "I consent to the use of cookies for improving my experience.",
+        "cookiesInfo": "We use cookies to store your language and region preferences as well as other settings, ensuring a personalized experience each time you visit our site. By consenting, you help us enhance your interaction with our platform."
+    },
+    "BookList": {
+        "title": "Books",
+        "description": "Description:",
+        "url": "URL:",
+        "edit": "Edit",
+        "delete": "Delete",
+        "addBook": "Add Book",
+        "importOpenLibrary": "Import Books Open Library",
+        "importGoogleBooks": "Import Google Books",
+        "importPenguinBooks": "Import Books Penguin Random House"
+    },
+    "ArticleForm": {
+        "legend": "Edit Article",
+        "title": "Title:",
+        "date": "Date:",
+        "publication": "Publication:",
+        "url": "URL:",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "ArticleList": {
+        "title": "Articles",
+        "date": "Date:",
+        "publication": "Publication:",
+        "url": "URL:",
+        "edit": "Edit",
+        "delete": "Delete",
+        "addArticle": "Add Article"
+    },
+    "OpenLibraryAuthorForm": {
+        "legend": "Edit Author",
+        "key": "Key:",
+        "text": "Text:",
+        "type": "Type:",
+        "name": "Name:",
+        "alternateNames": "Alternate Names:",
+        "birthDate": "Birth Date:",
+        "topWork": "Top Work:",
+        "workCount": "Work Count:",
+        "topSubjects": "Top Subjects:",
+        "version": "Version:",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "AuthorDocList": {
+        "title": "Authors",
+        "topWork": "Top Work:",
+        "birthDate": "Birth Date:",
+        "import": "Import",
+        "importTitle": "Import AuthorDoc",
+        "goBack": "Go Back"
+    },
+    "BookForm": {
+        "legend": "Book Details",
+        "title": "Title:",
+        "description": "Description:",
+        "url": "URL:",
+        "cover": "Cover:",
+        "chooseImage": "Choose Image",
+        "close": "Close",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "AuthorMainForm": {
+        "legend": "Author Information",
+        "authorName": "Author Name:",
+        "language": "Language:",
+        "country": "Country:",
+        "email": "Email:",
+        "welcomeText": "Welcome Text:",
+        "aboutText": "About Text:",
+        "headshotUrl": "Headshot URL:",
+        "chooseImage": "Choose Image",
+        "close": "Close",
+        "copyrightText": "Copyright Text:",
+        "topLevelDomain": "Top Level Domain:",
+        "secondLevelDomain": "Second Level Domain:",
+        "articles": "Articles",
+        "books": "Books",
+        "socialLinks": "Social Links",
+        "importAuthor": "Import Author From Open Library",
+        "importPenguinAuthor": "Import Author From Penguin Random House",
+        "save": "Save Author",
+        "cancel": "Cancel"
+    },
+    "ChooseSubscription": {
+        "title": "Choose Your Subscription",
+        "selected": "Selected",
+        "continue": "Continue to Checkout",
+        "note": "All plans include image hosting for up to 20 images."
+    },
+    "DomainRegistrationsList": {
+        "title": "Domain Registrations",
+        "error": "Failed to load domain registrations.",
+        "loading": "Loading domain registrations...",
+        "empty": "No domain registrations found."
+    },
+    "PenguinRandomHouseAuthorList": {
+        "title": "Penguin Random House Authors",
+        "import": "Import",
+        "importTitle": "Import Author from Penguin Random House",
+        "goBack": "Go Back",
+        "noResults": "No authors found."
+    },
+    "PenguinRandomHouseAuthorDetail": {
+        "title": "Penguin Random House Author Details",
+        "name": "Name",
+        "score": "Score",
+        "url": "URL",
+        "domain": "Domain",
+        "titleField": "Title",
+        "description": "Description",
+        "authorFirst": "First Name",
+        "authorLast": "Last Name",
+        "photoCredit": "Photo Credit",
+        "onTour": "On Tour",
+        "seriesAuthor": "Series Author",
+        "seriesIsbn": "Series ISBN",
+        "seriesCount": "Series Count",
+        "keywordId": "Keyword ID",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "SocialForm": {
+        "legend": "Social Link",
+        "name": "Name:",
+        "url": "URL:",
+        "save": "Save",
+        "cancel": "Cancel"
+    }
+}
