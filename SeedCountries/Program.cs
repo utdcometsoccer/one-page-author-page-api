@@ -164,7 +164,10 @@ else
 // Helper class for JSON deserialization
 public class CountryData
 {
+    [System.Text.Json.Serialization.JsonPropertyName("code")]
     public string Code { get; set; } = string.Empty;
+    
+    [System.Text.Json.Serialization.JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 }
 
