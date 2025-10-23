@@ -41,6 +41,8 @@ builder.Services
     .AddDomainRegistrationServices() // Add domain registration services
     .AddStateProvinceRepository() // Add StateProvince repository
     .AddStateProvinceServices() // Add StateProvince services
+    .AddLanguageRepository() // Add Language repository
+    .AddLanguageServices() // Add Language services
     .AddDnsZoneService() // Add DNS zone service for domain registration triggers
     .AddFrontDoorServices() // Add Azure Front Door services for domain management
     .AddGoogleDomainsService() // Add Google Domains service for domain registration
