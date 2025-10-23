@@ -39,7 +39,8 @@ class Program
             }
 
             var jsonFiles = Directory.GetFiles(dataRoot, "inkstainedwretch.*.json", SearchOption.TopDirectoryOnly);
-            var filePattern = new Regex(@"inkstainedwretch\.([a-z]{2})-([a-z]{2})\.json", RegexOptions.IgnoreCase);
+            // Support both standard (e.g., en-us) and extended (e.g., zh-cn-us) locale patterns
+            var filePattern = new Regex(@"inkstainedwretch\.([a-z]{2}(?:-[a-z]{2})?)-([a-z]{2})\.json", RegexOptions.IgnoreCase);
 
             foreach (var file in jsonFiles)
             {

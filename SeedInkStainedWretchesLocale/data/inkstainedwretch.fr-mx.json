@@ -9,11 +9,19 @@
         "continue": "Continue"
     },
     "LoginRegister": {
-        "loginHeaderTitle": "Connexion",
-        "loginHeaderSubtitle": "Connectez-vous à votre compte.",
-        "loginButtonLabel": "Se connecter avec Microsoft",
-        "logoutButtonLabel": "Se déconnecter",
-        "countdownIndicatorText": "Redirection vers l'enregistrement de domaine dans {countdown} secondes..."
+        "loginHeader": {
+            "title": "Connexion",
+            "subtitle": "Connectez-vous à votre compte."
+        },
+        "loginButton": {
+            "label": "Se connecter avec Microsoft"
+        },
+        "logoutButton": {
+            "label": "Se déconnecter"
+        },
+        "countdownIndicator": {
+            "text": "Redirection vers l'enregistrement de domaine dans {countdown} secondes..."
+        }
     },
     "ThankYou": {
         "title": "Merci",

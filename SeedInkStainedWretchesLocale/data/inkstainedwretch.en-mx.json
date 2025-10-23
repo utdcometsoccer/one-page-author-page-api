@@ -9,11 +9,19 @@
     "continue": "Continuar"
     },
     "LoginRegister": {
-        "loginHeaderTitle": "Iniciar sesión",
-        "loginHeaderSubtitle": "Accede a tu cuenta.",
-        "loginButtonLabel": "Iniciar sesión con Microsoft",
-        "logoutButtonLabel": "Cerrar sesión",
-        "countdownIndicatorText": "Redirigiendo a Registro de Dominio en {countdown} segundos..."
+        "loginHeader": {
+            "title": "Iniciar sesión",
+            "subtitle": "Accede a tu cuenta."
+        },
+        "loginButton": {
+            "label": "Iniciar sesión con Microsoft"
+        },
+        "logoutButton": {
+            "label": "Cerrar sesión"
+        },
+        "countdownIndicator": {
+            "text": "Redirigiendo a Registro de Dominio en {countdown} segundos..."
+        }
     },
     "ThankYou": {
         "title": "Gracias",

@@ -9,11 +9,19 @@
     "continue": "متابعة"
     },
     "LoginRegister": {
-        "loginHeaderTitle": "تسجيل الدخول",
-        "loginHeaderSubtitle": "سجّل الدخول إلى حسابك.",
-        "loginButtonLabel": "تسجيل الدخول باستخدام مايكروسوفت",
-        "logoutButtonLabel": "تسجيل الخروج",
-        "countdownIndicatorText": "جارٍ التحويل إلى تسجيل النطاق خلال {countdown} ثانية..."
+        "loginHeader": {
+            "title": "تسجيل الدخول",
+            "subtitle": "سجّل الدخول إلى حسابك."
+        },
+        "loginButton": {
+            "label": "تسجيل الدخول باستخدام مايكروسوفت"
+        },
+        "logoutButton": {
+            "label": "تسجيل الخروج"
+        },
+        "countdownIndicator": {
+            "text": "جارٍ التحويل إلى تسجيل النطاق خلال {countdown} ثانية..."
+        }
     },
     "ThankYou": {
         "title": "شكرًا لك",

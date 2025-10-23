@@ -9,11 +9,19 @@
         "continue": "繼續"
     },
     "LoginRegister": {
-        "loginHeaderTitle": "登入",
-        "loginHeaderSubtitle": "登入您的帳戶。",
-        "loginButtonLabel": "使用 Microsoft 登入",
-        "logoutButtonLabel": "登出",
-        "countdownIndicatorText": "將於 {countdown} 秒後重新導向至網域註冊..."
+        "loginHeader": {
+            "title": "登入",
+            "subtitle": "登入您的帳戶。"
+        },
+        "loginButton": {
+            "label": "使用 Microsoft 登入"
+        },
+        "logoutButton": {
+            "label": "登出"
+        },
+        "countdownIndicator": {
+            "text": "將於 {countdown} 秒後重新導向至網域註冊..."
+        }
     },
     "ThankYou": {
         "title": "感謝您",
