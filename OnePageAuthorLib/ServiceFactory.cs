@@ -524,7 +524,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
-        /// Registers Image API repositories and ensures containers exist for tiers, memberships, and images.
+        /// Registers Image API repositories and ensures containers exist for tiers, memberships, usage, and images.
         /// </summary>
         public static IServiceCollection AddImageApiRepositories(this IServiceCollection services)
         {
@@ -532,6 +532,8 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 new ImageStorageTiersContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
             services.AddTransient<IContainerManager<Entities.ImageAPI.ImageStorageTierMembership>>(sp =>
                 new ImageStorageTierMembershipsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+            services.AddTransient<IContainerManager<Entities.ImageAPI.ImageStorageUsage>>(sp =>
+                new ImageStorageUsagesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
             services.AddTransient<IContainerManager<Entities.ImageAPI.Image>>(sp =>
                 new NoSQL.ImageAPI.ImagesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
 
@@ -548,6 +550,13 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 var c = sp.GetRequiredService<IContainerManager<Entities.ImageAPI.ImageStorageTierMembership>>()
                     .EnsureContainerAsync().GetAwaiter().GetResult();
                 return new NoSQL.ImageStorageTierMembershipRepository(c);
+            });
+
+            services.AddSingleton<API.ImageAPI.IImageStorageUsageRepository>(sp =>
+            {
+                var c = sp.GetRequiredService<IContainerManager<Entities.ImageAPI.ImageStorageUsage>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.ImageStorageUsageRepository(c);
             });
 
             services.AddSingleton<InkStainedWretch.OnePageAuthorAPI.API.ImageAPI.IImageStorageTierRepository>(sp =>
@@ -568,10 +577,11 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
-        /// Registers Image API business services for upload, user images, and deletion operations.
+        /// Registers Image API business services for upload, user images, deletion, and tier management operations.
         /// </summary>
         public static IServiceCollection AddImageApiServices(this IServiceCollection services)
         {
+            services.AddTransient<API.ImageAPI.IImageStorageTierService, API.ImageServices.ImageStorageTierService>();
             services.AddTransient<API.ImageServices.IImageUploadService, API.ImageServices.ImageUploadService>();
             services.AddTransient<API.ImageServices.IUserImageService, API.ImageServices.UserImageService>();
             services.AddTransient<API.ImageServices.IImageDeleteService, API.ImageServices.ImageDeleteService>();

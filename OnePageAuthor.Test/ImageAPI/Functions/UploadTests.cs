@@ -170,7 +170,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
                 ErrorMessage = "Invalid file type. Only image files are allowed."
             };
 
-            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), "user-123"))
+            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), "user-123", It.IsAny<ClaimsPrincipal>()))
                 .ReturnsAsync(serviceResult);
 
             // Act
@@ -209,7 +209,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
                 ErrorMessage = "No storage tier assigned to user."
             };
 
-            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), userProfileId))
+            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), userProfileId, It.IsAny<ClaimsPrincipal>()))
                 .ReturnsAsync(serviceResult);
 
             // Act
@@ -268,7 +268,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
                 ErrorMessage = "File size exceeds limit for your subscription tier (5 MB)."
             };
 
-            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), userProfileId))
+            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), userProfileId, It.IsAny<ClaimsPrincipal>()))
                 .ReturnsAsync(serviceResult);
 
             // Act
@@ -326,7 +326,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
                 ErrorMessage = "Storage quota exceeded for your subscription tier."
             };
 
-            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), userProfileId))
+            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), userProfileId, It.IsAny<ClaimsPrincipal>()))
                 .ReturnsAsync(serviceResult);
 
             // Act
@@ -384,7 +384,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
                 ErrorMessage = "Bandwidth limit exceeded for your subscription tier."
             };
 
-            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), userProfileId))
+            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), userProfileId, It.IsAny<ClaimsPrincipal>()))
                 .ReturnsAsync(serviceResult);
 
             // Act
@@ -442,7 +442,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
                 ErrorMessage = "Maximum number of files reached for your subscription tier."
             };
 
-            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), userProfileId))
+            _imageUploadServiceMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>(), userProfileId, It.IsAny<ClaimsPrincipal>()))
                 .ReturnsAsync(serviceResult);
 
             // Act

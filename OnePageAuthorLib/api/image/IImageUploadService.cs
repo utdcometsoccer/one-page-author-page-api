@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
+using System.Security.Claims;
 
 namespace InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 
@@ -13,6 +14,7 @@ public interface IImageUploadService
     /// </summary>
     /// <param name="file">The image file to upload</param>
     /// <param name="userProfileId">The authenticated user's profile ID</param>
+    /// <param name="user">The authenticated user's claims principal (for role-based tier determination)</param>
     /// <returns>Upload result with image metadata or error response</returns>
-    Task<ImageUploadResult> UploadImageAsync(IFormFile file, string userProfileId);
+    Task<ImageUploadResult> UploadImageAsync(IFormFile file, string userProfileId, ClaimsPrincipal user);
 }

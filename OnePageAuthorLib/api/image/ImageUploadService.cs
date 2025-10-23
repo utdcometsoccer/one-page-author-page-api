@@ -4,6 +4,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageAPI;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
+using System.Security.Claims;
 
 namespace InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 
@@ -13,8 +14,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 public class ImageUploadService : IImageUploadService
 {
     private readonly ILogger<ImageUploadService> _logger;
-    private readonly IImageStorageTierMembershipRepository _membershipRepository;
-    private readonly IImageStorageTierRepository _tierRepository;
+    private readonly IImageStorageTierService _tierService;
+    private readonly IImageStorageUsageRepository _usageRepository;
     private readonly IImageRepository _imageRepository;
     private readonly BlobServiceClient _blobServiceClient;
 
@@ -33,19 +34,19 @@ public class ImageUploadService : IImageUploadService
 
     public ImageUploadService(
         ILogger<ImageUploadService> logger,
-        IImageStorageTierMembershipRepository membershipRepository,
-        IImageStorageTierRepository tierRepository,
+        IImageStorageTierService tierService,
+        IImageStorageUsageRepository usageRepository,
         IImageRepository imageRepository,
         BlobServiceClient blobServiceClient)
     {
         _logger = logger;
-        _membershipRepository = membershipRepository;
-        _tierRepository = tierRepository;
+        _tierService = tierService;
+        _usageRepository = usageRepository;
         _imageRepository = imageRepository;
         _blobServiceClient = blobServiceClient;
     }
 
-    public async Task<ImageUploadResult> UploadImageAsync(IFormFile file, string userProfileId)
+    public async Task<ImageUploadResult> UploadImageAsync(IFormFile file, string userProfileId, ClaimsPrincipal user)
     {
         try
         {
@@ -63,21 +64,18 @@ public class ImageUploadService : IImageUploadService
                 return ServiceResult.Failure<ImageUploadResult>("Invalid file type. Only image files are allowed.", 400);
             }
 
-            // Get user's tier membership
-            var membership = await _membershipRepository.GetForUserAsync(userProfileId);
-            if (membership == null)
-            {
-                _logger.LogWarning("User {UserProfileId} has no tier membership.", userProfileId);
-                return ServiceResult.Failure<ImageUploadResult>("No storage tier assigned to user.", 400);
-            }
-
-            // Get tier details
-            var tier = await _tierRepository.GetByIdAsync(membership.TierId);
+            // Get user's tier from Entra ID roles
+            var tier = await _tierService.GetUserTierAsync(user);
             if (tier == null)
             {
-                _logger.LogError("Tier {TierId} not found for membership {MembershipId}.", membership.TierId, membership.id);
+                _logger.LogError("Unable to determine storage tier for user {UserProfileId}", userProfileId);
                 return ServiceResult.Failure<ImageUploadResult>("Storage tier configuration error.", 500);
             }
+
+            _logger.LogInformation("User {UserProfileId} is in tier {TierName}", userProfileId, tier.Name);
+
+            // Get or create usage record
+            var usage = await _usageRepository.GetOrCreateAsync(userProfileId);
 
             // Get tier limits
             if (!_tierLimits.TryGetValue(tier.Name, out var limits))
@@ -103,7 +101,7 @@ public class ImageUploadService : IImageUploadService
             }
 
             // Check storage quota
-            var currentStorageUsed = membership.StorageUsedInBytes;
+            var currentStorageUsed = usage.StorageUsedInBytes;
             var storageQuotaInBytes = (long)(tier.StorageInGB * 1024 * 1024 * 1024);
             if (currentStorageUsed + file.Length > storageQuotaInBytes)
             {
@@ -111,7 +109,7 @@ public class ImageUploadService : IImageUploadService
             }
 
             // Check bandwidth quota
-            var currentBandwidthUsed = membership.BandwidthUsedInBytes;
+            var currentBandwidthUsed = usage.BandwidthUsedInBytes;
             var bandwidthQuotaInBytes = (long)(tier.BandwidthInGB * 1024 * 1024 * 1024);
             if (currentBandwidthUsed + file.Length > bandwidthQuotaInBytes)
             {
@@ -162,9 +160,10 @@ public class ImageUploadService : IImageUploadService
             await _imageRepository.AddAsync(imageRecord);
 
             // Update user's storage usage and bandwidth usage
-            membership.StorageUsedInBytes += file.Length;
-            membership.BandwidthUsedInBytes += file.Length; // Upload counts toward bandwidth usage
-            await _membershipRepository.UpdateAsync(membership);
+            usage.StorageUsedInBytes += file.Length;
+            usage.BandwidthUsedInBytes += file.Length; // Upload counts toward bandwidth usage
+            usage.LastUpdated = DateTime.UtcNow;
+            await _usageRepository.UpdateAsync(usage);
 
             _logger.LogInformation("Image uploaded successfully. User: {UserProfileId}, Image: {ImageId}, Size: {Size} bytes",
                 userProfileId, imageRecord.id, file.Length);
