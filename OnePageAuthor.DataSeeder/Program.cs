@@ -10,7 +10,8 @@ namespace OnePageAuthorAPI.DataSeeder
 {
     /// <summary>
     /// Console application for seeding StateProvince data into Azure Cosmos DB.
-    /// Seeds US, Canada, and Mexico data in English, French, and Spanish.
+    /// Seeds US, Canada, and Mexico data in English, French, Spanish, Arabic, Simplified Chinese, and Traditional Chinese.
+    /// Implements idempotent operations - can be run multiple times safely.
     /// </summary>
     class Program
     {
@@ -99,39 +100,23 @@ namespace OnePageAuthorAPI.DataSeeder
 
         /// <summary>
         /// Seeds comprehensive StateProvince data for US, Canada, and Mexico in multiple languages.
+        /// This operation is idempotent - it can be run multiple times safely without creating duplicates.
         /// </summary>
         public async Task SeedDataAsync()
         {
-            _logger.LogInformation("Starting StateProvince data seeding...");
+            _logger.LogInformation("Starting idempotent StateProvince data seeding...");
 
             var allData = new List<StateProvince>();
 
-            // Add US states in English, French, and Spanish
+            // Add North American countries data in all supported languages
             allData.AddRange(GetUSStates());
-
-            // Add Canadian provinces in English and French
             allData.AddRange(GetCanadianProvinces());
-
-            // Add Mexican states in Spanish, English, and French
             allData.AddRange(GetMexicanStates());
 
-            // Add Chinese provinces in Simplified Chinese and English
-            allData.AddRange(GetChineseProvinces());
+            _logger.LogInformation("Preparing to seed {Count} StateProvince entries...", allData.Count);
 
-            // Add Taiwan counties/cities in Traditional Chinese and English
-            allData.AddRange(GetTaiwanRegions());
-
-            // Add Egyptian governorates in Arabic and English
-            allData.AddRange(GetEgyptianGovernorates());
-
-            // Delete all existing StateProvince entries first
-            _logger.LogInformation("Deleting all existing StateProvince entries...");
-            var deletedCount = await _stateProvinceService.DeleteAllStateProvincesAsync();
-            _logger.LogInformation("Deleted {DeletedCount} existing StateProvince entries", deletedCount);
-
-            _logger.LogInformation("Seeding {Count} StateProvince entries...", allData.Count);
-
-            int successCount = 0;
+            int createdCount = 0;
+            int skippedCount = 0;
             int errorCount = 0;
 
             foreach (var stateProvince in allData)
@@ -145,29 +130,47 @@ namespace OnePageAuthorAPI.DataSeeder
                     {
                         _logger.LogWarning("Skipping entry with missing data: Country={Country}, Culture={Culture}, Code={Code}", 
                             stateProvince.Country, stateProvince.Culture, stateProvince.Code);
+                        errorCount++;
                         continue;
                     }
 
                     // Create unique ID for each culture variant
                     stateProvince.id = $"{stateProvince.Code}_{stateProvince.Culture}";
 
-                    await _stateProvinceService.CreateStateProvinceAsync(stateProvince);
-                    successCount++;
-                    _logger.LogDebug("Created: {Code} - {Name} ({Culture})", stateProvince.Code, stateProvince.Name, stateProvince.Culture);
+                    // Check if entry already exists (idempotent operation)
+                    var existing = await _stateProvinceService.GetStateProvinceByCountryCultureAndCodeAsync(
+                        stateProvince.Country!, stateProvince.Culture!, stateProvince.Code!);
+
+                    if (existing != null)
+                    {
+                        // Entry already exists, skip it
+                        skippedCount++;
+                        _logger.LogDebug("Skipped (already exists): {Code} - {Name} ({Culture})", 
+                            stateProvince.Code, stateProvince.Name, stateProvince.Culture);
+                    }
+                    else
+                    {
+                        // Entry doesn't exist, create it
+                        await _stateProvinceService.CreateStateProvinceAsync(stateProvince);
+                        createdCount++;
+                        _logger.LogDebug("Created: {Code} - {Name} ({Culture})", 
+                            stateProvince.Code, stateProvince.Name, stateProvince.Culture);
+                    }
                 }
                 catch (Exception ex)
                 {
                     errorCount++;
-                    _logger.LogError(ex, "Failed to create StateProvince: {Code} - {Name} ({Culture})",
+                    _logger.LogError(ex, "Failed to process StateProvince: {Code} - {Name} ({Culture})",
                         stateProvince.Code, stateProvince.Name, stateProvince.Culture);
                 }
             }
 
-            _logger.LogInformation("Data seeding completed. Success: {SuccessCount}, Errors: {ErrorCount}", successCount, errorCount);
+            _logger.LogInformation("Idempotent data seeding completed. Created: {CreatedCount}, Skipped: {SkippedCount}, Errors: {ErrorCount}", 
+                createdCount, skippedCount, errorCount);
         }
 
         /// <summary>
-        /// Gets US states and territories in English, French, and Spanish.
+        /// Gets US states and territories in English, French, Spanish, Arabic, Simplified Chinese, and Traditional Chinese.
         /// </summary>
         private List<StateProvince> GetUSStates()
         {
@@ -233,6 +236,66 @@ namespace OnePageAuthorAPI.DataSeeder
                 {"PR", "Puerto Rico"}, {"VI", "Islas Vírgenes"}
             };
 
+            // US States - Arabic
+            var usStatesArabic = new Dictionary<string, string>
+            {
+                {"AL", "ألاباما"}, {"AK", "ألاسكا"}, {"AZ", "أريزونا"}, {"AR", "أركنساس"},
+                {"CA", "كاليفورنيا"}, {"CO", "كولورادو"}, {"CT", "كونيتيكت"}, {"DE", "ديلاوير"},
+                {"FL", "فلوريدا"}, {"GA", "جورجيا"}, {"HI", "هاواي"}, {"ID", "أيداهو"},
+                {"IL", "إلينوي"}, {"IN", "إنديانا"}, {"IA", "آيوا"}, {"KS", "كانساس"},
+                {"KY", "كنتاكي"}, {"LA", "لويزيانا"}, {"ME", "مين"}, {"MD", "ماريلاند"},
+                {"MA", "ماساتشوستس"}, {"MI", "ميشيغان"}, {"MN", "مينيسوتا"}, {"MS", "ميسيسيبي"},
+                {"MO", "ميزوري"}, {"MT", "مونتانا"}, {"NE", "نبراسكا"}, {"NV", "نيفادا"},
+                {"NH", "نيوهامبشير"}, {"NJ", "نيوجيرسي"}, {"NM", "نيومكسيكو"}, {"NY", "نيويورك"},
+                {"NC", "كارولاينا الشمالية"}, {"ND", "داكوتا الشمالية"}, {"OH", "أوهايو"}, {"OK", "أوكلاهوما"},
+                {"OR", "أوريغون"}, {"PA", "بنسلفانيا"}, {"RI", "رود آيلاند"}, {"SC", "كارولاينا الجنوبية"},
+                {"SD", "داكوتا الجنوبية"}, {"TN", "تينيسي"}, {"TX", "تكساس"}, {"UT", "يوتا"},
+                {"VT", "فيرمونت"}, {"VA", "فرجينيا"}, {"WA", "واشنطن"}, {"WV", "فرجينيا الغربية"},
+                {"WI", "ويسكونسن"}, {"WY", "وايومنغ"}, {"DC", "مقاطعة كولومبيا"},
+                {"AS", "ساموا الأمريكية"}, {"GU", "غوام"}, {"MP", "جزر ماريانا الشمالية"},
+                {"PR", "بورتوريكو"}, {"VI", "جزر فيرجن"}
+            };
+
+            // US States - Simplified Chinese
+            var usStatesSimplifiedChinese = new Dictionary<string, string>
+            {
+                {"AL", "阿拉巴马州"}, {"AK", "阿拉斯加州"}, {"AZ", "亚利桑那州"}, {"AR", "阿肯色州"},
+                {"CA", "加利福尼亚州"}, {"CO", "科罗拉多州"}, {"CT", "康涅狄格州"}, {"DE", "特拉华州"},
+                {"FL", "佛罗里达州"}, {"GA", "乔治亚州"}, {"HI", "夏威夷州"}, {"ID", "爱达荷州"},
+                {"IL", "伊利诺伊州"}, {"IN", "印第安纳州"}, {"IA", "爱荷华州"}, {"KS", "堪萨斯州"},
+                {"KY", "肯塔基州"}, {"LA", "路易斯安那州"}, {"ME", "缅因州"}, {"MD", "马里兰州"},
+                {"MA", "马萨诸塞州"}, {"MI", "密歇根州"}, {"MN", "明尼苏达州"}, {"MS", "密西西比州"},
+                {"MO", "密苏里州"}, {"MT", "蒙大拿州"}, {"NE", "内布拉斯加州"}, {"NV", "内华达州"},
+                {"NH", "新罕布什尔州"}, {"NJ", "新泽西州"}, {"NM", "新墨西哥州"}, {"NY", "纽约州"},
+                {"NC", "北卡罗来纳州"}, {"ND", "北达科他州"}, {"OH", "俄亥俄州"}, {"OK", "俄克拉荷马州"},
+                {"OR", "俄勒冈州"}, {"PA", "宾夕法尼亚州"}, {"RI", "罗德岛州"}, {"SC", "南卡罗来纳州"},
+                {"SD", "南达科他州"}, {"TN", "田纳西州"}, {"TX", "德克萨斯州"}, {"UT", "犹他州"},
+                {"VT", "佛蒙特州"}, {"VA", "弗吉尼亚州"}, {"WA", "华盛顿州"}, {"WV", "西弗吉尼亚州"},
+                {"WI", "威斯康星州"}, {"WY", "怀俄明州"}, {"DC", "哥伦比亚特区"},
+                {"AS", "美属萨摩亚"}, {"GU", "关岛"}, {"MP", "北马里亚纳群岛"},
+                {"PR", "波多黎各"}, {"VI", "美属维尔京群岛"}
+            };
+
+            // US States - Traditional Chinese
+            var usStatesTraditionalChinese = new Dictionary<string, string>
+            {
+                {"AL", "阿拉巴馬州"}, {"AK", "阿拉斯加州"}, {"AZ", "亞利桑那州"}, {"AR", "阿肯色州"},
+                {"CA", "加利福尼亞州"}, {"CO", "科羅拉多州"}, {"CT", "康涅狄格州"}, {"DE", "特拉華州"},
+                {"FL", "佛羅里達州"}, {"GA", "喬治亞州"}, {"HI", "夏威夷州"}, {"ID", "愛達荷州"},
+                {"IL", "伊利諾伊州"}, {"IN", "印第安納州"}, {"IA", "愛荷華州"}, {"KS", "堪薩斯州"},
+                {"KY", "肯塔基州"}, {"LA", "路易斯安那州"}, {"ME", "緬因州"}, {"MD", "馬里蘭州"},
+                {"MA", "麻薩諸塞州"}, {"MI", "密歇根州"}, {"MN", "明尼蘇達州"}, {"MS", "密西西比州"},
+                {"MO", "密蘇里州"}, {"MT", "蒙大拿州"}, {"NE", "內布拉斯加州"}, {"NV", "內華達州"},
+                {"NH", "新罕布什爾州"}, {"NJ", "新澤西州"}, {"NM", "新墨西哥州"}, {"NY", "紐約州"},
+                {"NC", "北卡羅來納州"}, {"ND", "北達科他州"}, {"OH", "俄亥俄州"}, {"OK", "俄克拉荷馬州"},
+                {"OR", "俄勒岡州"}, {"PA", "賓夕法尼亞州"}, {"RI", "羅德島州"}, {"SC", "南卡羅來納州"},
+                {"SD", "南達科他州"}, {"TN", "田納西州"}, {"TX", "德克薩斯州"}, {"UT", "猶他州"},
+                {"VT", "佛蒙特州"}, {"VA", "弗吉尼亞州"}, {"WA", "華盛頓州"}, {"WV", "西弗吉尼亞州"},
+                {"WI", "威斯康星州"}, {"WY", "懷俄明州"}, {"DC", "哥倫比亞特區"},
+                {"AS", "美屬薩摩亞"}, {"GU", "關島"}, {"MP", "北馬里亞納群島"},
+                {"PR", "波多黎各"}, {"VI", "美屬維爾京群島"}
+            };
+
             // Create StateProvince objects for each language
             foreach (var kvp in usStatesEnglish)
             {
@@ -249,11 +312,26 @@ namespace OnePageAuthorAPI.DataSeeder
                 states.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "US", Culture = "es-US" });
             }
 
+            foreach (var kvp in usStatesArabic)
+            {
+                states.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "US", Culture = "ar-US" });
+            }
+
+            foreach (var kvp in usStatesSimplifiedChinese)
+            {
+                states.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "US", Culture = "zh-CN" });
+            }
+
+            foreach (var kvp in usStatesTraditionalChinese)
+            {
+                states.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "US", Culture = "zh-TW" });
+            }
+
             return states;
         }
 
         /// <summary>
-        /// Gets Canadian provinces and territories in English and French.
+        /// Gets Canadian provinces and territories in English, French, Spanish, Arabic, Simplified Chinese, and Traditional Chinese.
         /// </summary>
         private List<StateProvince> GetCanadianProvinces()
         {
@@ -279,6 +357,46 @@ namespace OnePageAuthorAPI.DataSeeder
                 {"YT", "Yukon"}
             };
 
+            // Canadian Provinces - Spanish
+            var canadianProvincesSpanish = new Dictionary<string, string>
+            {
+                {"AB", "Alberta"}, {"BC", "Columbia Británica"}, {"MB", "Manitoba"},
+                {"NB", "Nuevo Brunswick"}, {"NL", "Terranova y Labrador"}, {"NS", "Nueva Escocia"},
+                {"ON", "Ontario"}, {"PE", "Isla del Príncipe Eduardo"}, {"QC", "Quebec"},
+                {"SK", "Saskatchewan"}, {"NT", "Territorios del Noroeste"}, {"NU", "Nunavut"},
+                {"YT", "Yukón"}
+            };
+
+            // Canadian Provinces - Arabic
+            var canadianProvincesArabic = new Dictionary<string, string>
+            {
+                {"AB", "ألبرتا"}, {"BC", "كولومبيا البريطانية"}, {"MB", "مانيتوبا"},
+                {"NB", "نيو برونزويك"}, {"NL", "نيوفاوندلاند ولابرادور"}, {"NS", "نوفا سكوتيا"},
+                {"ON", "أونتاريو"}, {"PE", "جزيرة الأمير إدوارد"}, {"QC", "كيبك"},
+                {"SK", "ساسكاتشوان"}, {"NT", "الأقاليم الشمالية الغربية"}, {"NU", "نونافوت"},
+                {"YT", "يوكون"}
+            };
+
+            // Canadian Provinces - Simplified Chinese
+            var canadianProvincesSimplifiedChinese = new Dictionary<string, string>
+            {
+                {"AB", "艾伯塔省"}, {"BC", "不列颠哥伦比亚省"}, {"MB", "马尼托巴省"},
+                {"NB", "新不伦瑞克省"}, {"NL", "纽芬兰与拉布拉多省"}, {"NS", "新斯科舍省"},
+                {"ON", "安大略省"}, {"PE", "爱德华王子岛省"}, {"QC", "魁北克省"},
+                {"SK", "萨斯喀彻温省"}, {"NT", "西北地区"}, {"NU", "努纳武特地区"},
+                {"YT", "育空地区"}
+            };
+
+            // Canadian Provinces - Traditional Chinese
+            var canadianProvincesTraditionalChinese = new Dictionary<string, string>
+            {
+                {"AB", "艾伯塔省"}, {"BC", "不列顛哥倫比亞省"}, {"MB", "馬尼托巴省"},
+                {"NB", "新不倫瑞克省"}, {"NL", "紐芬蘭與拉布拉多省"}, {"NS", "新斯科舍省"},
+                {"ON", "安大略省"}, {"PE", "愛德華王子島省"}, {"QC", "魁北克省"},
+                {"SK", "薩斯喀徹溫省"}, {"NT", "西北地區"}, {"NU", "努納武特地區"},
+                {"YT", "育空地區"}
+            };
+
             // Create StateProvince objects for each language
             foreach (var kvp in canadianProvincesEnglish)
             {
@@ -290,11 +408,31 @@ namespace OnePageAuthorAPI.DataSeeder
                 provinces.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "CA", Culture = "fr-CA" });
             }
 
+            foreach (var kvp in canadianProvincesSpanish)
+            {
+                provinces.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "CA", Culture = "es-CA" });
+            }
+
+            foreach (var kvp in canadianProvincesArabic)
+            {
+                provinces.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "CA", Culture = "ar-CA" });
+            }
+
+            foreach (var kvp in canadianProvincesSimplifiedChinese)
+            {
+                provinces.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "CA", Culture = "zh-CN" });
+            }
+
+            foreach (var kvp in canadianProvincesTraditionalChinese)
+            {
+                provinces.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "CA", Culture = "zh-TW" });
+            }
+
             return provinces;
         }
 
         /// <summary>
-        /// Gets Mexican states in Spanish, English, and French.
+        /// Gets Mexican states in Spanish, English, French, Arabic, Simplified Chinese, and Traditional Chinese.
         /// </summary>
         private List<StateProvince> GetMexicanStates()
         {
@@ -342,6 +480,48 @@ namespace OnePageAuthorAPI.DataSeeder
                 {"ZAC", "Zacatecas"}
             };
 
+            // Mexican States - Arabic
+            var mexicanStatesArabic = new Dictionary<string, string>
+            {
+                {"AGU", "أغواسكالينتيس"}, {"BCN", "باخا كاليفورنيا"}, {"BCS", "باخا كاليفورنيا الجنوبية"},
+                {"CAM", "كامبيتشي"}, {"CHP", "تشياباس"}, {"CHH", "تشيواوا"}, {"CMX", "مدينة مكسيكو"},
+                {"COA", "كواويلا"}, {"COL", "كوليما"}, {"DUR", "دورانغو"}, {"GUA", "غواناخواتو"},
+                {"GRO", "غيريرو"}, {"HID", "هيدالغو"}, {"JAL", "خاليسكو"}, {"MEX", "ولاية المكسيك"},
+                {"MIC", "ميتشواكان"}, {"MOR", "موريلوس"}, {"NAY", "ناياريت"}, {"NLE", "نويفو ليون"},
+                {"OAX", "أواخاكا"}, {"PUE", "بويبلا"}, {"QUE", "كيريتارو"}, {"ROO", "كينتانا رو"},
+                {"SLP", "سان لويس بوتوسي"}, {"SIN", "سينالوا"}, {"SON", "سونورا"}, {"TAB", "تاباسكو"},
+                {"TAM", "تاماوليباس"}, {"TLA", "تلاكسكالا"}, {"VER", "فيراكروز"}, {"YUC", "يوكاتان"},
+                {"ZAC", "زاكاتيكاس"}
+            };
+
+            // Mexican States - Simplified Chinese
+            var mexicanStatesSimplifiedChinese = new Dictionary<string, string>
+            {
+                {"AGU", "阿瓜斯卡连特斯州"}, {"BCN", "下加利福尼亚州"}, {"BCS", "南下加利福尼亚州"},
+                {"CAM", "坎佩切州"}, {"CHP", "恰帕斯州"}, {"CHH", "奇瓦瓦州"}, {"CMX", "墨西哥城"},
+                {"COA", "科阿韦拉州"}, {"COL", "科利马州"}, {"DUR", "杜兰戈州"}, {"GUA", "瓜纳华托州"},
+                {"GRO", "格雷罗州"}, {"HID", "伊达尔戈州"}, {"JAL", "哈利斯科州"}, {"MEX", "墨西哥州"},
+                {"MIC", "米却肯州"}, {"MOR", "莫雷洛斯州"}, {"NAY", "纳亚里特州"}, {"NLE", "新莱昂州"},
+                {"OAX", "瓦哈卡州"}, {"PUE", "普埃布拉州"}, {"QUE", "克雷塔罗州"}, {"ROO", "金塔纳罗奥州"},
+                {"SLP", "圣路易斯波托西州"}, {"SIN", "锡那罗亚州"}, {"SON", "索诺拉州"}, {"TAB", "塔巴斯科州"},
+                {"TAM", "塔毛利帕斯州"}, {"TLA", "特拉斯卡拉州"}, {"VER", "韦拉克鲁斯州"}, {"YUC", "尤卡坦州"},
+                {"ZAC", "萨卡特卡斯州"}
+            };
+
+            // Mexican States - Traditional Chinese
+            var mexicanStatesTraditionalChinese = new Dictionary<string, string>
+            {
+                {"AGU", "阿瓜斯卡連特斯州"}, {"BCN", "下加利福尼亞州"}, {"BCS", "南下加利福尼亞州"},
+                {"CAM", "坎佩切州"}, {"CHP", "恰帕斯州"}, {"CHH", "奇瓦瓦州"}, {"CMX", "墨西哥城"},
+                {"COA", "科阿韋拉州"}, {"COL", "科利馬州"}, {"DUR", "杜蘭戈州"}, {"GUA", "瓜納華托州"},
+                {"GRO", "格雷羅州"}, {"HID", "伊達爾戈州"}, {"JAL", "哈利斯科州"}, {"MEX", "墨西哥州"},
+                {"MIC", "米卻肯州"}, {"MOR", "莫雷洛斯州"}, {"NAY", "納亞里特州"}, {"NLE", "新萊昂州"},
+                {"OAX", "瓦哈卡州"}, {"PUE", "普埃布拉州"}, {"QUE", "克雷塔羅州"}, {"ROO", "金塔納羅奧州"},
+                {"SLP", "聖路易斯波托西州"}, {"SIN", "錫那羅亞州"}, {"SON", "索諾拉州"}, {"TAB", "塔巴斯科州"},
+                {"TAM", "塔毛利帕斯州"}, {"TLA", "特拉斯卡拉州"}, {"VER", "韋拉克魯斯州"}, {"YUC", "尤卡坦州"},
+                {"ZAC", "薩卡特卡斯州"}
+            };
+
             // Create StateProvince objects for each language
             foreach (var kvp in mexicanStatesSpanish)
             {
@@ -358,136 +538,22 @@ namespace OnePageAuthorAPI.DataSeeder
                 states.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "MX", Culture = "fr-MX" });
             }
 
+            foreach (var kvp in mexicanStatesArabic)
+            {
+                states.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "MX", Culture = "ar-MX" });
+            }
+
+            foreach (var kvp in mexicanStatesSimplifiedChinese)
+            {
+                states.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "MX", Culture = "zh-CN" });
+            }
+
+            foreach (var kvp in mexicanStatesTraditionalChinese)
+            {
+                states.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "MX", Culture = "zh-TW" });
+            }
+
             return states;
-        }
-
-        /// <summary>
-        /// Gets Chinese provinces and autonomous regions in Simplified Chinese and English.
-        /// </summary>
-        private List<StateProvince> GetChineseProvinces()
-        {
-            var provinces = new List<StateProvince>();
-
-            // Chinese Provinces - Simplified Chinese (zh-CN)
-            var chineseProvincesZhCN = new Dictionary<string, string>
-            {
-                {"BJ", "北京市"}, {"TJ", "天津市"}, {"HE", "河北省"}, {"SX", "山西省"}, {"NM", "内蒙古自治区"},
-                {"LN", "辽宁省"}, {"JL", "吉林省"}, {"HL", "黑龙江省"}, {"SH", "上海市"}, {"JS", "江苏省"},
-                {"ZJ", "浙江省"}, {"AH", "安徽省"}, {"FJ", "福建省"}, {"JX", "江西省"}, {"SD", "山东省"},
-                {"HA", "河南省"}, {"HB", "湖北省"}, {"HN", "湖南省"}, {"GD", "广东省"}, {"GX", "广西壮族自治区"},
-                {"HI", "海南省"}, {"CQ", "重庆市"}, {"SC", "四川省"}, {"GZ", "贵州省"}, {"YN", "云南省"},
-                {"XZ", "西藏自治区"}, {"SN", "陕西省"}, {"GS", "甘肃省"}, {"QH", "青海省"}, {"NX", "宁夏回族自治区"},
-                {"XJ", "新疆维吾尔自治区"}, {"HK", "香港特别行政区"}, {"MO", "澳门特别行政区"}
-            };
-
-            // Chinese Provinces - English
-            var chineseProvincesEn = new Dictionary<string, string>
-            {
-                {"BJ", "Beijing"}, {"TJ", "Tianjin"}, {"HE", "Hebei"}, {"SX", "Shanxi"}, {"NM", "Inner Mongolia"},
-                {"LN", "Liaoning"}, {"JL", "Jilin"}, {"HL", "Heilongjiang"}, {"SH", "Shanghai"}, {"JS", "Jiangsu"},
-                {"ZJ", "Zhejiang"}, {"AH", "Anhui"}, {"FJ", "Fujian"}, {"JX", "Jiangxi"}, {"SD", "Shandong"},
-                {"HA", "Henan"}, {"HB", "Hubei"}, {"HN", "Hunan"}, {"GD", "Guangdong"}, {"GX", "Guangxi"},
-                {"HI", "Hainan"}, {"CQ", "Chongqing"}, {"SC", "Sichuan"}, {"GZ", "Guizhou"}, {"YN", "Yunnan"},
-                {"XZ", "Tibet"}, {"SN", "Shaanxi"}, {"GS", "Gansu"}, {"QH", "Qinghai"}, {"NX", "Ningxia"},
-                {"XJ", "Xinjiang"}, {"HK", "Hong Kong SAR"}, {"MO", "Macau SAR"}
-            };
-
-            // Create StateProvince objects for each language
-            foreach (var kvp in chineseProvincesZhCN)
-            {
-                provinces.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "CN", Culture = "zh-CN" });
-            }
-
-            foreach (var kvp in chineseProvincesEn)
-            {
-                provinces.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "CN", Culture = "en-CN" });
-            }
-
-            return provinces;
-        }
-
-        /// <summary>
-        /// Gets Taiwan counties and cities in Traditional Chinese and English.
-        /// </summary>
-        private List<StateProvince> GetTaiwanRegions()
-        {
-            var regions = new List<StateProvince>();
-
-            // Taiwan Counties/Cities - Traditional Chinese (zh-TW)
-            var taiwanRegionsZhTW = new Dictionary<string, string>
-            {
-                {"TPE", "臺北市"}, {"TPH", "新北市"}, {"TYC", "桃園市"}, {"TCH", "臺中市"}, {"TNH", "臺南市"},
-                {"KHH", "高雄市"}, {"KEE", "基隆市"}, {"HSZ", "新竹市"}, {"HSQ", "新竹縣"}, {"MIA", "苗栗縣"},
-                {"CHA", "彰化縣"}, {"NAN", "南投縣"}, {"YUN", "雲林縣"}, {"CYI", "嘉義市"}, {"CYQ", "嘉義縣"},
-                {"PIF", "屏東縣"}, {"ILA", "宜蘭縣"}, {"HUA", "花蓮縣"}, {"TTE", "臺東縣"}, {"PEN", "澎湖縣"},
-                {"KIN", "金門縣"}, {"LIE", "連江縣"}
-            };
-
-            // Taiwan Counties/Cities - English
-            var taiwanRegionsEn = new Dictionary<string, string>
-            {
-                {"TPE", "Taipei City"}, {"TPH", "New Taipei City"}, {"TYC", "Taoyuan City"}, {"TCH", "Taichung City"}, {"TNH", "Tainan City"},
-                {"KHH", "Kaohsiung City"}, {"KEE", "Keelung City"}, {"HSZ", "Hsinchu City"}, {"HSQ", "Hsinchu County"}, {"MIA", "Miaoli County"},
-                {"CHA", "Changhua County"}, {"NAN", "Nantou County"}, {"YUN", "Yunlin County"}, {"CYI", "Chiayi City"}, {"CYQ", "Chiayi County"},
-                {"PIF", "Pingtung County"}, {"ILA", "Yilan County"}, {"HUA", "Hualien County"}, {"TTE", "Taitung County"}, {"PEN", "Penghu County"},
-                {"KIN", "Kinmen County"}, {"LIE", "Lienchiang County"}
-            };
-
-            // Create StateProvince objects for each language
-            foreach (var kvp in taiwanRegionsZhTW)
-            {
-                regions.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "TW", Culture = "zh-TW" });
-            }
-
-            foreach (var kvp in taiwanRegionsEn)
-            {
-                regions.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "TW", Culture = "en-TW" });
-            }
-
-            return regions;
-        }
-
-        /// <summary>
-        /// Gets Egyptian governorates in Arabic and English.
-        /// </summary>
-        private List<StateProvince> GetEgyptianGovernorates()
-        {
-            var governorates = new List<StateProvince>();
-
-            // Egyptian Governorates - Arabic (ar-EG)
-            var egyptianGovernoratesAr = new Dictionary<string, string>
-            {
-                {"CAI", "القاهرة"}, {"GIZ", "الجيزة"}, {"SHG", "الشرقية"}, {"DKH", "الدقهلية"}, {"BNS", "بني سويف"},
-                {"FYM", "الفيوم"}, {"MNF", "المنوفية"}, {"BHR", "البحيرة"}, {"ISM", "الإسماعيلية"}, {"GH", "الغربية"},
-                {"MN", "المنيا"}, {"ASY", "أسيوط"}, {"SWH", "سوهاج"}, {"QN", "قنا"}, {"ASN", "أسوان"},
-                {"LX", "الأقصر"}, {"WAD", "الوادي الجديد"}, {"MT", "مطروح"}, {"ALX", "الإسكندرية"}, {"KFS", "كفر الشيخ"},
-                {"PTS", "بورسعيد"}, {"DT", "دمياط"}, {"JS", "جنوب سيناء"}, {"SIN", "شمال سيناء"}, {"SUZ", "السويس"},
-                {"BA", "البحر الأحمر"}, {"HW", "حلوان"}, {"6O", "السادس من أكتوبر"}
-            };
-
-            // Egyptian Governorates - English
-            var egyptianGovernoratesEn = new Dictionary<string, string>
-            {
-                {"CAI", "Cairo"}, {"GIZ", "Giza"}, {"SHG", "Ash Sharqiyah"}, {"DKH", "Dakahlia"}, {"BNS", "Beni Suef"},
-                {"FYM", "Fayyum"}, {"MNF", "Monufia"}, {"BHR", "Beheira"}, {"ISM", "Ismailia"}, {"GH", "Gharbia"},
-                {"MN", "Minya"}, {"ASY", "Asyut"}, {"SWH", "Sohag"}, {"QN", "Qena"}, {"ASN", "Aswan"},
-                {"LX", "Luxor"}, {"WAD", "New Valley"}, {"MT", "Matrouh"}, {"ALX", "Alexandria"}, {"KFS", "Kafr el-Sheikh"},
-                {"PTS", "Port Said"}, {"DT", "Damietta"}, {"JS", "South Sinai"}, {"SIN", "North Sinai"}, {"SUZ", "Suez"},
-                {"BA", "Red Sea"}, {"HW", "Helwan"}, {"6O", "6th of October"}
-            };
-
-            // Create StateProvince objects for each language
-            foreach (var kvp in egyptianGovernoratesAr)
-            {
-                governorates.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "EG", Culture = "ar-EG" });
-            }
-
-            foreach (var kvp in egyptianGovernoratesEn)
-            {
-                governorates.Add(new StateProvince { Code = kvp.Key, Name = kvp.Value, Country = "EG", Culture = "en-EG" });
-            }
-
-            return governorates;
         }
     }
 }
