@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using InkStainedWretch.OnePageAuthorAPI;
+using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 
@@ -90,11 +91,16 @@ namespace OnePageAuthorAPI.DataSeeder
     public class StateProvinceSeeder
     {
         private readonly IStateProvinceService _stateProvinceService;
+        private readonly IStringStateProvinceRepository _repository;
         private readonly ILogger<StateProvinceSeeder> _logger;
 
-        public StateProvinceSeeder(IStateProvinceService stateProvinceService, ILogger<StateProvinceSeeder> logger)
+        public StateProvinceSeeder(
+            IStateProvinceService stateProvinceService,
+            IStringStateProvinceRepository repository,
+            ILogger<StateProvinceSeeder> logger)
         {
             _stateProvinceService = stateProvinceService ?? throw new ArgumentNullException(nameof(stateProvinceService));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -137,23 +143,20 @@ namespace OnePageAuthorAPI.DataSeeder
                     // Create unique ID for each culture variant
                     stateProvince.id = $"{stateProvince.Code}_{stateProvince.Culture}";
 
-                    // Check if entry already exists (idempotent operation)
-                    var existing = await _stateProvinceService.GetStateProvinceByCountryCultureAndCodeAsync(
-                        stateProvince.Country!, stateProvince.Culture!, stateProvince.Code!);
-
-                    if (existing != null)
+                    try
                     {
-                        // Entry already exists, skip it
-                        skippedCount++;
-                        _logger.LogDebug("Skipped (already exists): {Code} - {Name} ({Culture})", 
-                            stateProvince.Code, stateProvince.Name, stateProvince.Culture);
-                    }
-                    else
-                    {
-                        // Entry doesn't exist, create it
-                        await _stateProvinceService.CreateStateProvinceAsync(stateProvince);
+                        // Try to create the entry directly using repository (idempotent operation)
+                        // If it already exists, CosmosException with Conflict status will be thrown
+                        await _repository.AddAsync(stateProvince);
                         createdCount++;
                         _logger.LogDebug("Created: {Code} - {Name} ({Culture})", 
+                            stateProvince.Code, stateProvince.Name, stateProvince.Culture);
+                    }
+                    catch (Microsoft.Azure.Cosmos.CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+                    {
+                        // Entry already exists, skip it (this makes the operation idempotent)
+                        skippedCount++;
+                        _logger.LogDebug("Skipped (already exists): {Code} - {Name} ({Culture})", 
                             stateProvince.Code, stateProvince.Name, stateProvince.Culture);
                     }
                 }
