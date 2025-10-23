@@ -41,6 +41,8 @@ builder.Services
     .AddDomainRegistrationServices() // Add domain registration services
     .AddStateProvinceRepository() // Add StateProvince repository
     .AddStateProvinceServices() // Add StateProvince services
+    .AddCountryRepository() // Add Country repository
+    .AddCountryServices() // Add Country services
     .AddLanguageRepository() // Add Language repository
     .AddLanguageServices() // Add Language services
     .AddDnsZoneService() // Add DNS zone service for domain registration triggers
