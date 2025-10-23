@@ -31,10 +31,12 @@ class Program
                                 {
                                     var config = new ConfigurationBuilder()
                                         .AddUserSecrets<Program>()
+                                        .AddEnvironmentVariables()
                                         .Build();
-                                    string endpointUri = config["EndpointUri"] ?? throw new InvalidOperationException("EndpointUri is not set.");
-                                    string primaryKey = config["PrimaryKey"] ?? throw new InvalidOperationException("PrimaryKey is not set.");
-                                    string databaseId = config["DatabaseId"] ?? throw new InvalidOperationException("DatabaseId is not set.");
+                                    // Standardize configuration keys to match other applications
+                                    string endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? config["EndpointUri"] ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
+                                    string primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? config["PrimaryKey"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
+                                    string databaseId = config["COSMOSDB_DATABASE_ID"] ?? config["DatabaseId"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
                                     // Register Cosmos via extensions and domain services
                                     services

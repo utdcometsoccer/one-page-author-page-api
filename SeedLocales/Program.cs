@@ -11,11 +11,12 @@ class Program
     {
         var config = new ConfigurationBuilder()
                                     .AddUserSecrets<Program>()
+                                    .AddEnvironmentVariables()
                                     .Build();
-        // Read Cosmos DB settings from environment variables or config
-        string endpointUri = config["EndpointUri"] ?? throw new InvalidOperationException("EndpointUri is not set.");
-        string primaryKey = config["PrimaryKey"] ?? throw new InvalidOperationException("PrimaryKey is not set.");
-        string databaseId = config["DatabaseId"] ?? throw new InvalidOperationException("DatabaseId is not set.");
+        // Read Cosmos DB settings from environment variables or config - standardize keys
+        string endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? config["EndpointUri"] ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
+        string primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? config["PrimaryKey"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
+        string databaseId = config["COSMOSDB_DATABASE_ID"] ?? config["DatabaseId"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
         // Build DI using extensions and resolve repository
         var services = new ServiceCollection();

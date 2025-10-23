@@ -39,13 +39,13 @@ Console.WriteLine($"Azure AD Audience configured: {maskedAudience}");
 Console.WriteLine($"Azure AD Authority configured: {maskedAuthority}");
 
 // Cosmos + repositories for user profiles
-var endpointUri = config["COSMOSDB_ENDPOINT_URI"];
-var primaryKey = config["COSMOSDB_PRIMARY_KEY"];
-var databaseId = config["COSMOSDB_DATABASE_ID"];
+var endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
+var primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
+var databaseId = config["COSMOSDB_DATABASE_ID"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
 builder.Services
-    .AddCosmosClient(endpointUri!, primaryKey!)
-    .AddCosmosDatabase(databaseId!)
+    .AddCosmosClient(endpointUri, primaryKey)
+    .AddCosmosDatabase(databaseId)
     .AddUserProfileRepository()
     .AddImageApiRepositories()
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
