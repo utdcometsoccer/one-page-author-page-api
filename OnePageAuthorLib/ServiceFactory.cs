@@ -703,6 +703,34 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
+        /// Registers Country repository with Cosmos DB container.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddCountryRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Country>>(sp =>
+                new NoSQL.CountriesContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<Interfaces.ICountryRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.Country>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.CountryRepository(container);
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Country services for country management.
+        /// </summary>
+        public static IServiceCollection AddCountryServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.ICountryService, API.CountryService>();
+            return services;
+        }
+
+        /// <summary>
         /// Registers DNS zone service for Azure DNS zone management.
         /// </summary>
         public static IServiceCollection AddDnsZoneService(this IServiceCollection services)
