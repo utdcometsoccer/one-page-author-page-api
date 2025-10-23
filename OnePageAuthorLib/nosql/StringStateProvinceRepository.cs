@@ -220,5 +220,77 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
 
             return null;
         }
+
+        /// <summary>
+        /// Gets a StateProvince entity by its string id, using the culture extracted from id as partition key.
+        /// Expected id format: "{Code}_{Culture}" (e.g., "CA_en-US")
+        /// </summary>
+        /// <param name="id">The string id of the StateProvince entity.</param>
+        /// <returns>The StateProvince entity if found, otherwise null.</returns>
+        public override async Task<StateProvince?> GetByIdAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return null;
+
+            // Extract culture from id (format: "Code_Culture")
+            var parts = id.Split('_');
+            if (parts.Length != 2)
+            {
+                // Fallback to base implementation if id format doesn't match
+                return await base.GetByIdAsync(id);
+            }
+
+            var culture = parts[1];
+            
+            try
+            {
+                var response = await _container.ReadItemAsync<StateProvince>(id, new PartitionKey(culture));
+                return response.Resource;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Adds a new StateProvince entity using Culture as the partition key.
+        /// </summary>
+        /// <param name="entity">The StateProvince entity to add.</param>
+        /// <returns>The added StateProvince entity.</returns>
+        public override async Task<StateProvince> AddAsync(StateProvince entity)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            if (string.IsNullOrWhiteSpace(entity.Culture))
+                throw new ArgumentException("StateProvince entity must have a non-empty Culture property");
+
+            if (string.IsNullOrWhiteSpace(entity.id))
+                throw new ArgumentException("StateProvince entity must have a non-empty id property");
+
+            var response = await _container.CreateItemAsync(entity, new PartitionKey(entity.Culture));
+            return response.Resource;
+        }
+
+        /// <summary>
+        /// Updates a StateProvince entity using Culture as the partition key.
+        /// </summary>
+        /// <param name="entity">The StateProvince entity to update.</param>
+        /// <returns>The updated StateProvince entity.</returns>
+        public override async Task<StateProvince> UpdateAsync(StateProvince entity)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            if (string.IsNullOrWhiteSpace(entity.Culture))
+                throw new ArgumentException("StateProvince entity must have a non-empty Culture property");
+
+            if (string.IsNullOrWhiteSpace(entity.id))
+                throw new ArgumentException("StateProvince entity must have a non-empty id property");
+
+            var response = await _container.ReplaceItemAsync(entity, entity.id, new PartitionKey(entity.Culture));
+            return response.Resource;
+        }
     }
 }

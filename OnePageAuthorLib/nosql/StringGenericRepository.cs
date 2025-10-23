@@ -21,7 +21,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         /// </summary>
         /// <param name="id">The string id of the entity.</param>
         /// <returns>The entity if found, otherwise null.</returns>
-        public async Task<TEntity?> GetByIdAsync(string id)
+        public virtual async Task<TEntity?> GetByIdAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
                 return null;
@@ -61,7 +61,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         /// </summary>
         /// <param name="entity">The entity to add.</param>
         /// <returns>The added entity.</returns>
-        public async Task<TEntity> AddAsync(TEntity entity)
+        public virtual async Task<TEntity> AddAsync(TEntity entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
@@ -82,7 +82,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         /// </summary>
         /// <param name="entity">The entity to update.</param>
         /// <returns>The updated entity.</returns>
-        public async Task<TEntity> UpdateAsync(TEntity entity)
+        public virtual async Task<TEntity> UpdateAsync(TEntity entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
