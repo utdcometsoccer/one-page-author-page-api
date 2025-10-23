@@ -46,15 +46,21 @@ namespace OnePageAuthorAPI.DataSeeder
                     var configuration = context.Configuration;
 
                     // Get configuration from user secrets, environment variables, or appsettings
-                    var cosmosEndpoint = configuration["CosmosDb:Endpoint"]
+                    // Standardize configuration keys and require explicit configuration for production safety
+                    var cosmosEndpoint = configuration["COSMOSDB_ENDPOINT_URI"] 
+                        ?? configuration["CosmosDb:Endpoint"]
                         ?? Environment.GetEnvironmentVariable("COSMOS_DB_ENDPOINT")
-                        ?? "https://localhost:8081"; // Default to Cosmos DB Emulator
-                    var cosmosKey = configuration["CosmosDb:Key"]
+                        ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required. For development, you can use the emulator endpoint: https://localhost:8081");
+                    
+                    var cosmosKey = configuration["COSMOSDB_PRIMARY_KEY"]
+                        ?? configuration["CosmosDb:Key"]
                         ?? Environment.GetEnvironmentVariable("COSMOS_DB_KEY")
-                        ?? "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="; // Emulator key
-                    var databaseId = configuration["CosmosDb:Database"]
+                        ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required. For development, you can use the emulator key: C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==");
+                    
+                    var databaseId = configuration["COSMOSDB_DATABASE_ID"]
+                        ?? configuration["CosmosDb:Database"]
                         ?? Environment.GetEnvironmentVariable("COSMOS_DB_DATABASE")
-                        ?? "OnePageAuthorDB";
+                        ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
                     // Register Azure Cosmos DB services
                     services.AddCosmosClient(cosmosEndpoint, cosmosKey);

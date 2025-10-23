@@ -60,13 +60,13 @@ builder.Services.AddAuthorization(options =>
 // Authentication/Authorization middleware are added automatically when services are registered above.
 
 // Cosmos + repositories
-var endpointUri = Environment.GetEnvironmentVariable("COSMOSDB_ENDPOINT_URI");
-var primaryKey = Environment.GetEnvironmentVariable("COSMOSDB_PRIMARY_KEY");
-var databaseId = Environment.GetEnvironmentVariable("COSMOSDB_DATABASE_ID");
+var endpointUri = Environment.GetEnvironmentVariable("COSMOSDB_ENDPOINT_URI") ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
+var primaryKey = Environment.GetEnvironmentVariable("COSMOSDB_PRIMARY_KEY") ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
+var databaseId = Environment.GetEnvironmentVariable("COSMOSDB_DATABASE_ID") ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
 builder.Services
-    .AddCosmosClient(endpointUri!, primaryKey!)
-    .AddCosmosDatabase(databaseId!)
+    .AddCosmosClient(endpointUri, primaryKey)
+    .AddCosmosDatabase(databaseId)
     .AddUserProfileRepository()
     .AddImageApiRepositories()
     .AddImageApiServices()
@@ -78,9 +78,7 @@ builder.Services
 // Azure Blob Storage
 builder.Services.AddSingleton(sp =>
 {
-    var connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
-    if (string.IsNullOrWhiteSpace(connectionString))
-        throw new InvalidOperationException("Azure Storage connection string is not configured");
+    var connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING") ?? throw new InvalidOperationException("AZURE_STORAGE_CONNECTION_STRING is required");
     return new Azure.Storage.Blobs.BlobServiceClient(connectionString);
 });
 
