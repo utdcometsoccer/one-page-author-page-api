@@ -9,19 +9,11 @@
         "continue": "Continue"
     },
     "LoginRegister": {
-        "loginHeader": {
-            "title": "Login",
-            "subtitle": "Sign in to your account."
-        },
-        "loginButton": {
-            "label": "Sign in with Microsoft"
-        },
-        "logoutButton": {
-            "label": "Sign out"
-        },
-        "countdownIndicator": {
-            "text": "Redirecting to Domain Registration in {countdown} seconds..."
-        }
+        "loginHeaderTitle": "Login",
+        "loginHeaderSubtitle": "Sign in to your account.",
+        "loginButtonLabel": "Sign in with Microsoft",
+        "logoutButtonLabel": "Sign out",
+        "countdownIndicatorText": "Redirecting to Domain Registration in {countdown} seconds..."
     },
     "ThankYou": {
         "title": "Thank You",

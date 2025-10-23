@@ -18,6 +18,7 @@ class Program
         "CountdownIndicator",
         "DomainInput",
         "DomainRegistrationsList",
+        "LoginRegister",
         "OpenLibraryAuthorForm",
         "SocialForm",
         "SocialList"
