@@ -92,9 +92,8 @@ The system generates comprehensive documentation files:
 │   ├── entities/, api/, nosql/, Authentication/
 ├── OnePageAuthor.Test/                 # Unit and integration tests (NEW)
 ├── SeedAPIData/                        # API data seeding utility (NEW)
-├── SeedLocales/                        # Localization data seeding (NEW)
 ├── SeedImageStorageTiers/              # Storage tier configuration (NEW)
-├── SeedInkStainedWretchesLocale/       # App-specific localization (NEW)
+├── SeedInkStainedWretchesLocale/       # Comprehensive localization seeding (NEW)
 └── IntegrationTestAuthorDataService/   # Integration test utilities (NEW)
 ```
 
@@ -140,10 +139,10 @@ The API enforces different limits based on subscription tiers:
 4. **Deploy**: Updated documentation deploys with your application
 
 ### Current Documentation Statistics  
-- **Total Projects**: 11 (complete solution coverage)
+- **Total Projects**: 10 (complete solution coverage)
 - **Azure Functions**: 4 projects (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStripe, function-app)  
 - **Libraries**: 1 project (OnePageAuthorLib)
-- **Utilities**: 4 projects (SeedAPIData, SeedLocales, SeedImageStorageTiers, SeedInkStainedWretchesLocale)
+- **Utilities**: 3 projects (SeedAPIData, SeedImageStorageTiers, SeedInkStainedWretchesLocale)
 - **Test Projects**: 2 projects (OnePageAuthor.Test, IntegrationTestAuthorDataService)
 - **Documented Members**: 298 classes and methods across all projects
 

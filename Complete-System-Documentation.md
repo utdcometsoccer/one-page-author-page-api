@@ -21,9 +21,8 @@ The OnePageAuthor system consists of multiple Azure Functions, core libraries, a
 
 ### Utilities (Data Management Layer)
 - **SeedAPIData**: API data initialization
-- **SeedLocales**: Localization data management
 - **SeedImageStorageTiers**: Storage tier configuration
-- **SeedInkStainedWretchesLocale**: Application-specific localization
+- **SeedInkStainedWretchesLocale**: Comprehensive localization for all containers (North America: US, CA, MX in EN, ES, FR, AR, ZH-CN, ZH-TW)
 
 ### Testing (Quality Assurance Layer)  
 - **OnePageAuthor.Test**: Unit and integration tests
@@ -244,17 +243,13 @@ Core library containing business logic, entities, and data services
 
 Data seeding utility for populating API with initial data
 
-#### SeedLocales
-
-Localization data seeding utility for multi-language support
-
 #### SeedImageStorageTiers
 
 Utility for seeding image storage tier configurations
 
 #### SeedInkStainedWretchesLocale
 
-Localization seeding utility for Ink Stained Wretches specific content
+Comprehensive, idempotent localization seeding utility for all UI components and containers. Supports North American countries (US, CA, MX) in multiple languages: English (EN), Spanish (ES), French (FR), Arabic (AR), Simplified Chinese (ZH-CN), and Traditional Chinese (ZH-TW). Features automatic container creation, duplicate detection, and support for both standard (en-us) and extended (zh-cn-us) locale codes.
 
 
 ### Testing Projects

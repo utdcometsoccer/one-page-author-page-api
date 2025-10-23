@@ -33,8 +33,7 @@ A comprehensive .NET 9 platform providing APIs and utilities for author manageme
 
 #### 🛠️ Data Management (Seeding & Utilities)
 - **SeedAPIData** — Author, book, and article data initialization
-- **SeedLocales** — Multi-language localization data seeding
-- **SeedInkStainedWretchesLocale** — Application-specific UI text localization
+- **SeedInkStainedWretchesLocale** — Comprehensive multi-language localization and UI text (North America: EN, ES, FR, AR, ZH-CN, ZH-TW)
 - **SeedImageStorageTiers** — Image storage tier configuration
 - **OnePageAuthor.DataSeeder** — StateProvince and geographical data seeding
 
@@ -195,8 +194,7 @@ The platform provides comprehensive DI extensions through `OnePageAuthorLib`:
 
 ### Available Seeders
 - **SeedAPIData** — Author profiles, books, articles, and relationships
-- **SeedLocales** — Multi-language localization data (EN, ES, FR, DE, PT, IT)
-- **SeedInkStainedWretchesLocale** — Application-specific UI text
+- **SeedInkStainedWretchesLocale** — Comprehensive multi-language localization for all UI components (North America: EN, ES, FR, AR, ZH-CN, ZH-TW for US, CA, MX)
 - **SeedImageStorageTiers** — Image storage configuration
 - **OnePageAuthor.DataSeeder** — StateProvince geographic data
 
@@ -205,8 +203,8 @@ The platform provides comprehensive DI extensions through `OnePageAuthorLib`:
 # Seed author and content data
 cd SeedAPIData && dotnet run
 
-# Initialize localization data
-cd SeedLocales && dotnet run
+# Initialize comprehensive localization data (idempotent)
+cd SeedInkStainedWretchesLocale && dotnet run
 
 # Setup geographic data
 cd OnePageAuthor.DataSeeder && dotnet run
@@ -310,8 +308,7 @@ dotnet test --filter "Category=Unit"
 | Project | Purpose | Data Types |
 |---------|---------|------------|
 | **SeedAPIData** | Core data initialization | Authors, books, articles, relationships |
-| **SeedLocales** | Localization data | Multi-language UI text, cultural settings |
-| **SeedInkStainedWretchesLocale** | App-specific text | Custom UI components, messages |
+| **SeedInkStainedWretchesLocale** | Comprehensive localization | All UI components, messages, navigation for North American countries (US, CA, MX) in EN, ES, FR, AR, ZH-CN, ZH-TW |
 | **SeedImageStorageTiers** | Storage configuration | Image processing settings, storage tiers |
 | **OnePageAuthor.DataSeeder** | Geographic data | StateProvince, country codes, regions |
 
