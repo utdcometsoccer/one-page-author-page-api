@@ -35,6 +35,21 @@
 			}
 		},
 		{
+			"label": "build-amazon-console",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"type": "process",
+			"group": "build",
+			"problemMatcher": "$msCompile",
+			"options": {
+				"cwd": "${workspaceFolder}/AmazonProductTestConsole"
+			}
+		},
+		{
 			"label": "clean release (functions)",
 			"command": "dotnet",
 			"args": [

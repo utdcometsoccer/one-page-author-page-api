@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 
 namespace InkStainedWretchFunctions;
@@ -14,16 +13,13 @@ public class GetLanguages
 {
     private readonly ILogger<GetLanguages> _logger;
     private readonly ILanguageService _languageService;
-    private readonly IJwtValidationService _jwtValidationService;
 
     public GetLanguages(
         ILogger<GetLanguages> logger,
-        ILanguageService languageService,
-        IJwtValidationService jwtValidationService)
+        ILanguageService languageService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _languageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
-        _jwtValidationService = jwtValidationService ?? throw new ArgumentNullException(nameof(jwtValidationService));
     }
 
     /// <summary>
@@ -45,13 +41,6 @@ public class GetLanguages
         {
             _logger.LogWarning("Language parameter is null or empty");
             return new BadRequestObjectResult(new { error = "Language parameter is required" });
-        }
-
-        // Authenticate the request using JWT token
-        var (user, errorResult) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
-        if (errorResult != null)
-        {
-            return errorResult;
         }
 
         try

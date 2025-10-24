@@ -50,6 +50,78 @@ The functions use the following configuration values from `local.settings.json`:
 - **AMAZON_PRODUCT_MARKETPLACE**: Amazon marketplace domain (e.g., "www.amazon.com")
 - **AMAZON_PRODUCT_API_ENDPOINT**: Full API endpoint URL
 
+## 🔍 How to Find Your Correct Amazon Partner Tag
+
+### Step 1: Sign in to Amazon Associates
+1. Go to [Amazon Associates Central](https://affiliate-program.amazon.com/)
+2. Sign in with your Amazon Associates account
+3. If you don't have an account, you'll need to apply first (approval required)
+
+### Step 2: Locate Your Associate Tag
+1. **Method A - Dashboard**: 
+   - On your Associates dashboard, look for "Associate ID" or "Tracking ID"
+   - It will be in the format: `yourstore-20` or `yourname-21`, etc.
+
+2. **Method B - Account Settings**:
+   - Go to "Account & Login Info" → "Manage Your Tracking IDs"
+   - You'll see all your Associate IDs listed here
+
+3. **Method C - Link Generator**:
+   - Use the "Product Linking" → "Link to Any Page" tool
+   - Your Associate ID will appear in the generated links as `tag=yourstore-20`
+
+### Step 3: Verify Tag Format
+Your Partner Tag should follow this pattern:
+- Format: `{store-name}-{number}`
+- Examples: `mystore-20`, `johnbooks-21`, `techreviews-20`
+- Length: Usually 8-15 characters
+- Ends with: `-20`, `-21`, `-22`, etc. (based on your locale)
+
+### Step 4: Important Requirements
+⚠️ **CRITICAL**: Having an Amazon Associates account is NOT enough!
+
+You must also:
+1. **Apply for Product Advertising API Access**
+   - Go to [Amazon Developer Portal](https://developer.amazon.com/)
+   - Sign in and navigate to "Product Advertising API"
+   - Submit application (separate approval process)
+   - Wait for approval (can take several days/weeks)
+
+2. **Generate AWS Credentials**
+   - After PA API approval, generate Access Key and Secret Key
+   - These are different from your regular AWS credentials
+
+### Step 5: Test Your Configuration
+Update your user secrets with the correct Partner Tag:
+```bash
+dotnet user-secrets set "AMAZON_PRODUCT_PARTNER_TAG" "your-actual-tag-20" --project InkStainedWretchFunctions.csproj
+```
+
+### Common Issues & Solutions
+
+❌ **404 Error with Valid Tag**: Your Associates account may not have Product Advertising API approval
+- Solution: Apply for PA API access separately
+
+❌ **403 Error**: Invalid AWS credentials or wrong region
+- Solution: Verify Access Key, Secret Key, and region match your PA API setup
+
+❌ **400 Error**: Malformed request or invalid parameters
+- Solution: Check endpoint URL and request format
+
+### Testing Your Partner Tag
+You can verify your tag is working by:
+1. Using the console application: `dotnet run --project AmazonProductTestConsole`
+2. Checking the detailed error messages for specific guidance
+3. Monitoring the debug logs for signature validation
+
+### Partner Tag Locations by Country
+- **US**: Ends with `-20`
+- **UK**: Ends with `-21` 
+- **Germany**: Ends with `-03`
+- **France**: Ends with `-21`
+- **Japan**: Ends with `-22`
+- **Canada**: Ends with `-20`
+
 ## Architecture
 
 The implementation includes:

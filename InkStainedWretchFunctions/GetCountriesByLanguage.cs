@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 
 namespace InkStainedWretchFunctions;
@@ -14,16 +13,13 @@ public class GetCountriesByLanguage
 {
     private readonly ILogger<GetCountriesByLanguage> _logger;
     private readonly ICountryService _countryService;
-    private readonly IJwtValidationService _jwtValidationService;
 
     public GetCountriesByLanguage(
         ILogger<GetCountriesByLanguage> logger,
-        ICountryService countryService,
-        IJwtValidationService jwtValidationService)
+        ICountryService countryService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _countryService = countryService ?? throw new ArgumentNullException(nameof(countryService));
-        _jwtValidationService = jwtValidationService ?? throw new ArgumentNullException(nameof(jwtValidationService));
     }
 
     /// <summary>
@@ -48,13 +44,6 @@ public class GetCountriesByLanguage
 
         // Normalize language to lowercase
         language = language.ToLowerInvariant();
-
-        // Authenticate the request using JWT token
-        var (user, errorResult) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
-        if (errorResult != null)
-        {
-            return errorResult;
-        }
 
         try
         {

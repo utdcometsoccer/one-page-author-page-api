@@ -44,6 +44,16 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Amazon
                 throw new ArgumentException("Item page must be greater than 0", nameof(itemPage));
             }
 
+            // Validate configuration before making API call
+            if (_config.PartnerTag.Contains("yourtag") || _config.PartnerTag.Contains("placeholder") || _config.PartnerTag == "yourtag-20")
+            {
+                _logger.LogError("Invalid Partner Tag detected: {PartnerTag}. This appears to be a placeholder value.", _config.PartnerTag);
+                throw new InvalidOperationException(
+                    $"Invalid Amazon Partner Tag: '{_config.PartnerTag}'. This appears to be a placeholder. " +
+                    $"You need a real Amazon Associates Partner Tag from your approved Amazon Associates account. " +
+                    $"Visit https://affiliate-program.amazon.com/ to sign up and get your real Partner Tag.");
+            }
+
             try
             {
                 // Build the request payload
@@ -61,8 +71,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Amazon
                         "ItemInfo.Title",
                         "ItemInfo.ByLineInfo",
                         "ItemInfo.ContentInfo",
-                        "ItemInfo.ProductInfo",
-                        "Offers.Listings.Price"
+                        "ItemInfo.ProductInfo"
                     }
                 };
 
@@ -71,6 +80,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Amazon
 
                 // Create signed request
                 var request = CreateSignedRequest(requestJson);
+                
+                _logger.LogDebug("Sending request to: {Endpoint} with headers: {Headers}", 
+                    request.RequestUri, string.Join(", ", request.Headers.Select(h => $"{h.Key}={string.Join(",", h.Value)}")));
+
+                // Log signature debugging information
+                LogSignatureDebugInfo(requestJson, request);
 
                 // Send the request
                 var response = await _httpClient.SendAsync(request);
@@ -85,8 +100,25 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Amazon
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "HTTP error while calling Amazon Product API for author: {AuthorName}", authorName);
-                throw new InvalidOperationException($"Failed to call Amazon Product API: {ex.Message}", ex);
+                _logger.LogError(ex, "HTTP error while calling Amazon Product API for author: {AuthorName}. Endpoint: {Endpoint}, Region: {Region}", 
+                    authorName, _config.ApiEndpoint, _config.Region);
+                
+                // Provide more specific diagnostic information
+                var errorMessage = ex.Message.Contains("404") 
+                    ? $"Amazon Product API returned 404 Not Found. This usually indicates:\n" +
+                      $"1. INVALID PARTNER TAG: '{_config.PartnerTag}' - Must be a real Amazon Associates Partner Tag from your approved Amazon Associates account (format: 'yourstore-20')\n" +
+                      $"2. Product Advertising API access not approved - You need separate approval for PA API beyond Amazon Associates\n" +
+                      $"3. Incorrect API endpoint URL: {_config.ApiEndpoint}\n" +
+                      $"4. Invalid region: {_config.Region}\n" +
+                      $"5. Invalid AWS credentials or malformed request signature\n" +
+                      $"\nIMPORTATE: The current Partner Tag '{_config.PartnerTag}' appears to be a placeholder. You need:\n" +
+                      $"- A real Amazon Associates account (https://affiliate-program.amazon.com/)\n" +
+                      $"- Approval for Product Advertising API access\n" +
+                      $"- Your actual Partner Tag from your Associates account\n" +
+                      $"Original error: {ex.Message}"
+                    : $"Failed to call Amazon Product API: {ex.Message}";
+                
+                throw new InvalidOperationException(errorMessage, ex);
             }
             catch (JsonException ex)
             {
@@ -105,6 +137,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Amazon
         /// </summary>
         private HttpRequestMessage CreateSignedRequest(string requestBody)
         {
+            // Validate endpoint format
+            if (!_config.ApiEndpoint.Contains("/paapi5/searchitems"))
+            {
+                _logger.LogWarning("API endpoint may be incorrect. Expected format: https://webservices.amazon.{{domain}}/paapi5/searchitems, but got: {Endpoint}", 
+                    _config.ApiEndpoint);
+            }
             var timestamp = DateTime.UtcNow;
             var dateStamp = timestamp.ToString("yyyyMMdd");
             var amzDate = timestamp.ToString("yyyyMMddTHHmmssZ");
@@ -143,6 +181,72 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Amazon
             request.Headers.TryAddWithoutValidation("Authorization", authorizationHeader);
 
             return request;
+        }
+
+        /// <summary>
+        /// Logs detailed signature debugging information
+        /// </summary>
+        private void LogSignatureDebugInfo(string requestBody, HttpRequestMessage request)
+        {
+            if (!_logger.IsEnabled(LogLevel.Debug))
+                return;
+
+            try
+            {
+                var timestamp = DateTime.UtcNow;
+                var dateStamp = timestamp.ToString("yyyyMMdd");
+                var amzDate = timestamp.ToString("yyyyMMddTHHmmssZ");
+
+                // Log payload hash
+                var payloadHash = GetSha256Hash(requestBody);
+                _logger.LogDebug("🔍 AWS Signature Debug Info:");
+                _logger.LogDebug("   Payload Hash: {PayloadHash}", payloadHash);
+                
+                // Log canonical request components
+                var canonicalUri = new Uri(_config.ApiEndpoint).AbsolutePath;
+                var canonicalHeaders = $"host:{new Uri(_config.ApiEndpoint).Host}\n" +
+                                      $"x-amz-date:{amzDate}\n" +
+                                      $"x-amz-target:com.amazon.paapi5.v1.ProductAdvertisingAPIv1.SearchItems\n";
+                var signedHeaders = "host;x-amz-date;x-amz-target";
+                
+                var canonicalRequest = $"POST\n{canonicalUri}\n\n{canonicalHeaders}\n{signedHeaders}\n{payloadHash}";
+                var canonicalRequestHash = GetSha256Hash(canonicalRequest);
+                
+                _logger.LogDebug("   Canonical URI: {CanonicalUri}", canonicalUri);
+                _logger.LogDebug("   Canonical Headers: {CanonicalHeaders}", canonicalHeaders.Replace("\n", "\\n"));
+                _logger.LogDebug("   Canonical Request Hash: {CanonicalRequestHash}", canonicalRequestHash);
+                
+                // Log string to sign
+                var credentialScope = $"{dateStamp}/{_config.Region}/{ServiceName}/aws4_request";
+                var stringToSign = $"{Algorithm}\n{amzDate}\n{credentialScope}\n{canonicalRequestHash}";
+                _logger.LogDebug("   String to Sign: {StringToSign}", stringToSign.Replace("\n", "\\n"));
+                _logger.LogDebug("   Credential Scope: {CredentialScope}", credentialScope);
+                
+                // Log signing key derivation steps
+                var kSecret = System.Text.Encoding.UTF8.GetBytes($"AWS4{_config.SecretKey}");
+                var kDate = HmacSha256(kSecret, dateStamp);
+                var kRegion = HmacSha256(kDate, _config.Region);
+                var kService = HmacSha256(kRegion, ServiceName);
+                var kSigning = HmacSha256(kService, "aws4_request");
+                
+                _logger.LogDebug("   kDate: {KDate}", BytesToHex(kDate));
+                _logger.LogDebug("   kRegion: {KRegion}", BytesToHex(kRegion));
+                _logger.LogDebug("   kService: {KService}", BytesToHex(kService));
+                _logger.LogDebug("   kSigning: {KSigning}", BytesToHex(kSigning));
+                
+                // Log final signature
+                var signature = BytesToHex(HmacSha256(kSigning, stringToSign));
+                _logger.LogDebug("   Final Signature: {Signature}", signature);
+                
+                // Log authorization header
+                var authHeader = request.Headers.Authorization?.ToString() ?? 
+                               request.Headers.FirstOrDefault(h => h.Key == "Authorization").Value?.FirstOrDefault();
+                _logger.LogDebug("   Authorization Header: {AuthHeader}", authHeader);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to log signature debug info");
+            }
         }
 
         /// <summary>
