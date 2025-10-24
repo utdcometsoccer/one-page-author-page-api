@@ -27,6 +27,25 @@
             "request": "attach", 
             "preLaunchTask": "func-inkstainedwretchstripe",
             "processId": "${command:azureFunctions.pickProcess}"
+        },
+        {
+            "name": "Attach by Process ID",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}",
+            "justMyCode": false,
+            "suppressJITOptimizations": true
+        },
+        {
+            "name": "Debug Amazon Product Console",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/AmazonProductTestConsole/bin/Debug/net9.0/AmazonProductTestConsole.dll",
+            "args": ["--config", "Stephen King"],
+            "cwd": "${workspaceFolder}/AmazonProductTestConsole",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "preLaunchTask": "build-amazon-console"
         }
     ],
     "compounds": [

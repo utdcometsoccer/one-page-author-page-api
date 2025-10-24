@@ -58,7 +58,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Amazon
             {
                 throw new InvalidOperationException($"Required configuration '{key}' is missing or empty. Please check your local.settings.json or environment variables.");
             }
-            return value;
+            return value.Trim();
         }
     }
 }
