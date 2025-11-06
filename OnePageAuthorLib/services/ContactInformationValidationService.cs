@@ -204,6 +204,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             if (email.Length > 254) // RFC 5321 limit
                 return false;
 
+            // Check for consecutive periods (invalid in email addresses)
+            if (email.Contains(".."))
+                return false;
+
             // Basic format check - must contain @ and domain
             if (!email.Contains('@'))
                 return false;
