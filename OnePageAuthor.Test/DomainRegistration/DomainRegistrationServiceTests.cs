@@ -117,6 +117,10 @@ namespace OnePageAuthor.Test.DomainRegistration
             var user = CreateTestUser();
             var contactInfo = CreateTestContactInfo();
 
+            // Setup domain validation to fail for null domain
+            _domainValidationServiceMock.Setup(x => x.ValidateDomain(null!))
+                                       .Returns(ValidationResult.Failure("Domain information is required"));
+
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() => 
                 _service.CreateDomainRegistrationAsync(user, null!, contactInfo));
@@ -128,6 +132,10 @@ namespace OnePageAuthor.Test.DomainRegistration
             // Arrange
             var user = CreateTestUser();
             var domain = CreateTestDomain();
+
+            // Setup contact validation to fail for null contact info
+            _contactValidationServiceMock.Setup(x => x.ValidateContactInformation(null!))
+                                        .Returns(ValidationResult.Failure("Contact information is required"));
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() => 
@@ -142,6 +150,10 @@ namespace OnePageAuthor.Test.DomainRegistration
             var domain = new Domain { TopLevelDomain = "com", SecondLevelDomain = "" };
             var contactInfo = CreateTestContactInfo();
 
+            // Setup domain validation to fail for empty second level domain
+            _domainValidationServiceMock.Setup(x => x.ValidateDomain(It.Is<Domain>(d => d.SecondLevelDomain == "")))
+                                       .Returns(ValidationResult.Failure("Second level domain is required"));
+
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() => 
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
@@ -154,6 +166,10 @@ namespace OnePageAuthor.Test.DomainRegistration
             var user = CreateTestUser();
             var domain = new Domain { TopLevelDomain = "", SecondLevelDomain = "example" };
             var contactInfo = CreateTestContactInfo();
+
+            // Setup domain validation to fail for empty top level domain
+            _domainValidationServiceMock.Setup(x => x.ValidateDomain(It.Is<Domain>(d => d.TopLevelDomain == "")))
+                                       .Returns(ValidationResult.Failure("Top level domain is required"));
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() => 
@@ -169,6 +185,10 @@ namespace OnePageAuthor.Test.DomainRegistration
             var contactInfo = CreateTestContactInfo();
             contactInfo.FirstName = "";
 
+            // Setup contact validation to fail for missing first name
+            _contactValidationServiceMock.Setup(x => x.ValidateContactInformation(It.Is<ContactInformation>(c => c.FirstName == "")))
+                                        .Returns(ValidationResult.Failure("First name is required"));
+
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() => 
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
@@ -183,6 +203,10 @@ namespace OnePageAuthor.Test.DomainRegistration
             var contactInfo = CreateTestContactInfo();
             contactInfo.EmailAddress = "";
 
+            // Setup contact validation to fail for missing email
+            _contactValidationServiceMock.Setup(x => x.ValidateContactInformation(It.Is<ContactInformation>(c => c.EmailAddress == "")))
+                                        .Returns(ValidationResult.Failure("Email address is required"));
+
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() => 
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
@@ -196,6 +220,10 @@ namespace OnePageAuthor.Test.DomainRegistration
             var domain = CreateTestDomain();
             var contactInfo = CreateTestContactInfo();
             contactInfo.EmailAddress = "invalid-email";
+
+            // Setup contact validation to fail for invalid email format
+            _contactValidationServiceMock.Setup(x => x.ValidateContactInformation(It.Is<ContactInformation>(c => c.EmailAddress == "invalid-email")))
+                                        .Returns(ValidationResult.Failure("Email address format is invalid"));
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() => 
