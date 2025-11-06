@@ -2,7 +2,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
 {
@@ -28,17 +27,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
         /// </summary>
         [Function("TestScenario1")]
         public async Task<IActionResult> TestScenario1(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/scenario1")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/scenario1")] HttpRequest req,
+            [FromBody] EndToEndTestRequest testRequest)
         {
             try
             {
                 _logger.LogInformation("[E2E TEST] Starting Scenario 1 - Frontend UI Test (No Infrastructure)");
-
-                var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                var testRequest = JsonSerializer.Deserialize<EndToEndTestRequest>(requestBody, new JsonSerializerOptions 
-                { 
-                    PropertyNameCaseInsensitive = true 
-                });
 
                 if (testRequest == null || string.IsNullOrEmpty(testRequest.DomainName))
                 {
@@ -96,17 +90,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
         /// </summary>
         [Function("TestScenario3")]
         public async Task<IActionResult> TestScenario3(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/scenario3")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/scenario3")] HttpRequest req,
+            [FromBody] EndToEndTestRequest testRequest)
         {
             try
             {
                 _logger.LogWarning("[E2E TEST] Starting Scenario 3 - REAL MONEY TEST - USE WITH CAUTION!");
-
-                var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                var testRequest = JsonSerializer.Deserialize<EndToEndTestRequest>(requestBody, new JsonSerializerOptions 
-                { 
-                    PropertyNameCaseInsensitive = true 
-                });
 
                 if (testRequest == null || string.IsNullOrEmpty(testRequest.DomainName))
                 {
