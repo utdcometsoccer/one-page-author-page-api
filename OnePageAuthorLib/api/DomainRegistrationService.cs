@@ -13,15 +13,21 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         private readonly ILogger<DomainRegistrationService> _logger;
         private readonly IDomainRegistrationRepository _repository;
         private readonly IUserIdentityService _userIdentityService;
+        private readonly IDomainValidationService _domainValidationService;
+        private readonly IContactInformationValidationService _contactValidationService;
 
         public DomainRegistrationService(
             ILogger<DomainRegistrationService> logger,
             IDomainRegistrationRepository repository,
-            IUserIdentityService userIdentityService)
+            IUserIdentityService userIdentityService,
+            IDomainValidationService domainValidationService,
+            IContactInformationValidationService contactValidationService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _userIdentityService = userIdentityService ?? throw new ArgumentNullException(nameof(userIdentityService));
+            _domainValidationService = domainValidationService ?? throw new ArgumentNullException(nameof(domainValidationService));
+            _contactValidationService = contactValidationService ?? throw new ArgumentNullException(nameof(contactValidationService));
         }
 
         public async Task<DomainRegistration> CreateDomainRegistrationAsync(
@@ -31,12 +37,26 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         {
             var upn = _userIdentityService.GetUserUpn(user);
             
-            // Validate domain information first
-            ValidateDomain(domain);
-            ValidateContactInformation(contactInformation);
+            // Validate domain information using the dedicated service
+            var domainValidationResult = _domainValidationService.ValidateDomain(domain);
+            if (!domainValidationResult.IsValid)
+            {
+                var errorMessage = string.Join("; ", domainValidationResult.Errors);
+                _logger.LogWarning("Domain validation failed for user {Upn}: {Errors}", upn, errorMessage);
+                throw new ArgumentException($"Domain validation failed: {errorMessage}", nameof(domain));
+            }
+            
+            // Validate contact information using the dedicated service
+            var contactValidationResult = _contactValidationService.ValidateContactInformation(contactInformation);
+            if (!contactValidationResult.IsValid)
+            {
+                var errorMessage = string.Join("; ", contactValidationResult.Errors);
+                _logger.LogWarning("Contact information validation failed for user {Upn}: {Errors}", upn, errorMessage);
+                throw new ArgumentException($"Contact information validation failed: {errorMessage}", nameof(contactInformation));
+            }
             
             _logger.LogInformation("Creating domain registration for user {Upn}, domain {Domain}", 
-                upn, $"{domain.SecondLevelDomain}.{domain.TopLevelDomain}");
+                upn, domain.FullDomainName);
 
             var domainRegistration = new DomainRegistration(upn, domain, contactInformation);
             
@@ -85,94 +105,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             return await _repository.UpdateAsync(existingRegistration);
         }
 
-        private static void ValidateDomain(Domain domain)
-        {
-            if (domain == null)
-                throw new ArgumentException("Domain information is required", nameof(domain));
 
-            if (string.IsNullOrWhiteSpace(domain.SecondLevelDomain))
-                throw new ArgumentException("Second level domain is required", nameof(domain));
-
-            if (string.IsNullOrWhiteSpace(domain.TopLevelDomain))
-                throw new ArgumentException("Top level domain is required", nameof(domain));
-
-            // Basic domain name validation
-            if (!IsValidDomainName(domain.SecondLevelDomain))
-                throw new ArgumentException("Invalid second level domain name", nameof(domain));
-
-            if (!IsValidTopLevelDomain(domain.TopLevelDomain))
-                throw new ArgumentException("Invalid top level domain", nameof(domain));
-        }
-
-        private static void ValidateContactInformation(ContactInformation contactInfo)
-        {
-            if (contactInfo == null)
-                throw new ArgumentException("Contact information is required", nameof(contactInfo));
-
-            if (string.IsNullOrWhiteSpace(contactInfo.FirstName))
-                throw new ArgumentException("First name is required", nameof(contactInfo));
-
-            if (string.IsNullOrWhiteSpace(contactInfo.LastName))
-                throw new ArgumentException("Last name is required", nameof(contactInfo));
-
-            if (string.IsNullOrWhiteSpace(contactInfo.EmailAddress))
-                throw new ArgumentException("Email address is required", nameof(contactInfo));
-
-            if (string.IsNullOrWhiteSpace(contactInfo.Address))
-                throw new ArgumentException("Address is required", nameof(contactInfo));
-
-            if (string.IsNullOrWhiteSpace(contactInfo.City))
-                throw new ArgumentException("City is required", nameof(contactInfo));
-
-            if (string.IsNullOrWhiteSpace(contactInfo.State))
-                throw new ArgumentException("State is required", nameof(contactInfo));
-
-            if (string.IsNullOrWhiteSpace(contactInfo.Country))
-                throw new ArgumentException("Country is required", nameof(contactInfo));
-
-            if (string.IsNullOrWhiteSpace(contactInfo.ZipCode))
-                throw new ArgumentException("ZIP code is required", nameof(contactInfo));
-
-            if (string.IsNullOrWhiteSpace(contactInfo.TelephoneNumber))
-                throw new ArgumentException("Telephone number is required", nameof(contactInfo));
-
-            // Basic email validation
-            if (!IsValidEmail(contactInfo.EmailAddress))
-                throw new ArgumentException("Invalid email address format", nameof(contactInfo));
-        }
-
-        private static bool IsValidDomainName(string domainName)
-        {
-            if (string.IsNullOrWhiteSpace(domainName))
-                return false;
-
-            // Basic domain name validation - alphanumeric and hyphens, not starting/ending with hyphen
-            return System.Text.RegularExpressions.Regex.IsMatch(domainName, @"^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$");
-        }
-
-        private static bool IsValidTopLevelDomain(string tld)
-        {
-            if (string.IsNullOrWhiteSpace(tld))
-                return false;
-
-            // Basic TLD validation - letters only, 2-6 characters
-            return System.Text.RegularExpressions.Regex.IsMatch(tld, @"^[a-zA-Z]{2,6}$");
-        }
-
-        private static bool IsValidEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return false;
-
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
-        }
     }
 }

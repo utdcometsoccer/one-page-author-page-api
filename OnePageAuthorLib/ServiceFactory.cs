@@ -642,6 +642,8 @@ namespace InkStainedWretch.OnePageAuthorAPI
         public static IServiceCollection AddDomainRegistrationServices(this IServiceCollection services)
         {
             services.AddScoped<Interfaces.IUserIdentityService, API.UserIdentityService>();
+            services.AddScoped<Interfaces.IDomainValidationService, Services.DomainValidationService>();
+            services.AddScoped<Interfaces.IContactInformationValidationService, Services.ContactInformationValidationService>();
             services.AddScoped<Interfaces.IDomainRegistrationService, API.DomainRegistrationService>();
             return services;
         }

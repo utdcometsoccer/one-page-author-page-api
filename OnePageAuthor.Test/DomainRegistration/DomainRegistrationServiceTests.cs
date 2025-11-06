@@ -4,6 +4,7 @@ using System.Security.Claims;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
+using static InkStainedWretch.OnePageAuthorAPI.Interfaces.ValidationResult;
 
 namespace OnePageAuthor.Test.DomainRegistration
 {
@@ -12,6 +13,8 @@ namespace OnePageAuthor.Test.DomainRegistration
         private readonly Mock<ILogger<DomainRegistrationService>> _loggerMock;
         private readonly Mock<IDomainRegistrationRepository> _repositoryMock;
         private readonly Mock<IUserIdentityService> _userIdentityServiceMock;
+        private readonly Mock<IDomainValidationService> _domainValidationServiceMock;
+        private readonly Mock<IContactInformationValidationService> _contactValidationServiceMock;
         private readonly DomainRegistrationService _service;
 
         public DomainRegistrationServiceTests()
@@ -19,11 +22,24 @@ namespace OnePageAuthor.Test.DomainRegistration
             _loggerMock = new Mock<ILogger<DomainRegistrationService>>();
             _repositoryMock = new Mock<IDomainRegistrationRepository>();
             _userIdentityServiceMock = new Mock<IUserIdentityService>();
-            _service = new DomainRegistrationService(_loggerMock.Object, _repositoryMock.Object, _userIdentityServiceMock.Object);
+            _domainValidationServiceMock = new Mock<IDomainValidationService>();
+            _contactValidationServiceMock = new Mock<IContactInformationValidationService>();
+            _service = new DomainRegistrationService(
+                _loggerMock.Object, 
+                _repositoryMock.Object, 
+                _userIdentityServiceMock.Object,
+                _domainValidationServiceMock.Object,
+                _contactValidationServiceMock.Object);
 
             // Setup default behavior for user identity service
             _userIdentityServiceMock.Setup(x => x.GetUserUpn(It.IsAny<ClaimsPrincipal>()))
                                    .Returns("test@example.com");
+
+            // Setup default successful validation behavior
+            _domainValidationServiceMock.Setup(x => x.ValidateDomain(It.IsAny<Domain>()))
+                                       .Returns(ValidationResult.Success());
+            _contactValidationServiceMock.Setup(x => x.ValidateContactInformation(It.IsAny<ContactInformation>()))
+                                        .Returns(ValidationResult.Success());
         }
 
         private static ClaimsPrincipal CreateTestUser(string upn = "test@example.com", string oid = "test-oid-123")
