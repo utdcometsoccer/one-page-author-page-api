@@ -43,8 +43,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                 var result = new TestResult
                 {
                     TestName = "FrontDoor",
-                    DomainName = testRequest.DomainName,
-                    Operation = testRequest.Operation,
+                    DomainName = testRequest.DomainName ?? "",
+                    Operation = testRequest.Operation ?? "",
                     TestScenario = _testConfig.TestScenario,
                     IsMocked = _testConfig.MockAzureInfrastructure,
                     Timestamp = DateTime.UtcNow
@@ -54,20 +54,20 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                 switch (testRequest.Operation?.ToLower())
                 {
                     case "add":
-                        result.Success = await SimulateFrontDoorAdd(testRequest.DomainName);
+                        result.Success = await SimulateFrontDoorAdd(testRequest.DomainName ?? "");
                         result.Message = result.Success ? "Domain added to Front Door" : "Failed to add domain";
                         result.EstimatedCost = _testConfig.MockAzureInfrastructure ? 0m : 0.10m; // Azure Front Door cost
                         break;
                     case "remove":
-                        result.Success = await SimulateFrontDoorRemove(testRequest.DomainName);
+                        result.Success = await SimulateFrontDoorRemove(testRequest.DomainName ?? "");
                         result.Message = result.Success ? "Domain removed from Front Door" : "Failed to remove domain";
                         break;
                     case "validate":
-                        result.Success = await SimulateFrontDoorValidate(testRequest.DomainName);
+                        result.Success = await SimulateFrontDoorValidate(testRequest.DomainName ?? "");
                         result.Message = result.Success ? "Domain validation successful" : "Domain validation failed";
                         break;
                     case "exists":
-                        result.Success = await SimulateFrontDoorExists(testRequest.DomainName);
+                        result.Success = await SimulateFrontDoorExists(testRequest.DomainName ?? "");
                         result.Message = result.Success ? "Domain exists in Front Door" : "Domain does not exist";
                         break;
                     default:
@@ -106,8 +106,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                 var result = new TestResult
                 {
                     TestName = "DnsZone",
-                    DomainName = testRequest.DomainName,
-                    Operation = testRequest.Operation,
+                    DomainName = testRequest.DomainName ?? "",
+                    Operation = testRequest.Operation ?? "",
                     TestScenario = _testConfig.TestScenario,
                     IsMocked = _testConfig.MockAzureInfrastructure,
                     Timestamp = DateTime.UtcNow
@@ -116,20 +116,20 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                 switch (testRequest.Operation?.ToLower())
                 {
                     case "create":
-                        result.Success = await SimulateDnsZoneCreate(testRequest.DomainName);
+                        result.Success = await SimulateDnsZoneCreate(testRequest.DomainName ?? "");
                         result.Message = result.Success ? "DNS zone created" : "Failed to create DNS zone";
                         result.EstimatedCost = _testConfig.MockAzureInfrastructure ? 0m : 0.50m; // Azure DNS zone cost
                         break;
                     case "delete":
-                        result.Success = await SimulateDnsZoneDelete(testRequest.DomainName);
+                        result.Success = await SimulateDnsZoneDelete(testRequest.DomainName ?? "");
                         result.Message = result.Success ? "DNS zone deleted" : "Failed to delete DNS zone";
                         break;
                     case "exists":
-                        result.Success = await SimulateDnsZoneExists(testRequest.DomainName);
+                        result.Success = await SimulateDnsZoneExists(testRequest.DomainName ?? "");
                         result.Message = result.Success ? "DNS zone exists" : "DNS zone does not exist";
                         break;
                     case "nameservers":
-                        var nameServers = await SimulateDnsZoneGetNameServers(testRequest.DomainName);
+                        var nameServers = await SimulateDnsZoneGetNameServers(testRequest.DomainName ?? "");
                         result.Success = nameServers.Length > 0;
                         result.Message = result.Success ? $"Retrieved {nameServers.Length} name servers" : "Failed to get name servers";
                         result.Data = nameServers;
@@ -170,8 +170,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                 var result = new TestResult
                 {
                     TestName = "GoogleDomains",
-                    DomainName = testRequest.DomainName,
-                    Operation = testRequest.Operation,
+                    DomainName = testRequest.DomainName ?? "",
+                    Operation = testRequest.Operation ?? "",
                     TestScenario = _testConfig.TestScenario,
                     IsMocked = _testConfig.MockGoogleDomains,
                     Timestamp = DateTime.UtcNow
@@ -182,7 +182,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                     case "register":
                         if (!_testConfig.SkipDomainPurchase && !_testConfig.MockGoogleDomains)
                         {
-                            result.EstimatedCost = EstimateDomainCost(testRequest.DomainName);
+                            result.EstimatedCost = EstimateDomainCost(testRequest.DomainName ?? "");
                             if (result.EstimatedCost > _testConfig.MaxTestCostLimit)
                             {
                                 result.Success = false;
@@ -191,11 +191,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                             }
                         }
                         
-                        result.Success = await SimulateGoogleDomainsRegister(testRequest.DomainName);
+                        result.Success = await SimulateGoogleDomainsRegister(testRequest.DomainName ?? "");
                         result.Message = result.Success ? "Domain registration initiated" : "Failed to register domain";
                         break;
                     case "available":
-                        result.Success = await SimulateGoogleDomainsAvailable(testRequest.DomainName);
+                        result.Success = await SimulateGoogleDomainsAvailable(testRequest.DomainName ?? "");
                         result.Message = result.Success ? "Domain is available" : "Domain is not available";
                         break;
                     default:

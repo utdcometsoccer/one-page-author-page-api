@@ -248,7 +248,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
         private async Task<(bool, string, decimal)> ProcessRealPayment(EndToEndTestRequest request)
         {
             await Task.Delay(1000);
-            var cost = EstimateDomainCost(request.DomainName);
+            var cost = EstimateDomainCost(request.DomainName ?? "");
             // In real scenario, this would process actual Stripe payment
             return (true, "Real payment processed via Stripe", cost);
         }
