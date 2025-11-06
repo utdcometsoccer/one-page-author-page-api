@@ -2,7 +2,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
 {
@@ -28,16 +27,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
         /// </summary>
         [Function("TestFrontDoor")]
         public async Task<IActionResult> TestFrontDoor(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/frontdoor")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/frontdoor")] HttpRequest req,
+            [FromBody] TestRequest testRequest)
         {
             try
             {
-                var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                var testRequest = JsonSerializer.Deserialize<TestRequest>(requestBody, new JsonSerializerOptions 
-                { 
-                    PropertyNameCaseInsensitive = true 
-                });
-
                 if (testRequest == null || string.IsNullOrEmpty(testRequest.DomainName))
                 {
                     return new BadRequestObjectResult("Missing domainName in request body");
@@ -96,16 +90,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
         /// </summary>
         [Function("TestDnsZone")]
         public async Task<IActionResult> TestDnsZone(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/dns")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/dns")] HttpRequest req,
+            [FromBody] TestRequest testRequest)
         {
             try
             {
-                var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                var testRequest = JsonSerializer.Deserialize<TestRequest>(requestBody, new JsonSerializerOptions 
-                { 
-                    PropertyNameCaseInsensitive = true 
-                });
-
                 if (testRequest == null || string.IsNullOrEmpty(testRequest.DomainName))
                 {
                     return new BadRequestObjectResult("Missing domainName in request body");
@@ -165,16 +154,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
         /// </summary>
         [Function("TestGoogleDomains")]
         public async Task<IActionResult> TestGoogleDomains(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/googledomains")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/googledomains")] HttpRequest req,
+            [FromBody] TestRequest testRequest)
         {
             try
             {
-                var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                var testRequest = JsonSerializer.Deserialize<TestRequest>(requestBody, new JsonSerializerOptions 
-                { 
-                    PropertyNameCaseInsensitive = true 
-                });
-
                 if (testRequest == null || string.IsNullOrEmpty(testRequest.DomainName))
                 {
                     return new BadRequestObjectResult("Missing domainName in request body");

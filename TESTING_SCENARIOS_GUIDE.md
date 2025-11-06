@@ -3,9 +3,11 @@
 ## Your 3 Testing Scenarios
 
 ### Scenario 1: Frontend-Safe Testing (Cost: $0.00)
+
 **Purpose**: End-to-end UI testing without creating domains or modifying infrastructure
 
 **To activate this scenario, set these values in `local.settings.json`:**
+
 ```json
 {
   "TESTING_MODE": "true",
@@ -22,9 +24,11 @@
 ```
 
 ### Scenario 2: Individual Function Testing (Cost: $0.50-$5.00)
+
 **Purpose**: Test individual Azure Functions that modify Azure infrastructure
 
 **To activate this scenario, set these values in `local.settings.json`:**
+
 ```json
 {
   "TESTING_MODE": "true",
@@ -41,9 +45,11 @@
 ```
 
 ### Scenario 3: Production Testing (Cost: $12-$50+)
+
 **Purpose**: Full end-to-end test with real money, real domains, real infrastructure
 
 **To activate this scenario, set these values in `local.settings.json`:**
+
 ```json
 {
   "TESTING_MODE": "true",
@@ -64,15 +70,18 @@
 1. **Update local.settings.json** with the scenario configuration above
 2. **Set up your secrets** using dotnet user-secrets (for sensitive values)
 3. **Start the Functions app**:
+
    ```bash
    cd InkStainedWretchFunctions
    func start
    ```
+
 4. **Test your endpoints** according to the scenario
 
 ## 📊 What Each Scenario Tests
 
 ### Scenario 1 (Frontend-Safe)
+
 - ✅ UI/UX flows
 - ✅ API response structures  
 - ✅ Error handling
@@ -81,6 +90,7 @@
 - ❌ No costs incurred
 
 ### Scenario 2 (Individual Functions)
+
 - ✅ Real Azure operations (DNS zones, Front Door)
 - ✅ External API integrations (Amazon, Penguin Random House)
 - ✅ Infrastructure modifications
@@ -89,6 +99,7 @@
 - 💰 Minimal Azure costs ($0.50-$5.00)
 
 ### Scenario 3 (Production)
+
 - ✅ Everything real
 - ✅ Domain purchases
 - ✅ Real Stripe transactions
@@ -162,7 +173,8 @@ $config | ConvertTo-Json -Depth 10 | Out-File $configPath -Encoding UTF8
 Write-Host "Configuration updated in $configPath" -ForegroundColor Cyan
 ```
 
-## Usage:
+## Usage
+
 ```powershell
 # Switch to Scenario 1
 .\switch-scenario.ps1 -Scenario 1
