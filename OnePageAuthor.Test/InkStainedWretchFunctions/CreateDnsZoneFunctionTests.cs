@@ -35,7 +35,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             IReadOnlyList<DomainRegistrationEntity>? input = null;
 
             // Act
-            await _function.Run(input);
+            await _function.Run(input!);
 
             // Assert
             _mockLogger.Verify(

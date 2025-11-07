@@ -61,12 +61,12 @@ namespace OnePageAuthor.Test.Services
         [InlineData("", "Second level domain is required")]
         [InlineData("   ", "Second level domain is required")]
         [InlineData(null, "Second level domain is required")]
-        public void ValidateDomain_WithInvalidSecondLevelDomain_ReturnsInvalidResult(string secondLevelDomain, string expectedError)
+        public void ValidateDomain_WithInvalidSecondLevelDomain_ReturnsInvalidResult(string? secondLevelDomain, string expectedError)
         {
             // Arrange
             var domain = new Domain
             {
-                SecondLevelDomain = secondLevelDomain,
+                SecondLevelDomain = secondLevelDomain!,
                 TopLevelDomain = "com"
             };
 
@@ -146,13 +146,13 @@ namespace OnePageAuthor.Test.Services
         [InlineData("", "Top level domain is required")]
         [InlineData("   ", "Top level domain is required")]
         [InlineData(null, "Top level domain is required")]
-        public void ValidateDomain_WithInvalidTopLevelDomain_ReturnsInvalidResult(string topLevelDomain, string expectedError)
+        public void ValidateDomain_WithInvalidTopLevelDomain_ReturnsInvalidResult(string? topLevelDomain, string expectedError)
         {
             // Arrange
             var domain = new Domain
             {
                 SecondLevelDomain = "example",
-                TopLevelDomain = topLevelDomain
+                TopLevelDomain = topLevelDomain!
             };
 
             // Act
