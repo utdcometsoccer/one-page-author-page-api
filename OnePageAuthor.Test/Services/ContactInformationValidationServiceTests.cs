@@ -58,11 +58,11 @@ namespace OnePageAuthor.Test.Services
         [InlineData("   ", "First name is required")]
         [InlineData(null, "First name is required")]
         [InlineData("A", "First name must be at least 2 characters long")]
-        public void ValidateContactInformation_WithInvalidFirstName_ReturnsInvalidResult(string firstName, string expectedError)
+        public void ValidateContactInformation_WithInvalidFirstName_ReturnsInvalidResult(string? firstName, string expectedError)
         {
             // Arrange
             var contactInfo = CreateValidContactInformation();
-            contactInfo.FirstName = firstName;
+            contactInfo.FirstName = firstName!;
 
             // Act
             var result = _service.ValidateContactInformation(contactInfo);
@@ -110,11 +110,11 @@ namespace OnePageAuthor.Test.Services
         [InlineData("   ", "Last name is required")]
         [InlineData(null, "Last name is required")]
         [InlineData("S", "Last name must be at least 2 characters long")]
-        public void ValidateContactInformation_WithInvalidLastName_ReturnsInvalidResult(string lastName, string expectedError)
+        public void ValidateContactInformation_WithInvalidLastName_ReturnsInvalidResult(string? lastName, string expectedError)
         {
             // Arrange
             var contactInfo = CreateValidContactInformation();
-            contactInfo.LastName = lastName;
+            contactInfo.LastName = lastName!;
 
             // Act
             var result = _service.ValidateContactInformation(contactInfo);
@@ -132,11 +132,11 @@ namespace OnePageAuthor.Test.Services
         [InlineData("invalid@", "Email address format is invalid")]
         [InlineData("@invalid.com", "Email address format is invalid")]
         [InlineData("invalid..email@test.com", "Email address format is invalid")]
-        public void ValidateContactInformation_WithInvalidEmail_ReturnsInvalidResult(string email, string expectedError)
+        public void ValidateContactInformation_WithInvalidEmail_ReturnsInvalidResult(string? email, string expectedError)
         {
             // Arrange
             var contactInfo = CreateValidContactInformation();
-            contactInfo.EmailAddress = email;
+            contactInfo.EmailAddress = email!;
 
             // Act
             var result = _service.ValidateContactInformation(contactInfo);
@@ -151,11 +151,11 @@ namespace OnePageAuthor.Test.Services
         [InlineData("   ", "Address is required")]
         [InlineData(null, "Address is required")]
         [InlineData("123", "Address must be at least 5 characters long")]
-        public void ValidateContactInformation_WithInvalidAddress_ReturnsInvalidResult(string address, string expectedError)
+        public void ValidateContactInformation_WithInvalidAddress_ReturnsInvalidResult(string? address, string expectedError)
         {
             // Arrange
             var contactInfo = CreateValidContactInformation();
-            contactInfo.Address = address;
+            contactInfo.Address = address!;
 
             // Act
             var result = _service.ValidateContactInformation(contactInfo);
@@ -185,11 +185,11 @@ namespace OnePageAuthor.Test.Services
         [InlineData("   ", "City is required")]
         [InlineData(null, "City is required")]
         [InlineData("A", "City must be at least 2 characters long")]
-        public void ValidateContactInformation_WithInvalidCity_ReturnsInvalidResult(string city, string expectedError)
+        public void ValidateContactInformation_WithInvalidCity_ReturnsInvalidResult(string? city, string expectedError)
         {
             // Arrange
             var contactInfo = CreateValidContactInformation();
-            contactInfo.City = city;
+            contactInfo.City = city!;
 
             // Act
             var result = _service.ValidateContactInformation(contactInfo);
@@ -204,11 +204,11 @@ namespace OnePageAuthor.Test.Services
         [InlineData("   ", "State is required")]
         [InlineData(null, "State is required")]
         [InlineData("A", "State must be at least 2 characters long")]
-        public void ValidateContactInformation_WithInvalidState_ReturnsInvalidResult(string state, string expectedError)
+        public void ValidateContactInformation_WithInvalidState_ReturnsInvalidResult(string? state, string expectedError)
         {
             // Arrange
             var contactInfo = CreateValidContactInformation();
-            contactInfo.State = state;
+            contactInfo.State = state!;
 
             // Act
             var result = _service.ValidateContactInformation(contactInfo);
@@ -223,11 +223,11 @@ namespace OnePageAuthor.Test.Services
         [InlineData("   ", "Country is required")]
         [InlineData(null, "Country is required")]
         [InlineData("InvalidCountry", "Country 'InvalidCountry' is not supported")]
-        public void ValidateContactInformation_WithInvalidCountry_ReturnsInvalidResult(string country, string expectedError)
+        public void ValidateContactInformation_WithInvalidCountry_ReturnsInvalidResult(string? country, string expectedError)
         {
             // Arrange
             var contactInfo = CreateValidContactInformation();
-            contactInfo.Country = country;
+            contactInfo.Country = country!;
 
             // Act
             var result = _service.ValidateContactInformation(contactInfo);
@@ -243,11 +243,11 @@ namespace OnePageAuthor.Test.Services
         [InlineData(null, "ZIP code is required")]
         [InlineData("123", "ZIP code format is invalid for the specified country")]
         [InlineData("abcde", "ZIP code format is invalid for the specified country")]
-        public void ValidateContactInformation_WithInvalidZipCode_ReturnsInvalidResult(string zipCode, string expectedError)
+        public void ValidateContactInformation_WithInvalidZipCode_ReturnsInvalidResult(string? zipCode, string expectedError)
         {
             // Arrange
             var contactInfo = CreateValidContactInformation();
-            contactInfo.ZipCode = zipCode;
+            contactInfo.ZipCode = zipCode!;
 
             // Act
             var result = _service.ValidateContactInformation(contactInfo);
@@ -263,11 +263,11 @@ namespace OnePageAuthor.Test.Services
         [InlineData(null, "Telephone number is required")]
         [InlineData("abc", "Telephone number format is invalid")]
         [InlineData("123", "Telephone number format is invalid")]
-        public void ValidateContactInformation_WithInvalidPhoneNumber_ReturnsInvalidResult(string phoneNumber, string expectedError)
+        public void ValidateContactInformation_WithInvalidPhoneNumber_ReturnsInvalidResult(string? phoneNumber, string expectedError)
         {
             // Arrange
             var contactInfo = CreateValidContactInformation();
-            contactInfo.TelephoneNumber = phoneNumber;
+            contactInfo.TelephoneNumber = phoneNumber!;
 
             // Act
             var result = _service.ValidateContactInformation(contactInfo);
@@ -287,10 +287,10 @@ namespace OnePageAuthor.Test.Services
         [InlineData("@invalid.com", false)]
         [InlineData("", false)]
         [InlineData(null, false)]
-        public void IsValidEmail_WithVariousInputs_ReturnsExpectedResult(string email, bool expected)
+        public void IsValidEmail_WithVariousInputs_ReturnsExpectedResult(string? email, bool expected)
         {
             // Act
-            var result = _service.IsValidEmail(email);
+            var result = _service.IsValidEmail(email!);
 
             // Assert
             Assert.Equal(expected, result);
@@ -306,10 +306,10 @@ namespace OnePageAuthor.Test.Services
         [InlineData("123", false)]
         [InlineData("", false)]
         [InlineData(null, false)]
-        public void IsValidPhoneNumber_WithVariousInputs_ReturnsExpectedResult(string phoneNumber, bool expected)
+        public void IsValidPhoneNumber_WithVariousInputs_ReturnsExpectedResult(string? phoneNumber, bool expected)
         {
             // Act
-            var result = _service.IsValidPhoneNumber(phoneNumber);
+            var result = _service.IsValidPhoneNumber(phoneNumber!);
 
             // Assert
             Assert.Equal(expected, result);
