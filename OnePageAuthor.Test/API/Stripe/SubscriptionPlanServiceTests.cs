@@ -228,5 +228,67 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
             Assert.Equal("price_valid", result[0].Id);
             Assert.Equal("price_valid2", result[1].Id);
         }
+
+        [Theory]
+        [InlineData("Pro Monthly", "Pro Monthly", "Pro Monthly")] // Valid nickname should be used
+        [InlineData("", "Professional Plan", "Pro")] // Empty nickname should fall back to product name extraction
+        [InlineData(null, "Basic Starter Plan", "Basic")] // Null nickname should fall back to product name extraction
+        [InlineData("   ", "Enterprise Solution", "Enterprise")] // Whitespace nickname should fall back to product name extraction
+        [InlineData(null, "", "Plan")] // Both null/empty should result in default "Plan"
+        [InlineData("", null, "Plan")] // Both empty/null should result in default "Plan"
+        [InlineData(null, "   ", "Plan")] // Both null/whitespace should result in default "Plan"
+        [InlineData("Valid Nickname", "", "Valid Nickname")] // Valid nickname with empty product name
+        [InlineData("My Custom Label", "Some Product", "My Custom Label")] // Valid nickname should take precedence
+        public async Task MapToSubscriptionPlanAsync_Label_AlwaysHasValidValue(string? nickname, string? productName, string expectedLabel)
+        {
+            // Arrange
+            var priceDto = new PriceDto
+            {
+                Id = "price_test",
+                ProductId = "prod_test",
+                ProductName = productName ?? string.Empty,
+                ProductDescription = "Test description",
+                Nickname = nickname ?? string.Empty,
+                UnitAmount = 1000,
+                Currency = "usd",
+                Active = true,
+                CreatedDate = DateTime.UtcNow
+            };
+
+            // Act
+            var result = await _service.MapToSubscriptionPlanAsync(priceDto);
+
+            // Assert
+            Assert.NotNull(result.Label);
+            Assert.NotEmpty(result.Label);
+            Assert.Equal(expectedLabel, result.Label);
+            Assert.False(string.IsNullOrWhiteSpace(result.Label));
+        }
+
+        [Fact]
+        public async Task MapToSubscriptionPlanAsync_Label_HandlesComplexProductNames()
+        {
+            // Arrange
+            var priceDto = new PriceDto
+            {
+                Id = "price_test",
+                ProductId = "prod_test",
+                ProductName = "  Advanced   Premium   Solution  ",
+                ProductDescription = "Test description",
+                Nickname = string.Empty,
+                UnitAmount = 1000,
+                Currency = "usd",
+                Active = true,
+                CreatedDate = DateTime.UtcNow
+            };
+
+            // Act
+            var result = await _service.MapToSubscriptionPlanAsync(priceDto);
+
+            // Assert
+            Assert.NotNull(result.Label);
+            Assert.NotEmpty(result.Label);
+            Assert.Equal("Premium", result.Label); // Should extract "Premium" from the product name
+        }
     }
 }
