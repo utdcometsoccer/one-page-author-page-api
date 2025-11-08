@@ -233,6 +233,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<IListSubscriptions, ListSubscriptions>();
             services.AddScoped<ICancelSubscription, CancelSubscriptionService>();
             services.AddScoped<IUpdateSubscription, UpdateSubscriptionService>();
+            services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
             services.AddScoped<IInvoicePreview>(sp =>
             {
                 var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<InvoicePreviewService>>();
