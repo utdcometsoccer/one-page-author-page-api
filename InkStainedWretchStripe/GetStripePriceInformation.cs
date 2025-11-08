@@ -56,6 +56,17 @@ public class GetStripePriceInformation
                 return new BadRequestObjectResult(new { error = "Invalid request payload" });
             }
 
+            // Set default culture if not provided
+            if (string.IsNullOrEmpty(request.Culture))
+            {
+                request.Culture = "en-US"; // Default culture
+                _logger.LogDebug("No culture specified in request, using default culture: en-US");
+            }
+            else
+            {
+                _logger.LogInformation("Processing price request for culture: {Culture}", request.Culture);
+            }
+
             var result = await _priceService.GetPricesAsync(request);
             return new OkObjectResult(result);
         }

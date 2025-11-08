@@ -63,7 +63,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
 
             _innerServiceMock.Setup(x => x.GetPricesAsync(request))
                 .ReturnsAsync(priceListResponse);
-            _subscriptionPlanServiceMock.Setup(x => x.MapToSubscriptionPlansAsync(priceDtos))
+            _subscriptionPlanServiceMock.Setup(x => x.MapToSubscriptionPlansAsync(priceDtos, It.IsAny<string>()))
                 .ReturnsAsync(subscriptionPlans);
 
             // Act
@@ -80,7 +80,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
             Assert.Contains("Pro features", result.Plans[1].Features);
 
             _innerServiceMock.Verify(x => x.GetPricesAsync(request), Times.Once);
-            _subscriptionPlanServiceMock.Verify(x => x.MapToSubscriptionPlansAsync(priceDtos), Times.Once);
+            _subscriptionPlanServiceMock.Verify(x => x.MapToSubscriptionPlansAsync(priceDtos, It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
 
             _innerServiceMock.Setup(x => x.GetPriceByIdAsync(priceId))
                 .ReturnsAsync(priceDto);
-            _subscriptionPlanServiceMock.Setup(x => x.MapToSubscriptionPlanAsync(priceDto))
+            _subscriptionPlanServiceMock.Setup(x => x.MapToSubscriptionPlanAsync(priceDto, It.IsAny<string>()))
                 .ReturnsAsync(subscriptionPlan);
 
             // Act
@@ -124,7 +124,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
             Assert.Contains("Test features", result.Features);
 
             _innerServiceMock.Verify(x => x.GetPriceByIdAsync(priceId), Times.Once);
-            _subscriptionPlanServiceMock.Verify(x => x.MapToSubscriptionPlanAsync(priceDto), Times.Once);
+            _subscriptionPlanServiceMock.Verify(x => x.MapToSubscriptionPlanAsync(priceDto, It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -143,7 +143,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
             Assert.Null(result);
 
             _innerServiceMock.Verify(x => x.GetPriceByIdAsync(priceId), Times.Once);
-            _subscriptionPlanServiceMock.Verify(x => x.MapToSubscriptionPlanAsync(It.IsAny<PriceDto>()), Times.Never);
+            _subscriptionPlanServiceMock.Verify(x => x.MapToSubscriptionPlanAsync(It.IsAny<PriceDto>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -161,7 +161,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
 
             _innerServiceMock.Setup(x => x.GetPricesAsync(request))
                 .ReturnsAsync(priceListResponse);
-            _subscriptionPlanServiceMock.Setup(x => x.MapToSubscriptionPlansAsync(It.IsAny<IEnumerable<PriceDto>>()))
+            _subscriptionPlanServiceMock.Setup(x => x.MapToSubscriptionPlansAsync(It.IsAny<IEnumerable<PriceDto>>(), It.IsAny<string>()))
                 .ReturnsAsync(subscriptionPlans);
 
             // Act
@@ -174,7 +174,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
             Assert.Equal("", result.LastId);
 
             _innerServiceMock.Verify(x => x.GetPricesAsync(request), Times.Once);
-            _subscriptionPlanServiceMock.Verify(x => x.MapToSubscriptionPlansAsync(It.IsAny<IEnumerable<PriceDto>>()), Times.Once);
+            _subscriptionPlanServiceMock.Verify(x => x.MapToSubscriptionPlansAsync(It.IsAny<IEnumerable<PriceDto>>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -199,7 +199,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
 
             _innerServiceMock.Setup(x => x.GetPricesAsync(request))
                 .ReturnsAsync(priceListResponse);
-            _subscriptionPlanServiceMock.Setup(x => x.MapToSubscriptionPlansAsync(It.IsAny<IEnumerable<PriceDto>>()))
+            _subscriptionPlanServiceMock.Setup(x => x.MapToSubscriptionPlansAsync(It.IsAny<IEnumerable<PriceDto>>(), It.IsAny<string>()))
                 .ReturnsAsync(new List<SubscriptionPlan>());
 
             // Act

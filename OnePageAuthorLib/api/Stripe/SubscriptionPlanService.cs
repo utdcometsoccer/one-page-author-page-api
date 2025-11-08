@@ -16,35 +16,36 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             _logger = logger;
         }
 
-        public async Task<SubscriptionPlan> MapToSubscriptionPlanAsync(PriceDto priceDto)
+        public async Task<SubscriptionPlan> MapToSubscriptionPlanAsync(PriceDto priceDto, string? culture = null)
         {
             if (priceDto == null)
             {
                 throw new ArgumentNullException(nameof(priceDto));
             }
 
-            _logger.LogInformation("Mapping PriceDto to SubscriptionPlan for product {ProductId}", priceDto.ProductId);
+            _logger.LogInformation("Mapping PriceDto to SubscriptionPlan for product {ProductId} with culture {Culture}", priceDto.ProductId, culture ?? "default");
 
             var features = await GetProductFeaturesAsync(priceDto.ProductId, priceDto.ProductName, priceDto.ProductDescription);
+            var (localizedLabel, localizedName, localizedDescription) = await GetLocalizedContentAsync(priceDto.ProductId, priceDto.Nickname, priceDto.ProductName, priceDto.ProductDescription, culture);
 
             var plan = new SubscriptionPlan
             {
                 Id = priceDto.Id,
                 StripePriceId = priceDto.Id,
-                Label = GetValidLabel(priceDto.Nickname, priceDto.ProductName),
-                Name = priceDto.ProductName,
-                Description = priceDto.ProductDescription,
+                Label = GetValidLabel(localizedLabel, localizedName),
+                Name = localizedName,
+                Description = localizedDescription,
                 Price = priceDto.AmountDecimal,
                 Currency = priceDto.Currency.ToUpperInvariant(),
                 Duration = CalculateDurationInMonths(priceDto),
                 Features = features
             };
 
-            _logger.LogInformation("Successfully mapped SubscriptionPlan with {FeatureCount} features", features.Count);
+            _logger.LogInformation("Successfully mapped SubscriptionPlan with {FeatureCount} features for culture {Culture}", features.Count, culture ?? "default");
             return plan;
         }
 
-        public async Task<List<SubscriptionPlan>> MapToSubscriptionPlansAsync(IEnumerable<PriceDto> priceDtos)
+        public async Task<List<SubscriptionPlan>> MapToSubscriptionPlansAsync(IEnumerable<PriceDto> priceDtos, string? culture = null)
         {
             if (priceDtos == null)
             {
@@ -57,7 +58,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             {
                 try
                 {
-                    var plan = await MapToSubscriptionPlanAsync(priceDto);
+                    var plan = await MapToSubscriptionPlanAsync(priceDto, culture);
                     plans.Add(plan);
                 }
                 catch (Exception ex)
@@ -332,6 +333,155 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
 
             return features;
+        }
+
+        /// <summary>
+        /// Gets localized content for a product from Stripe metadata based on culture.
+        /// Falls back to default/original content if culture is not provided or localized content is not found.
+        /// </summary>
+        /// <param name="productId">The Stripe product ID</param>
+        /// <param name="originalNickname">The original price nickname</param>
+        /// <param name="originalName">The original product name</param>
+        /// <param name="originalDescription">The original product description</param>
+        /// <param name="culture">The culture code (e.g., "es-US", "fr-CA")</param>
+        /// <returns>Tuple containing localized nickname, name, and description</returns>
+        private async Task<(string nickname, string name, string description)> GetLocalizedContentAsync(string productId, string originalNickname, string originalName, string originalDescription, string? culture)
+        {
+            // If no culture specified, return original content
+            if (string.IsNullOrEmpty(culture))
+            {
+                _logger.LogDebug("No culture specified, using original content for product {ProductId}", productId);
+                return (originalNickname, originalName, originalDescription);
+            }
+
+            try
+            {
+                var productService = new ProductService();
+                var product = await productService.GetAsync(productId);
+
+                if (product?.Metadata == null)
+                {
+                    _logger.LogDebug("No metadata found for product {ProductId}, using original content", productId);
+                    return (originalNickname, originalName, originalDescription);
+                }
+
+                // Normalize culture code to handle different formats
+                var normalizedCulture = NormalizeCultureCode(culture);
+                _logger.LogDebug("Looking for localized content for product {ProductId} in culture {Culture}", productId, normalizedCulture);
+
+                // Look for culture-specific localized content in metadata
+                string localizedNickname = originalNickname;
+                string localizedName = originalName;
+                string localizedDescription = originalDescription;
+
+                // Check for localized nickname in metadata
+                var nicknameKey = GetCultureMetadataKey(product.Metadata, normalizedCulture, "localized_nickname");
+                if (!string.IsNullOrEmpty(nicknameKey) && product.Metadata.ContainsKey(nicknameKey))
+                {
+                    var metadataNickname = product.Metadata[nicknameKey];
+                    if (!string.IsNullOrEmpty(metadataNickname))
+                    {
+                        localizedNickname = metadataNickname;
+                        _logger.LogDebug("Found localized nickname for {Culture}: {Nickname}", normalizedCulture, localizedNickname);
+                    }
+                }
+
+                // Check for localized name in metadata
+                var nameKey = GetCultureMetadataKey(product.Metadata, normalizedCulture, "localized_name");
+                if (!string.IsNullOrEmpty(nameKey) && product.Metadata.ContainsKey(nameKey))
+                {
+                    var metadataName = product.Metadata[nameKey];
+                    if (!string.IsNullOrEmpty(metadataName))
+                    {
+                        localizedName = metadataName;
+                        _logger.LogDebug("Found localized name for {Culture}: {Name}", normalizedCulture, localizedName);
+                    }
+                }
+
+                // For description, we can fallback to a general localized description if available
+                // This would be stored in our StripeProductManager metadata
+                var descriptionFromMetadata = GetLocalizedDescriptionFromMetadata(product.Metadata, normalizedCulture);
+                if (!string.IsNullOrEmpty(descriptionFromMetadata))
+                {
+                    localizedDescription = descriptionFromMetadata;
+                    _logger.LogDebug("Found localized description for {Culture}", normalizedCulture);
+                }
+
+                return (localizedNickname, localizedName, localizedDescription);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error retrieving localized content for product {ProductId} culture {Culture}, using original content", productId, culture);
+                return (originalNickname, originalName, originalDescription);
+            }
+        }
+
+        /// <summary>
+        /// Normalizes culture code to a consistent format (e.g., "en-US")
+        /// </summary>
+        private string NormalizeCultureCode(string culture)
+        {
+            if (string.IsNullOrEmpty(culture))
+                return "en-US"; // Default culture
+
+            // Convert to lowercase and handle common variations
+            var normalized = culture.Trim().ToLowerInvariant();
+            
+            // Map common culture codes
+            return normalized switch
+            {
+                "en" or "english" => "en-US",
+                "es" or "spanish" => "es-US", 
+                "fr" or "french" => "fr-CA",
+                "en-us" => "en-US",
+                "en-ca" => "en-CA",
+                "es-us" => "es-US",
+                "es-mx" => "es-MX",
+                "fr-ca" => "fr-CA",
+                "fr-fr" => "fr-FR",
+                _ => culture // Return as-is if not recognized
+            };
+        }
+
+        /// <summary>
+        /// Gets the metadata key for a specific culture and content type
+        /// </summary>
+        private string GetCultureMetadataKey(IDictionary<string, string> metadata, string culture, string contentType)
+        {
+            // Look for culture-specific keys in metadata
+            // Format: culture_01_localized_name, culture_02_localized_nickname, etc.
+            var cultureKeys = metadata.Keys
+                .Where(k => k.Contains("_code") && metadata[k].Equals(culture, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            foreach (var cultureKey in cultureKeys)
+            {
+                // Extract culture index (e.g., "01" from "culture_01_code")
+                var parts = cultureKey.Split('_');
+                if (parts.Length >= 2)
+                {
+                    var cultureIndex = parts[1];
+                    var targetKey = $"culture_{cultureIndex}_{contentType}";
+                    
+                    if (metadata.ContainsKey(targetKey))
+                    {
+                        return targetKey;
+                    }
+                }
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Gets localized description from metadata if available
+        /// </summary>
+        private string GetLocalizedDescriptionFromMetadata(IDictionary<string, string> metadata, string culture)
+        {
+            // For now, we'll return the original description since the StripeProductManager
+            // stores localized descriptions in the configuration, not directly in Stripe metadata
+            // This could be enhanced in the future if needed
+            return string.Empty;
         }
     }
 }
