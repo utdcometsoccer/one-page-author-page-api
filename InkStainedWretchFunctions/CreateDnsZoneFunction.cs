@@ -41,6 +41,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 CreateLeaseContainerIfNotExists = true)]
             IReadOnlyList<DomainRegistration> input)
         {
+            _logger.LogInformation("=== CreateDnsZoneFunction triggered ===");
+            _logger.LogInformation("Input received: {InputCount} documents", input?.Count ?? 0);
+            
             if (input == null || input.Count == 0)
             {
                 _logger.LogInformation("No domain registrations to process");
