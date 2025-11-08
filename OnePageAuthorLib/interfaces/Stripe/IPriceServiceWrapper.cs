@@ -5,6 +5,6 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     public interface IPriceServiceWrapper
     {
         Task<SubscriptionPlanListResponse> GetPricesAsync(PriceListRequest request);
-        Task<SubscriptionPlan?> GetPriceByIdAsync(string priceId);
+        Task<SubscriptionPlan?> GetPriceByIdAsync(string priceId, string? culture = null);
     }
 }

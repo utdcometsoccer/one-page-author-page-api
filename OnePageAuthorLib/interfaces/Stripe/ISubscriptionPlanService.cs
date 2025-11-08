@@ -11,14 +11,16 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         /// Maps a PriceDto to a SubscriptionPlan with features retrieved from Stripe.
         /// </summary>
         /// <param name="priceDto">The price information from Stripe</param>
+        /// <param name="culture">Optional culture code for localized content. Falls back to default culture if not provided or invalid.</param>
         /// <returns>A subscription plan with populated features from Stripe product data</returns>
-        Task<SubscriptionPlan> MapToSubscriptionPlanAsync(PriceDto priceDto);
+        Task<SubscriptionPlan> MapToSubscriptionPlanAsync(PriceDto priceDto, string? culture = null);
 
         /// <summary>
         /// Maps multiple PriceDtos to SubscriptionPlans with features retrieved from Stripe.
         /// </summary>
         /// <param name="priceDtos">The price information list from Stripe</param>
+        /// <param name="culture">Optional culture code for localized content. Falls back to default culture if not provided or invalid.</param>
         /// <returns>A list of subscription plans with populated features from Stripe product data</returns>
-        Task<List<SubscriptionPlan>> MapToSubscriptionPlansAsync(IEnumerable<PriceDto> priceDtos);
+        Task<List<SubscriptionPlan>> MapToSubscriptionPlansAsync(IEnumerable<PriceDto> priceDtos, string? culture = null);
     }
 }

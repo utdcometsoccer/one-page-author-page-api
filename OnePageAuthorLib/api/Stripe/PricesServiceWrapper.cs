@@ -19,9 +19,9 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
         public async Task<SubscriptionPlanListResponse> GetPricesAsync(PriceListRequest request)
         {
-            _logger.LogDebug("Wrapper forwarding GetPricesAsync");
+            _logger.LogDebug("Wrapper forwarding GetPricesAsync with culture {Culture}", request.Culture ?? "default");
             var response = await _inner.GetPricesAsync(request);
-            var plans = await _subscriptionPlanService.MapToSubscriptionPlansAsync(response.Prices);
+            var plans = await _subscriptionPlanService.MapToSubscriptionPlansAsync(response.Prices, request.Culture);
             return new SubscriptionPlanListResponse
             {
                 LastId = response.LastId,
@@ -30,15 +30,15 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             };
         }
 
-        public async Task<SubscriptionPlan?> GetPriceByIdAsync(string priceId)
+        public async Task<SubscriptionPlan?> GetPriceByIdAsync(string priceId, string? culture = null)
         {
-            _logger.LogDebug("Wrapper forwarding GetPriceByIdAsync for {PriceId}", priceId);
+            _logger.LogDebug("Wrapper forwarding GetPriceByIdAsync for {PriceId} with culture {Culture}", priceId, culture ?? "default");
             var priceDto = await _inner.GetPriceByIdAsync(priceId);
             if (priceDto == null)
             {
                 return null;
             }
-            return await _subscriptionPlanService.MapToSubscriptionPlanAsync(priceDto);
+            return await _subscriptionPlanService.MapToSubscriptionPlanAsync(priceDto, culture);
         }
     }
 }

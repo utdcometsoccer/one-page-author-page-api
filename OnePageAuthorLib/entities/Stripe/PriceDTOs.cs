@@ -6,12 +6,14 @@ namespace InkStainedWretch.OnePageAuthorLib.Entities.Stripe
         {
             ProductId = string.Empty;
             Currency = string.Empty;
+            Culture = string.Empty;
         }
         public bool? Active { get; set; }
         public string ProductId { get; set; }
         public int? Limit { get; set; } = 100;
         public string Currency { get; set; }
         public bool IncludeProductDetails { get; set; } = true;
+        public string Culture { get; set; }
     }
 
     public class PriceListResponse
