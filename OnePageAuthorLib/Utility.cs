@@ -20,6 +20,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// </summary>
         /// <param name="price">The Stripe price DTO to map.</param>
         /// <returns>A populated <see cref="SubscriptionPlan"/> derived from the Stripe price.</returns>
+        [Obsolete("Use ISubscriptionPlanService.MapToSubscriptionPlanAsync instead for dependency injection and Stripe feature retrieval.")]
         public static SubscriptionPlan MapToSubscriptionPlan(PriceDto price)
         {
             if (price == null) throw new ArgumentNullException(nameof(price));
