@@ -31,7 +31,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             {
                 Id = priceDto.Id,
                 StripePriceId = priceDto.Id,
-                Label = priceDto.Nickname ?? ExtractLabelFromProductName(priceDto.ProductName),
+                Label = GetValidLabel(priceDto.Nickname, priceDto.ProductName),
                 Name = priceDto.ProductName,
                 Description = priceDto.ProductDescription,
                 Price = priceDto.AmountDecimal,
@@ -197,18 +197,36 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         }
 
         /// <summary>
+        /// Gets a valid, non-null, non-empty label from Stripe data, with fallbacks to ensure a value is always returned.
+        /// </summary>
+        /// <param name="nickname">The Stripe price nickname</param>
+        /// <param name="productName">The Stripe product name</param>
+        /// <returns>A guaranteed non-null, non-empty label</returns>
+        private string GetValidLabel(string? nickname, string? productName)
+        {
+            // First, try the nickname if it's not null or empty
+            if (!string.IsNullOrWhiteSpace(nickname))
+            {
+                return nickname.Trim();
+            }
+
+            // If nickname is null/empty, extract from product name
+            return ExtractLabelFromProductName(productName);
+        }
+
+        /// <summary>
         /// Extracts a short label from the product name for display purposes.
         /// </summary>
         /// <param name="productName">The full product name</param>
-        /// <returns>A short label extracted from the product name</returns>
-        private string ExtractLabelFromProductName(string productName)
+        /// <returns>A guaranteed non-null, non-empty label extracted from the product name</returns>
+        private string ExtractLabelFromProductName(string? productName)
         {
-            if (string.IsNullOrEmpty(productName))
+            if (string.IsNullOrWhiteSpace(productName))
             {
                 return "Plan";
             }
 
-            var name = productName.ToLowerInvariant();
+            var name = productName.Trim().ToLowerInvariant();
             
             if (name.Contains("basic") || name.Contains("starter"))
                 return "Basic";
@@ -219,7 +237,11 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             else if (name.Contains("enterprise") || name.Contains("business"))
                 return "Enterprise";
             else
-                return productName.Split(' ')[0]; // Use first word
+            {
+                // Use first word, but ensure it's not empty
+                var firstWord = productName.Trim().Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+                return !string.IsNullOrWhiteSpace(firstWord) ? firstWord : "Plan";
+            }
         }
 
         /// <summary>
