@@ -29,25 +29,174 @@ func start
 ```
 
 ## Configuration
-These settings are read from environment variables or local.settings.json:
-- STRIPE_API_KEY
-- STRIPE_WEBHOOK_SECRET (required for /api/WebHook signature verification)
 
-Add library/service configuration via `OnePageAuthorLib` as needed.
+### User Secrets Setup (Recommended for Development)
 
-Example local.settings.json (do not commit secrets):
+**Important**: This project requires sensitive configuration values that should NOT be stored in source control.
+
+#### Initialize User Secrets
+
+```bash
+cd InkStainedWretchStripe
+dotnet user-secrets init
+```
+
+#### Add Required Secrets
+
+Replace the placeholder values with your actual credentials:
+
+```bash
+# Stripe API Key (Get from Stripe Dashboard)
+dotnet user-secrets set "STRIPE_API_KEY" "sk_test_YOUR_ACTUAL_STRIPE_KEY"
+
+# Stripe Webhook Secret (Get from Stripe Dashboard)
+dotnet user-secrets set "STRIPE_WEBHOOK_SECRET" "whsec_YOUR_ACTUAL_WEBHOOK_SECRET"
+
+# Cosmos DB Primary Key (Get from Azure Portal)
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "YOUR_ACTUAL_COSMOS_KEY"
+
+# Azure AD Tenant ID (Get from Azure Portal)
+dotnet user-secrets set "AAD_TENANT_ID" "YOUR_ACTUAL_TENANT_ID"
+
+# Azure AD Client ID (Get from Azure Portal)
+dotnet user-secrets set "AAD_CLIENT_ID" "YOUR_ACTUAL_CLIENT_ID"
+
+# Azure AD Audience (Usually same as Client ID)
+dotnet user-secrets set "AAD_AUDIENCE" "YOUR_ACTUAL_CLIENT_ID"
+```
+
+#### Verify Setup
+
+```bash
+dotnet user-secrets list
+```
+
+You should see your secrets listed (values will be hidden for security).
+
+### Configuration Values
+
+These settings are read from user secrets, environment variables, or local.settings.json:
+
+| Setting | Description | Required |
+|---------|-------------|----------|
+| `STRIPE_API_KEY` | Stripe API secret key | Yes |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | Yes (for webhooks) |
+| `COSMOSDB_PRIMARY_KEY` | Cosmos DB access key | Yes |
+| `AAD_TENANT_ID` | Azure AD tenant ID | Yes |
+| `AAD_CLIENT_ID` | Azure AD application client ID | Yes |
+| `AAD_AUDIENCE` | Azure AD API audience | Yes |
+
+### Where to Find Your Values
+
+**Stripe API Key:**
+1. Go to [Stripe Dashboard](https://dashboard.stripe.com/)
+2. Navigate to Developers > API Keys
+3. Copy the "Secret key" (starts with `sk_test_` for test mode)
+
+**Stripe Webhook Secret:**
+1. Go to [Stripe Dashboard](https://dashboard.stripe.com/)
+2. Navigate to Developers > Webhooks
+3. Create or select a webhook endpoint
+4. Copy the "Signing secret" (starts with `whsec_`)
+
+**Cosmos DB Primary Key:**
+1. Go to [Azure Portal](https://portal.azure.com/)
+2. Navigate to your Cosmos DB account
+3. Go to Settings > Keys
+4. Copy the "Primary Key"
+
+**Azure AD Values:**
+1. Go to [Azure Portal](https://portal.azure.com/)
+2. Navigate to Azure Active Directory > App registrations
+3. Select your app registration
+4. Copy the "Application (client) ID" and "Directory (tenant) ID"
+
+### Example local.settings.json (Alternative Configuration Method)
+
+⚠️ **WARNING**: Do not commit secrets to source control!
+
+```json
 {
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "STRIPE_API_KEY": "sk_test_***",
-    "STRIPE_WEBHOOK_SECRET": "whsec_***"
+    "STRIPE_WEBHOOK_SECRET": "whsec_***",
+    "COSMOSDB_PRIMARY_KEY": "***",
+    "AAD_TENANT_ID": "***",
+    "AAD_CLIENT_ID": "***",
+    "AAD_AUDIENCE": "***"
   }
 }
+```
+
+Add library/service configuration via `OnePageAuthorLib` as needed.
 
 ## Deployment
-- Deploy as an Azure Functions app (v4, dotnet-isolated). Configure STRIPE_API_KEY as an app setting.
+
+### Production Deployment
+
+For production deployments:
+
+1. Deploy as an Azure Functions app (v4, dotnet-isolated)
+2. Configure settings as Azure App Settings (not in local.settings.json):
+   - `STRIPE_API_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+   - `COSMOSDB_PRIMARY_KEY`
+   - `AAD_TENANT_ID`
+   - `AAD_CLIENT_ID`
+   - `AAD_AUDIENCE`
+
+3. Optionally use Azure Key Vault for enhanced security:
+   ```bash
+   az keyvault secret set --vault-name <vault-name> --name STRIPE-API-KEY --value <key>
+   ```
+
+### Security Best Practices
+
+- ✅ **Never commit secrets to source control**
+- ✅ **Use user secrets for local development**
+- ✅ **Use environment variables or Azure App Settings for production**
+- ✅ **Use Azure Key Vault for sensitive production data**
+- ✅ **Rotate keys regularly**
+- ✅ **Use test keys (`sk_test_`) for development**
+- ✅ **Use live keys (`sk_live_`) only in production**
+- ❌ **Don't share secrets via email or chat**
+- ❌ **Don't hardcode secrets in your application**
+
+### Webhook Configuration
+
+For production webhook handling:
+
+1. In Stripe Dashboard, add webhook endpoint:
+   - URL: `https://<your-function-app>.azurewebsites.net/api/WebHook`
+   - Events to send: Select the events you want to handle (e.g., `invoice.payment_succeeded`)
+2. Copy the webhook signing secret
+3. Add as app setting: `STRIPE_WEBHOOK_SECRET=whsec_***`
+
+## Troubleshooting
+
+### "Configuration value not found" errors
+- Make sure you've run `dotnet user-secrets init`
+- Verify secrets are set with `dotnet user-secrets list`
+- Check that you're in the correct project directory
+
+### Authentication errors
+- Verify your Azure AD configuration matches your app registration
+- Check that the tenant ID and client ID are correct
+- Ensure your app registration has the necessary permissions
+
+### Stripe errors
+- Verify you're using the correct API key for your environment (test vs live)
+- Check that your Stripe account is active and in good standing
+- Ensure webhook secret matches the endpoint configuration
+
+### Webhook signature validation failures
+- Verify `STRIPE_WEBHOOK_SECRET` is set correctly
+- Check system clock synchronization (5-minute tolerance window)
+- Ensure the webhook endpoint URL matches Stripe configuration
+- Test with Stripe CLI: `stripe listen --forward-to localhost:7292/api/WebHook`
 
 ## Notes
 - Program.cs wires Application Insights, Function middleware, and registers Stripe-related services via `.AddStripeServices()`.
