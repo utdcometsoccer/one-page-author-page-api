@@ -46,6 +46,25 @@
             "console": "integratedTerminal",
             "stopAtEntry": false,
             "preLaunchTask": "build-amazon-console"
+        },
+        {
+            "name": "Launch Azure Storage Emulator",
+            "type": "node",
+            "request": "launch",
+            "program": "azurite",
+            "args": [
+                "--silent",
+                "--location", "${workspaceFolder}/.azurite",
+                "--debug", "${workspaceFolder}/.azurite/debug.log"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "presentation": {
+                "hidden": false,
+                "group": "Storage",
+                "order": 1
+            },
+            "stopOnEntry": false
         }
     ],
     "compounds": [
@@ -61,6 +80,21 @@
                 "hidden": false,
                 "group": "All Services",
                 "order": 1
+            }
+        },
+        {
+            "name": "Launch All Services (with Storage)",
+            "configurations": [
+                "Launch Azure Storage Emulator",
+                "Debug ImageAPI",
+                "Debug InkStainedWretchFunctions", 
+                "Debug InkStainedWretchStripe"
+            ],
+            "stopAll": true,
+            "presentation": {
+                "hidden": false,
+                "group": "All Services",
+                "order": 2
             }
         }
     ]

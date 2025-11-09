@@ -268,3 +268,4 @@ __pycache__/
 
 # Azurite (Azure Storage Emulator) database files
 __azurite_db_*.json
+.azurite/

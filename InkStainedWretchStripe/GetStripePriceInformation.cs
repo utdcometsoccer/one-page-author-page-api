@@ -67,6 +67,13 @@ public class GetStripePriceInformation
                 _logger.LogInformation("Processing price request for culture: {Culture}", request.Culture);
             }
 
+            // Ensure we only return active products
+            if (request.Active != true)
+            {
+                request.Active = true;
+                _logger.LogDebug("Setting Active filter to true to exclude inactive products");
+            }
+
             var result = await _priceService.GetPricesAsync(request);
             return new OkObjectResult(result);
         }
