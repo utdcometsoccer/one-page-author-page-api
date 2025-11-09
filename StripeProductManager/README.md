@@ -57,7 +57,14 @@ dotnet user-secrets set "Stripe:SecretKey" "sk_test_your_actual_stripe_secret_ke
 
 **Option B: Environment Variable**
 ```bash
+# Windows (PowerShell)
+$env:STRIPE__SECRETKEY = "sk_test_your_actual_stripe_secret_key"
+
+# Windows (Command Prompt)
 set STRIPE__SECRETKEY=sk_test_your_actual_stripe_secret_key
+
+# Linux/Mac
+export STRIPE__SECRETKEY=sk_test_your_actual_stripe_secret_key
 ```
 
 **Option C: Update appsettings.json**
@@ -68,6 +75,19 @@ set STRIPE__SECRETKEY=sk_test_your_actual_stripe_secret_key
   }
 }
 ```
+
+**Option D: Environment-Specific Configuration**
+
+Create environment-specific configuration files:
+```bash
+# For development
+cp appsettings.json appsettings.Development.json
+
+# For production
+cp appsettings.json appsettings.Production.json
+```
+
+Then customize pricing for each environment. The application automatically loads the appropriate file based on `ASPNETCORE_ENVIRONMENT`.
 
 ### 2. Build and Run
 
@@ -124,19 +144,110 @@ The application includes comprehensive error handling:
 ===============================================
 
 🔄 Processing: Ink Stained Wretch - Annual Subscription
+   📍 Cultures: en-US (primary), es-US, fr-CA, en-CA, es-MX, fr-FR
+   🌐 Localized versions: 3 languages
 ✅ Product created/updated: prod_abc123
 ✅ Price created/updated: price_def456 (Nickname: 1 year subscription)
 
-🔄 Processing: Ink Stained Wretch - 2-Year Subscription  
+🔄 Processing: Ink Stained Wretch - 2-Year Subscription
+   📍 Cultures: en-US (primary), es-US, fr-CA, en-CA, es-MX, fr-FR
+   🌐 Localized versions: 3 languages
 ✅ Product created/updated: prod_ghi789
 ✅ Price created/updated: price_jkl012 (Nickname: 2 year subscription)
 
 🔄 Processing: Ink Stained Wretch - 3-Year Subscription
+   📍 Cultures: en-US (primary), es-US, fr-CA, en-CA, es-MX, fr-FR
+   🌐 Localized versions: 3 languages
 ✅ Product created/updated: prod_mno345
 ✅ Price created/updated: price_pqr678 (Nickname: 3 year subscription)
 
 ✅ All products and prices have been successfully created/updated!
+✅ Culture information added to all products!
 ```
+
+## Culture and Internationalization Support
+
+### Supported Languages
+
+The application includes comprehensive culture information for internationalization:
+
+#### English Variants
+- **en-US**: English (United States) - Primary
+- **en-CA**: English (Canada)
+
+#### Spanish Variants
+- **es-US**: Spanish (United States)
+- **es-MX**: Spanish (Mexico)
+
+#### French Variants
+- **fr-CA**: French (Canada)
+- **fr-FR**: French (France)
+
+### Culture-Specific Features
+
+Each product includes localized names, descriptions, and pricing nicknames:
+
+**Example - Annual Subscription:**
+- **English (en-US)**: "Ink Stained Wretch - Annual Subscription" / "1 year subscription"
+- **Spanish (es-US)**: "Escritor Manchado de Tinta - Suscripción Anual" / "suscripción de 1 año"
+- **French (fr-CA)**: "Écrivain Taché d'Encre - Abonnement Annuel" / "abonnement de 1 an"
+
+### Enhanced Stripe Metadata
+
+Products include rich culture metadata:
+- `supported_cultures`: Comma-separated list of supported culture codes
+- `primary_language`: Primary culture code
+- `multi_language`: Boolean indicating multi-language support
+- `culture_count`: Number of supported cultures
+- `localized_versions`: Number of cultures with localized content
+- `culture_XX_code`: Individual culture codes
+- `culture_XX_name`: Culture display names
+- `culture_XX_localized_name`: Product name in that culture
+- `culture_XX_localized_nickname`: Price nickname in that culture
+
+### Configuration Example
+
+```json
+{
+  "Name": "Ink Stained Wretch - Annual Subscription",
+  "SupportedCultures": ["en-US", "en-CA", "es-US", "es-MX", "fr-CA", "fr-FR"],
+  "PrimaryCulture": "en-US",
+  "CultureSpecificInfo": {
+    "en-US": {
+      "LocalizedName": "Ink Stained Wretch - Annual Subscription",
+      "LocalizedDescription": "Complete author management platform...",
+      "LocalizedNickname": "1 year subscription"
+    },
+    "es-US": {
+      "LocalizedName": "Escritor Manchado de Tinta - Suscripción Anual",
+      "LocalizedDescription": "Plataforma completa de gestión de autores...",
+      "LocalizedNickname": "suscripción de 1 año"
+    },
+    "fr-CA": {
+      "LocalizedName": "Écrivain Taché d'Encre - Abonnement Annuel",
+      "LocalizedDescription": "Plateforme complète de gestion d'auteurs...",
+      "LocalizedNickname": "abonnement de 1 an"
+    }
+  }
+}
+```
+
+### Managing Cultures
+
+**Adding New Cultures:**
+1. Add culture code to `SupportedCultures` array
+2. Add entry to `CultureSpecificInfo` with localized content
+3. Run the application to update Stripe products
+
+**Changing Primary Culture:**
+1. Update `PrimaryCulture` field in configuration
+2. Ensure the primary culture exists in `SupportedCultures`
+3. Re-run the application to update metadata
+
+**Removing Cultures:**
+1. Remove culture code from `SupportedCultures`
+2. Remove corresponding entry from `CultureSpecificInfo`
+3. Re-run to clean up Stripe metadata
 
 ## Integration with Your Platform
 
@@ -152,3 +263,82 @@ Console.WriteLine($"Features: {string.Join(", ", subscriptionPlan.Features)}");
 ```
 
 This ensures your subscription plans have rich feature information directly from Stripe, making them consistent across your entire platform.
+
+## Customizing Products
+
+### Product & Pricing Configuration
+
+The application reads product definitions and pricing from `appsettings.json`. You can customize products, descriptions, and prices by editing the configuration:
+
+```json
+{
+  "Stripe": {
+    "Products": [
+      {
+        "Name": "Custom Plan - Monthly",
+        "Description": "Monthly subscription with all features",
+        "PriceInCents": 999,
+        "PriceNickname": "monthly plan",
+        "IntervalCount": 1,
+        "PlanType": "monthly"
+      },
+      {
+        "Name": "Custom Plan - Annual",
+        "Description": "Annual subscription with discount",
+        "PriceInCents": 9900,
+        "PriceNickname": "annual plan",
+        "IntervalCount": 1,
+        "PlanType": "annual"
+      }
+    ]
+  }
+}
+```
+
+### Customization Options
+
+To change pricing, cultures, or add new products:
+
+1. **Modify existing products**: Edit the `PriceInCents` value (e.g., 5900 = $59.00)
+2. **Add new products**: Add new entries to the `Products` array
+3. **Change billing cycles**: Modify `IntervalCount` (1 = yearly, 2 = every 2 years, etc.)
+4. **Update descriptions**: Edit the `Description` field for each product
+5. **Add cultures**: Modify `SupportedCultures` array and add entries to `CultureSpecificInfo`
+6. **Change primary language**: Update `PrimaryCulture` field
+
+## Verifying in Stripe Dashboard
+
+1. Log into your [Stripe Dashboard](https://dashboard.stripe.com/)
+2. Go to **Products** → **Products**
+3. You should see your "Ink Stained Wretch" products
+4. Click on any product to see the rich metadata
+5. Go to **Products** → **Prices** to see the pricing configurations
+
+## Troubleshooting
+
+### Error: "Stripe:SecretKey is required"
+- Make sure you've set your Stripe API key using one of the methods above
+- Verify the key starts with `sk_test_` for test mode or `sk_live_` for live mode
+
+### Error: "Invalid API Key"
+- Double-check your Stripe API key is correct
+- Ensure you're using the correct key for your Stripe account
+- Make sure the key hasn't expired or been revoked
+
+### Error: Network/Connection Issues
+- Check your internet connection
+- Verify you can access https://api.stripe.com
+- Check if you're behind a corporate firewall
+
+### Warning: "Stripe.net version resolved to newer version"
+- This is harmless - NuGet automatically resolved to a newer compatible version
+- The application will work correctly with Stripe.net 47.0.0
+
+## Next Steps
+
+After running the application:
+
+1. **Test Integration**: Verify your `SubscriptionPlanService` picks up the new features
+2. **Update UI**: Your subscription selection UI now has rich feature data
+3. **Customize Features**: Edit the metadata in Stripe Dashboard to add/remove features
+4. **Go Live**: When ready, switch to live Stripe keys and run again
