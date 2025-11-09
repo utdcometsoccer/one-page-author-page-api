@@ -33,12 +33,200 @@ The ImageAPI provides a comprehensive image management system for the OnePageAut
 
 ## 🔌 API Endpoints
 
+### Overview
+
 | Method | Endpoint | Description | Authentication |
 |--------|----------|-------------|----------------|
 | `POST` | `/api/images/upload` | Upload image file | Required |
 | `GET` | `/api/images/user` | Get user's images | Required |
 | `DELETE` | `/api/images/{imageId}` | Delete image | Required |
 | `GET` | `/api/whoami` | Get user info | Required |
+
+### 1. Upload Image
+
+**Endpoint:** `POST /api/images/upload`
+
+**Description:** Upload an image file to Azure Blob Storage with subscription tier validation.
+
+**Headers:**
+- `Authorization: Bearer <token>` (required)
+
+**Body:**
+- `file`: Image file (multipart/form-data)
+
+**Limits:**
+File size and count limits depend on subscription tier:
+- **Starter (Free)**: Max 5MB file size, 20 files max
+- **Pro ($9.99/month)**: Max 10MB file size, 500 files max
+- **Elite ($19.99/month)**: Max 25MB file size, 2000 files max
+
+**Responses:**
+
+**201 Created** - Image uploaded successfully
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "url": "https://storage.blob.core.windows.net/images/filename.jpg",
+  "name": "filename.jpg",
+  "size": 1048576
+}
+```
+
+**400 Bad Request** - File too large for subscription tier
+```json
+{
+  "error": "File size exceeds limit for your subscription tier."
+}
+```
+
+**403 Forbidden** - User has reached upload limit
+```json
+{
+  "error": "Maximum number of files reached for your subscription tier."
+}
+```
+
+**402 Payment Required** - Bandwidth limit exceeded
+```json
+{
+  "error": "Bandwidth limit exceeded for your subscription tier."
+}
+```
+
+**507 Insufficient Storage** - Storage quota exceeded
+```json
+{
+  "error": "Storage quota exceeded for your subscription tier."
+}
+```
+
+**401 Unauthorized** - Invalid or missing token
+
+**Example:**
+```bash
+curl -X POST "https://your-api.azurewebsites.net/api/images/upload" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "file=@image.jpg"
+```
+
+### 2. List User Images
+
+**Endpoint:** `GET /api/images/user`
+
+**Description:** Get a list of all images uploaded by the authenticated user.
+
+**Headers:**
+- `Authorization: Bearer <token>` (required)
+
+**Responses:**
+
+**200 OK** - Returns array of user images
+```json
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "url": "https://storage.blob.core.windows.net/images/filename1.jpg",
+    "name": "filename1.jpg",
+    "size": 1048576,
+    "uploadedAt": "2024-01-15T10:30:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "url": "https://storage.blob.core.windows.net/images/filename2.jpg",
+    "name": "filename2.jpg",
+    "size": 2097152,
+    "uploadedAt": "2024-01-16T14:45:00Z"
+  }
+]
+```
+
+**401 Unauthorized** - Invalid or missing token
+
+**Example:**
+```bash
+curl -X GET "https://your-api.azurewebsites.net/api/images/user" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### 3. Delete Image
+
+**Endpoint:** `DELETE /api/images/{id}`
+
+**Description:** Delete an image by its ID. Only the image owner can delete their images.
+
+**Headers:**
+- `Authorization: Bearer <token>` (required)
+
+**Path Parameters:**
+- `id`: Image ID (UUID)
+
+**Responses:**
+
+**200 OK** - Image deleted successfully
+```json
+{
+  "message": "Image deleted successfully"
+}
+```
+
+**404 Not Found** - Image not found
+```json
+{
+  "error": "Image not found"
+}
+```
+
+**401 Unauthorized** - Invalid or missing token
+
+**403 Forbidden** - User does not own this image
+
+**Example:**
+```bash
+curl -X DELETE "https://your-api.azurewebsites.net/api/images/550e8400-e29b-41d4-a716-446655440000" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### 4. WhoAmI
+
+**Endpoint:** `GET /api/whoami`
+
+**Description:** Get information about the authenticated user from JWT token claims.
+
+**Headers:**
+- `Authorization: Bearer <token>` (required)
+
+**Responses:**
+
+**200 OK** - Returns user information
+```json
+{
+  "userId": "user@example.com",
+  "claims": {
+    "upn": "user@example.com",
+    "name": "John Doe",
+    "roles": ["user"]
+  }
+}
+```
+
+**401 Unauthorized** - Invalid or missing token
+
+**Example:**
+```bash
+curl -X GET "https://your-api.azurewebsites.net/api/whoami" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+## Error Codes
+
+| Code | Description | Common Causes |
+|------|-------------|---------------|
+| `400` | Bad Request | File too large for subscription tier |
+| `401` | Unauthorized | Missing or invalid JWT token |
+| `402` | Payment Required | Bandwidth limit exceeded |
+| `403` | Forbidden | Upload limit reached, or not image owner |
+| `404` | Not Found | Image not found |
+| `507` | Insufficient Storage | Storage quota exceeded |
 
 ## 🚀 Quick Start
 
