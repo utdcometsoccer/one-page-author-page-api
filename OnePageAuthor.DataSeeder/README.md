@@ -194,3 +194,90 @@ Each StateProvince entry contains:
 - **Error Handling**: Continues processing even if individual records fail
 - **Multi-language Support**: Proper culture-specific naming conventions in 6 languages
 - **Data Preservation**: Existing entries are not deleted or modified
+- **User Secrets Integration**: Secure configuration management for development
+- **Enhanced Data Model**: Separate Country field for efficient querying
+
+## Change History
+
+### Idempotent Seeder Implementation
+The seeder was enhanced to implement true idempotent behavior:
+- **Before**: Deleted all existing StateProvince entries before creating new ones (destructive)
+- **After**: Checks if each entry exists before creating, skips existing entries, preserves all data
+- Provides detailed logging: created count, skipped count, error count
+
+**Testing Idempotent Behavior:**
+- First run: All 594 entries created
+- Second run: All 594 entries skipped
+- Partial data: Only missing entries created
+
+### Data Model Enhancement
+**Code Structure Change:**
+- **Before**: ISO 3166-2 format with country prefixes (e.g., `US-CA`, `CA-ON`, `MX-JAL`)
+- **After**: Simplified codes with separate Country field (e.g., Code: `CA`, Country: `US`)
+
+**Benefits:**
+- Cleaner, more intuitive state/province codes
+- Better separation of concerns (Country vs. State)
+- More flexible querying capabilities
+- Dedicated Country field enables efficient country-based queries
+
+**Sample Transformations:**
+| Region | Old Code | New Code | Country | Name Example |
+|--------|----------|----------|---------|--------------|
+| California | `US-CA` | `CA` | `US` | California/Californie |
+| Ontario | `CA-ON` | `ON` | `CA` | Ontario |
+| Jalisco | `MX-JAL` | `JAL` | `MX` | Jalisco |
+
+### Language Support Enhancement
+**Initial Support:**
+- US: English, French, Spanish (3 languages)
+- Canada: English, French (2 languages)
+- Mexico: Spanish, English, French (3 languages)
+
+**Enhanced Support:**
+- All North American countries now support 6 languages:
+  - English: `en-US`, `en-CA`, `en-MX`
+  - French: `fr-US`, `fr-CA`, `fr-MX`
+  - Spanish: `es-US`, `es-CA`, `es-MX`
+  - Arabic: `ar-US`, `ar-CA`, `ar-MX`
+  - Simplified Chinese: `zh-CN`
+  - Traditional Chinese: `zh-TW`
+
+**Translation Examples:**
+
+*US State - California:*
+- English (en-US): "California"
+- French (fr-US): "Californie"
+- Spanish (es-US): "California"
+- Arabic (ar-US): "كاليفورنيا"
+- Simplified Chinese (zh-CN): "加利福尼亚州"
+- Traditional Chinese (zh-TW): "加利福尼亞州"
+
+*Canadian Province - Quebec:*
+- English (en-CA): "Quebec"
+- French (fr-CA): "Québec"
+- Spanish (es-CA): "Quebec"
+- Arabic (ar-CA): "كيبك"
+- Simplified Chinese (zh-CN): "魁北克省"
+- Traditional Chinese (zh-TW): "魁北克省"
+
+### User Secrets Integration
+Enhanced security through user secrets configuration:
+- **Security**: Secrets stored outside source code
+- **Team Safety**: No risk of committing sensitive data
+- **Environment Isolation**: Development secrets separate from production
+- **Configuration Hierarchy**: User Secrets → Environment Variables → appsettings.json
+
+**Already Configured:**
+```powershell
+# Secrets are pre-configured for Cosmos DB Emulator
+dotnet user-secrets set "CosmosDb:Endpoint" "https://localhost:8081"
+dotnet user-secrets set "CosmosDb:Key" "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
+dotnet user-secrets set "CosmosDb:Database" "OnePageAuthorDB"
+```
+
+### Repository and Service Updates
+- Updated `GetByCountryAsync()` to query by Country field instead of code prefix
+- Updated `GetByCountryAndCultureAsync()` to use Country field
+- Maintained backward compatibility for existing queries
+- Updated validation in service layer from ISO 3166-2 format to 2-3 character code validation
