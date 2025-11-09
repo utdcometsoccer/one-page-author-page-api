@@ -36,7 +36,8 @@ Place JSON files in `data/` with this pattern:
 - **Standard format**: `inkstainedwretch.<language>-<country>.json` (e.g., `inkstainedwretch.en-us.json`)
 - **Extended format**: `inkstainedwretch.<language-variant>-<country>.json` (e.g., `inkstainedwretch.zh-cn-us.json`, `inkstainedwretch.zh-tw-ca.json`)
 
-Each top-level property name should match a POCO/container name (e.g., `Navbar`, `ThankYou`, `ArticleList`). Values can be an object or array.
+Each top-level property name should match a POCO/container name (e.g.,
+avbar`, `ThankYou`, `ArticleList`). Values can be an object or array.
 
 ### North America Locales Included
 The seeder includes comprehensive localization for all North American countries:

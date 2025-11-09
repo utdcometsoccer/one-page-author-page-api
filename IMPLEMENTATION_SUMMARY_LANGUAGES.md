@@ -8,7 +8,8 @@ This document summarizes the implementation of the GetLanguages API endpoint as 
 ### ✅ Core Functionality
 - **Function Implementation**: Created `GetLanguages` Azure Function in InkStainedWretchFunctions project
 - **Endpoint Route**: `GET /api/languages/{language}`
-- **Response Format**: Returns array of JSON objects with `code` and `name` properties
+- **Response Format**: Returns array of JSON objects with `code` and
+ame` properties
   ```json
   [
     { "code": "en", "name": "English" },
@@ -17,7 +18,8 @@ This document summarizes the implementation of the GetLanguages API endpoint as 
   ```
 
 ### ✅ Technical Implementation
-- **Entity**: `Language` entity with `id`, `Code`, `Name`, and `RequestLanguage` properties
+- **Entity**: `Language` entity with `id`, `Code`,
+ame`, and `RequestLanguage` properties
 - **Repository**: `LanguageRepository` implementing `ILanguageRepository` with Cosmos DB queries
 - **Service**: `LanguageService` implementing `ILanguageService` with business logic
 - **Container Manager**: `LanguagesContainerManager` for Cosmos DB container setup

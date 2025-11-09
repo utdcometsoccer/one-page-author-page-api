@@ -22,7 +22,8 @@ The seeder supports the following languages as specified in the issue:
 Each language data file (`languages-{language}.json`) contains an array of language entries with:
 
 - `Code`: ISO 639-1 two-letter language code (e.g., "en", "es", "fr")
-- `Name`: Localized name of the language
+-
+ame`: Localized name of the language
 - `RequestLanguage`: The language in which the name is provided (partition key)
 
 ## Configuration

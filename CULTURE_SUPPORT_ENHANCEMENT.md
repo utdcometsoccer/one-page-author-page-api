@@ -1,14 +1,17 @@
 # Culture Support Enhancement for GetStripePriceInformation
 
 ## Overview
+
 Enhanced the `GetStripePriceInformation` Azure Function to support culture-specific subscription plans while providing fallback to default culture when none is specified.
 
 ## Changes Made
 
 ### 1. Enhanced Request Model
+
 **File**: `OnePageAuthorLib\entities\Stripe\PriceDTOs.cs`
 
 Added `Culture` property to `PriceListRequest`:
+
 ```csharp
 public class PriceListRequest
 {
@@ -18,9 +21,11 @@ public class PriceListRequest
 ```
 
 ### 2. Updated Service Interfaces
+
 **File**: `OnePageAuthorLib\interfaces\Stripe\ISubscriptionPlanService.cs`
 
 Added culture parameter to interface methods:
+
 ```csharp
 Task<SubscriptionPlan> MapToSubscriptionPlanAsync(PriceDto priceDto, string? culture = null);
 Task<List<SubscriptionPlan>> MapToSubscriptionPlansAsync(IEnumerable<PriceDto> priceDtos, string? culture = null);
@@ -29,30 +34,35 @@ Task<List<SubscriptionPlan>> MapToSubscriptionPlansAsync(IEnumerable<PriceDto> p
 **File**: `OnePageAuthorLib\interfaces\Stripe\IPriceServiceWrapper.cs`
 
 Added culture support to wrapper interface:
+
 ```csharp
 Task<SubscriptionPlan?> GetPriceByIdAsync(string priceId, string? culture = null);
 ```
 
 ### 3. Enhanced Service Implementation
+
 **File**: `OnePageAuthorLib\api\Stripe\SubscriptionPlanService.cs`
 
-#### New Localization Methods:
+#### New Localization Methods
 
 1. **`GetLocalizedContentAsync`**: Retrieves culture-specific content from Stripe metadata
 2. **`NormalizeCultureCode`**: Normalizes culture codes to consistent format
 3. **`GetCultureMetadataKey`**: Finds metadata keys for specific cultures
 4. **`GetLocalizedDescriptionFromMetadata`**: Gets localized descriptions (placeholder for future enhancement)
 
-#### Culture Mapping:
+#### Culture Mapping
+
 - `en` or `english` → `en-US`
 - `es` or `spanish` → `es-US`
 - `fr` or `french` → `fr-CA`
 - Plus explicit mappings for `en-CA`, `es-MX`, `fr-FR`, etc.
 
 ### 4. Updated Function Implementation
+
 **File**: `InkStainedWretchStripe\GetStripePriceInformation.cs`
 
 Enhanced to set default culture and log culture usage:
+
 ```csharp
 // Set default culture if not provided
 if (string.IsNullOrEmpty(request.Culture))
@@ -69,6 +79,7 @@ else
 ## Usage Examples
 
 ### API Request with Culture
+
 ```json
 {
   "active": true,
@@ -78,6 +89,7 @@ else
 ```
 
 ### API Request without Culture (uses default)
+
 ```json
 {
   "active": true,
@@ -98,7 +110,7 @@ else
 
 The system looks for culture-specific metadata in Stripe products created by the `StripeProductManager`:
 
-```
+```text
 culture_01_code: "en-US"
 culture_01_localized_name: "Ink Stained Wretch - Annual Subscription"
 culture_01_localized_nickname: "1 year subscription"
@@ -111,6 +123,7 @@ culture_02_localized_nickname: "suscripción de 1 año"
 ## Supported Cultures
 
 Default configuration supports:
+
 - **English**: `en-US` (default), `en-CA`
 - **Spanish**: `es-US`, `es-MX`
 - **French**: `fr-CA`, `fr-FR`

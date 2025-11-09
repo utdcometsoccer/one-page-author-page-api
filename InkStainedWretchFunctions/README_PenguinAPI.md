@@ -12,7 +12,8 @@ Searches for authors by name and returns the raw JSON response from Penguin Rand
 **Parameters:**
 - Query parameter: `?authorName=Stephen King`
 - Or JSON body: `{"authorName": "Stephen King"}`
-- Alternative parameter names: `author`, `name`
+- Alternative parameter names: `author`,
+ame`
 
 **Example Usage:**
 ```bash
