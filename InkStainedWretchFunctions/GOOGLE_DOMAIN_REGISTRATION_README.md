@@ -9,20 +9,24 @@ This document describes the **GoogleDomainRegistrationFunction** - an Azure Func
 ### Components
 
 1. **GoogleDomainRegistrationFunction** (InkStainedWretchFunctions)
+
    - Azure Function with Cosmos DB trigger
    - Orchestrates domain registration flow
    - Minimal logic - delegates to service layer
 
 2. **IGoogleDomainsService** (OnePageAuthorLib/interfaces)
+
    - Interface defining Google Domains API operations
    - Follows dependency injection pattern
 
 3. **GoogleDomainsService** (OnePageAuthorLib/api)
+
    - Implements business logic for domain registration
    - Integrates with Google Cloud Domains API
    - Handles error scenarios and logging
 
 4. **Unit Tests** (OnePageAuthor.Test)
+
    - GoogleDomainsServiceTests
    - Validates service behavior and error handling
 
@@ -40,6 +44,7 @@ The function uses a unique lease prefix to avoid conflicts with other triggers o
     LeaseContainerName = "leases",
     LeaseContainerPrefix = "googledomainregistration",
     CreateLeaseContainerIfNotExists = true)]
+
 ```
 
 ### Processing Flow
@@ -53,6 +58,7 @@ The function uses a unique lease prefix to avoid conflicts with other triggers o
 ### Google Domains API Integration
 
 The service uses the official Google.Cloud.Domains.V1 NuGet package (v2.4.0) which provides:
+
 - Domain registration capabilities
 - Domain availability checking
 - Contact information management
@@ -70,6 +76,7 @@ The following environment variables/app settings are required:
 ### Authentication
 
 The service uses Application Default Credentials (ADC) for Google Cloud authentication:
+
 - In Azure, configure Managed Identity
 - Grant the identity appropriate permissions in Google Cloud (Domain Registration Admin)
 - Workload Identity Federation recommended for production
@@ -81,13 +88,16 @@ The service uses Application Default Credentials (ADC) for Google Cloud authenti
 Registers a domain using the Google Domains API.
 
 **Parameters:**
+
 - `domainRegistration` - Domain registration information from Cosmos DB
 
 **Returns:**
+
 - `true` if registration initiated successfully
 - `false` if validation fails or API call errors
 
 **Behavior:**
+
 - Validates input parameters
 - Creates Google Domains client
 - Builds registration request with contact information
@@ -99,15 +109,18 @@ Registers a domain using the Google Domains API.
 Checks if a domain is available for registration.
 
 **Parameters:**
+
 - `domainName` - Full domain name to check
 
 **Returns:**
+
 - `true` if domain is available
 - `false` if unavailable or error occurs
 
 ## Error Handling
 
 The function is designed to be resilient:
+
 - Validates all inputs before API calls
 - Catches and logs exceptions per registration
 - Continues processing remaining registrations on error
@@ -123,6 +136,7 @@ public static IServiceCollection AddGoogleDomainsService(this IServiceCollection
     services.AddScoped<Interfaces.IGoogleDomainsService, API.GoogleDomainsService>();
     return services;
 }
+
 ```
 
 Registered in `Program.cs`:
@@ -133,11 +147,13 @@ builder.Services
     .AddCosmosDatabase(databaseId!)
     // ... other services ...
     .AddGoogleDomainsService(); // Add Google Domains service
+
 ```
 
 ## Testing
 
 Unit tests cover:
+
 - Constructor validation (null parameters, missing configuration)
 - RegisterDomainAsync validation (null/empty inputs)
 - IsDomainAvailableAsync validation
@@ -148,9 +164,13 @@ Tests use Moq for mocking dependencies.
 ## NuGet Dependencies
 
 ### OnePageAuthorLib
+
+
 - **Google.Cloud.Domains.V1** (v2.4.0) - Google Cloud Domains API client
 
 ### InkStainedWretchFunctions  
+
+
 - No additional packages required (references OnePageAuthorLib)
 
 ## Deployment Checklist
@@ -167,11 +187,13 @@ Tests use Moq for mocking dependencies.
 ## Monitoring and Observability
 
 The function provides detailed logging:
+
 - Information level: Processing progress, operation status
 - Warning level: Validation failures, skipped registrations
 - Error level: API failures, unexpected exceptions
 
 Monitor using:
+
 - Application Insights
 - Azure Functions logs
 - Cosmos DB monitoring (lease container activity)
@@ -179,10 +201,12 @@ Monitor using:
 ## Comparison with Existing Functions
 
 This function follows the same pattern as:
+
 - **DomainRegistrationTriggerFunction** - Adds domains to Azure Front Door
 - **CreateDnsZoneFunction** - Creates Azure DNS zones
 
 Key similarities:
+
 - Uses Cosmos DB trigger on DomainRegistrations
 - Unique lease prefix prevents conflicts
 - Minimal function logic with service delegation
@@ -207,6 +231,7 @@ Key similarities:
 ## Future Enhancements
 
 Potential improvements:
+
 - Track long-running operation status
 - Update DomainRegistration status when complete
 - Implement retry logic for failed registrations
@@ -218,19 +243,23 @@ Potential improvements:
 ## Support and Troubleshooting
 
 Common issues:
+
 1. **"GOOGLE_CLOUD_PROJECT_ID configuration is required"**
    - Ensure environment variable is set in Function App configuration
 
 2. **Authentication errors**
+
    - Verify Managed Identity is configured
    - Check Google Cloud IAM permissions
 
 3. **Domain registration fails**
+
    - Verify domain is available
    - Check contact information is complete and valid
    - Review Google Cloud Domains API quotas
 
 4. **Function not triggering**
+
    - Verify Cosmos DB connection string
    - Check lease container exists
    - Review Application Insights for errors

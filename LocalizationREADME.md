@@ -24,7 +24,8 @@ Each top-level section is stored in its own Cosmos DB container. The partition k
 | AuthorRegistration | `AuthorRegistration` | `/Culture` |
 | LoginRegister | `LoginRegister` | `/Culture` |
 | ThankYou | `ThankYou` | `/Culture` |
-| Navbar | `Navbar` | `/Culture` |
+| Navbar |
+avbar` | `/Culture` |
 | DomainRegistration | `DomainRegistration` | `/Culture` |
 | ErrorPage | `ErrorPage` | `/Culture` |
 | ImageManager | `ImageManager` | `/Culture` |

@@ -51,7 +51,8 @@ Added comprehensive tests to verify Label validation:
 ## Guarantees
 
 The enhanced implementation guarantees:
-- ✅ Label is never `null`
+- ✅ Label is never
+ull`
 - ✅ Label is never empty string (`""`)
 - ✅ Label is never whitespace-only (`"   "`)
 - ✅ Label always contains at least one non-whitespace character
@@ -64,11 +65,15 @@ The enhanced implementation guarantees:
 | Nickname | Product Name | Result Label |
 |----------|--------------|--------------|
 | "Pro Monthly" | "Professional Plan" | "Pro Monthly" |
-| `null` | "Basic Starter Plan" | "Basic" |
+|
+ull` | "Basic Starter Plan" | "Basic" |
 | `""` | "Enterprise Solution" | "Enterprise" |
 | `"   "` | "Premium Package" | "Premium" |
-| `null` | `null` | "Plan" |
+|
+ull` |
+ull` | "Plan" |
 | "Custom Label" | "Whatever Name" | "Custom Label" |
-| `null` | "  Advanced   Premium   Solution  " | "Premium" |
+|
+ull` | "  Advanced   Premium   Solution  " | "Premium" |
 
 This ensures that the Label field will always be suitable for display in UI components and will never cause null reference exceptions or empty display issues.

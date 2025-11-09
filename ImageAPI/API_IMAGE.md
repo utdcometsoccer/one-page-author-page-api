@@ -5,18 +5,21 @@ This API allows users to upload images to Azure Blob Storage, retrieve a list of
 ## Service Tiers
 
 ### Starter (Free)
+
 - **Storage:** 5GB
 - **Bandwidth:** 25GB
 - **Max file size:** 5MB
 - **Max files:** 20
 
 ### Pro ($9.99/month)
+
 - **Storage:** 250GB
 - **Bandwidth:** 1TB
 - **Max file size:** 10MB
 - **Max files:** 500
 
 ### Elite ($19.99/month)
+
 - **Storage:** 2TB
 - **Bandwidth:** 10TB
 - **Max file size:** 25MB
@@ -25,6 +28,7 @@ This API allows users to upload images to Azure Blob Storage, retrieve a list of
 ## Endpoints
 
 ### 1. Upload Image
+
 - **POST** `/api/images/upload`
 - **Description:** Upload an image file to Azure Blob Storage.
 - **Headers:**
@@ -42,6 +46,7 @@ This API allows users to upload images to Azure Blob Storage, retrieve a list of
   - `401 Unauthorized`: Invalid or missing token.
 
 ### 2. List User Images
+
 - **GET** `/api/images/user`
 - **Description:** Get a list of all images uploaded by the authenticated user.
 - **Headers:**
@@ -51,6 +56,7 @@ This API allows users to upload images to Azure Blob Storage, retrieve a list of
   - `401 Unauthorized`: Invalid or missing token.
 
 ### 3. Delete Image
+
 - **DELETE** `/api/images/{id}`
 - **Description:** Delete an image by its ID.
 - **Headers:**
@@ -61,6 +67,7 @@ This API allows users to upload images to Azure Blob Storage, retrieve a list of
   - `401 Unauthorized`: Invalid or missing token.
 
 ## Error Codes
+
 - `400`: Bad Request (e.g., file too large for subscription tier)
 - `401`: Unauthorized
 - `402`: Payment Required (e.g., bandwidth limit exceeded)
@@ -69,6 +76,7 @@ This API allows users to upload images to Azure Blob Storage, retrieve a list of
 - `507`: Insufficient Storage (storage quota exceeded)
 
 ## Notes
+
 - All endpoints require authentication.
 - Images are stored in Azure Blob Storage and returned with public URLs.
 - File size, file count, storage, and bandwidth limits are enforced based on subscription tier.

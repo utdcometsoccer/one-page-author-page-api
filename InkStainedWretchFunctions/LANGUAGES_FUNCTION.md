@@ -44,7 +44,8 @@ The endpoint returns an array of language objects in JSON format:
 
 Each language object contains:
 - `code`: ISO 639-1 two-letter language code (lowercase)
-- `name`: Localized name of the language in the requested language
+-
+ame`: Localized name of the language in the requested language
 
 ## Supported Languages
 

@@ -10,7 +10,8 @@ This document outlines the complete boilerplate code generated for storing `Stat
 **File**: `OnePageAuthorLib\entities\StateProvince.cs` *(Already existed)*
 - **Purpose**: Data model representing states/provinces with ISO 3166-2 codes
 - **Partition Key**: `Code` (e.g., "US-CA", "CA-ON")
-- **Properties**: `id`, `Code`, `Name`
+- **Properties**: `id`, `Code`,
+ame`
 
 ### 2. Container Manager
 **File**: `OnePageAuthorLib\nosql\StateProvincesContainerManager.cs`

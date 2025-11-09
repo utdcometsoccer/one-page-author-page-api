@@ -1,11 +1,13 @@
 # Active Products Filter Enhancement
 
 ## Overview
+
 Enhanced the `GetStripePriceInformation` Azure Function to automatically filter out inactive products by ensuring the `Active` property is always set to `true` in the request.
 
 ## Changes Made
 
 ### Enhanced Function Logic
+
 **File**: `InkStainedWretchStripe\GetStripePriceInformation.cs`
 
 Added automatic filtering for active products:
@@ -22,11 +24,14 @@ if (request.Active != true)
 ## How It Works
 
 ### Before Enhancement
+
 - The function would pass through whatever `Active` value was provided in the request
-- If `Active` was `null` or `false`, inactive products could be returned
+- If `Active` was
+ull` or `false`, inactive products could be returned
 - Callers needed to remember to explicitly set `Active = true`
 
 ### After Enhancement
+
 - The function **automatically ensures** `Active = true` is set
 - Inactive products are **always filtered out** regardless of the input
 - Provides consistent behavior and prevents accidental inclusion of inactive products
@@ -37,6 +42,7 @@ if (request.Active != true)
 ### Request Examples
 
 **Request with Active explicitly set to true** (no change):
+
 ```json
 {
   "active": true,
@@ -44,9 +50,11 @@ if (request.Active != true)
   "culture": "en-US"
 }
 ```
+
 → Behavior unchanged, active filter already applied
 
 **Request with Active set to false** (now changed to true):
+
 ```json
 {
   "active": false,
@@ -54,15 +62,18 @@ if (request.Active != true)
   "culture": "en-US"
 }
 ```
+
 → Automatically changed to `active: true` and logged
 
 **Request without Active property** (now defaults to true):
+
 ```json
 {
   "limit": 10,
   "culture": "en-US"
 }
 ```
+
 → Automatically set to `active: true` and logged
 
 ## Integration with Existing Services
@@ -87,7 +98,7 @@ The enhancement works seamlessly with the existing service architecture:
 
 The function now logs when the active filter is automatically applied:
 
-```
+```text
 [DEBUG] Setting Active filter to true to exclude inactive products
 ```
 
@@ -106,12 +117,15 @@ This enhancement is particularly valuable for:
 ## Technical Details
 
 ### Filter Priority
+
 The function checks `if (request.Active != true)` which means:
+
 - `Active = true` → No change (already correct)
 - `Active = false` → Changed to `true` (filtered)
 - `Active = null` → Changed to `true` (filtered)
 
 ### Service Chain
+
 1. `GetStripePriceInformation` → Sets `Active = true`
 2. `PricesServiceWrapper` → Passes request through
 3. `PricesService` → Maps to Stripe API options

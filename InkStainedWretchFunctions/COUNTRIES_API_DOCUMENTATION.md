@@ -56,7 +56,8 @@ Returns a JSON object with language, count, and array of countries:
 Each country object contains:
 
 - `code` (string): ISO 3166-1 alpha-2 country code (2 uppercase letters)
-- `name` (string): Localized country name in the requested language
+-
+ame` (string): Localized country name in the requested language
 
 Countries are returned sorted alphabetically by name in the requested language.
 
