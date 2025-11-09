@@ -46,14 +46,24 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
                 var stripeResponse = await service.ListAsync(options);
 
+                // Map Stripe prices to DTOs
+                var mappedPrices = stripeResponse.Data
+                    .Select(MapStripePriceToDto)
+                    .Where(p => p is not null)
+                    .Cast<PriceDto>();
+
+                // Apply LINQ filtering based on request parameters
+                var filteredPrices = ApplyFilters(mappedPrices, request);
+
                 var response = new PriceListResponse
                 {
-                    Prices = stripeResponse.Data.Select(MapStripePriceToDto).Where(p => p is not null).Cast<PriceDto>().ToList(),
+                    Prices = filteredPrices.ToList(),
                     HasMore = stripeResponse.HasMore,
                     LastId = stripeResponse.Data.LastOrDefault()?.Id ?? string.Empty
                 };
 
-                _logger.LogInformation("Retrieved {Count} Stripe prices", response.Prices.Count);
+                _logger.LogInformation("Retrieved {Count} Stripe prices (filtered from {TotalCount})", 
+                    response.Prices.Count, stripeResponse.Data.Count);
                 return response;
             }
             catch (StripeException ex)
@@ -104,6 +114,23 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 _logger.LogError(ex, "Error retrieving Stripe price {PriceId}", priceId);
                 throw;
             }
+        }
+
+        private IEnumerable<PriceDto> ApplyFilters(IEnumerable<PriceDto> prices, PriceListRequest? request)
+        {
+            if (request == null)
+            {
+                return prices;
+            }
+
+            // Filter by Active status using LINQ
+            if (request.Active.HasValue)
+            {
+                _logger.LogDebug("Applying LINQ filter for Active={Active}", request.Active.Value);
+                prices = prices.Where(p => p.Active == request.Active.Value);
+            }
+
+            return prices;
         }
 
         private PriceDto? MapStripePriceToDto(Price? price)
