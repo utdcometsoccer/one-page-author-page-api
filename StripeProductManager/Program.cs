@@ -299,39 +299,28 @@ namespace InkStainedWretch.StripeProductManager
             return new List<string>
             {
                 // Authentication & Identity
-                "Microsoft Entra ID Integration",
                 "Single Sign-On (SSO)",
                 "User Profile Management",
-                "Identity Claims Processing",
-                "Session Management",
                 
                 // Image Management
                 "Multi-Format Image Upload",
-                "Azure Blob Storage Integration",
-                "Tier-Based Storage Plans",
                 "Image Organization & Retrieval",
                 "Secure Upload & Access Control",
                 
                 // Domain Registration
                 "Custom Domain Registration",
                 "Domain Validation Services",
-                "Automated DNS Zone Creation",
                 "SSL Certificate Management",
                 "Domain Portfolio Management",
                 
                 // Payment & Subscriptions
-                "Stripe Payment Integration",
                 "Recurring Billing Management",
                 "Multiple Payment Methods",
-                "Invoice Management",
-                "Payment Analytics",
                 
                 // Content Discovery
                 "Penguin Random House Integration",
-                "Amazon Product API",
                 "Book Search & Discovery",
                 "Author Search Functionality",
-                "Affiliate Marketing Support",
                 
                 // Internationalization
                 "Multi-Language Support (6 languages)",
@@ -349,33 +338,12 @@ namespace InkStainedWretch.StripeProductManager
                 "International Address Formats",
                 "Geographic Search",
                 
-                // Developer Features
-                "RESTful API Design",
-                "API Documentation",
-                "Rate Limiting",
-                "API Versioning",
-                "Webhook Support",
-                
-                // Infrastructure
-                "Azure Functions Serverless",
-                "Azure Cosmos DB",
-                "Azure Front Door CDN",
-                "Auto-Scaling",
-                "Global Distribution",
-                
                 // Security & Compliance
                 "Enterprise Security",
                 "Data Encryption",
                 "Role-Based Access Control",
                 "Audit Logging",
                 "WCAG Compliance",
-                
-                // Business Intelligence
-                "Usage Analytics",
-                "Revenue Tracking",
-                "Performance Insights",
-                "Custom Reporting",
-                "Real-Time Monitoring",
                 
                 // Accessibility
                 "Cross-Platform Support",
