@@ -23,7 +23,9 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 var service = new PriceService();
                 var options = new PriceListOptions
                 {
-                    // Don't pass Active filter to Stripe API - we'll filter manually with LINQ
+                    // Pass Active filter to Stripe API for efficiency (reduces data transfer)
+                    // We'll also apply LINQ filtering for additional control
+                    Active = request?.Active,
                     Limit = request?.Limit ?? 100
                 };
 
@@ -53,13 +55,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     .Cast<PriceDto>();
 
                 // Apply LINQ filtering based on request parameters
-                var filteredPrices = ApplyFilters(mappedPrices, request);
+                var filteredPrices = ApplyFilters(mappedPrices, request).ToList();
 
                 var response = new PriceListResponse
                 {
-                    Prices = filteredPrices.ToList(),
+                    Prices = filteredPrices,
                     HasMore = stripeResponse.HasMore,
-                    LastId = stripeResponse.Data.LastOrDefault()?.Id ?? string.Empty
+                    LastId = filteredPrices.LastOrDefault()?.Id ?? string.Empty
                 };
 
                 _logger.LogInformation("Retrieved {Count} Stripe prices (filtered from {TotalCount})", 
@@ -123,8 +125,10 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 return prices;
             }
 
-            // Manually filter by Active status using LINQ (not delegated to Stripe API)
-            // This gives us explicit control over the filtering logic
+            // Apply LINQ filtering by Active status for complete control
+            // Note: We also pass the Active filter to Stripe API for efficiency,
+            // but LINQ filtering ensures we have explicit control over the results
+            // and allows for additional filtering logic beyond what Stripe API supports
             if (request.Active.HasValue)
             {
                 _logger.LogDebug("Applying LINQ filter for Active={Active}", request.Active.Value);
