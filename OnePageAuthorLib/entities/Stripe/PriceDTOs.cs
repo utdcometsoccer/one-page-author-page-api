@@ -32,6 +32,7 @@ namespace InkStainedWretch.OnePageAuthorLib.Entities.Stripe
         public long? UnitAmount { get; set; }
         public string Currency { get; set; } = string.Empty;
         public bool Active { get; set; }
+        public bool ProductActive { get; set; }
         public string Nickname { get; set; } = string.Empty;
         public string LookupKey { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
@@ -44,5 +45,11 @@ namespace InkStainedWretch.OnePageAuthorLib.Entities.Stripe
             ? $"{RecurringIntervalCount} {RecurringInterval}{(RecurringIntervalCount > 1 ? "s" : "")}"
             : "One-time";
         public DateTime CreatedDate { get; set; }
+        
+        /// <summary>
+        /// Indicates if both the price and its associated product are active.
+        /// For subscription plans to be truly available, both must be active.
+        /// </summary>
+        public bool IsFullyActive => Active && ProductActive;
     }
 }

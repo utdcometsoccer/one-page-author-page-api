@@ -41,7 +41,9 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     options.Currency = currency;
                 }
 
-                if (request?.IncludeProductDetails == true)
+                // Always expand product details when Active filtering is requested
+                // This is required to check both Price.Active and Product.Active status
+                if (request?.IncludeProductDetails == true || request?.Active.HasValue == true)
                 {
                     options.Expand = new List<string> { "data.product" };
                 }
@@ -54,6 +56,18 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     .Where(p => p is not null)
                     .Cast<PriceDto>();
 
+                // Log debug info if filtering by Active status
+                if (request?.Active.HasValue == true)
+                {
+                    var allPrices = mappedPrices.ToList();
+                    var activePrices = allPrices.Count(p => p.Active);
+                    var activeProducts = allPrices.Count(p => p.ProductActive);
+                    var fullyActive = allPrices.Count(p => p.Active && p.ProductActive);
+                    
+                    _logger.LogDebug("Before filtering: Total={Total}, ActivePrices={ActivePrices}, ActiveProducts={ActiveProducts}, FullyActive={FullyActive}",
+                        allPrices.Count, activePrices, activeProducts, fullyActive);
+                }
+
                 // Apply LINQ filtering based on request parameters
                 var filteredPrices = ApplyFilters(mappedPrices, request).ToList();
 
@@ -65,8 +79,8 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     LastId = stripeResponse.Data.LastOrDefault()?.Id ?? string.Empty
                 };
 
-                _logger.LogInformation("Retrieved {Count} Stripe prices (filtered from {TotalCount})", 
-                    response.Prices.Count, stripeResponse.Data.Count);
+                _logger.LogInformation("Retrieved {Count} Stripe prices (filtered from {TotalCount}) with Active filter: {ActiveFilter}", 
+                    response.Prices.Count, stripeResponse.Data.Count, request?.Active?.ToString() ?? "null");
                 return response;
             }
             catch (StripeException ex)
@@ -133,7 +147,19 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             if (request.Active.HasValue)
             {
                 _logger.LogDebug("Applying LINQ filter for Active={Active}", request.Active.Value);
-                prices = prices.Where(p => p.Active == request.Active.Value);
+                
+                if (request.Active.Value)
+                {
+                    // When filtering for active items, ensure BOTH price and product are active
+                    // This is crucial for subscription plans - both price and product must be active
+                    prices = prices.Where(p => p.Active && p.ProductActive);
+                    _logger.LogDebug("Applied enhanced active filter: both Price.Active and Product.Active must be true");
+                }
+                else
+                {
+                    // When filtering for inactive items, show items where price is inactive
+                    prices = prices.Where(p => p.Active == false);
+                }
             }
 
             return prices;
@@ -152,6 +178,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 UnitAmount = price.UnitAmount,
                 Currency = price.Currency ?? string.Empty,
                 Active = price.Active,
+                ProductActive = price.Product?.Active ?? false,
                 Nickname = price.Nickname ?? string.Empty,
                 LookupKey = price.LookupKey ?? string.Empty,
                 Type = price.Type ?? string.Empty,
