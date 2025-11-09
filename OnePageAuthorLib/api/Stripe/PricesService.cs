@@ -23,6 +23,8 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 var service = new PriceService();
                 var options = new PriceListOptions
                 {
+                    // Pass Active filter to Stripe API for efficiency (reduces data transfer)
+                    // We'll also apply LINQ filtering for additional control
                     Active = request?.Active,
                     Limit = request?.Limit ?? 100
                 };
@@ -46,14 +48,25 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
                 var stripeResponse = await service.ListAsync(options);
 
+                // Map Stripe prices to DTOs
+                var mappedPrices = stripeResponse.Data
+                    .Select(MapStripePriceToDto)
+                    .Where(p => p is not null)
+                    .Cast<PriceDto>();
+
+                // Apply LINQ filtering based on request parameters
+                var filteredPrices = ApplyFilters(mappedPrices, request).ToList();
+
                 var response = new PriceListResponse
                 {
-                    Prices = stripeResponse.Data.Select(MapStripePriceToDto).Where(p => p is not null).Cast<PriceDto>().ToList(),
+                    Prices = filteredPrices,
                     HasMore = stripeResponse.HasMore,
+                    // Use LastId from Stripe response for proper cursor-based pagination
                     LastId = stripeResponse.Data.LastOrDefault()?.Id ?? string.Empty
                 };
 
-                _logger.LogInformation("Retrieved {Count} Stripe prices", response.Prices.Count);
+                _logger.LogInformation("Retrieved {Count} Stripe prices (filtered from {TotalCount})", 
+                    response.Prices.Count, stripeResponse.Data.Count);
                 return response;
             }
             catch (StripeException ex)
@@ -104,6 +117,26 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 _logger.LogError(ex, "Error retrieving Stripe price {PriceId}", priceId);
                 throw;
             }
+        }
+
+        private IEnumerable<PriceDto> ApplyFilters(IEnumerable<PriceDto> prices, PriceListRequest? request)
+        {
+            if (request == null)
+            {
+                return prices;
+            }
+
+            // Apply LINQ filtering by Active status for complete control
+            // Note: We also pass the Active filter to Stripe API for efficiency,
+            // but LINQ filtering ensures we have explicit control over the results
+            // and allows for additional filtering logic beyond what Stripe API supports
+            if (request.Active.HasValue)
+            {
+                _logger.LogDebug("Applying LINQ filter for Active={Active}", request.Active.Value);
+                prices = prices.Where(p => p.Active == request.Active.Value);
+            }
+
+            return prices;
         }
 
         private PriceDto? MapStripePriceToDto(Price? price)
