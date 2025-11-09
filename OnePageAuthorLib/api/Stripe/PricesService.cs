@@ -23,7 +23,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 var service = new PriceService();
                 var options = new PriceListOptions
                 {
-                    Active = request?.Active,
+                    // Don't pass Active filter to Stripe API - we'll filter manually with LINQ
                     Limit = request?.Limit ?? 100
                 };
 
@@ -123,11 +123,8 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 return prices;
             }
 
-            // Filter by Active status using LINQ
-            // Note: While we pass the Active filter to Stripe API for efficiency,
-            // we apply LINQ filtering here as a safeguard and to ensure complete
-            // control over results, allowing for scenarios where API filtering
-            // may not be sufficient or when additional filtering logic is needed
+            // Manually filter by Active status using LINQ (not delegated to Stripe API)
+            // This gives us explicit control over the filtering logic
             if (request.Active.HasValue)
             {
                 _logger.LogDebug("Applying LINQ filter for Active={Active}", request.Active.Value);
