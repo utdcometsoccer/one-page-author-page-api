@@ -5,34 +5,46 @@
 ### Step 1: Prepare for History Cleanup
 
 1. **Create a backup** (in case anything goes wrong):
+
+
    ```powershell
+
    git clone --mirror . ../backup-$(Get-Date -Format 'yyyy-MM-dd-HHmmss')
+
    ```
 
 2. **Commit any pending changes**:
+
+
    ```powershell
+
    git add .
    git commit -m "Prepare for secret cleanup"
+
    ```
 
 ### Step 2: Use BFG Repo-Cleaner (RECOMMENDED)
 
 **Option A: Download BFG**
-- Download `bfg.jar` from: https://rtyley.github.io/bfg-repo-cleaner/
+
+- Download `bfg.jar` from: <https://rtyley.github.io/bfg-repo-cleaner/>
 - Requires Java (install if needed)
 
 **Option B: Use Package Manager**
+
 ```powershell
 # Windows (Scoop)
 scoop install bfg
 
 # macOS (Homebrew)  
 brew install bfg
+
 ```
 
 ### Step 3: Create Secret Replacements File
 
 Create `replacements.txt` in your repository root:
+
 ```
 zSxwMnRf3gKKUEDvO8nMmZ5pJJM2SLB6igMVeFFXfjBGvFSil2YjG2qowoe096iV0SaM0cZxey1EACDbuLmQBA====>***REMOVED***
 zSxwMnRf3gKKUEDvO8nMmZ5pJJM2SLB6igMVeFFXgjBGvFSil2YjG2qowoe096iV0SaM0cZxey1EACDbuLmQBA====>***REMOVED***
@@ -42,6 +54,7 @@ AKPAEB227N1760409523==>***REMOVED***
 5c6d167a-2c48-4da0-8a21-29340b0f461e==>***REMOVED***
 f2b0b4ad-ba25-4f5e-b72a-2a6c51ebdb73==>***REMOVED***
 planar-root-475103-h7==>***REMOVED***
+
 ```
 
 ### Step 4: Clean Repository History
@@ -60,6 +73,7 @@ git gc --prune=now --aggressive
 
 # Force push cleaned history
 git push --force
+
 ```
 
 ### Step 5: Update Your Local Repository
@@ -72,6 +86,7 @@ Remove-Item -Recurse -Force one-page-author-page-api
 # Re-clone the cleaned repository
 git clone https://github.com/utdcometsoccer/one-page-author-page-api.git
 cd one-page-author-page-api
+
 ```
 
 ### Step 6: Set Up User Secrets for Development
@@ -90,6 +105,7 @@ dotnet user-secrets set "AMAZON_PRODUCT_SECRET_KEY" "your-actual-amazon-secret"
 dotnet user-secrets set "AAD_TENANT_ID" "your-actual-tenant-id"
 dotnet user-secrets set "AAD_CLIENT_ID" "your-actual-client-id" 
 dotnet user-secrets set "GOOGLE_CLOUD_PROJECT_ID" "your-actual-project-id"
+
 ```
 
 ### Step 7: Test Your Setup
@@ -98,6 +114,7 @@ dotnet user-secrets set "GOOGLE_CLOUD_PROJECT_ID" "your-actual-project-id"
 # Build and test the application
 dotnet build
 dotnet run  # or func start
+
 ```
 
 ### Step 8: Notify Team Members
@@ -105,15 +122,15 @@ dotnet run  # or func start
 Send this message to all team members:
 
 > **🚨 URGENT: Repository History Cleaned**
-> 
+>
 > The Git history has been cleaned to remove exposed secrets.
-> 
+>
 > **YOU MUST:**
 > 1. Delete your local clone
-> 2. Re-clone from GitHub  
+> 2. Re-clone from GitHub
 > 3. Set up user secrets (see instructions in repository)
 > 4. DO NOT push old branches or commits
-> 
+>
 > **DO NOT commit secrets to the repository again!**
 
 ### Step 9: Clean Up Temporary Files
@@ -122,6 +139,7 @@ Send this message to all team members:
 # Remove temporary files
 Remove-Item replacements.txt -Force
 Remove-Item -Recurse -Force temp-clean.git
+
 ```
 
 ## ✅ Verification

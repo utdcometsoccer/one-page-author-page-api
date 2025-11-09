@@ -38,24 +38,30 @@ Given these limitations, the authorization system uses:
 ## Prerequisites
 
 ### 1. Management Application Registration
+
 Create an App Registration in Azure AD for this management tool:
 
 - **Name**: `OnePageAuthor-RoleManager` (or similar)
 - **Account types**: `Accounts in this organizational directory only (Single tenant)`
 - **API Permissions**:
+
   - `Microsoft Graph` → `Application.ReadWrite.All` (Application permission)
   - `Microsoft Graph` → `AppRoleAssignment.ReadWrite.All` (Application permission)
   - **Grant admin consent** for these permissions
+
 - **Certificates & secrets**: Create a client secret
 
-### 2. Target Application Registration  
+### 2. Target Application Registration
+
 Your existing ImageAPI app registration should be configured for Microsoft Account users:
 
-- **Account types**: `Personal Microsoft accounts only` 
+- **Account types**: `Personal Microsoft accounts only`
 - **Authentication**: Configure redirect URIs as needed
 - This app will receive the roles created by the management tool
 
 ### 3. Additional Requirements
+
+
 - Cosmos DB access to read ImageStorageTiers and ImageStorageTierMemberships
 - Both applications must be in the same Azure AD tenant
 
@@ -82,6 +88,7 @@ dotnet user-secrets set "AAD_MANAGEMENT_CLIENT_SECRET" "your-management-app-clie
 
 # Target App (ImageAPI app configured for Microsoft Account users)
 dotnet user-secrets set "AAD_TARGET_CLIENT_ID" "your-imageapi-app-client-id"
+
 ```
 
 ### Environment Variables Alternative
@@ -96,6 +103,7 @@ AAD_TENANT_ID=<your-tenant-id>
 AAD_MANAGEMENT_CLIENT_ID=<management-app-client-id>
 AAD_MANAGEMENT_CLIENT_SECRET=<management-app-client-secret>
 AAD_TARGET_CLIENT_ID=<target-app-client-id>
+
 ```
 
 ### Finding Your Configuration Values
@@ -114,6 +122,7 @@ dotnet run --project EntraIdRoleManager
 # Or from the EntraIdRoleManager directory
 cd EntraIdRoleManager
 dotnet run
+
 ```
 
 ## What It Does
@@ -139,6 +148,7 @@ After running the tool, verify the setup:
 ## App Role Format
 
 Roles are created with the following format:
+
 - **Display Name**: `ImageStorageTier.{TierName}` (e.g., `ImageStorageTier.Starter`)
 - **Value**: `ImageStorageTier.{TierName}` (used in JWT claims)
 - **Description**: Includes tier details (cost, storage, bandwidth)
@@ -146,6 +156,7 @@ Roles are created with the following format:
 ## After Running
 
 After running this tool:
+
 1. **Target Application**: Has app roles defined for each storage tier
 2. **User Assignments**: Users are assigned to appropriate roles based on their Cosmos DB memberships
 3. **JWT Tokens**: When users authenticate with the target app, JWT tokens include `roles` claims like `ImageStorageTier.Starter`
@@ -155,6 +166,7 @@ After running this tool:
 ## Microsoft Account Integration
 
 This setup enables:
+
 - **Personal Microsoft Account Users**: Can authenticate and receive appropriate storage tier roles
 - **Role-Based Authorization**: ImageAPI functions can authorize based on JWT roles instead of Cosmos DB lookups
 - **Simplified Architecture**: Removes dependency on ImageStorageTierMembership for runtime authorization
@@ -163,20 +175,24 @@ This setup enables:
 
 ### Common Issues
 
-1. **"Service principal not found"**: 
+1. **"Service principal not found"**:
+
    - The tool will automatically create the Service Principal if it doesn't exist
    - Verify the target app Client ID is correct
    - Ensure the management app has sufficient permissions to create Service Principals
 
 2. **"Insufficient privileges"**:
+
    - Verify management app has `Application.ReadWrite.All` and `AppRoleAssignment.ReadWrite.All` permissions
    - Ensure admin consent has been granted
 
 3. **"Application not found"**:
+
    - Check that both apps are in the same Azure AD tenant
    - Verify Client IDs are correct
 
 4. **User assignment failures**:
+
    - Ensure user IDs in Cosmos DB match Azure AD user object IDs
    - For Microsoft Account users, verify they exist in the tenant
 

@@ -18,6 +18,7 @@ public class PriceListRequest
     // ... existing properties ...
     public string Culture { get; set; } = string.Empty; // New culture property
 }
+
 ```
 
 ### 2. Updated Service Interfaces
@@ -29,6 +30,7 @@ Added culture parameter to interface methods:
 ```csharp
 Task<SubscriptionPlan> MapToSubscriptionPlanAsync(PriceDto priceDto, string? culture = null);
 Task<List<SubscriptionPlan>> MapToSubscriptionPlansAsync(IEnumerable<PriceDto> priceDtos, string? culture = null);
+
 ```
 
 **File**: `OnePageAuthorLib\interfaces\Stripe\IPriceServiceWrapper.cs`
@@ -37,6 +39,7 @@ Added culture support to wrapper interface:
 
 ```csharp
 Task<SubscriptionPlan?> GetPriceByIdAsync(string priceId, string? culture = null);
+
 ```
 
 ### 3. Enhanced Service Implementation
@@ -74,6 +77,7 @@ else
 {
     _logger.LogInformation("Processing price request for culture: {Culture}", request.Culture);
 }
+
 ```
 
 ## Usage Examples
@@ -86,6 +90,7 @@ else
   "limit": 10,
   "culture": "es-US"
 }
+
 ```
 
 ### API Request without Culture (uses default)
@@ -95,6 +100,7 @@ else
   "active": true,
   "limit": 10
 }
+
 ```
 
 ## How Culture Localization Works
@@ -118,6 +124,7 @@ culture_01_localized_nickname: "1 year subscription"
 culture_02_code: "es-US"
 culture_02_localized_name: "Escritor Manchado de Tinta - Suscripción Anual"
 culture_02_localized_nickname: "suscripción de 1 año"
+
 ```
 
 ## Supported Cultures

@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml/badge.svg)](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
-[![NuGet](https://img.shields.io/badge/Library-Core-green.svg)](#)
+![NuGet](https://img.shields.io/badge/Library-Core-green.svg)
 
 Core library for the OnePageAuthor API solution providing business logic, data access, and shared services.
 
@@ -19,7 +19,7 @@ OnePageAuthorLib is the foundational library for the OnePageAuthor system, provi
 
 ## 📁 Project Structure
 
-```
+```text
 OnePageAuthorLib/
 ├── entities/           # Data models and entity classes
 │   ├── authormanagement/   # Author and user entities
@@ -35,22 +35,29 @@ OnePageAuthorLib/
 │   └── Stripe/         # Stripe payment processing
 ├── Authentication/     # JWT and auth services
 └── interfaces/         # Service contracts and interfaces
+
 ```
 
 ## 🔧 Key Components
 
 ### Entity Models
+
+
 - **Author**: Core author information and metadata
 - **Article**: Blog posts and content management
 - **Book**: Book metadata and publishing information
 - **Social**: Social media profile integration
 
-### Data Services  
+### Data Services
+
+
 - **Cosmos DB Integration**: NoSQL document storage and querying
 - **Repository Pattern**: Abstracted data access with interfaces
 - **Connection Management**: Efficient database connection handling
 
 ### Business Services
+
+
 - **Authentication Services**: JWT token validation and user context
 - **Stripe Integration**: Payment processing and subscription management
 - **Localization Services**: Multi-language content support
@@ -59,11 +66,15 @@ OnePageAuthorLib/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+
 - .NET 9.0 SDK
 - Azure Cosmos DB account
 - Visual Studio 2022 or VS Code
 
 ### Building the Library
+
+
 ```bash
 # Restore dependencies
 dotnet restore OnePageAuthorLib.csproj
@@ -73,18 +84,24 @@ dotnet build OnePageAuthorLib.csproj
 
 # Run tests
 dotnet test ../OnePageAuthor.Test/OnePageAuthor.Test.csproj
+
 ```
 
 ### Using in Your Project
+
 Add a project reference to use OnePageAuthorLib:
+
 ```xml
 <ItemGroup>
   <ProjectReference Include="../OnePageAuthorLib/OnePageAuthorLib.csproj" />
 </ItemGroup>
+
 ```
 
 ### Configuration
+
 The library expects configuration for:
+
 ```json
 {
   "CosmosDbConnectionString": "your-cosmos-connection-string",
@@ -92,6 +109,7 @@ The library expects configuration for:
   "BlobStorageConnectionString": "your-storage-connection-string",
   "StripeSecretKey": "your-stripe-secret-key"
 }
+
 ```
 
 ## 📖 Documentation
@@ -103,9 +121,11 @@ The library expects configuration for:
 ## 🧪 Testing
 
 The library is thoroughly tested via the OnePageAuthor.Test project:
+
 ```bash
 cd ../OnePageAuthor.Test
 dotnet test --filter "Category=OnePageAuthorLib"
+
 ```
 
 ## 🤝 Contributing

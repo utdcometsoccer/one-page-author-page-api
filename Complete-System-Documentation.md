@@ -11,20 +11,28 @@ The OnePageAuthor system consists of multiple Azure Functions, core libraries, a
 ## Architecture Components
 
 ### Azure Functions (API Layer)
+
+
 - **ImageAPI**: Image upload, management and retrieval
 - **InkStainedWretchFunctions**: Domain registration and external integrations
 - **InkStainedWretchStripe**: Payment processing and subscription management
 - **function-app**: Core author data and localization services
 
 ### Libraries (Business Logic Layer)
+
+
 - **OnePageAuthorLib**: Core business logic, entities, and data access services
 
 ### Utilities (Data Management Layer)
+
+
 - **SeedAPIData**: API data initialization
 - **SeedImageStorageTiers**: Storage tier configuration
 - **SeedInkStainedWretchesLocale**: Comprehensive localization for all containers (North America: US, CA, MX in EN, ES, FR, AR, ZH-CN, ZH-TW)
 
-### Testing (Quality Assurance Layer)  
+### Testing (Quality Assurance Layer)
+
+
 - **OnePageAuthor.Test**: Unit and integration tests
 - **IntegrationTestAuthorDataService**: Author data service validation
 
@@ -45,24 +53,42 @@ Authorization: Bearer <your-jwt-token>
 Image management API for uploading, retrieving, and deleting user images
 
 **Functions:**
+
 - `Delete`: Azure Function for deleting an image by its ID. Uses the ImageDeleteService for business logic.
+
   - `HttpRequest)`: Deletes a user's image by ID.
+
 - `Upload`: Azure Function for uploading image files to Azure Blob Storage. Uses the ImageUploadService for business logic and validation.
+
   - `HttpRequest)`: Uploads an image file to Azure Blob Storage with subscription tier validation.
+
 - `User`: Azure Function for retrieving all images uploaded by the authenticated user. Uses the UserImageService for business logic.
+
   - `HttpRequest)`: Retrieves all images uploaded by the authenticated user.
+
 - `WhoAmI`: Azure Function for retrieving information about the authenticated user. Returns user identity and claims information from JWT token.
+
   - `HttpRequest)`: Returns information about the authenticated user from JWT token claims.
+
 - `FunctionExecutorHostBuilderExtensions`: System.Xml.XmlElement
+
   - `IHostBuilder)`: Configures an optimized function executor to the invocation pipeline.
+
 - `FunctionExecutorAutoStartup`: System.Xml.XmlElement
+
   - `IHostBuilder)`: System.Xml.XmlElement
+
 - `GeneratedFunctionMetadataProvider`: System.Xml.XmlElement
+
   - `String)`
   - `IHostBuilder)`: Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
 - `WorkerHostBuilderFunctionMetadataProviderExtension`: System.Xml.XmlElement
+
   - `IHostBuilder)`: Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
 - `FunctionMetadataProviderAutoStartup`: System.Xml.XmlElement
+
   - `IHostBuilder)`: System.Xml.XmlElement
 
 #### InkStainedWretchFunctions
@@ -70,26 +96,42 @@ Image management API for uploading, retrieving, and deleting user images
 Core application functions for domain registration and external API integration
 
 **Functions:**
+
 - `DomainRegistrationFunction`: HTTP endpoint to create and manage domain registrations.
+
   - `CreateDomainRegistrationRequest)`: Creates a new domain registration for the authenticated user.
   - `HttpRequest)`: Gets all domain registrations for the authenticated user.
   - `String)`: Gets a specific domain registration by ID for the authenticated user.
+
 - `PenguinRandomHouseFunction`: Azure Function for calling Penguin Random House API
+
   - `String)`: Searches for authors by name and returns the unmodified JSON response from Penguin Random House API.
   - `String)`: Gets titles by author key and returns the unmodified JSON response from Penguin Random House API.
+
 - `LocalizedText`: System.Xml.XmlElement
+
   - `ILocalizationTextProvider)`: System.Xml.XmlElement
   - `String)`: Handles HTTP GET requests for localized text.
+
 - `FunctionExecutorHostBuilderExtensions`: System.Xml.XmlElement
+
   - `IHostBuilder)`: Configures an optimized function executor to the invocation pipeline.
+
 - `FunctionExecutorAutoStartup`: System.Xml.XmlElement
+
   - `IHostBuilder)`: System.Xml.XmlElement
+
 - `GeneratedFunctionMetadataProvider`: System.Xml.XmlElement
+
   - `String)`
   - `IHostBuilder)`: Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
 - `WorkerHostBuilderFunctionMetadataProviderExtension`: System.Xml.XmlElement
+
   - `IHostBuilder)`: Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
 - `FunctionMetadataProviderAutoStartup`: System.Xml.XmlElement
+
   - `IHostBuilder)`: System.Xml.XmlElement
 
 #### InkStainedWretchStripe
@@ -97,17 +139,27 @@ Core application functions for domain registration and external API integration
 Stripe payment processing functions for subscription management and billing
 
 **Functions:**
+
 - `CreateStripeCustomer`: Azure Function for creating a Stripe customer. Handles HTTP POST requests, validates the incoming payload, and delegates customer creation logic.
 - `FunctionExecutorHostBuilderExtensions`: System.Xml.XmlElement
+
   - `IHostBuilder)`: Configures an optimized function executor to the invocation pipeline.
+
 - `FunctionExecutorAutoStartup`: System.Xml.XmlElement
+
   - `IHostBuilder)`: System.Xml.XmlElement
+
 - `GeneratedFunctionMetadataProvider`: System.Xml.XmlElement
+
   - `String)`
   - `IHostBuilder)`: Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
 - `WorkerHostBuilderFunctionMetadataProviderExtension`: System.Xml.XmlElement
+
   - `IHostBuilder)`: Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
 - `FunctionMetadataProviderAutoStartup`: System.Xml.XmlElement
+
   - `IHostBuilder)`: System.Xml.XmlElement
 
 #### function-app
@@ -115,16 +167,26 @@ Stripe payment processing functions for subscription management and billing
 Main application functions for author data and localization services
 
 **Functions:**
+
 - `FunctionExecutorHostBuilderExtensions`: System.Xml.XmlElement
+
   - `IHostBuilder)`: Configures an optimized function executor to the invocation pipeline.
+
 - `FunctionExecutorAutoStartup`: System.Xml.XmlElement
+
   - `IHostBuilder)`: System.Xml.XmlElement
+
 - `GeneratedFunctionMetadataProvider`: System.Xml.XmlElement
+
   - `String)`
   - `IHostBuilder)`: Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
 - `WorkerHostBuilderFunctionMetadataProviderExtension`: System.Xml.XmlElement
+
   - `IHostBuilder)`: Adds the GeneratedFunctionMetadataProvider to the service collection. During initialization, the worker will return generated function metadata instead of relying on the Azure Functions host for function indexing.
+
 - `FunctionMetadataProviderAutoStartup`: System.Xml.XmlElement
+
   - `IHostBuilder)`: System.Xml.XmlElement
 
 
@@ -135,6 +197,7 @@ Main application functions for author data and localization services
 Core library containing business logic, entities, and data services
 
 **Key Components:**
+
 - `Article`: Represents an article authored by the author.
 - `AuthorResponse`: Represents the response containing author data for the One Page Author API.
 - `Book`: Represents a book authored by the author.
@@ -266,15 +329,19 @@ Integration testing utility for author data service validation
 ## Development Information
 
 ### Build Configuration
+
 All projects are configured to automatically generate XML documentation during Debug builds.
 
 ### Documentation Generation
+
 This documentation is automatically generated from source code XML comments and can be regenerated using:
 `
 .\Generate-ApiDocumentation.ps1
 `
 
 ### Project Statistics
+
+
 - **Total Projects**: 11
 - **Azure Functions**: 4
 - **Libraries**: 4

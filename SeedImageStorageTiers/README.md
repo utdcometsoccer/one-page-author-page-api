@@ -20,34 +20,44 @@ SeedImageStorageTiers is a console application that initializes the database wit
 The utility seeds the following storage tiers:
 
 ### Starter Tier (Free)
+
+
 - **Storage Limit**: 5GB
 - **Bandwidth**: 25GB/month
 - **Max File Size**: 5MB
 - **Max Files**: 20 files
 - **Monthly Cost**: $0
 
-### Pro Tier 
+### Pro Tier
+
+
 - **Storage Limit**: 250GB
-- **Bandwidth**: 1TB/month  
+- **Bandwidth**: 1TB/month
 - **Max File Size**: 10MB
 - **Max Files**: 500 files
 - **Monthly Cost**: $9.99
 
 ### Elite Tier
+
+
 - **Storage Limit**: 2TB
 - **Bandwidth**: 10TB/month
 - **Max File Size**: 25MB
-- **Max Files**: 2000 files  
+- **Max Files**: 2000 files
 - **Monthly Cost**: $19.99
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+
 - .NET 9.0 SDK
 - Access to OnePageAuthor Azure Cosmos DB
 - Proper connection string configuration
 
 ### Running the Seeder
+
+
 ```bash
 # Navigate to the project directory
 cd SeedImageStorageTiers
@@ -60,6 +70,7 @@ dotnet build
 
 # Run the seeder
 dotnet run
+
 ```
 
 ### Configuration
@@ -73,6 +84,7 @@ dotnet user-secrets set "CosmosDbConnectionString" "your-cosmos-connection-strin
 # Set other required configuration
 dotnet user-secrets set "DatabaseId" "your-database-id"
 dotnet user-secrets set "ContainerId" "your-container-id"
+
 ```
 
 ## 🔧 Usage
@@ -85,12 +97,15 @@ The seeder will:
 4. Display confirmation messages for each tier created/updated
 
 ### Sample Output
+
+
 ```
 Starting Image Storage Tiers Seeding...
 ✅ Starter tier configured successfully
 ✅ Pro tier configured successfully  
 ✅ Elite tier configured successfully
 Seeding completed! 3 storage tiers are now available.
+
 ```
 
 ## 🧪 Testing
@@ -98,6 +113,7 @@ Seeding completed! 3 storage tiers are now available.
 The seeding operation can be run multiple times safely - it will update existing records rather than creating duplicates.
 
 To verify the seeding worked correctly:
+
 1. Check your Cosmos DB container for the storage tier records
 2. Run the ImageAPI and verify tier validation works properly
 3. Check application logs for any tier-related errors

@@ -106,6 +106,7 @@ When deploying this refactor, ensure that:
 
 
    ```csharp
+
    services.AddDomainRegistrationServices(); // Now includes IUserIdentityService registration
 
    ```

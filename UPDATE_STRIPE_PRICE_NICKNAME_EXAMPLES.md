@@ -25,6 +25,7 @@ public async Task<Price> UpdatePriceNicknameAsync(string priceId, string newNick
     
     return await service.UpdateAsync(priceId, options);
 }
+
 ```
 
 ### Example Usage
@@ -32,6 +33,7 @@ public async Task<Price> UpdatePriceNicknameAsync(string priceId, string newNick
 ```csharp
 // Update a price nickname
 var updatedPrice = await UpdatePriceNicknameAsync("price_1234567890", "Pro Monthly Plan");
+
 ```
 
 ## Option 3: Add to Your Service
@@ -85,6 +87,7 @@ public class PriceManagementService : IPriceManagementService
         }
     }
 }
+
 ```
 
 ## Option 4: Azure Function Endpoint
@@ -139,6 +142,7 @@ public class UpdateNicknameRequest
 {
     public string Nickname { get; set; } = string.Empty;
 }
+
 ```
 
 ## Important Notes
@@ -175,9 +179,11 @@ public async Task MapToSubscriptionPlanAsync_UsesUpdatedNickname()
     // Assert
     Assert.Equal("Updated Pro Plan", result.Label); // Should use the updated nickname
 }
+
 ```
 
 The recommended approach depends on your use case:
+
 - **Manual updates**: Use Stripe Dashboard
 - **Programmatic updates**: Use Stripe API with proper error handling
 - **Bulk updates**: Create a management service or Azure Function

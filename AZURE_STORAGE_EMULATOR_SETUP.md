@@ -12,12 +12,14 @@ You need to have Azurite installed globally:
 
 ```bash
 npm install -g azurite
+
 ```
 
 Or if you prefer using it locally in the project:
 
 ```bash
 npm install --save-dev azurite
+
 ```
 
 ## Launch Configurations Added
@@ -36,6 +38,7 @@ npm install --save-dev azurite
 **Name**: `Launch All Services (with Storage)`
 
 - **Purpose**: Compound configuration that starts:
+
   1. Azure Storage Emulator
   2. ImageAPI Functions
   3. InkStainedWretchFunctions
@@ -73,6 +76,7 @@ Use this connection string in your applications:
 
 ```text
 DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
+
 ```
 
 ### Data Persistence
@@ -97,6 +101,7 @@ DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02x
     "cwd": "${workspaceFolder}",
     "console": "integratedTerminal"
 }
+
 ```
 
 ### Arguments Explained
@@ -115,14 +120,16 @@ If you get port conflicts, you can customize the ports:
 2. Add port arguments:
 
    ```json
+
    "args": [
        "--blobPort", "10000",
-       "--queuePort", "10001", 
+       "--queuePort", "10001",
        "--tablePort", "10002",
        "--silent",
        "--location", "${workspaceFolder}/.azurite",
        "--debug", "${workspaceFolder}/.azurite/debug.log"
    ]
+
    ```
 
 ### Azurite Not Found
@@ -130,11 +137,15 @@ If you get port conflicts, you can customize the ports:
 If you get "azurite command not found":
 
 1. Install globally:
+
 pm install -g azurite`
+
 2. Or update the program path to local installation:
 
    ```json
+
    "program": "${workspaceFolder}/node_modules/.bin/azurite"
+
    ```
 
 ### Clear Storage Data
@@ -158,6 +169,7 @@ Your Azure Functions can connect to the local storage emulator using:
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
   }
 }
+
 ```
 
 ### Or with explicit connection string
@@ -168,6 +180,7 @@ Your Azure Functions can connect to the local storage emulator using:
     "AzureWebJobsStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
   }
 }
+
 ```
 
 ## Benefits

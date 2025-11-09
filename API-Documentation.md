@@ -35,7 +35,7 @@ class ApiClient {
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = ${'$'}{this.baseUrl}{endpoint};
-    
+
     const response = await fetch(url, {
       ...options,
       headers: {
@@ -102,6 +102,7 @@ System.Xml.XmlElement
 **Description:** System.Xml.XmlElement
 
 **Parameters:**
+
 - `hostBuilder`: The instance to use for service registration.
 
 ---
@@ -139,6 +140,7 @@ System.Xml.XmlElement
 **Description:** System.Xml.XmlElement
 
 **Parameters:**
+
 - `hostBuilder`: The instance to use for service registration.
 
 ---
@@ -166,6 +168,7 @@ System.Xml.XmlElement
 **Description:** System.Xml.XmlElement
 
 **Parameters:**
+
 - `hostBuilder`: The instance to use for service registration.
 
 ---
@@ -203,6 +206,7 @@ System.Xml.XmlElement
 **Description:** System.Xml.XmlElement
 
 **Parameters:**
+
 - `hostBuilder`: The instance to use for service registration.
 
 ---
@@ -220,6 +224,7 @@ Cosmos DB trigger function that creates DNS zones when domain registrations are 
 **Description:** Triggered when documents are inserted or updated in the DomainRegistrations container. Creates Azure DNS zones for newly registered domains.
 
 **Parameters:**
+
 - `input`: List of domain registrations that were added or modified
 
 ---
@@ -233,6 +238,7 @@ HTTP endpoint to create and manage domain registrations.
 **Description:** Creates a new domain registration for the authenticated user.
 
 **Parameters:**
+
 - `req`: HTTP request containing the domain registration data
 - `payload`: Domain registration request payload with domain details
 
@@ -247,6 +253,7 @@ System.Xml.XmlElement
 **Description:** Gets all domain registrations for the authenticated user.
 
 **Parameters:**
+
 - `req`: HTTP request (no additional parameters required)
 
 **Returns:** System.Xml.XmlElement
@@ -260,6 +267,7 @@ System.Xml.XmlElement
 **Description:** Gets a specific domain registration by ID for the authenticated user.
 
 **Parameters:**
+
 - `req`: HTTP request
 - `registrationId`: The registration ID from the route
 
@@ -272,6 +280,7 @@ System.Xml.XmlElement
 **Description:** Processes changes to domain registrations and registers domains via Google Domains API.
 
 **Parameters:**
+
 - `input`: List of changed domain registrations from Cosmos DB
 
 ---
@@ -285,6 +294,7 @@ Azure Function triggered by changes to the DomainRegistrations Cosmos DB contain
 **Description:** Processes changes to domain registrations and adds new domains to Azure Front Door.
 
 **Parameters:**
+
 - `input`: List of changed domain registrations from Cosmos DB
 
 ---
@@ -298,6 +308,7 @@ Azure Function triggered by changes to the DomainRegistrations Cosmos DB contain
 **Description:** Processes changes to domain registrations and registers domains via Google Domains API.
 
 **Parameters:**
+
 - `input`: List of changed domain registrations from Cosmos DB
 
 ---
@@ -311,6 +322,7 @@ Azure Function for calling Penguin Random House API
 **Description:** Searches for authors by name and returns the unmodified JSON response from Penguin Random House API.
 
 **Parameters:**
+
 - `req`: HTTP request with authentication
 - `authorName`: Author name from route parameter to search for
 
@@ -325,6 +337,7 @@ System.Xml.XmlElement
 **Description:** Gets titles by author key and returns the unmodified JSON response from Penguin Random House API.
 
 **Parameters:**
+
 - `req`: HTTP request with authentication
 - `authorKey`: Author key from route parameter (obtained from search results)
 
@@ -343,6 +356,7 @@ Azure Function for retrieving StateProvince data by culture.
 **Description:** Gets states and provinces by culture code.
 
 **Parameters:**
+
 - `req`: The HTTP request.
 - `culture`: The culture code (e.g., "en-US", "fr-CA", "es-MX").
 
@@ -355,6 +369,7 @@ Azure Function for retrieving StateProvince data by culture.
 **Description:** Gets states and provinces by country code and culture.
 
 **Parameters:**
+
 - `req`: The HTTP request.
 - `countryCode`: The two-letter country code (e.g., "US", "CA", "MX").
 - `culture`: The culture code (e.g., "en-US", "fr-CA", "es-MX").
@@ -372,6 +387,7 @@ Azure Function for retrieving StateProvince data by country and culture.
 **Description:** Gets states and provinces by country code and culture.
 
 **Parameters:**
+
 - `req`: The HTTP request.
 - `countryCode`: The two-letter country code (e.g., "US", "CA", "MX").
 - `culture`: The culture code (e.g., "en-US", "fr-CA", "es-MX").
@@ -389,6 +405,7 @@ System.Xml.XmlElement
 **Description:** System.Xml.XmlElement
 
 **Parameters:**
+
 - `logger`: Logger instance.
 - `provider`: Localization text provider service.
 
@@ -399,6 +416,7 @@ System.Xml.XmlElement
 **Description:** Handles HTTP GET requests for localized text.
 
 **Parameters:**
+
 - `req`: The incoming HTTP request.
 - `culture`: Route parameter representing the culture (e.g. en-US).
 
@@ -425,6 +443,7 @@ System.Xml.XmlElement
 **Description:** System.Xml.XmlElement
 
 **Parameters:**
+
 - `hostBuilder`: The instance to use for service registration.
 
 ---
@@ -462,6 +481,7 @@ System.Xml.XmlElement
 **Description:** System.Xml.XmlElement
 
 **Parameters:**
+
 - `hostBuilder`: The instance to use for service registration.
 
 ---
@@ -489,6 +509,7 @@ System.Xml.XmlElement
 **Description:** System.Xml.XmlElement
 
 **Parameters:**
+
 - `hostBuilder`: The instance to use for service registration.
 
 ---
@@ -526,6 +547,7 @@ System.Xml.XmlElement
 **Description:** System.Xml.XmlElement
 
 **Parameters:**
+
 - `hostBuilder`: The instance to use for service registration.
 
 ---
@@ -612,7 +634,7 @@ try {
 API endpoints may be rate-limited based on subscription tier:
 
 - **Starter**: 100 requests/minute
-- **Pro**: 1000 requests/minute  
+- **Pro**: 1000 requests/minute
 - **Elite**: 10000 requests/minute
 
 Rate limit headers are included in responses:

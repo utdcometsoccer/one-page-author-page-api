@@ -10,6 +10,8 @@ A comprehensive .NET 9 platform providing APIs and utilities for author manageme
 ## 🚀 Platform Overview
 
 ### Key Features
+
+
 - **.NET 9** Azure Functions with isolated worker runtime
 - **Azure Cosmos DB** with NoSQL document storage and repository patterns
 - **Stripe Integration** for subscription management, checkout, and webhook processing
@@ -23,27 +25,37 @@ A comprehensive .NET 9 platform providing APIs and utilities for author manageme
 ### Architecture Components
 
 #### 🏗️ Azure Functions (API Layer)
+
+
 - **ImageAPI** — Image upload, management, and retrieval services
 - **InkStainedWretchFunctions** — Domain registration, localization, and external API integrations
 - **InkStainedWretchStripe** — Stripe payment processing and subscription management
 - **function-app** — Core author data and additional infrastructure functions
 
 #### 📚 Core Libraries (Business Logic Layer)
+
+
 - **OnePageAuthorLib** — Shared library with entities, repositories, services, and orchestrators
 
 #### 🛠️ Data Management (Seeding & Utilities)
+
+
 - **SeedAPIData** — Author, book, and article data initialization
 - **SeedInkStainedWretchesLocale** — Comprehensive multi-language localization and UI text (North America: EN, ES, FR, AR, ZH-CN, ZH-TW)
 - **SeedImageStorageTiers** — Image storage tier configuration
 - **OnePageAuthor.DataSeeder** — StateProvince and geographical data seeding
 
 #### 🧪 Testing & Quality Assurance
+
+
 - **OnePageAuthor.Test** — Comprehensive unit and integration tests
 - **IntegrationTestAuthorDataService** — Author data service validation testing
 
 ## 🛠️ Prerequisites & Setup
 
 ### System Requirements
+
+
 - **.NET SDK 9.0** or later
 - **Azure Functions Core Tools v4** (optional for local development)
 - **Azure Cosmos DB** account or local emulator
@@ -51,6 +63,8 @@ A comprehensive .NET 9 platform providing APIs and utilities for author manageme
 - **Microsoft Entra ID** app registration (tenant ID, client ID)
 
 ### Quick Start
+
+
 ```bash
 # Clone the repository
 git clone https://github.com/utdcometsoccer/one-page-author-page-api.git
@@ -61,11 +75,13 @@ dotnet build OnePageAuthorAPI.sln -c Debug
 
 # Run tests
 dotnet test OnePageAuthorAPI.sln -c Debug
+
 ```
 
 ## ⚙️ Configuration
 
 ### Core Environment Variables
+
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `COSMOSDB_ENDPOINT_URI` | Azure Cosmos DB endpoint URI | ✅ Yes |
@@ -77,6 +93,7 @@ dotnet test OnePageAuthorAPI.sln -c Debug
 | `STRIPE_WEBHOOK_SECRET` | Webhook endpoint secret for verification | For webhooks |
 
 ### External API Integration (Optional)
+
 <details>
 <summary>🐧 Penguin Random House API Configuration</summary>
 
@@ -102,6 +119,8 @@ dotnet test OnePageAuthorAPI.sln -c Debug
 </details>
 
 ### Example Configuration (local.settings.json)
+
+
 ```json
 {
   "IsEncrypted": false,
@@ -117,20 +136,26 @@ dotnet test OnePageAuthorAPI.sln -c Debug
     "STRIPE_WEBHOOK_SECRET": "<your-webhook-secret>"
   }
 }
+
 ```
 
 ## 🏗️ Development & Deployment
 
 ### Building the Solution
+
+
 ```bash
 # Build entire solution
 dotnet build OnePageAuthorAPI.sln -c Debug
 
 # Build specific project
 dotnet build OnePageAuthorLib/OnePageAuthorLib.csproj
+
 ```
 
 ### Running Locally
+
+
 ```bash
 # Run a specific Azure Function app
 cd InkStainedWretchStripe
@@ -141,15 +166,19 @@ func start
 # Run data seeders
 cd SeedAPIData
 dotnet run
+
 ```
 
 ### Testing
+
+
 ```bash
 # Run all tests
 dotnet test OnePageAuthorAPI.sln -c Debug
 
 # Run specific test project
 dotnet test OnePageAuthor.Test/OnePageAuthor.Test.csproj --logger "console;verbosity=detailed"
+
 ```
 
 ## 🔧 Dependency Injection Extensions
@@ -157,16 +186,22 @@ dotnet test OnePageAuthor.Test/OnePageAuthor.Test.csproj --logger "console;verbo
 The platform provides comprehensive DI extensions through `OnePageAuthorLib`:
 
 ### Database & Storage
+
+
 - `AddCosmosClient(endpointUri, primaryKey)` — Azure Cosmos DB client
 - `AddCosmosDatabase(databaseId)` — Database configuration
 
 ### Repositories & Data Access
+
+
 - `AddAuthorRepositories()` — Author data repositories
 - `AddLocaleRepository()` — Localization data access
 - `AddUserProfileRepository()` — User profile management
 - `AddStateProvinceRepository()` — Geographic data access
 
 ### Business Services
+
+
 - `AddAuthorDataService()` — Author management services
 - `AddLocaleDataService()` — Localization services
 - `AddInkStainedWretchServices()` — Core platform services
@@ -174,10 +209,14 @@ The platform provides comprehensive DI extensions through `OnePageAuthorLib`:
 - `AddStateProvinceServices()` — Geographic services
 
 ### Authentication & Security
+
+
 - `AddJwtAuthentication()` — JWT token validation
 - `AddUserProfileServices()` — User authentication services
 
 ### External Integrations
+
+
 - `AddPenguinRandomHouseServices()` — Book catalog integration
 - `AddDomainRegistrationServices()` — Domain management
 - `AddFrontDoorServices()` — Azure Front Door integration
@@ -193,12 +232,16 @@ The platform provides comprehensive DI extensions through `OnePageAuthorLib`:
 ## 📊 Data Management & Seeding
 
 ### Available Seeders
+
+
 - **SeedAPIData** — Author profiles, books, articles, and relationships
 - **SeedInkStainedWretchesLocale** — Comprehensive multi-language localization for all UI components (North America: EN, ES, FR, AR, ZH-CN, ZH-TW for US, CA, MX)
 - **SeedImageStorageTiers** — Image storage configuration
 - **OnePageAuthor.DataSeeder** — StateProvince geographic data
 
 ### Running Seeders
+
+
 ```bash
 # Seed author and content data
 cd SeedAPIData && dotnet run
@@ -208,6 +251,7 @@ cd SeedInkStainedWretchesLocale && dotnet run
 
 # Setup geographic data
 cd OnePageAuthor.DataSeeder && dotnet run
+
 ```
 
 ## 🌐 Internationalization & Localization
@@ -224,21 +268,27 @@ The platform supports comprehensive multi-language functionality:
 ### Azure Functions Applications
 
 #### 🖼️ ImageAPI
+
 **Purpose**: Image upload, management, and retrieval services
+
 - `POST /api/upload` — Upload user images with size and format validation
 - `GET /api/images/{imageId}` — Retrieve image metadata and URLs
 - `DELETE /api/images/{imageId}` — Delete user images
 - **Features**: Automatic resizing, format conversion, storage tier management
 
-#### 🌐 InkStainedWretchFunctions  
+#### 🌐 InkStainedWretchFunctions
+
 **Purpose**: Domain registration, localization, and external API integrations
+
 - `GET /api/localizedtext/{culture}` — Retrieve localized UI text with fallback logic
 - `POST /api/domain-registrations` — Create domain registrations with auto-provisioning
 - `GET /api/domain-registrations` — List user domain registrations
 - **Features**: Azure Front Door integration, multi-language support, external API proxying
 
 #### 💳 InkStainedWretchStripe
+
 **Purpose**: Stripe payment processing and subscription management
+
 - `POST /api/CreateStripeCheckoutSession` — Create secure checkout sessions
 - `POST /api/CreateStripeCustomer` — Customer creation and management
 - `POST /api/CreateSubscription` — Subscription lifecycle management
@@ -246,26 +296,35 @@ The platform supports comprehensive multi-language functionality:
 - `GET /api/ListSubscription/{customerId}` — Subscription queries with filtering
 
 #### 📚 function-app
+
 **Purpose**: Core author data and additional infrastructure functions
+
 - Author profile management
 - Content publishing workflows
 - System health monitoring
 
 ### Authentication
+
 All endpoints require JWT Bearer authentication:
+
 ```http
 Authorization: Bearer <your-jwt-token>
+
 ```
 
 ## 🧪 Testing & Quality Assurance
 
 ### Test Coverage
+
+
 - **Unit Tests**: Business logic validation with 90%+ coverage
-- **Integration Tests**: End-to-end API workflow validation  
+- **Integration Tests**: End-to-end API workflow validation
 - **Service Tests**: External API integration verification
 - **Performance Tests**: Load testing for critical endpoints
 
 ### Running Tests
+
+
 ```bash
 # Run all tests with coverage
 dotnet test OnePageAuthorAPI.sln --collect:"XPlat Code Coverage"
@@ -273,6 +332,7 @@ dotnet test OnePageAuthorAPI.sln --collect:"XPlat Code Coverage"
 # Run specific test categories
 dotnet test --filter "Category=Integration"
 dotnet test --filter "Category=Unit"
+
 ```
 
 ## 📋 Project Structure & Components
@@ -327,6 +387,8 @@ dotnet test --filter "Category=Unit"
 ## 🚀 Production Deployment
 
 ### Azure Resources Required
+
+
 - **Azure Functions Apps** (v4, .NET 9 isolated)
 - **Azure Cosmos DB** account with containers
 - **Azure Storage** account for function app storage
@@ -335,6 +397,8 @@ dotnet test --filter "Category=Unit"
 - **Application Insights** for monitoring and logging
 
 ### Deployment Checklist
+
+
 - [ ] Configure all required environment variables
 - [ ] Set up managed identity for Azure resource access
 - [ ] Configure CORS policies for frontend integration
@@ -346,12 +410,16 @@ dotnet test --filter "Category=Unit"
 ## 🤝 Contributing & Community
 
 ### Development Workflow
+
+
 1. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines
 2. Follow [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) for community standards
 3. Review [`SECURITY.md`](SECURITY.md) for security considerations
 4. Check existing issues and PRs before creating new ones
 
 ### Getting Help
+
+
 - **Documentation**: Check project-specific README files for detailed information
 - **Issues**: Use GitHub Issues for bug reports and feature requests
 - **Security**: Follow responsible disclosure via [`SECURITY.md`](SECURITY.md)
@@ -365,7 +433,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📚 Additional Documentation
 
 - [`Complete-System-Documentation.md`](Complete-System-Documentation.md) — Comprehensive system overview
-- [`API-Documentation.md`](API-Documentation.md) — Detailed API reference and examples  
+- [`API-Documentation.md`](API-Documentation.md) — Detailed API reference and examples
 - [`STATEPROVINCE_BOILERPLATE_SUMMARY.md`](STATEPROVINCE_BOILERPLATE_SUMMARY.md) — Geographic data implementation
 - [`LocalizationREADME.md`](LocalizationREADME.md) — Internationalization guide
 - [`DEVELOPMENT_SCRIPTS.md`](DEVELOPMENT_SCRIPTS.md) — Development automation scripts

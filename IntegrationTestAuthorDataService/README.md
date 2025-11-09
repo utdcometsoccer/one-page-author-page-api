@@ -19,18 +19,24 @@ This project provides comprehensive integration testing specifically for:
 ## 🧪 Test Scenarios
 
 ### Data Access Tests
+
+
 - Author creation, retrieval, update, and deletion
 - Complex query scenarios and filtering operations
 - Bulk operations and batch processing
 - Transaction handling and rollback scenarios
 
 ### Integration Validation
+
+
 - Database connectivity and authentication
-- Container and partition key validation  
+- Container and partition key validation
 - Index utilization and query optimization
 - Cross-container relationship integrity
 
 ### Error Handling Tests
+
+
 - Network connectivity issues simulation
 - Invalid data validation and error responses
 - Concurrent access and conflict resolution
@@ -46,11 +52,15 @@ This project provides comprehensive integration testing specifically for:
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+
 - .NET 9.0 SDK
 - Azure Cosmos DB Emulator OR test instance
 - Valid connection strings and configuration
 
 ### Running Integration Tests
+
+
 ```bash
 # Navigate to project directory
 cd IntegrationTestAuthorDataService
@@ -66,10 +76,13 @@ dotnet run
 
 # Alternative: Run as test project
 dotnet test
+
 ```
 
 ### Configuration
+
 Set up test database connection:
+
 ```bash
 # For Cosmos DB Emulator
 dotnet user-secrets set "CosmosDbConnectionString" "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
@@ -77,23 +90,30 @@ dotnet user-secrets set "CosmosDbConnectionString" "AccountEndpoint=https://loca
 # For test instance
 dotnet user-secrets set "CosmosDbConnectionString" "your-test-cosmos-connection-string"
 dotnet user-secrets set "DatabaseId" "OnePageAuthorTest"
+
 ```
 
 ## 🔧 Test Features
 
 ### Comprehensive Coverage
+
+
 - **Author Entity Tests**: Full CRUD lifecycle validation
 - **Query Performance**: Response time benchmarking
 - **Data Integrity**: Consistency and validation checks
 - **Concurrency Tests**: Multi-user scenario simulation
 
 ### Automated Validation
+
+
 - Database schema verification
-- Index effectiveness analysis  
+- Index effectiveness analysis
 - Query cost optimization checks
 - Memory usage and resource monitoring
 
 ### Sample Test Output
+
+
 ```
 Starting Author Data Service Integration Tests...
 
@@ -115,6 +135,7 @@ Starting Author Data Service Integration Tests...
 
 ✅ All integration tests passed! (23/23)
 Total execution time: 2.3 seconds
+
 ```
 
 ## 📖 Documentation
@@ -126,6 +147,8 @@ Total execution time: 2.3 seconds
 ## 🤝 Contributing
 
 ### Adding Integration Tests
+
+
 1. Create test scenarios in the appropriate test category
 2. Use proper setup and teardown for database operations
 3. Include performance benchmarks where applicable
@@ -133,6 +156,8 @@ Total execution time: 2.3 seconds
 5. Document test expectations and success criteria
 
 ### Test Guidelines
+
+
 - **Isolated Tests**: Each test should be independent and repeatable
 - **Real Data**: Use realistic test data that mirrors production scenarios
 - **Performance Baselines**: Include response time expectations

@@ -21,6 +21,7 @@
   "TEST_SCENARIO": "frontend-safe",
   "TEST_DOMAIN_SUFFIX": "test-frontend.local"
 }
+
 ```
 
 ### Scenario 2: Individual Function Testing (Cost: $0.50-$5.00)
@@ -42,6 +43,7 @@
   "TEST_SCENARIO": "individual-testing",
   "TEST_DOMAIN_SUFFIX": "test-individual.local"
 }
+
 ```
 
 ### Scenario 3: Production Testing (Cost: $12-$50+)
@@ -63,6 +65,7 @@
   "TEST_SCENARIO": "production-test",
   "TEST_DOMAIN_SUFFIX": "test-production.com"
 }
+
 ```
 
 ## 🚀 How to Run Each Scenario
@@ -72,8 +75,10 @@
 3. **Start the Functions app**:
 
    ```bash
+
    cd InkStainedWretchFunctions
    func start
+
    ```
 
 4. **Test your endpoints** according to the scenario
@@ -83,7 +88,7 @@
 ### Scenario 1 (Frontend-Safe)
 
 - ✅ UI/UX flows
-- ✅ API response structures  
+- ✅ API response structures
 - ✅ Error handling
 - ❌ No real external API calls
 - ❌ No infrastructure changes
@@ -171,6 +176,7 @@ switch ($Scenario) {
 
 $config | ConvertTo-Json -Depth 10 | Out-File $configPath -Encoding UTF8
 Write-Host "Configuration updated in $configPath" -ForegroundColor Cyan
+
 ```
 
 ## Usage
@@ -184,4 +190,5 @@ Write-Host "Configuration updated in $configPath" -ForegroundColor Cyan
 
 # Switch to Scenario 3
 .\switch-scenario.ps1 -Scenario production
+
 ```

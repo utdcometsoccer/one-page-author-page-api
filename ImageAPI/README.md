@@ -21,11 +21,15 @@ The ImageAPI provides a comprehensive image management system for the OnePageAut
 ## 📋 Features
 
 ### Subscription Tier Support
+
+
 - **Starter (Free)**: 5MB max file size, 20 files max, 5GB storage
-- **Pro ($9.99/month)**: 10MB max file size, 500 files max, 250GB storage  
+- **Pro ($9.99/month)**: 10MB max file size, 500 files max, 250GB storage
 - **Elite ($19.99/month)**: 25MB max file size, 2000 files max, 2TB storage
 
 ### Security Features
+
+
 - JWT token authentication on all endpoints
 - User ownership validation for image operations
 - Secure file upload with content type validation
@@ -49,13 +53,16 @@ The ImageAPI provides a comprehensive image management system for the OnePageAut
 **Description:** Upload an image file to Azure Blob Storage with subscription tier validation.
 
 **Headers:**
+
 - `Authorization: Bearer <token>` (required)
 
 **Body:**
+
 - `file`: Image file (multipart/form-data)
 
 **Limits:**
 File size and count limits depend on subscription tier:
+
 - **Starter (Free)**: Max 5MB file size, 20 files max
 - **Pro ($9.99/month)**: Max 10MB file size, 500 files max
 - **Elite ($19.99/month)**: Max 25MB file size, 2000 files max
@@ -63,6 +70,7 @@ File size and count limits depend on subscription tier:
 **Responses:**
 
 **201 Created** - Image uploaded successfully
+
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
@@ -70,43 +78,54 @@ File size and count limits depend on subscription tier:
   "name": "filename.jpg",
   "size": 1048576
 }
+
 ```
 
 **400 Bad Request** - File too large for subscription tier
+
 ```json
 {
   "error": "File size exceeds limit for your subscription tier."
 }
+
 ```
 
 **403 Forbidden** - User has reached upload limit
+
 ```json
 {
   "error": "Maximum number of files reached for your subscription tier."
 }
+
 ```
 
 **402 Payment Required** - Bandwidth limit exceeded
+
 ```json
 {
   "error": "Bandwidth limit exceeded for your subscription tier."
 }
+
 ```
 
 **507 Insufficient Storage** - Storage quota exceeded
+
 ```json
 {
   "error": "Storage quota exceeded for your subscription tier."
 }
+
 ```
 
 **401 Unauthorized** - Invalid or missing token
 
 **Example:**
+
 ```bash
 curl -X POST "https://your-api.azurewebsites.net/api/images/upload" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -F "file=@image.jpg"
+
 ```
 
 ### 2. List User Images
@@ -116,11 +135,13 @@ curl -X POST "https://your-api.azurewebsites.net/api/images/upload" \
 **Description:** Get a list of all images uploaded by the authenticated user.
 
 **Headers:**
+
 - `Authorization: Bearer <token>` (required)
 
 **Responses:**
 
 **200 OK** - Returns array of user images
+
 ```json
 [
   {
@@ -138,14 +159,17 @@ curl -X POST "https://your-api.azurewebsites.net/api/images/upload" \
     "uploadedAt": "2024-01-16T14:45:00Z"
   }
 ]
+
 ```
 
 **401 Unauthorized** - Invalid or missing token
 
 **Example:**
+
 ```bash
 curl -X GET "https://your-api.azurewebsites.net/api/images/user" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
 ```
 
 ### 3. Delete Image
@@ -155,25 +179,31 @@ curl -X GET "https://your-api.azurewebsites.net/api/images/user" \
 **Description:** Delete an image by its ID. Only the image owner can delete their images.
 
 **Headers:**
+
 - `Authorization: Bearer <token>` (required)
 
 **Path Parameters:**
+
 - `id`: Image ID (UUID)
 
 **Responses:**
 
 **200 OK** - Image deleted successfully
+
 ```json
 {
   "message": "Image deleted successfully"
 }
+
 ```
 
 **404 Not Found** - Image not found
+
 ```json
 {
   "error": "Image not found"
 }
+
 ```
 
 **401 Unauthorized** - Invalid or missing token
@@ -181,9 +211,11 @@ curl -X GET "https://your-api.azurewebsites.net/api/images/user" \
 **403 Forbidden** - User does not own this image
 
 **Example:**
+
 ```bash
 curl -X DELETE "https://your-api.azurewebsites.net/api/images/550e8400-e29b-41d4-a716-446655440000" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
 ```
 
 ### 4. WhoAmI
@@ -193,11 +225,13 @@ curl -X DELETE "https://your-api.azurewebsites.net/api/images/550e8400-e29b-41d4
 **Description:** Get information about the authenticated user from JWT token claims.
 
 **Headers:**
+
 - `Authorization: Bearer <token>` (required)
 
 **Responses:**
 
 **200 OK** - Returns user information
+
 ```json
 {
   "userId": "user@example.com",
@@ -207,14 +241,17 @@ curl -X DELETE "https://your-api.azurewebsites.net/api/images/550e8400-e29b-41d4
     "roles": ["user"]
   }
 }
+
 ```
 
 **401 Unauthorized** - Invalid or missing token
 
 **Example:**
+
 ```bash
 curl -X GET "https://your-api.azurewebsites.net/api/whoami" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
 ```
 
 ## Error Codes
@@ -231,11 +268,15 @@ curl -X GET "https://your-api.azurewebsites.net/api/whoami" \
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+
 - .NET 9.0 SDK
 - Azure Storage Account
 - Azure Functions Core Tools v4
 
 ### Local Development
+
+
 ```bash
 # Clone the repository
 git clone https://github.com/utdcometsoccer/one-page-author-page-api.git
@@ -249,10 +290,13 @@ dotnet build
 
 # Run locally (requires local.settings.json configuration)
 func start
+
 ```
 
 ### Configuration
+
 Create a `local.settings.json` file:
+
 ```json
 {
   "IsEncrypted": false,
@@ -263,20 +307,23 @@ Create a `local.settings.json` file:
     "BlobStorageConnectionString": "your-blob-storage-connection-string"
   }
 }
+
 ```
 
 ## 🧪 Testing
 
 Run unit tests:
+
 ```bash
 cd ../OnePageAuthor.Test
 dotnet test --filter "Category=ImageAPI"
+
 ```
 
 ## 📖 Documentation
 
 - [Complete API Documentation](../API-Documentation.md)
-- [System Architecture](../Complete-System-Documentation.md)  
+- [System Architecture](../Complete-System-Documentation.md)
 - [Authentication Guide](../README-Documentation.md)
 
 ## 🤝 Contributing

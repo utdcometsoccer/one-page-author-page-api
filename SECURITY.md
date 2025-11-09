@@ -8,6 +8,7 @@ If you believe you have found a security vulnerability, please do not open a pub
 2. Alternatively, contact the maintainers privately (if a security contact is listed).
 
 Please include:
+
 - A description of the issue and potential impact
 - Steps to reproduce or proof of concept
 - Any suggested mitigations

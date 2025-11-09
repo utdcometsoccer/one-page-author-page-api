@@ -11,7 +11,7 @@ Seeds language names in multiple languages to support the GetLanguages API endpo
 The seeder supports the following languages as specified in the issue:
 
 - **English (en)**: English
-- **Spanish (es)**: Español  
+- **Spanish (es)**: Español
 - **French (fr)**: Français
 - **Arabic (ar)**: العربية
 - **Chinese Simplified (zh-cn)**: 中文（简体）- Mainland China
@@ -24,6 +24,7 @@ Each language data file (`languages-{language}.json`) contains an array of langu
 - `Code`: ISO 639-1 two-letter language code (e.g., "en", "es", "fr")
 -
 ame`: Localized name of the language
+
 - `RequestLanguage`: The language in which the name is provided (partition key)
 
 ## Configuration
@@ -35,6 +36,7 @@ The application requires the following configuration settings:
 - `COSMOSDB_DATABASE_ID`: Cosmos DB database name
 
 These can be provided via:
+
 1. User Secrets (recommended for development)
 2. Environment variables
 
@@ -45,6 +47,7 @@ dotnet user-secrets init --project SeedLanguages
 dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "your-endpoint" --project SeedLanguages
 dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "your-key" --project SeedLanguages
 dotnet user-secrets set "COSMOSDB_DATABASE_ID" "your-database" --project SeedLanguages
+
 ```
 
 ## Running the Application
@@ -52,6 +55,7 @@ dotnet user-secrets set "COSMOSDB_DATABASE_ID" "your-database" --project SeedLan
 ```bash
 cd SeedLanguages
 dotnet run
+
 ```
 
 ## Idempotency

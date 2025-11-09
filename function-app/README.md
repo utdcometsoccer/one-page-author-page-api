@@ -31,10 +31,14 @@ The function-app is the primary Azure Functions application that provides:
 - Application Insights telemetry
 
 ## Quickstart
+
+
 ```pwsh
 dotnet build function-app.csproj
 func start
+
 ```
 
 ## Configuration
+
 See `Program.cs` for required settings and bindings.

@@ -37,6 +37,7 @@ cd SeedCountries
 dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "your-endpoint-uri"
 dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "your-primary-key"
 dotnet user-secrets set "COSMOSDB_DATABASE_ID" "your-database-id"
+
 ```
 
 ## Running the Seeder
@@ -44,12 +45,14 @@ dotnet user-secrets set "COSMOSDB_DATABASE_ID" "your-database-id"
 ```bash
 cd SeedCountries
 dotnet run
+
 ```
 
 Or run from the solution directory:
 
 ```bash
 dotnet run --project SeedCountries
+
 ```
 
 ## Data Files
@@ -72,20 +75,26 @@ Each JSON file contains an array of country objects:
   { "code": "US", "name": "United States" },
   { "code": "CA", "name": "Canada" }
 ]
+
 ```
 
 ## Cosmos DB Structure
 
 Countries are stored in the `Countries` container with:
+
 - **Partition Key**: `/Language`
 - **Document Structure**:
+
+
   ```json
+
   {
     "id": "unique-guid",
     "Code": "US",
     "Name": "United States",
     "Language": "en"
   }
+
   ```
 
 ## Exit Codes
@@ -96,6 +105,7 @@ Countries are stored in the `Countries` container with:
 ## Output
 
 The application provides detailed console output:
+
 - Files being processed
 - Languages detected
 - Countries created/skipped
@@ -105,6 +115,7 @@ The application provides detailed console output:
 ## Idempotent Behavior
 
 The seeder checks if each country already exists before creating it. This allows you to:
+
 - Re-run the seeder safely after failures
 - Add new languages without affecting existing data
 - Update the seeder and re-run without duplicates
@@ -120,6 +131,7 @@ To add a new language:
 ## Maintenance
 
 To update country data:
+
 1. Modify the JSON files in the `data` directory
 2. Run the seeder to add new countries
 3. Existing countries will be skipped automatically

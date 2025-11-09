@@ -6,8 +6,11 @@ Thanks for your interest in contributing! This document describes how to get set
 
 1. Ensure you have the prerequisites from the README installed.
 2. Fork the repo (if external) and create a feature branch:
+
    - Suggested: `feature/<short-description>` or `fix/<short-description>`
+
 3. Build and run tests locally:
+
    - `dotnet build OnePageAuthorAPI.sln -c Debug`
    - `dotnet test OnePageAuthorAPI.sln -c Debug`
 

@@ -31,6 +31,8 @@ The InkStainedWretchFunctions project provides a comprehensive Azure Functions a
 ### Functions Overview
 
 #### HTTP Triggered Functions
+
+
 - **GET /api/localizedtext/{culture}** - Returns localized UI text
 - **POST /api/domain-registrations** - Creates new domain registrations
 - **GET /api/domain-registrations** - Gets all domain registrations for user
@@ -44,6 +46,8 @@ The InkStainedWretchFunctions project provides a comprehensive Azure Functions a
 - **GET /api/GetPenguinTitlesByAuthor** - Gets Penguin titles by author
 
 #### Cosmos DB Triggered Functions
+
+
 - **DomainRegistrationTrigger** - Automatically adds domains to Azure Front Door
 - **CreateDnsZoneFunction** - Automatically creates Azure DNS zones
 - **GoogleDomainRegistrationFunction** - Automatically registers domains via Google Domains API
@@ -56,6 +60,7 @@ dotnet build InkStainedWretchFunctions.csproj
 
 # Run locally
 func start
+
 ```
 
 ## Configuration
@@ -89,6 +94,7 @@ Add these settings to your Azure Function App configuration or `local.settings.j
     "PENGUIN_RANDOM_HOUSE_API_DOMAIN": "PRH.US"
   }
 }
+
 ```
 
 ### Configuration Details
@@ -115,9 +121,11 @@ Returns aggregated localized UI text from multiple containers with fallback supp
 **Fallback Order:** exact culture → language-prefixed variant → neutral language → empty object
 
 **Example:**
+
 ```bash
 curl -X GET "https://your-api.azurewebsites.net/api/localizedtext/en-US" \
   -H "Authorization: Bearer your-jwt-token"
+
 ```
 
 ### Countries API
@@ -127,11 +135,13 @@ curl -X GET "https://your-api.azurewebsites.net/api/localizedtext/en-US" \
 Returns localized country names based on the requested language.
 
 **Parameters:**
+
 - `language` (required): Language code (`en`, `es`, `fr`, `ar`, `zh-cn`, `zh-tw`)
 
 **Supported Countries:** 40 major countries from all continents
 
 **Example Response:**
+
 ```json
 {
   "language": "en",
@@ -141,12 +151,15 @@ Returns localized country names based on the requested language.
     { "code": "CA", "name": "Canada" }
   ]
 }
+
 ```
 
 **Example:**
+
 ```bash
 curl -X GET "https://your-api.azurewebsites.net/api/countries/en" \
   -H "Authorization: Bearer your-jwt-token"
+
 ```
 
 ### Languages API
@@ -158,18 +171,22 @@ Returns all available languages with names localized in the requested language.
 **Supported Languages:** English, Spanish, French, Arabic, Chinese (Simplified), Chinese (Traditional)
 
 **Example Response:**
+
 ```json
 [
   { "code": "en", "name": "English" },
   { "code": "es", "name": "Spanish" },
   { "code": "fr", "name": "French" }
 ]
+
 ```
 
 **Example:**
+
 ```bash
 curl -X GET "https://your-api.azurewebsites.net/api/languages/en" \
   -H "Authorization: Bearer your-jwt-token"
+
 ```
 
 ### StateProvince APIs
@@ -181,9 +198,11 @@ curl -X GET "https://your-api.azurewebsites.net/api/languages/en" \
 Returns all states and provinces for a specific culture across all countries.
 
 **Parameters:**
+
 - `culture` (required): Culture code (e.g., `en-US`, `fr-CA`, `es-MX`, `zh-CN`, `zh-TW`, `ar-EG`)
 
 **Example Response:**
+
 ```json
 {
   "Culture": "en-US",
@@ -198,6 +217,7 @@ Returns all states and provinces for a specific culture across all countries.
     }
   ]
 }
+
 ```
 
 #### Get StateProvinces by Country and Culture
@@ -207,10 +227,12 @@ Returns all states and provinces for a specific culture across all countries.
 Returns states and provinces for a specific country and culture.
 
 **Parameters:**
+
 - `countryCode` (required): Two-letter ISO country code (`US`, `CA`, `MX`, `CN`, `TW`, `EG`)
 - `culture` (required): Culture code
 
 **Example Response:**
+
 ```json
 {
   "Country": "US",
@@ -220,9 +242,11 @@ Returns states and provinces for a specific country and culture.
     { "Code": "CA", "Name": "California", "Country": "US", "Culture": "en-US" }
   ]
 }
+
 ```
 
 **Supported Geographic Data:**
+
 - **United States**: 55 states and territories
 - **Canada**: 13 provinces and territories
 - **Mexico**: 32 states
@@ -239,11 +263,13 @@ Returns states and provinces for a specific country and culture.
 Creates a new domain registration for the authenticated user.
 
 **Request Body:**
+
 ```json
 {
   "domain": "example.com",
   "email": "user@example.com"
 }
+
 ```
 
 #### Get All Domain Registrations
@@ -267,11 +293,13 @@ Gets a specific domain registration by ID.
 **Trigger:** New or updated documents in the `DomainRegistrations` container
 
 **Configuration:**
+
 - **Lease Container**: `leases`
 - **Lease Prefix**: `domainregistration`
 - **Status Filter**: Only processes `Pending` or `InProgress` registrations
 
 **Process Flow:**
+
 1. Triggered by Cosmos DB change feed
 2. Validates domain registration data
 3. Checks if domain exists in Front Door
@@ -279,14 +307,17 @@ Gets a specific domain registration by ID.
 5. Logs success or failure
 
 **Required RBAC Permissions:**
+
 - CDN Profile Contributor or CDN Endpoint Contributor role on the Front Door profile
 
 **Assigning Permissions:**
+
 ```bash
 az role assignment create \
   --assignee <function-app-managed-identity-object-id> \
   --role "CDN Profile Contributor" \
   --scope /subscriptions/<subscription-id>/resourceGroups/<rg-name>/providers/Microsoft.Cdn/profiles/<profile-name>
+
 ```
 
 ### CreateDnsZoneFunction
@@ -296,11 +327,13 @@ az role assignment create \
 **Trigger:** New or updated documents in the `DomainRegistrations` container
 
 **Configuration:**
+
 - **Lease Container**: `leases`
 - **Lease Prefix**: `DnsZone`
 - **Status Filter**: Only processes `Pending` or `InProgress` registrations
 
 **Process Flow:**
+
 1. Monitors DomainRegistrations container
 2. Validates domain registration data
 3. Checks if DNS zone already exists
@@ -309,19 +342,23 @@ az role assignment create \
 
 **Authentication:**
 Uses `DefaultAzureCredential` supporting:
+
 1. Managed Identity (recommended for production)
 2. Environment Variables (local development)
 3. Azure CLI (local development)
 
 **Required RBAC Permissions:**
+
 - DNS Zone Contributor role on the resource group
 
 **Assigning Permissions:**
+
 ```bash
 az role assignment create \
   --assignee $PRINCIPAL_ID \
   --role "DNS Zone Contributor" \
   --resource-group <dns-resource-group>
+
 ```
 
 ### GoogleDomainRegistrationFunction
@@ -331,11 +368,13 @@ az role assignment create \
 **Trigger:** New or updated documents in the `DomainRegistrations` container
 
 **Configuration:**
+
 - **Lease Container**: `leases`
 - **Lease Prefix**: `googledomainregistration`
 - **Status Filter**: Only processes `Pending` registrations
 
 **Process Flow:**
+
 1. Triggered by domain registration creation
 2. Validates domain registration data
 3. Calls Google Domains API to register the domain
@@ -344,11 +383,13 @@ az role assignment create \
 
 **Authentication:**
 Uses Application Default Credentials (ADC):
+
 - Managed Identity in Azure
 - Workload Identity Federation recommended for production
 - Requires Domain Registration Admin permissions in Google Cloud
 
 **Cost Considerations:**
+
 - Domain registration costs vary by TLD
 - Long-running operations may have additional costs
 - Consider implementing domain availability checks before registration
@@ -366,16 +407,20 @@ Uses Application Default Credentials (ADC):
 Searches for books by author name and returns unmodified JSON from Amazon.
 
 **Parameters:**
+
 - `authorName` (route parameter, required): Author name to search for
 - `page` (query parameter, optional): Page number for pagination (default: 1)
 
 **Example:**
+
 ```bash
 curl "http://localhost:7072/api/amazon/books/author/Stephen%20King" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
 ```
 
 **Features:**
+
 - AWS Signature Version 4 authentication
 - Unmodified JSON response from Amazon
 - Pagination support
@@ -390,6 +435,7 @@ curl "http://localhost:7072/api/amazon/books/author/Stephen%20King" \
 5. Configure credentials in your settings
 
 **Partner Tag Format:**
+
 - US: Ends with `-20`
 - UK: Ends with `-21`
 - Germany: Ends with `-03`
@@ -408,11 +454,13 @@ curl "http://localhost:7072/api/amazon/books/author/Stephen%20King" \
 Searches for authors by name and returns unmodified JSON.
 
 **Parameters:**
+
 - Query parameter: `?authorName=Stephen King`
 - Or JSON body: `{"authorName": "Stephen King"}`
 - Alternative parameter names: `author`, `name`
 
 **Example:**
+
 ```bash
 # GET request
 curl "http://localhost:7072/api/SearchPenguinAuthors?authorName=Stephen%20King"
@@ -421,6 +469,7 @@ curl "http://localhost:7072/api/SearchPenguinAuthors?authorName=Stephen%20King"
 curl -X POST "http://localhost:7072/api/SearchPenguinAuthors" \
   -H "Content-Type: application/json" \
   -d '{"authorName": "Stephen King"}'
+
 ```
 
 #### GetPenguinTitlesByAuthor
@@ -430,12 +479,15 @@ curl -X POST "http://localhost:7072/api/SearchPenguinAuthors" \
 Gets titles by author key with pagination support.
 
 **Parameters:**
+
 - Query parameters: `?authorKey=123456&rows=10&start=0`
 - Or JSON body: `{"authorKey": "123456", "rows": 10, "start": 0}`
 
 **Example:**
+
 ```bash
 curl "http://localhost:7072/api/GetPenguinTitlesByAuthor?authorKey=123456&rows=10&start=0"
+
 ```
 
 ## Testing Strategy
@@ -445,6 +497,8 @@ The project includes a comprehensive testing framework with three distinct scena
 ### Testing Scenarios
 
 #### Scenario 1: Frontend UI Testing (Completely Safe)
+
+
 - **Purpose**: Test client UI without creating actual resources
 - **Cost**: $0.00 (all operations mocked)
 - **Safety**: 100% safe - no real resources created
@@ -453,15 +507,19 @@ The project includes a comprehensive testing framework with three distinct scena
 **Configuration:** All mocking enabled, $0 cost limit
 
 **Usage:**
+
 ```powershell
 # Switch to safe testing
 .\Testing\SwitchTestConfig.ps1 -Scenario 1
 
 # Run tests
 .\Testing\RunTests.ps1 -Scenario 1 -DomainName "test.example.com"
+
 ```
 
 #### Scenario 2: Individual Function Testing (Minimal Cost)
+
+
 - **Purpose**: Test each function with real Azure APIs but mock expensive operations
 - **Cost**: ~$0.50-2.00 per test run
 - **Safety**: Low cost - creates some Azure resources but no domain purchases
@@ -470,12 +528,16 @@ The project includes a comprehensive testing framework with three distinct scena
 **Configuration:** Azure real, domains mocked, $5 cost limit
 
 **Usage:**
+
 ```powershell
 .\Testing\SwitchTestConfig.ps1 -Scenario 2
 .\Testing\RunTests.ps1 -Scenario 2 -DomainName "test.example.com"
+
 ```
 
 #### Scenario 3: Full End-to-End with Real Money (Production Test)
+
+
 - **Purpose**: Complete production test with real domains, DNS, and Front Door
 - **Cost**: $12-50+ per test (domain registration costs vary by TLD)
 - **Safety**: ⚠️ HIGH COST - uses real money and creates production resources
@@ -484,14 +546,17 @@ The project includes a comprehensive testing framework with three distinct scena
 **Configuration:** Everything real, $50 cost limit
 
 **Usage:**
+
 ```powershell
 .\Testing\SwitchTestConfig.ps1 -Scenario 3
 .\Testing\RunTests.ps1 -Scenario 3 -DomainName "real-test-domain.com" -ConfirmRealMoney $true
+
 ```
 
 ### Testing Infrastructure
 
 **Files Created:**
+
 - `TestingConfiguration.cs` - Feature flag management
 - `Testing/Mocks/` - Mock implementations for services
 - `TestHarnessFunction.cs` - Individual function testing endpoints
@@ -501,6 +566,7 @@ The project includes a comprehensive testing framework with three distinct scena
 - `scenario3.local.settings.json` - Production testing config
 
 **Test Endpoints:**
+
 - `POST /api/test/frontdoor` - Test Front Door operations
 - `POST /api/test/dns` - Test DNS zone operations
 - `POST /api/test/googledomains` - Test Google Domains operations
@@ -510,6 +576,7 @@ The project includes a comprehensive testing framework with three distinct scena
 ### Cost Management
 
 **Safety Features:**
+
 1. **Cost Limits**: `MAX_TEST_COST_LIMIT` prevents expensive operations
 2. **Domain Purchase Protection**: `SKIP_DOMAIN_PURCHASE` prevents accidental purchases
 3. **Confirmation Required**: Scenario 3 requires explicit `confirmRealMoney: true`
@@ -536,6 +603,7 @@ The project includes a comprehensive testing framework with three distinct scena
 
 # Verify
 dotnet user-secrets list
+
 ```
 
 ### Secrets Moved to User Secrets
@@ -571,6 +639,7 @@ dotnet user-secrets remove "KEY_NAME"
 
 # Clear all secrets
 dotnet user-secrets clear
+
 ```
 
 ### File Locations
@@ -598,24 +667,29 @@ dotnet user-secrets clear
 az functionapp identity assign \
   --name <function-app-name> \
   --resource-group <rg-name>
+
 ```
 
 #### 2. Assign RBAC Roles
 
 **For Front Door:**
+
 ```bash
 az role assignment create \
   --assignee <managed-identity-object-id> \
   --role "CDN Profile Contributor" \
   --scope /subscriptions/<subscription-id>/resourceGroups/<rg-name>/providers/Microsoft.Cdn/profiles/<profile-name>
+
 ```
 
 **For DNS Zones:**
+
 ```bash
 az role assignment create \
   --assignee <managed-identity-object-id> \
   --role "DNS Zone Contributor" \
   --resource-group <dns-resource-group>
+
 ```
 
 #### 3. Configure Application Settings
@@ -632,12 +706,14 @@ az functionapp config appsettings set \
   AZURE_RESOURCE_GROUP_NAME=<value> \
   AZURE_FRONTDOOR_PROFILE_NAME=<value> \
   AZURE_DNS_RESOURCE_GROUP=<value>
+
 ```
 
 #### 4. Deploy the Function App
 
 ```bash
 func azure functionapp publish <function-app-name>
+
 ```
 
 ### Production Best Practices
@@ -653,17 +729,20 @@ func azure functionapp publish <function-app-name>
 ### Monitoring
 
 **View Function Execution:**
+
 - Azure Portal > Function App > Functions
 - Application Insights logs
 - Cosmos DB change feed metrics
 
 **Key Log Messages:**
+
 - "DomainRegistrationTrigger processing {Count} domain registration(s)"
 - "Successfully processed domain {DomainName} for Front Door"
 - "DNS zone created successfully for domain {DomainName}"
 - "Failed to add domain {DomainName} to Front Door"
 
 **Log Queries (KQL):**
+
 ```kql
 // Find DNS zone creation events
 traces
@@ -677,6 +756,7 @@ traces
 | where operation_Name == "CreateDnsZone"
 | project timestamp, message
 | order by timestamp desc
+
 ```
 
 ## Notes
@@ -699,6 +779,7 @@ traces
 ## Support
 
 For issues or questions:
+
 - File an issue in the repository
 - Contact the development team
 - Review Application Insights logs for errors

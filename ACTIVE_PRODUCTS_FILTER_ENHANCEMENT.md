@@ -19,6 +19,7 @@ if (request.Active != true)
     request.Active = true;
     _logger.LogDebug("Setting Active filter to true to exclude inactive products");
 }
+
 ```
 
 ## How It Works
@@ -27,7 +28,9 @@ if (request.Active != true)
 
 - The function would pass through whatever `Active` value was provided in the request
 - If `Active` was
+
 ull` or `false`, inactive products could be returned
+
 - Callers needed to remember to explicitly set `Active = true`
 
 ### After Enhancement
@@ -49,6 +52,7 @@ ull` or `false`, inactive products could be returned
   "limit": 10,
   "culture": "en-US"
 }
+
 ```
 
 → Behavior unchanged, active filter already applied
@@ -61,6 +65,7 @@ ull` or `false`, inactive products could be returned
   "limit": 10,
   "culture": "en-US"
 }
+
 ```
 
 → Automatically changed to `active: true` and logged
@@ -72,6 +77,7 @@ ull` or `false`, inactive products could be returned
   "limit": 10,
   "culture": "en-US"
 }
+
 ```
 
 → Automatically set to `active: true` and logged
@@ -100,6 +106,7 @@ The function now logs when the active filter is automatically applied:
 
 ```text
 [DEBUG] Setting Active filter to true to exclude inactive products
+
 ```
 
 This helps with troubleshooting and monitoring to understand when the automatic filter is being applied.

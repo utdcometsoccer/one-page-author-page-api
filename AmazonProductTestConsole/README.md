@@ -15,23 +15,33 @@ A .NET console application for testing and debugging the Amazon Product Advertis
 ## Setup
 
 1. **Build the application:**
+
+
    ```bash
+
    dotnet build AmazonProductTestConsole.csproj
+
    ```
 
 2. **Configure User Secrets** (already done if copied from InkStainedWretchFunctions):
+
+
    ```bash
+
    dotnet user-secrets set "AMAZON_PRODUCT_ACCESS_KEY" "your-aws-access-key"
    dotnet user-secrets set "AMAZON_PRODUCT_SECRET_KEY" "your-aws-secret-key"
    dotnet user-secrets set "AMAZON_PRODUCT_PARTNER_TAG" "your-associate-tag-20"
    dotnet user-secrets set "AMAZON_PRODUCT_REGION" "us-east-1"
    dotnet user-secrets set "AMAZON_PRODUCT_MARKETPLACE" "www.amazon.com"
-   dotnet user-secrets set "AMAZON_PRODUCT_API_ENDPOINT" "https://webservices.amazon.com/paapi5/searchitems"
+   dotnet user-secrets set "AMAZON_PRODUCT_API_ENDPOINT" "<https://webservices.amazon.com/paapi5/searchitems">
+
    ```
 
 ## Usage
 
 ### Basic Usage
+
+
 ```bash
 # Test with Stephen King (default)
 dotnet run
@@ -41,9 +51,12 @@ dotnet run -- "J.K. Rowling"
 
 # Test with author name containing spaces
 dotnet run -- "George R.R. Martin"
+
 ```
 
 ### Advanced Usage
+
+
 ```bash
 # Show current configuration
 dotnet run -- --config
@@ -59,6 +72,7 @@ dotnet run -- --config --author "Isaac Asimov"
 
 # Run without waiting for key press (useful for scripts)
 dotnet run -- --nowait "Agatha Christie"
+
 ```
 
 ## Command Line Options
@@ -74,6 +88,8 @@ dotnet run -- --nowait "Agatha Christie"
 ## Output Examples
 
 ### Successful API Call
+
+
 ```
 === Amazon Product API Test Console ===
 
@@ -92,9 +108,12 @@ dotnet run -- --nowait "Agatha Christie"
   3. The Stand (ASIN: B001RMZGDS)
 
 📈 Total available results: 127
+
 ```
 
 ### Configuration Error (404)
+
+
 ```
 ❌ Configuration Error:
 Amazon Product API returned 404 Not Found. This usually indicates:
@@ -108,6 +127,7 @@ To fix Amazon Product API issues:
 2. Apply for Product Advertising API access (separate from Associates)
 3. Get your real Partner Tag from your Associates account
 4. Update user secrets with your real Partner Tag
+
 ```
 
 ## Troubleshooting
@@ -120,7 +140,7 @@ To fix Amazon Product API issues:
 
 ### Required Amazon Setup
 
-1. **Amazon Associates Account**: Sign up at https://affiliate-program.amazon.com/
+1. **Amazon Associates Account**: Sign up at <https://affiliate-program.amazon.com/>
 2. **Product Advertising API Access**: Apply separately (requires Associates account)
 3. **Real Partner Tag**: Get from your Associates account dashboard (format: `yourstore-20`)
 
@@ -148,11 +168,13 @@ AmazonProductTestConsole/
 ├── Program.cs              # Basic console application
 ├── AdvancedProgram.cs      # Enhanced version with debugging features
 └── README.md              # This file
+
 ```
 
 ## Usage in Development
 
 This console application is perfect for:
+
 - Testing Amazon Product API integration during development
 - Debugging API configuration issues
 - Validating credentials and Partner Tag setup
@@ -162,6 +184,7 @@ This console application is perfect for:
 ## Attaching Debugger
 
 To debug the application:
+
 1. Set breakpoints in the source code
 2. Run with debugger: `F5` in VS Code
 3. Or attach to running process using VS Code's "Attach to Process" feature

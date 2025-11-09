@@ -5,20 +5,26 @@ This console application creates or updates Stripe products for the Ink Stained 
 ## Products Created
 
 ### 1. Annual Subscription ($59/year)
+
+
 - **Name**: "Ink Stained Wretch - Annual Subscription"
 - **Price**: $59.00 USD
 - **Billing**: Annually (every 1 year)
 - **Nickname**: "1 year subscription"
 
 ### 2. 2-Year Subscription ($118/2 years)
-- **Name**: "Ink Stained Wretch - 2-Year Subscription"  
+
+
+- **Name**: "Ink Stained Wretch - 2-Year Subscription"
 - **Price**: $118.00 USD
 - **Billing**: Every 2 years
 - **Nickname**: "2 year subscription"
 
 ### 3. 3-Year Subscription ($149/3 years)
+
+
 - **Name**: "Ink Stained Wretch - 3-Year Subscription"
-- **Price**: $149.00 USD  
+- **Price**: $149.00 USD
 - **Billing**: Every 3 years
 - **Nickname**: "3 year subscription"
 
@@ -27,6 +33,8 @@ This console application creates or updates Stripe products for the Ink Stained 
 All products include comprehensive features from the Ink Stained Wretch platform:
 
 ### Core Features
+
+
 - Microsoft Entra ID Integration & SSO
 - Multi-format image upload & Azure Blob Storage
 - Custom domain registration & DNS management
@@ -34,11 +42,15 @@ All products include comprehensive features from the Ink Stained Wretch platform
 - Penguin Random House & Amazon API integration
 
 ### Multi-Language Support
+
+
 - English (EN), Spanish (ES), French (FR)
 - Arabic (AR) with RTL support
 - Chinese Simplified (ZH-CN) & Traditional (ZH-TW)
 
 ### Technical Infrastructure
+
+
 - Azure Functions serverless architecture
 - Azure Cosmos DB for data persistence
 - Global CDN with Azure Front Door
@@ -50,12 +62,15 @@ All products include comprehensive features from the Ink Stained Wretch platform
 ### 1. Configure Stripe API Key
 
 **Option A: User Secrets (Recommended)**
+
 ```bash
 cd StripeProductManager
 dotnet user-secrets set "Stripe:SecretKey" "sk_test_your_actual_stripe_secret_key"
+
 ```
 
 **Option B: Environment Variable**
+
 ```bash
 # Windows (PowerShell)
 $env:STRIPE__SECRETKEY = "sk_test_your_actual_stripe_secret_key"
@@ -65,26 +80,31 @@ set STRIPE__SECRETKEY=sk_test_your_actual_stripe_secret_key
 
 # Linux/Mac
 export STRIPE__SECRETKEY=sk_test_your_actual_stripe_secret_key
+
 ```
 
 **Option C: Update appsettings.json**
+
 ```json
 {
   "Stripe": {
     "SecretKey": "sk_test_your_actual_stripe_secret_key"
   }
 }
+
 ```
 
 **Option D: Environment-Specific Configuration**
 
 Create environment-specific configuration files:
+
 ```bash
 # For development
 cp appsettings.json appsettings.Development.json
 
 # For production
 cp appsettings.json appsettings.Production.json
+
 ```
 
 Then customize pricing for each environment. The application automatically loads the appropriate file based on `ASPNETCORE_ENVIRONMENT`.
@@ -95,6 +115,7 @@ Then customize pricing for each environment. The application automatically loads
 cd StripeProductManager
 dotnet build
 dotnet run
+
 ```
 
 ## What the Application Does
@@ -104,6 +125,7 @@ dotnet run
 3. **Creates or updates products** with comprehensive metadata
 4. **Creates or updates prices** with correct billing intervals
 5. **Adds extensive metadata** including:
+
    - Platform features (50+ features from your documentation)
    - Culture/language support information
    - Technical architecture details
@@ -112,12 +134,16 @@ dotnet run
 ## Metadata Structure
 
 ### Product Metadata
+
+
 - **Features**: All major platform capabilities
 - **Culture Support**: Multi-language and localization data
 - **Technical Info**: Cloud provider, architecture, version
 - **Business Info**: Plan type, creation date, total features
 
 ### Price Metadata
+
+
 - **Billing Info**: Cycle, renewal period, currency
 - **Policies**: Cancellation, refund, auto-renewal
 - **Timestamps**: Created and updated dates
@@ -132,6 +158,7 @@ dotnet run
 ## Error Handling
 
 The application includes comprehensive error handling:
+
 - Logs all operations for debugging
 - Continues processing if individual products fail
 - Provides detailed console output
@@ -163,6 +190,7 @@ The application includes comprehensive error handling:
 
 ✅ All products and prices have been successfully created/updated!
 ✅ Culture information added to all products!
+
 ```
 
 ## Culture and Internationalization Support
@@ -172,14 +200,20 @@ The application includes comprehensive error handling:
 The application includes comprehensive culture information for internationalization:
 
 #### English Variants
+
+
 - **en-US**: English (United States) - Primary
 - **en-CA**: English (Canada)
 
 #### Spanish Variants
+
+
 - **es-US**: Spanish (United States)
 - **es-MX**: Spanish (Mexico)
 
 #### French Variants
+
+
 - **fr-CA**: French (Canada)
 - **fr-FR**: French (France)
 
@@ -188,6 +222,7 @@ The application includes comprehensive culture information for internationalizat
 Each product includes localized names, descriptions, and pricing nicknames:
 
 **Example - Annual Subscription:**
+
 - **English (en-US)**: "Ink Stained Wretch - Annual Subscription" / "1 year subscription"
 - **Spanish (es-US)**: "Escritor Manchado de Tinta - Suscripción Anual" / "suscripción de 1 año"
 - **French (fr-CA)**: "Écrivain Taché d'Encre - Abonnement Annuel" / "abonnement de 1 an"
@@ -195,6 +230,7 @@ Each product includes localized names, descriptions, and pricing nicknames:
 ### Enhanced Stripe Metadata
 
 Products include rich culture metadata:
+
 - `supported_cultures`: Comma-separated list of supported culture codes
 - `primary_language`: Primary culture code
 - `multi_language`: Boolean indicating multi-language support
@@ -230,21 +266,25 @@ Products include rich culture metadata:
     }
   }
 }
+
 ```
 
 ### Managing Cultures
 
 **Adding New Cultures:**
+
 1. Add culture code to `SupportedCultures` array
 2. Add entry to `CultureSpecificInfo` with localized content
 3. Run the application to update Stripe products
 
 **Changing Primary Culture:**
+
 1. Update `PrimaryCulture` field in configuration
 2. Ensure the primary culture exists in `SupportedCultures`
 3. Re-run the application to update metadata
 
 **Removing Cultures:**
+
 1. Remove culture code from `SupportedCultures`
 2. Remove corresponding entry from `CultureSpecificInfo`
 3. Re-run to clean up Stripe metadata
@@ -260,6 +300,7 @@ var subscriptionPlan = await subscriptionPlanService.MapToSubscriptionPlanAsync(
 // Features will be populated from the metadata
 Console.WriteLine($"Plan: {subscriptionPlan.Label}");
 Console.WriteLine($"Features: {string.Join(", ", subscriptionPlan.Features)}");
+
 ```
 
 This ensures your subscription plans have rich feature information directly from Stripe, making them consistent across your entire platform.
@@ -293,6 +334,7 @@ The application reads product definitions and pricing from `appsettings.json`. Y
     ]
   }
 }
+
 ```
 
 ### Customization Options
@@ -317,20 +359,28 @@ To change pricing, cultures, or add new products:
 ## Troubleshooting
 
 ### Error: "Stripe:SecretKey is required"
+
+
 - Make sure you've set your Stripe API key using one of the methods above
 - Verify the key starts with `sk_test_` for test mode or `sk_live_` for live mode
 
 ### Error: "Invalid API Key"
+
+
 - Double-check your Stripe API key is correct
 - Ensure you're using the correct key for your Stripe account
 - Make sure the key hasn't expired or been revoked
 
 ### Error: Network/Connection Issues
+
+
 - Check your internet connection
-- Verify you can access https://api.stripe.com
+- Verify you can access <https://api.stripe.com>
 - Check if you're behind a corporate firewall
 
 ### Warning: "Stripe.net version resolved to newer version"
+
+
 - This is harmless - NuGet automatically resolved to a newer compatible version
 - The application will work correctly with Stripe.net 47.0.0
 

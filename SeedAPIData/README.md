@@ -10,7 +10,7 @@ Console application for seeding the OnePageAuthor database with initial author, 
 SeedAPIData provides a reliable way to initialize your OnePageAuthor system with sample data including:
 
 - **Author Profiles**: Sample author information with biographies and metadata
-- **Book Catalog**: Demo book entries with covers, descriptions, and publication details  
+- **Book Catalog**: Demo book entries with covers, descriptions, and publication details
 - **Article Content**: Sample blog posts and article content
 - **Social Media Links**: Author social media profiles and connections
 - **Relationships**: Proper linking between authors, books, and articles
@@ -25,11 +25,15 @@ SeedAPIData provides a reliable way to initialize your OnePageAuthor system with
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+
 - .NET 9.0 SDK
 - Access to OnePageAuthor Azure Cosmos DB
 - Proper connection string configuration
 
 ### Running the Seeder
+
+
 ```bash
 # Navigate to project directory
 cd SeedAPIData
@@ -42,16 +46,20 @@ dotnet build
 
 # Run the seeder
 dotnet run
+
 ```
 
 ### Configuration
+
 Set up your database connection using user secrets:
+
 ```bash
 # Set Cosmos DB connection string
 dotnet user-secrets set "CosmosDbConnectionString" "your-cosmos-connection-string"
 
 # Set database configuration
 dotnet user-secrets set "DatabaseId" "OnePageAuthorDB"
+
 ```
 
 ## 📋 Sample Data
@@ -59,18 +67,24 @@ dotnet user-secrets set "DatabaseId" "OnePageAuthorDB"
 The seeder creates the following sample entities:
 
 ### Authors
+
+
 - Multiple author profiles with biographical information
-- Professional headshots and cover images  
+- Professional headshots and cover images
 - Social media profiles and website links
 - Geographic and demographic diversity
 
 ### Books
+
+
 - Fiction and non-fiction titles
 - Complete metadata (ISBN, publication dates, descriptions)
 - Cover images and promotional materials
 - Author-book relationships
 
-### Articles  
+### Articles
+
+
 - Blog posts and articles
 - Various content categories and tags
 - Publication dates and reading time estimates
@@ -79,19 +93,25 @@ The seeder creates the following sample entities:
 ## 🔧 Usage
 
 ### Safe Operation
+
+
 - The seeder can be run multiple times safely
 - Existing records will be updated rather than duplicated
 - Includes verification and rollback capabilities
 - Provides detailed logging of all operations
 
-### Verification  
+### Verification
+
 After running the seeder:
+
 1. Check Cosmos DB containers for new records
 2. Verify data integrity and relationships
 3. Test API endpoints with seeded data
 4. Review logs for any errors or warnings
 
 ### Sample Output
+
+
 ```
 Starting API Data Seeding...
 📚 Seeding authors... (3 authors created)
@@ -100,6 +120,7 @@ Starting API Data Seeding...
 🔗 Creating relationships...
 ✅ Seeding completed successfully!
 Total records: 23 entities created
+
 ```
 
 ## 📖 Documentation
@@ -118,4 +139,6 @@ Total records: 23 entities created
 6. Open a Pull Request
 
 ## Configuration
+
+
 - Provide any required connection/configuration values via environment variables or user-secrets.

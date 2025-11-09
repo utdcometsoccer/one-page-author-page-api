@@ -140,7 +140,7 @@ The **Ink Stained Wretch Application** is a comprehensive author management and 
 ### **Multi-Language Support**
 
 - **North American Focus**: Comprehensive support for US, Canada, and Mexico markets
-- **Language Options**: 
+- **Language Options**:
 
   - **English (EN)**: Primary language support
   - **Spanish (ES)**: Full Spanish localization
