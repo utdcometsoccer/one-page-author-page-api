@@ -61,7 +61,8 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 {
                     Prices = filteredPrices,
                     HasMore = stripeResponse.HasMore,
-                    LastId = filteredPrices.LastOrDefault()?.Id ?? string.Empty
+                    // Use LastId from Stripe response for proper cursor-based pagination
+                    LastId = stripeResponse.Data.LastOrDefault()?.Id ?? string.Empty
                 };
 
                 _logger.LogInformation("Retrieved {Count} Stripe prices (filtered from {TotalCount})", 
