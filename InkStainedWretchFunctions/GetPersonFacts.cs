@@ -44,8 +44,12 @@ public class GetPersonFacts
     /// <description>No Wikipedia page found for the specified person</description>
     /// </item>
     /// <item>
-    /// <term>500 Internal Server Error</term>
+    /// <term>502 Bad Gateway</term>
     /// <description>Error calling Wikipedia APIs</description>
+    /// </item>
+    /// <item>
+    /// <term>500 Internal Server Error</term>
+    /// <description>Unexpected server error</description>
     /// </item>
     /// </list>
     /// </returns>

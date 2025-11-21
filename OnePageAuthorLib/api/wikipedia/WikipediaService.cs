@@ -41,6 +41,8 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Wikipedia
             language = language.ToLowerInvariant();
 
             // URL encode the person name for API calls
+            // Note: REST API uses underscores for spaces (e.g., "Albert_Einstein")
+            // while MediaWiki API uses the original name with spaces
             var encodedName = Uri.EscapeDataString(personName.Trim().Replace(' ', '_'));
 
             _logger.LogInformation("Fetching Wikipedia facts for person: {PersonName} in language: {Language}", personName, language);
