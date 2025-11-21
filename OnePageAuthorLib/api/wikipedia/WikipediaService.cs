@@ -40,18 +40,19 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Wikipedia
             // Normalize language code
             language = language.ToLowerInvariant();
 
-            // URL encode the person name for API calls
-            // Note: REST API uses underscores for spaces (e.g., "Albert_Einstein")
-            // while MediaWiki API uses the original name with spaces
-            var encodedName = Uri.EscapeDataString(personName.Trim().Replace(' ', '_'));
+            // Prepare person name for API calls
+            // REST API expects underscores for spaces in the page title
+            // MediaWiki API expects spaces in the title parameter
+            var normalizedName = personName.Trim();
+            var restApiName = normalizedName.Replace(' ', '_');
 
             _logger.LogInformation("Fetching Wikipedia facts for person: {PersonName} in language: {Language}", personName, language);
 
             try
             {
                 // Fetch data from both APIs concurrently
-                var summaryTask = GetSummaryAsync(encodedName, language);
-                var extractTask = GetExtractAsync(personName, language);
+                var summaryTask = GetSummaryAsync(restApiName, language);
+                var extractTask = GetExtractAsync(normalizedName, language);
 
                 await Task.WhenAll(summaryTask, extractTask);
 
@@ -73,19 +74,28 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Wikipedia
                 _logger.LogInformation("Successfully retrieved Wikipedia facts for: {PersonName}", personName);
                 return response;
             }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP error calling Wikipedia APIs for person: {PersonName} in language: {Language}", personName, language);
+                throw; // Re-throw to preserve exception type for proper handling in Azure Function
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to get Wikipedia facts for person: {PersonName} in language: {Language}", personName, language);
-                throw new InvalidOperationException($"Failed to get Wikipedia facts: {ex.Message}", ex);
+                _logger.LogError(ex, "Unexpected error getting Wikipedia facts for person: {PersonName} in language: {Language}", personName, language);
+                throw; // Re-throw to preserve exception type
             }
         }
 
         /// <summary>
         /// Gets summary information from Wikipedia REST API
         /// </summary>
-        private async Task<(string? Title, string? Description, string? Extract, ThumbnailInfo? Thumbnail, string? CanonicalUrl)> GetSummaryAsync(string encodedName, string language)
+        /// <param name="pageTitle">Page title with underscores for spaces (will be URL encoded)</param>
+        /// <param name="language">Language code</param>
+        private async Task<(string? Title, string? Description, string? Extract, ThumbnailInfo? Thumbnail, string? CanonicalUrl)> GetSummaryAsync(string pageTitle, string language)
         {
-            var url = $"https://{language}.wikipedia.org/api/rest_v1/page/summary/{encodedName}";
+            // URL encode the page title for the REST API
+            var encodedTitle = Uri.EscapeDataString(pageTitle);
+            var url = $"https://{language}.wikipedia.org/api/rest_v1/page/summary/{encodedTitle}";
             _logger.LogDebug("Calling Wikipedia REST API: {Url}", url);
 
             var response = await _httpClient.GetAsync(url);
@@ -130,9 +140,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Wikipedia
         /// <summary>
         /// Gets lead paragraph from MediaWiki API
         /// </summary>
-        private async Task<string?> GetExtractAsync(string personName, string language)
+        /// <param name="pageTitle">Page title with spaces (will be URL encoded)</param>
+        /// <param name="language">Language code</param>
+        private async Task<string?> GetExtractAsync(string pageTitle, string language)
         {
-            var url = $"https://{language}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&titles={Uri.EscapeDataString(personName)}&format=json";
+            // URL encode the page title for query parameter
+            var encodedTitle = Uri.EscapeDataString(pageTitle);
+            var url = $"https://{language}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&titles={encodedTitle}&format=json";
             _logger.LogDebug("Calling MediaWiki API: {Url}", url);
 
             var response = await _httpClient.GetAsync(url);
