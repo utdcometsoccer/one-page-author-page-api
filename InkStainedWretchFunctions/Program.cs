@@ -35,6 +35,7 @@ builder.Services
     .AddInkStainedWretchServices()
     .AddPenguinRandomHouseServices()
     .AddAmazonProductServices() // Add Amazon Product API services
+    .AddWikipediaServices() // Add Wikipedia API services
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
     .AddUserProfileServices()
     .AddDomainRegistrationRepository() // Add domain registration repository

@@ -619,6 +619,18 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
+        /// Registers Wikipedia API services for retrieving person facts.
+        /// </summary>
+        public static IServiceCollection AddWikipediaServices(this IServiceCollection services)
+        {
+            // Register HTTP client and service
+            services.AddHttpClient<InkStainedWretch.OnePageAuthorLib.API.Wikipedia.IWikipediaService, 
+                                   InkStainedWretch.OnePageAuthorLib.API.Wikipedia.WikipediaService>();
+
+            return services;
+        }
+
+        /// <summary>
         /// Registers JWT authentication services including validation and token introspection.
         /// </summary>
         /// <param name="services">Service collection.</param>
