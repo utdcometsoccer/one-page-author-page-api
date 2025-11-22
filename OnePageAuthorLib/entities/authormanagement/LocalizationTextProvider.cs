@@ -45,6 +45,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
             var specific = culture;
             var language = GetNeutralCulture(culture) ?? culture; // language code
 
+            result.App = await QueryLanguageResolutionAsync<App>("App", specific, language);
             result.ArticleForm = await QueryLanguageResolutionAsync<ArticleForm>("ArticleForm", specific, language);
             result.ArticleList = await QueryLanguageResolutionAsync<ArticleList>("ArticleList", specific, language);
             result.AuthGuard = await QueryLanguageResolutionAsync<AuthGuard>("AuthGuard", specific, language);
@@ -60,6 +61,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
             result.DomainInput = await QueryLanguageResolutionAsync<DomainInput>("DomainInput", specific, language);
             result.DomainRegistration = await QueryLanguageResolutionAsync<DomainRegistration>("DomainRegistration", specific, language);
             result.DomainRegistrationsList = await QueryLanguageResolutionAsync<DomainRegistrationsList>("DomainRegistrationsList", specific, language);
+            result.ErrorBoundary = await QueryLanguageResolutionAsync<ErrorBoundary>("ErrorBoundary", specific, language);
             result.ErrorPage = await QueryLanguageResolutionAsync<ErrorPage>("ErrorPage", specific, language);
             result.ImageManager = await QueryLanguageResolutionAsync<ImageManager>("ImageManager", specific, language);
             result.LoginRegister = await QueryLanguageResolutionAsync<LoginRegister>("LoginRegister", specific, language);
@@ -67,9 +69,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
             result.OpenLibraryAuthorForm = await QueryLanguageResolutionAsync<OpenLibraryAuthorForm>("OpenLibraryAuthorForm", specific, language);
             result.PenguinRandomHouseAuthorDetail = await QueryLanguageResolutionAsync<PenguinRandomHouseAuthorDetail>("PenguinRandomHouseAuthorDetail", specific, language);
             result.PenguinRandomHouseAuthorList = await QueryLanguageResolutionAsync<PenguinRandomHouseAuthorList>("PenguinRandomHouseAuthorList", specific, language);
+            result.ProgressIndicator = await QueryLanguageResolutionAsync<ProgressIndicator>("ProgressIndicator", specific, language);
             result.SocialForm = await QueryLanguageResolutionAsync<SocialForm>("SocialForm", specific, language);
             result.SocialList = await QueryLanguageResolutionAsync<SocialList>("SocialList", specific, language);
             result.ThankYou = await QueryLanguageResolutionAsync<ThankYou>("ThankYou", specific, language);
+            result.Toast = await QueryLanguageResolutionAsync<Toast>("Toast", specific, language);
+            result.ToastMessages = await QueryLanguageResolutionAsync<ToastMessages>("ToastMessages", specific, language);
+            result.WelcomePage = await QueryLanguageResolutionAsync<WelcomePage>("WelcomePage", specific, language);
 
             return result;
         }

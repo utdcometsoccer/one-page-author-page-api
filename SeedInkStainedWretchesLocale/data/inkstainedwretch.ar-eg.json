@@ -1,241 +1,314 @@
 {
-    "AuthorRegistration": {
-    "authorListTitle": "معلومات المؤلف",
-    "languageLabel": "اللغة: ",
-    "regionLabel": "المنطقة: ",
-    "editAuthor": "تعديل",
-    "deleteAuthor": "حذف",
-    "addAuthor": "إضافة مؤلف",
-    "continue": "متابعة"
-    },
-    "LoginRegister": {
-        "loginHeader": {
-            "title": "تسجيل الدخول",
-            "subtitle": "سجّل الدخول إلى حسابك."
-        },
-        "loginButton": {
-            "label": "تسجيل الدخول باستخدام مايكروسوفت"
-        },
-        "logoutButton": {
-            "label": "تسجيل الخروج"
-        },
-        "countdownIndicator": {
-            "text": "جارٍ التحويل إلى تسجيل النطاق خلال {countdown} ثانية..."
-        }
-    },
-    "ThankYou": {
-        "title": "شكرًا لك",
-        "message": "شكرًا على شرائك!"
-    },
-    "Navbar": {
-        "brand": "الملطخ بالحبر",
-        "navigation": "التنقل",
-        "close": "إغلاق",
-        "navItems": {
-            "chooseCulture": { "label": "الثقافة", "description": "اختر اللغة والمنطقة" },
-            "login": { "label": "تسجيل الدخول", "description": "تسجيل الدخول / إنشاء حساب" },
-            "domainRegistration": { "label": "النطاق", "description": "تسجيل النطاق" },
-            "authorPage": { "label": "المؤلف", "description": "صفحة المؤلف" },
-            "subscribe": { "label": "اشترك", "description": "اختر خطة اشتراك وأكمل الدفع" },
-            "thankYou": { "label": "نجاح", "description": "شكرًا لك" }
-        }
-    },
-    "DomainRegistration": {
-        "title": "تسجيل النطاق",
-        "subtitle": "سجّل نطاقك ومعلومات الاتصال.",
-        "submit": "إرسال",
-        "firstName": "الاسم الأول",
-        "lastName": "اسم العائلة",
-        "address": "العنوان",
-        "address2": "العنوان 2",
-        "city": "المدينة",
-        "state": "المحافظة / المنطقة:",
-        "country": "الدولة:",
-        "zipCode": "الرمز البريدي",
-        "emailAddress": "البريد الإلكتروني",
-        "telephoneNumber": "رقم الهاتف"
-    },
-    "ErrorPage": {
-        "title": "خطأ",
-        "devMessage": "حدث خطأ أثناء التطوير.",
-        "details": "معلومات الخطأ التفصيلية:",
-        "tryAgain": "حاول مرة أخرى",
-        "userMessage": "نعتذر، حدث خطأ ما. يرجى المحاولة لاحقًا.",
-        "return": "العودة إلى التطبيق"
-    },
-    "ImageManager": {
-        "title": "صورك المرفوعة",
-        "loading": "جارٍ التحميل...",
-        "select": "اختيار",
-        "delete": "حذف",
-        "refresh": "تحديث"
-    },
-    "Checkout": {
-    "selectPlan": "يرجى اختيار خطة اشتراك للمتابعة.",
-    "formTitle": "أكمل عملية الشراء",
-    "errorMessage": "حدث خطأ أثناء الدفع. يرجى المحاولة مرة أخرى.",
-    "buttonLabel": "اشترك"
-    },
-    "AuthGuard": {
-        "title": "المصادقة مطلوبة",
-        "message": "يرجى تسجيل الدخول للوصول إلى هذا المحتوى. تحتاج للمصادقة لعرض وإدارة معلومات المؤلف الخاصة بك.",
-        "buttonLabel": "تسجيل الدخول باستخدام مايكروسوفت"
-    },
-    "DomainInput": {
-        "label": "النطاق:",
-        "placeholder": "example.com",
-        "error": "تنسيق النطاق غير صالح.",
-        "success": "تنسيق النطاق صالح ومتاح!"
-    },
-    "SocialList": {
-        "title": "روابط التواصل الاجتماعي",
-        "url": "الرابط:",
-        "edit": "تعديل",
-        "delete": "حذف",
-        "addSocial": "إضافة رابط اجتماعي"
-    },
-    "CountdownIndicator": {
-        "redirecting": "جارٍ التحويل خلال {countdown} ثانية..."
-    },
-    "ChooseCulture": {
-        "title": "اختر لغتك ومنطقتك",
-        "subtitle": "اختر لغتك ومنطقتك المفضلة لأفضل تجربة.",
-        "legend": "اختيار اللغة والدولة",
-        "languageLabel": "اللغة: ",
-        "countryLabel": "الدولة:",
-        "continue": "متابعة",
-        "cancel": "إلغاء",
-        "cookieConsent": "أوافق على استخدام الكوكيز لتحسين تجربتي.",
-        "cookiesInfo": "نستخدم الكوكيز لتخزين تفضيلاتك للغة والمنطقة بالإضافة إلى إعدادات أخرى، لضمان تجربة مخصصة في كل زيارة لموقعنا. بموافقتك، تساعدنا على تحسين تفاعلك مع منصتنا."
-    },
-    "BookList": {
-        "title": "الكتب",
-        "description": "الوصف:",
-        "url": "الرابط:",
-        "edit": "تعديل",
-        "delete": "حذف",
-        "addBook": "إضافة كتاب",
-        "importOpenLibrary": "استيراد كتب من Open Library",
-        "importGoogleBooks": "استيراد كتب من Google Books",
-        "importPenguinBooks": "استيراد كتب من Penguin Random House"
+    "App": {
+        "loadingDashboard": "Loading dashboard..."
     },
     "ArticleForm": {
-        "legend": "تعديل المقال",
-        "title": "العنوان:",
-        "date": "التاريخ:",
-        "publication": "الناشر:",
-        "url": "الرابط:",
-        "save": "حفظ",
-        "cancel": "إلغاء"
+        "legend": "Edit Article",
+        "title": "Title:",
+        "date": "Date:",
+        "publication": "Publication:",
+        "url": "URL:",
+        "save": "Save",
+        "cancel": "Cancel"
     },
     "ArticleList": {
-        "title": "المقالات",
-        "date": "التاريخ:",
-        "publication": "الناشر:",
-        "url": "الرابط:",
-        "edit": "تعديل",
-        "delete": "حذف",
-        "addArticle": "إضافة مقال"
+        "title": "Articles",
+        "date": "Date:",
+        "publication": "Publication:",
+        "url": "URL:",
+        "edit": "Edit",
+        "delete": "Delete",
+        "addArticle": "Add Article"
     },
-    "OpenLibraryAuthorForm": {
-        "legend": "تعديل المؤلف",
-        "key": "المفتاح:",
-        "text": "النص:",
-        "type": "النوع:",
-        "name": "الاسم:",
-        "alternateNames": "أسماء بديلة:",
-        "birthDate": "تاريخ الميلاد:",
-        "topWork": "أهم الأعمال:",
-        "workCount": "عدد الأعمال:",
-        "topSubjects": "الموضوعات الرئيسية:",
-        "version": "الإصدار:",
-        "save": "حفظ",
-        "cancel": "إلغاء"
+    "AuthGuard": {
+        "title": "Authentication Required",
+        "message": "Please sign in to access this content. You'll need to authenticate to view and manage your author information.",
+        "buttonLabel": "Sign in with Microsoft"
     },
     "AuthorDocList": {
-        "title": "المؤلفون",
-        "topWork": "أهم الأعمال:",
-        "birthDate": "تاريخ الميلاد:",
-        "import": "استيراد",
-        "importTitle": "استيراد AuthorDoc",
-        "goBack": "العودة"
-    },
-    "BookForm": {
-        "legend": "تفاصيل الكتاب",
-        "title": "العنوان:",
-        "description": "الوصف:",
-        "url": "الرابط:",
-        "cover": "الغلاف:",
-        "chooseImage": "اختيار صورة",
-        "close": "إغلاق",
-        "save": "حفظ",
-        "cancel": "إلغاء"
+        "title": "Authors",
+        "topWork": "Top Work:",
+        "birthDate": "Birth Date:",
+        "import": "Import",
+        "importTitle": "Import AuthorDoc",
+        "goBack": "Go Back"
     },
     "AuthorMainForm": {
-        "legend": "معلومات المؤلف",
-        "authorName": "اسم المؤلف:",
-        "language": "اللغة:",
-        "country": "الدولة:",
-        "email": "البريد الإلكتروني:",
-        "welcomeText": "نص الترحيب:",
-        "aboutText": "عن المؤلف:",
-        "headshotUrl": "رابط الصورة:",
-        "chooseImage": "اختيار صورة",
-        "close": "إغلاق",
-        "copyrightText": "نص حقوق النشر:",
-        "topLevelDomain": "النطاق الأعلى:",
-        "secondLevelDomain": "النطاق الثاني:",
-        "articles": "مقالات",
-        "books": "كتب",
-        "socialLinks": "روابط اجتماعية",
-        "importAuthor": "استيراد المؤلف من Open Library",
-        "importPenguinAuthor": "استيراد المؤلف من Penguin Random House",
-        "save": "حفظ المؤلف",
-        "cancel": "إلغاء"
+        "legend": "Author Information",
+        "authorName": "Author Name:",
+        "language": "Language:",
+        "country": "Country:",
+        "email": "Email:",
+        "welcomeText": "Welcome Text:",
+        "aboutText": "About Text:",
+        "headshotUrl": "Headshot URL:",
+        "chooseImage": "Choose Image",
+        "close": "Close",
+        "copyrightText": "Copyright Text:",
+        "topLevelDomain": "Top Level Domain:",
+        "secondLevelDomain": "Second Level Domain:",
+        "articles": "Articles",
+        "books": "Books",
+        "socialLinks": "Social Links",
+        "importAuthor": "Import Author From Open Library",
+        "importPenguinAuthor": "Import Author From Penguin Random House",
+        "save": "Save Author",
+        "cancel": "Cancel"
+    },
+    "AuthorRegistration": {
+        "authorListTitle": "Author Information",
+        "languageLabel": "Language: ",
+        "regionLabel": "Region: ",
+        "editAuthor": "Edit",
+        "deleteAuthor": "Delete",
+        "addAuthor": "Add Author",
+        "continue": "Continue"
+    },
+    "BookForm": {
+        "legend": "Book Details",
+        "title": "Title:",
+        "description": "Description:",
+        "url": "URL:",
+        "cover": "Cover:",
+        "chooseImage": "Choose Image",
+        "close": "Close",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "BookList": {
+        "title": "Books",
+        "description": "Description:",
+        "url": "URL:",
+        "edit": "Edit",
+        "delete": "Delete",
+        "addBook": "Add Book",
+        "importOpenLibrary": "Import Books Open Library",
+        "importGoogleBooks": "Import Google Books",
+        "importPenguinBooks": "Import Books Penguin Random House",
+        "importAmazonBooks": "Import Amazon Books",
+        "readMore": "Read More",
+        "showLess": "Show Less",
+        "empty": "No books found."
+    },
+    "Checkout": {
+        "selectPlan": "Please select a subscription plan to continue.",
+        "formTitle": "Complete your purchase",
+        "errorMessage": "An error occurred during payment. Please try again.",
+        "buttonLabel": "Subscribe"
+    },
+    "ChooseCulture": {
+        "title": "Choose Your Language and Region",
+        "subtitle": "Select your preferred language and region for the best experience.",
+        "legend": "Select Language and Country",
+        "languageLabel": "Language: ",
+        "countryLabel": "Country:",
+        "continue": "Continue",
+        "cancel": "Cancel",
+        "cookieConsent": "I consent to the use of cookies for improving my experience.",
+        "cookiesInfo": "We use cookies to store your language and region preferences as well as other settings, ensuring a personalized experience each time you visit our site. By consenting, you help us enhance your interaction with our platform."
     },
     "ChooseSubscription": {
-        "title": "اختر اشتراكك",
-        "selected": "تم الاختيار",
-        "continue": "متابعة إلى الدفع",
-        "note": "جميع الخطط تشمل استضافة الصور حتى 20 صورة."
+        "title": "Choose Your Subscription",
+        "selected": "Selected",
+        "continue": "Continue to Checkout",
+        "note": "All plans include image hosting for up to 20 images."
+    },
+    "CountdownIndicator": {
+        "redirecting": "Redirecting in {countdown} seconds..."
+    },
+    "DomainInput": {
+        "legend": "Domain",
+        "label": "Domain:",
+        "placeholder": "example.com",
+        "error": "Invalid domain format.",
+        "success": "Domain format is valid and available!"
+    },
+    "DomainRegistration": {
+        "title": "Domain Registration",
+        "subtitle": "Register your domain and contact information.",
+        "submit": "Submit",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "address": "Address",
+        "address2": "Address 2",
+        "city": "City",
+        "state": "State / Province:",
+        "country": "Country:",
+        "zipCode": "Zip Code",
+        "emailAddress": "Email Address",
+        "telephoneNumber": "Telephone Number"
     },
     "DomainRegistrationsList": {
-    "title": "تسجيلات النطاقات",
-    "error": "فشل تحميل تسجيلات النطاقات.",
-    "loading": "جارٍ تحميل تسجيلات النطاقات...",
-    "empty": "لم يتم العثور على تسجيلات النطاقات."
-  },
-    "PenguinRandomHouseAuthorList": {
-        "title": "مؤلفو Penguin Random House",
-        "import": "استيراد",
-        "importTitle": "استيراد مؤلف من Penguin Random House",
-        "goBack": "العودة",
-        "noResults": "لم يتم العثور على مؤلفين."
+        "title": "Domain Registrations",
+        "error": "Failed to load domain registrations.",
+        "loading": "Loading domain registrations...",
+        "empty": "No domain registrations found.",
+        "select": "Select",
+        "selected": "Selected"
+    },
+    "ErrorBoundary": {
+        "title": "Something Went Wrong",
+        "message": "An unexpected error occurred. Please try refreshing the page.",
+        "resetButton": "Reset"
+    },
+    "ErrorPage": {
+        "title": "Error",
+        "devMessage": "Something went wrong during development.",
+        "details": "Detailed Error Information:",
+        "tryAgain": "Try Again",
+        "userMessage": "We're sorry, but something went wrong. Please try again later.",
+        "return": "Return to App"
+    },
+    "ImageManager": {
+        "title": "Your Uploaded Images",
+        "loading": "Loading...",
+        "select": "Select",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "uploadTitle": "Upload Images",
+        "uploadText": "Drag and drop images here or click to browse",
+        "uploadButton": "Upload",
+        "supportedFormats": "Supported formats: JPEG, PNG, GIF, WebP",
+        "uploading": "Uploading...",
+        "uploadSuccess": "Upload successful!"
+    },
+    "LoginRegister": {
+        "loginHeaderTitle": "Login",
+        "loginHeaderSubtitle": "Sign in to your account.",
+        "loginButtonLabel": "Sign in with Microsoft",
+        "logoutButtonLabel": "Sign out",
+        "countdownIndicatorText": "Redirecting to Domain Registration in {countdown} seconds..."
+    },
+    "Navbar": {
+        "brand": "Ink Stained Wretches",
+        "navigation": "Navigation",
+        "close": "Close",
+        "navItems": {
+            "chooseCulture": {
+                "label": "Culture",
+                "description": "Choose Language & Region"
+            },
+            "login": {
+                "label": "Login",
+                "description": "Sign In / Sign Up"
+            },
+            "domainRegistration": {
+                "label": "Domain",
+                "description": "Register Domain"
+            },
+            "authorPage": {
+                "label": "Author",
+                "description": "Author Page"
+            },
+            "subscribe": {
+                "label": "Subscribe",
+                "description": "Choose a Subscription Plan and Checkout"
+            },
+            "thankYou": {
+                "label": "Success",
+                "description": "Thank You"
+            }
+        }
+    },
+    "OpenLibraryAuthorForm": {
+        "legend": "Edit Author",
+        "key": "Key:",
+        "text": "Text:",
+        "type": "Type:",
+        "name": "Name:",
+        "alternateNames": "Alternate Names:",
+        "birthDate": "Birth Date:",
+        "topWork": "Top Work:",
+        "workCount": "Work Count:",
+        "topSubjects": "Top Subjects:",
+        "version": "Version:",
+        "save": "Save",
+        "cancel": "Cancel"
     },
     "PenguinRandomHouseAuthorDetail": {
-        "title": "تفاصيل مؤلف Penguin Random House",
-        "name": "الاسم",
-        "score": "الدرجة",
-        "url": "الرابط",
-        "domain": "النطاق",
-        "titleField": "العنوان",
-        "description": "الوصف",
-        "authorFirst": "الاسم الأول",
-        "authorLast": "الاسم الأخير",
-        "photoCredit": "حقوق الصورة",
-        "onTour": "في جولة",
-        "seriesAuthor": "مؤلف السلسلة",
-        "seriesIsbn": "ISBN السلسلة",
-        "seriesCount": "عدد السلاسل",
-        "keywordId": "معرف الكلمة الرئيسية",
-        "save": "حفظ",
-        "cancel": "إلغاء"
+        "title": "Penguin Random House Author Details",
+        "name": "Name",
+        "score": "Score",
+        "url": "URL",
+        "domain": "Domain",
+        "titleField": "Title",
+        "description": "Description",
+        "authorFirst": "First Name",
+        "authorLast": "Last Name",
+        "photoCredit": "Photo Credit",
+        "onTour": "On Tour",
+        "seriesAuthor": "Series Author",
+        "seriesIsbn": "Series ISBN",
+        "seriesCount": "Series Count",
+        "keywordId": "Keyword ID",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "PenguinRandomHouseAuthorList": {
+        "title": "Penguin Random House Authors",
+        "import": "Import",
+        "importTitle": "Import Author from Penguin Random House",
+        "goBack": "Go Back",
+        "noResults": "No authors found."
+    },
+    "ProgressIndicator": {
+        "step": "Step",
+        "of": "of",
+        "domainInput": "Domain Input",
+        "contactInfo": "Contact Information",
+        "selectPlan": "Select Plan",
+        "payment": "Payment"
     },
     "SocialForm": {
-        "legend": "رابط اجتماعي",
-        "name": "الاسم:",
-        "url": "الرابط:",
-        "save": "حفظ",
-        "cancel": "إلغاء"
+        "legend": "Social Link",
+        "name": "Name:",
+        "url": "URL:",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "SocialList": {
+        "title": "Social Links",
+        "url": "URL:",
+        "edit": "Edit",
+        "delete": "Delete",
+        "addSocial": "Add Social Link"
+    },
+    "ThankYou": {
+        "title": "Thank You",
+        "message": "Thank you for your purchase!"
+    },
+    "Toast": {
+        "close": "Close"
+    },
+    "ToastMessages": {
+        "authorSaved": "Author saved successfully!",
+        "authorSaveError": "Failed to save author. Please try again.",
+        "authorDeleted": "Author deleted successfully!",
+        "authorDeleteError": "Failed to delete author. Please try again.",
+        "bookSaved": "Book saved successfully!",
+        "bookSaveError": "Failed to save book. Please try again.",
+        "bookDeleted": "Book deleted successfully!",
+        "bookDeleteError": "Failed to delete book. Please try again.",
+        "articleSaved": "Article saved successfully!",
+        "articleSaveError": "Failed to save article. Please try again.",
+        "articleDeleted": "Article deleted successfully!",
+        "articleDeleteError": "Failed to delete article. Please try again.",
+        "socialSaved": "Social link saved successfully!",
+        "socialSaveError": "Failed to save social link. Please try again.",
+        "socialDeleted": "Social link deleted successfully!",
+        "socialDeleteError": "Failed to delete social link. Please try again.",
+        "domainRegistered": "Domain registered successfully!",
+        "domainRegistrationError": "Failed to register domain. Please try again.",
+        "imageSaved": "Image saved successfully!",
+        "imageSaveError": "Failed to save image. Please try again.",
+        "imageDeleted": "Image deleted successfully!",
+        "imageDeleteError": "Failed to delete image. Please try again."
+    },
+    "WelcomePage": {
+        "title": "Welcome to Ink Stained Wretches",
+        "message": "Create your author page and share your work with the world.",
+        "comingSoon": "Coming Soon",
+        "description": "We're working hard to bring you an amazing experience. Stay tuned for updates!",
+        "stayTuned": "Stay tuned for more features and improvements."
     }
 }

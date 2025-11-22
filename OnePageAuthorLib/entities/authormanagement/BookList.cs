@@ -11,5 +11,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
         public string importOpenLibrary { get; set; } = string.Empty;
         public string importGoogleBooks { get; set; } = string.Empty;
         public string importPenguinBooks { get; set; } = string.Empty;
+        public string importAmazonBooks { get; set; } = string.Empty;
+        public string readMore { get; set; } = string.Empty;
+        public string showLess { get; set; } = string.Empty;
+        public string empty { get; set; } = string.Empty;
     }
 }

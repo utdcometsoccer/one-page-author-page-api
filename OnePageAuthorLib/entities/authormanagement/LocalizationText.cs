@@ -5,6 +5,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
     /// </summary>
     public class LocalizationText
     {
+        public App App { get; set; } = new App();
         public ArticleForm ArticleForm { get; set; } = new ArticleForm();
         public ArticleList ArticleList { get; set; } = new ArticleList();
         public AuthGuard AuthGuard { get; set; } = new AuthGuard();
@@ -20,6 +21,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
         public DomainInput DomainInput { get; set; } = new DomainInput();
         public DomainRegistration DomainRegistration { get; set; } = new DomainRegistration();
         public DomainRegistrationsList DomainRegistrationsList { get; set; } = new DomainRegistrationsList();
+        public ErrorBoundary ErrorBoundary { get; set; } = new ErrorBoundary();
         public ErrorPage ErrorPage { get; set; } = new ErrorPage();
         public ImageManager ImageManager { get; set; } = new ImageManager();
         public LoginRegister LoginRegister { get; set; } = new LoginRegister();
@@ -27,8 +29,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
         public OpenLibraryAuthorForm OpenLibraryAuthorForm { get; set; } = new OpenLibraryAuthorForm();
         public PenguinRandomHouseAuthorDetail PenguinRandomHouseAuthorDetail { get; set; } = new PenguinRandomHouseAuthorDetail();
         public PenguinRandomHouseAuthorList PenguinRandomHouseAuthorList { get; set; } = new PenguinRandomHouseAuthorList();
+        public ProgressIndicator ProgressIndicator { get; set; } = new ProgressIndicator();
         public SocialForm SocialForm { get; set; } = new SocialForm();
         public SocialList SocialList { get; set; } = new SocialList();
         public ThankYou ThankYou { get; set; } = new ThankYou();
+        public Toast Toast { get; set; } = new Toast();
+        public ToastMessages ToastMessages { get; set; } = new ToastMessages();
+        public WelcomePage WelcomePage { get; set; } = new WelcomePage();
     }
 }
