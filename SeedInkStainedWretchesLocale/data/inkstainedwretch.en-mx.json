@@ -1,259 +1,314 @@
 {
+    "App": {
+        "loadingDashboard": "Loading dashboard..."
+    },
+    "ArticleForm": {
+        "legend": "Edit Article",
+        "title": "Title:",
+        "date": "Date:",
+        "publication": "Publication:",
+        "url": "URL:",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "ArticleList": {
+        "title": "Articles",
+        "date": "Date:",
+        "publication": "Publication:",
+        "url": "URL:",
+        "edit": "Edit",
+        "delete": "Delete",
+        "addArticle": "Add Article"
+    },
+    "AuthGuard": {
+        "title": "Authentication Required",
+        "message": "Please sign in to access this content. You'll need to authenticate to view and manage your author information.",
+        "buttonLabel": "Sign in with Microsoft"
+    },
+    "AuthorDocList": {
+        "title": "Authors",
+        "topWork": "Top Work:",
+        "birthDate": "Birth Date:",
+        "import": "Import",
+        "importTitle": "Import AuthorDoc",
+        "goBack": "Go Back"
+    },
+    "AuthorMainForm": {
+        "legend": "Author Information",
+        "authorName": "Author Name:",
+        "language": "Language:",
+        "country": "Country:",
+        "email": "Email:",
+        "welcomeText": "Welcome Text:",
+        "aboutText": "About Text:",
+        "headshotUrl": "Headshot URL:",
+        "chooseImage": "Choose Image",
+        "close": "Close",
+        "copyrightText": "Copyright Text:",
+        "topLevelDomain": "Top Level Domain:",
+        "secondLevelDomain": "Second Level Domain:",
+        "articles": "Articles",
+        "books": "Books",
+        "socialLinks": "Social Links",
+        "importAuthor": "Import Author From Open Library",
+        "importPenguinAuthor": "Import Author From Penguin Random House",
+        "save": "Save Author",
+        "cancel": "Cancel"
+    },
     "AuthorRegistration": {
-    "authorListTitle": "Información del autor",
-    "languageLabel": "Idioma: ",
-    "regionLabel": "Región: ",
-    "editAuthor": "Editar",
-    "deleteAuthor": "Eliminar",
-    "addAuthor": "Agregar autor",
-    "continue": "Continuar"
+        "authorListTitle": "Author Information",
+        "languageLabel": "Language: ",
+        "regionLabel": "Region: ",
+        "editAuthor": "Edit",
+        "deleteAuthor": "Delete",
+        "addAuthor": "Add Author",
+        "continue": "Continue"
     },
-    "LoginRegister": {
-        "loginHeader": {
-            "title": "Iniciar sesión",
-            "subtitle": "Accede a tu cuenta."
-        },
-        "loginButton": {
-            "label": "Iniciar sesión con Microsoft"
-        },
-        "logoutButton": {
-            "label": "Cerrar sesión"
-        },
-        "countdownIndicator": {
-            "text": "Redirigiendo a Registro de Dominio en {countdown} segundos..."
-        }
+    "BookForm": {
+        "legend": "Book Details",
+        "title": "Title:",
+        "description": "Description:",
+        "url": "URL:",
+        "cover": "Cover:",
+        "chooseImage": "Choose Image",
+        "close": "Close",
+        "save": "Save",
+        "cancel": "Cancel"
     },
-    "ThankYou": {
-        "title": "Gracias",
-        "message": "¡Gracias por tu compra!"
+    "BookList": {
+        "title": "Books",
+        "description": "Description:",
+        "url": "URL:",
+        "edit": "Edit",
+        "delete": "Delete",
+        "addBook": "Add Book",
+        "importOpenLibrary": "Import Books Open Library",
+        "importGoogleBooks": "Import Google Books",
+        "importPenguinBooks": "Import Books Penguin Random House",
+        "importAmazonBooks": "Import Amazon Books",
+        "readMore": "Read More",
+        "showLess": "Show Less",
+        "empty": "No books found."
     },
-    "Navbar": {
-        "brand": "Tinta Manchada",
-        "navigation": "Navegación",
-        "close": "Cerrar",
-        "navItems": {
-            "chooseCulture": {
-                "label": "Cultura",
-                "description": "Elegir idioma y región"
-            },
-            "login": {
-                "label": "Iniciar sesión",
-                "description": "Acceder / Registrarse"
-            },
-            "domainRegistration": {
-                "label": "Dominio",
-                "description": "Registrar dominio"
-            },
-            "authorPage": {
-                "label": "Autor",
-                "description": "Página del autor"
-            },
-           "subscribe": {
-                "label": "Suscribirse",
-                "description": "Elige un plan de suscripción y completa el pago"
-            },
-            "thankYou": {
-                "label": "Éxito",
-                "description": "Gracias"
-            }
-        }
+    "Checkout": {
+        "selectPlan": "Please select a subscription plan to continue.",
+        "formTitle": "Complete your purchase",
+        "errorMessage": "An error occurred during payment. Please try again.",
+        "buttonLabel": "Subscribe"
+    },
+    "ChooseCulture": {
+        "title": "Choose Your Language and Region",
+        "subtitle": "Select your preferred language and region for the best experience.",
+        "legend": "Select Language and Country",
+        "languageLabel": "Language: ",
+        "countryLabel": "Country:",
+        "continue": "Continue",
+        "cancel": "Cancel",
+        "cookieConsent": "I consent to the use of cookies for improving my experience.",
+        "cookiesInfo": "We use cookies to store your language and region preferences as well as other settings, ensuring a personalized experience each time you visit our site. By consenting, you help us enhance your interaction with our platform."
+    },
+    "ChooseSubscription": {
+        "title": "Choose Your Subscription",
+        "selected": "Selected",
+        "continue": "Continue to Checkout",
+        "note": "All plans include image hosting for up to 20 images."
+    },
+    "CountdownIndicator": {
+        "redirecting": "Redirecting in {countdown} seconds..."
+    },
+    "DomainInput": {
+        "legend": "Domain",
+        "label": "Domain:",
+        "placeholder": "example.com",
+        "error": "Invalid domain format.",
+        "success": "Domain format is valid and available!"
     },
     "DomainRegistration": {
-        "title": "Registro de dominio",
-        "subtitle": "Registra tu dominio e información de contacto.",
-        "submit": "Enviar",
-        "firstName": "Nombre",
-        "lastName": "Apellido",
-        "address": "Dirección",
-        "address2": "Dirección 2",
-        "city": "Ciudad",
-        "state": "Estado / Provincia:",
-        "country": "País:",
-        "zipCode": "Código postal",
-        "emailAddress": "Correo electrónico",
-        "telephoneNumber": "Teléfono"
+        "title": "Domain Registration",
+        "subtitle": "Register your domain and contact information.",
+        "submit": "Submit",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "address": "Address",
+        "address2": "Address 2",
+        "city": "City",
+        "state": "State / Province:",
+        "country": "Country:",
+        "zipCode": "Zip Code",
+        "emailAddress": "Email Address",
+        "telephoneNumber": "Telephone Number"
+    },
+    "DomainRegistrationsList": {
+        "title": "Domain Registrations",
+        "error": "Failed to load domain registrations.",
+        "loading": "Loading domain registrations...",
+        "empty": "No domain registrations found.",
+        "select": "Select",
+        "selected": "Selected"
+    },
+    "ErrorBoundary": {
+        "title": "Something Went Wrong",
+        "message": "An unexpected error occurred. Please try refreshing the page.",
+        "resetButton": "Reset"
     },
     "ErrorPage": {
         "title": "Error",
-        "devMessage": "Algo salió mal durante el desarrollo.",
-        "details": "Información detallada del error:",
-        "tryAgain": "Intentar de nuevo",
-        "userMessage": "Lo sentimos, algo salió mal. Por favor, inténtalo de nuevo más tarde.",
-        "return": "Volver a la aplicación"
+        "devMessage": "Something went wrong during development.",
+        "details": "Detailed Error Information:",
+        "tryAgain": "Try Again",
+        "userMessage": "We're sorry, but something went wrong. Please try again later.",
+        "return": "Return to App"
     },
     "ImageManager": {
-        "title": "Tus imágenes subidas",
-        "loading": "Cargando...",
-        "select": "Seleccionar",
-        "delete": "Eliminar",
-        "refresh": "Actualizar"
+        "title": "Your Uploaded Images",
+        "loading": "Loading...",
+        "select": "Select",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "uploadTitle": "Upload Images",
+        "uploadText": "Drag and drop images here or click to browse",
+        "uploadButton": "Upload",
+        "supportedFormats": "Supported formats: JPEG, PNG, GIF, WebP",
+        "uploading": "Uploading...",
+        "uploadSuccess": "Upload successful!"
     },
-    "Checkout": {
-    "selectPlan": "Por favor, selecciona un plan de suscripción para continuar.",
-    "formTitle": "Completa tu compra",
-    "errorMessage": "Ocurrió un error durante el pago. Por favor, inténtalo de nuevo.",
-    "buttonLabel": "Suscribirse"
+    "LoginRegister": {
+        "loginHeaderTitle": "Login",
+        "loginHeaderSubtitle": "Sign in to your account.",
+        "loginButtonLabel": "Sign in with Microsoft",
+        "logoutButtonLabel": "Sign out",
+        "countdownIndicatorText": "Redirecting to Domain Registration in {countdown} seconds..."
     },
-    "AuthGuard": {
-        "title": "Autenticación requerida",
-        "message": "Por favor, inicia sesión para acceder a este contenido. Necesitas autenticarte para ver y gestionar tu información de autor.",
-        "buttonLabel": "Iniciar sesión con Microsoft"
-    },
-    "DomainInput": {
-        "label": "Dominio:",
-        "placeholder": "ejemplo.com",
-        "error": "Formato de dominio inválido.",
-        "success": "¡El formato de dominio es válido y está disponible!"
-    },
-    "SocialList": {
-        "title": "Redes sociales",
-        "url": "URL:",
-        "edit": "Editar",
-        "delete": "Eliminar",
-        "addSocial": "Agregar red social"
-    },
-    "CountdownIndicator": {
-        "redirecting": "Redirigiendo en {countdown} segundos..."
-    },
-    "ChooseCulture": {
-        "title": "Elige tu idioma y región",
-        "subtitle": "Selecciona tu idioma y región preferidos para la mejor experiencia.",
-        "legend": "Seleccionar idioma y país",
-        "languageLabel": "Idioma: ",
-        "countryLabel": "País:",
-        "continue": "Continuar",
-        "cancel": "Cancelar",
-        "cookieConsent": "Consiento el uso de cookies para mejorar mi experiencia.",
-        "cookiesInfo": "Utilizamos cookies para almacenar tus preferencias de idioma y región, así como otras configuraciones, asegurando una experiencia personalizada cada vez que visitas nuestro sitio. Al consentir, nos ayudas a mejorar tu interacción con nuestra plataforma."
-    },
-    "BookList": {
-        "title": "Libros",
-        "description": "Descripción:",
-        "url": "URL:",
-        "edit": "Editar",
-        "delete": "Eliminar",
-        "addBook": "Agregar libro",
-        "importOpenLibrary": "Importar libros de Open Library",
-        "importGoogleBooks": "Importar libros de Google Books",
-        "importPenguinBooks": "Importar libros de Penguin Random House"
-    },
-    "ArticleForm": {
-        "legend": "Editar artículo",
-        "title": "Título:",
-        "date": "Fecha:",
-        "publication": "Publicación:",
-        "url": "URL:",
-        "save": "Guardar",
-        "cancel": "Cancelar"
-    },
-    "ArticleList": {
-        "title": "Artículos",
-        "date": "Fecha:",
-        "publication": "Publicación:",
-        "url": "URL:",
-        "edit": "Editar",
-        "delete": "Eliminar",
-        "addArticle": "Agregar artículo"
+    "Navbar": {
+        "brand": "Ink Stained Wretches",
+        "navigation": "Navigation",
+        "close": "Close",
+        "navItems": {
+            "chooseCulture": {
+                "label": "Culture",
+                "description": "Choose Language & Region"
+            },
+            "login": {
+                "label": "Login",
+                "description": "Sign In / Sign Up"
+            },
+            "domainRegistration": {
+                "label": "Domain",
+                "description": "Register Domain"
+            },
+            "authorPage": {
+                "label": "Author",
+                "description": "Author Page"
+            },
+            "subscribe": {
+                "label": "Subscribe",
+                "description": "Choose a Subscription Plan and Checkout"
+            },
+            "thankYou": {
+                "label": "Success",
+                "description": "Thank You"
+            }
+        }
     },
     "OpenLibraryAuthorForm": {
-        "legend": "Editar autor",
-        "key": "Clave:",
-        "text": "Texto:",
-        "type": "Tipo:",
-        "name": "Nombre:",
-        "alternateNames": "Nombres alternativos:",
-        "birthDate": "Fecha de nacimiento:",
-        "topWork": "Obra principal:",
-        "workCount": "Cantidad de obras:",
-        "topSubjects": "Temas principales:",
-        "version": "Versión:",
-        "save": "Guardar",
-        "cancel": "Cancelar"
-    },
-    "AuthorDocList": {
-        "title": "Autores",
-        "topWork": "Obra principal:",
-        "birthDate": "Fecha de nacimiento:",
-        "import": "Importar",
-        "importTitle": "Importar AuthorDoc",
-        "goBack": "Regresar"
-    },
-    "BookForm": {
-        "legend": "Detalles del libro",
-        "title": "Título:",
-        "description": "Descripción:",
-        "url": "URL:",
-        "cover": "Portada:",
-        "chooseImage": "Elegir imagen",
-        "close": "Cerrar",
-        "save": "Guardar",
-        "cancel": "Cancelar"
-    },
-    "AuthorMainForm": {
-        "legend": "Información del autor",
-        "authorName": "Nombre del autor:",
-        "language": "Idioma:",
-        "country": "País:",
-        "email": "Correo electrónico:",
-        "welcomeText": "Texto de bienvenida:",
-        "aboutText": "Acerca del autor:",
-        "headshotUrl": "URL de la foto:",
-        "chooseImage": "Elegir imagen",
-        "close": "Cerrar",
-        "copyrightText": "Texto de copyright:",
-        "topLevelDomain": "Dominio de nivel superior:",
-        "secondLevelDomain": "Dominio de segundo nivel:",
-        "articles": "Artículos",
-        "books": "Libros",
-        "socialLinks": "Redes sociales",
-        "importAuthor": "Importar autor de Open Library",
-        "importPenguinAuthor": "Importar autor de Penguin Random House",
-        "save": "Guardar autor",
-        "cancel": "Cancelar"
-    },
-    "ChooseSubscription": {
-        "title": "Elige tu suscripción",
-        "selected": "Seleccionado",
-        "continue": "Continuar al pago",
-        "note": "Todos los planes incluyen alojamiento de imágenes para hasta 20 imágenes."
-    },
-    "DomainRegistrationsList": {
-        "title": "Registros de dominio",
-        "error": "No se pudieron cargar los registros de dominio.",
-        "loading": "Cargando registros de dominio...",
-        "empty": "No se encontraron registros de dominio."
-    },
-    "PenguinRandomHouseAuthorList": {
-        "title": "M autores de Penguin Random House",
-        "import": "Importar",
-        "importTitle": "Importar autor de Penguin Random House",
-        "goBack": "Regresar",
-        "noResults": "No se encontraron autores."
+        "legend": "Edit Author",
+        "key": "Key:",
+        "text": "Text:",
+        "type": "Type:",
+        "name": "Name:",
+        "alternateNames": "Alternate Names:",
+        "birthDate": "Birth Date:",
+        "topWork": "Top Work:",
+        "workCount": "Work Count:",
+        "topSubjects": "Top Subjects:",
+        "version": "Version:",
+        "save": "Save",
+        "cancel": "Cancel"
     },
     "PenguinRandomHouseAuthorDetail": {
-        "title": "Detalles del autor de Penguin Random House",
-        "name": "Nombre",
-        "score": "Puntuación",
+        "title": "Penguin Random House Author Details",
+        "name": "Name",
+        "score": "Score",
         "url": "URL",
-        "domain": "Dominio",
-        "titleField": "Título",
-        "description": "Descripción",
-        "authorFirst": "Nombre de pila",
-        "authorLast": "Apellido",
-        "photoCredit": "Créditos de la foto",
-        "onTour": "En gira",
-        "seriesAuthor": "Autor de la serie",
-        "seriesIsbn": "ISBN de la serie",
-        "seriesCount": "Número de series",
-        "keywordId": "ID de palabra clave",
-        "save": "Guardar",
-        "cancel": "Cancelar"
+        "domain": "Domain",
+        "titleField": "Title",
+        "description": "Description",
+        "authorFirst": "First Name",
+        "authorLast": "Last Name",
+        "photoCredit": "Photo Credit",
+        "onTour": "On Tour",
+        "seriesAuthor": "Series Author",
+        "seriesIsbn": "Series ISBN",
+        "seriesCount": "Series Count",
+        "keywordId": "Keyword ID",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "PenguinRandomHouseAuthorList": {
+        "title": "Penguin Random House Authors",
+        "import": "Import",
+        "importTitle": "Import Author from Penguin Random House",
+        "goBack": "Go Back",
+        "noResults": "No authors found."
+    },
+    "ProgressIndicator": {
+        "step": "Step",
+        "of": "of",
+        "domainInput": "Domain Input",
+        "contactInfo": "Contact Information",
+        "selectPlan": "Select Plan",
+        "payment": "Payment"
     },
     "SocialForm": {
-        "legend": "Enlace social",
-        "name": "Nombre:",
+        "legend": "Social Link",
+        "name": "Name:",
         "url": "URL:",
-        "save": "Guardar",
-        "cancel": "Cancelar"
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "SocialList": {
+        "title": "Social Links",
+        "url": "URL:",
+        "edit": "Edit",
+        "delete": "Delete",
+        "addSocial": "Add Social Link"
+    },
+    "ThankYou": {
+        "title": "Thank You",
+        "message": "Thank you for your purchase!"
+    },
+    "Toast": {
+        "close": "Close"
+    },
+    "ToastMessages": {
+        "authorSaved": "Author saved successfully!",
+        "authorSaveError": "Failed to save author. Please try again.",
+        "authorDeleted": "Author deleted successfully!",
+        "authorDeleteError": "Failed to delete author. Please try again.",
+        "bookSaved": "Book saved successfully!",
+        "bookSaveError": "Failed to save book. Please try again.",
+        "bookDeleted": "Book deleted successfully!",
+        "bookDeleteError": "Failed to delete book. Please try again.",
+        "articleSaved": "Article saved successfully!",
+        "articleSaveError": "Failed to save article. Please try again.",
+        "articleDeleted": "Article deleted successfully!",
+        "articleDeleteError": "Failed to delete article. Please try again.",
+        "socialSaved": "Social link saved successfully!",
+        "socialSaveError": "Failed to save social link. Please try again.",
+        "socialDeleted": "Social link deleted successfully!",
+        "socialDeleteError": "Failed to delete social link. Please try again.",
+        "domainRegistered": "Domain registered successfully!",
+        "domainRegistrationError": "Failed to register domain. Please try again.",
+        "imageSaved": "Image saved successfully!",
+        "imageSaveError": "Failed to save image. Please try again.",
+        "imageDeleted": "Image deleted successfully!",
+        "imageDeleteError": "Failed to delete image. Please try again."
+    },
+    "WelcomePage": {
+        "title": "Welcome to Ink Stained Wretches",
+        "message": "Create your author page and share your work with the world.",
+        "comingSoon": "Coming Soon",
+        "description": "We're working hard to bring you an amazing experience. Stay tuned for updates!",
+        "stayTuned": "Stay tuned for more features and improvements."
     }
 }
