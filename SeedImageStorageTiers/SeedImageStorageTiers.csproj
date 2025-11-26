@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\net9.0\SeedImageStorageTiers.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\net10.0\SeedImageStorageTiers.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>891da86c-fc63-49ba-8135-fd3973e69a56</UserSecretsId>

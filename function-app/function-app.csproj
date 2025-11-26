@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -9,7 +9,7 @@
     <RootNamespace>function_app</RootNamespace>
     <UserSecretsId>20376250-abcf-43c5-a034-c7310f425e52</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\net9.0\function-app.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\net10.0\function-app.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
 

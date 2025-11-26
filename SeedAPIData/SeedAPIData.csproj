@@ -12,11 +12,11 @@
   <PropertyGroup>
     <UserSecretsId>SeedAPIData</UserSecretsId>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\net9.0\SeedAPIData.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\net10.0\SeedAPIData.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
 

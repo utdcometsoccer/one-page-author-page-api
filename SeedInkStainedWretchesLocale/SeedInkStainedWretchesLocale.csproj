@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\net9.0\SeedInkStainedWretchesLocale.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\net10.0\SeedInkStainedWretchesLocale.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>339e90f0-8981-46f4-a03b-5a177d1ae5c8</UserSecretsId>

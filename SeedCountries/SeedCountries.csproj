@@ -20,11 +20,11 @@
   <PropertyGroup>
     <UserSecretsId>SeedCountries</UserSecretsId>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\net9.0\SeedCountries.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\net10.0\SeedCountries.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
