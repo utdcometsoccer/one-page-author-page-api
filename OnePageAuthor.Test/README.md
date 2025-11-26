@@ -69,8 +69,10 @@ dotnet test --logger "console;verbosity=detailed"
 For integration tests, configure connection strings in user secrets:
 
 ```bash
-dotnet user-secrets set "CosmosDbConnectionString" "your-test-cosmos-connection"
-dotnet user-secrets set "BlobStorageConnectionString" "your-test-storage-connection"
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://localhost:8081/"
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
+dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthorDb"
+dotnet user-secrets set "AZURE_STORAGE_CONNECTION_STRING" "your-test-storage-connection"
 
 ```
 

@@ -73,7 +73,7 @@ Add these settings to your Azure Function App configuration or `local.settings.j
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AzureWebJobsStorage": "your-connection-string",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "COSMOSDB_ENDPOINT_URI": "https://<account>.documents.azure.com:443/",
     "COSMOSDB_PRIMARY_KEY": "<secret>",

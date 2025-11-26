@@ -104,10 +104,11 @@ The library expects configuration for:
 
 ```json
 {
-  "CosmosDbConnectionString": "your-cosmos-connection-string",
-  "DatabaseId": "OnePageAuthorDB", 
-  "BlobStorageConnectionString": "your-storage-connection-string",
-  "StripeSecretKey": "your-stripe-secret-key"
+  "COSMOSDB_ENDPOINT_URI": "https://your-account.documents.azure.com:443/",
+  "COSMOSDB_PRIMARY_KEY": "your-cosmos-primary-key",
+  "COSMOSDB_DATABASE_ID": "OnePageAuthorDb", 
+  "AZURE_STORAGE_CONNECTION_STRING": "your-storage-connection-string",
+  "STRIPE_API_KEY": "your-stripe-secret-key"
 }
 
 ```
