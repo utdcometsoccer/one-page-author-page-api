@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>69486447-53e4-42f4-8087-cfcf7fb5e04d</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\net9.0\InkStainedWretchStripe.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\net10.0\InkStainedWretchStripe.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
