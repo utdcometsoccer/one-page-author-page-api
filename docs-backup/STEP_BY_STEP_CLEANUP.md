@@ -46,14 +46,13 @@ brew install bfg
 Create `replacements.txt` in your repository root:
 
 ```
-zSxwMnRf3gKKUEDvO8nMmZ5pJJM2SLB6igMVeFFXfjBGvFSil2YjG2qowoe096iV0SaM0cZxey1EACDbuLmQBA====>***REMOVED***
-zSxwMnRf3gKKUEDvO8nMmZ5pJJM2SLB6igMVeFFXgjBGvFSil2YjG2qowoe096iV0SaM0cZxey1EACDbuLmQBA====>***REMOVED***
-zqjkb3q6d9qgbjf44xmzn5c3==>***REMOVED***
-AKPAEB227N1760409523==>***REMOVED***
-2kqJ6hkHk2rPrLGOY5wUx4dVTv6WPJ5dpCbCe6wv==>***REMOVED***
-5c6d167a-2c48-4da0-8a21-29340b0f461e==>***REMOVED***
-f2b0b4ad-ba25-4f5e-b72a-2a6c51ebdb73==>***REMOVED***
-planar-root-475103-h7==>***REMOVED***
+your-cosmos-primary-key==>***REMOVED***
+your-cosmos-secondary-key==>***REMOVED***
+your-amazon-access-key==>***REMOVED***
+your-amazon-secret-key==>***REMOVED***
+your-azure-tenant-id==>***REMOVED***
+your-app-client-id==>***REMOVED***
+your-google-project-id==>***REMOVED***
 
 ```
 

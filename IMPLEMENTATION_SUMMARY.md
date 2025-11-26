@@ -173,7 +173,7 @@ The implementation follows the existing codebase patterns:
   "COSMOSDB_ENDPOINT_URI": "https://your-account.documents.azure.com:443/",
   "COSMOSDB_PRIMARY_KEY": "your-primary-key",
   "COSMOSDB_DATABASE_ID": "YourDatabaseName",
-  "CosmosDBConnection": "AccountEndpoint=https://...;AccountKey=...",
+  "CosmosDBConnection": "AccountEndpoint=https://your-account.documents.azure.com:443/;AccountKey=your-primary-key;",
   "AZURE_SUBSCRIPTION_ID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   "AZURE_DNS_RESOURCE_GROUP": "your-dns-resource-group"
 }

@@ -20,7 +20,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0" />
     <PackageReference Include="Stripe.net" Version="50.0.0" />
-    <PackageReference Include="System.Text.Json" Version="10.0.0" />
+    <!--<PackageReference Include="System.Text.Json" Version="10.0.0" />-->
   </ItemGroup>
 
   <ItemGroup>
