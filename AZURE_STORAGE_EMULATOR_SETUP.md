@@ -165,7 +165,7 @@ Your Azure Functions can connect to the local storage emulator using:
 ```json
 {
   "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AzureWebJobsStorage": "your-connection-string",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
   }
 }

@@ -125,11 +125,11 @@ dotnet test OnePageAuthorAPI.sln -c Debug
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AzureWebJobsStorage": "your-connection-string",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "COSMOSDB_ENDPOINT_URI": "https://localhost:8081/",
+    "COSMOSDB_ENDPOINT_URI": "https://your-cosmos-account.documents.azure.com:443/",
     "COSMOSDB_PRIMARY_KEY": "<your-cosmos-db-key>",
-    "COSMOSDB_DATABASE_ID": "OnePageAuthor",
+    "COSMOSDB_DATABASE_ID": "OnePageAuthorDb",
     "STRIPE_API_KEY": "<your-stripe-secret-key>",
     "AAD_TENANT_ID": "<your-tenant-id>",
     "AAD_AUDIENCE": "<your-client-id>",
@@ -1273,7 +1273,7 @@ The implementation follows the existing codebase patterns:
   "COSMOSDB_ENDPOINT_URI": "https://your-account.documents.azure.com:443/",
   "COSMOSDB_PRIMARY_KEY": "your-primary-key",
   "COSMOSDB_DATABASE_ID": "YourDatabaseName",
-  "CosmosDBConnection": "AccountEndpoint=https://...;AccountKey=...",
+  "CosmosDBConnection": "AccountEndpoint=https://your-account.documents.azure.com:443/;AccountKey=your-primary-key;",
   "AZURE_SUBSCRIPTION_ID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   "AZURE_DNS_RESOURCE_GROUP": "your-dns-resource-group"
 }
@@ -3442,7 +3442,7 @@ Your Azure Functions can connect to the local storage emulator using:
 ```json
 {
   "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AzureWebJobsStorage": "your-connection-string",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
   }
 }
@@ -4894,14 +4894,13 @@ brew install bfg
 Create `replacements.txt` in your repository root:
 
 ```
-zSxwMnRf3gKKUEDvO8nMmZ5pJJM2SLB6igMVeFFXfjBGvFSil2YjG2qowoe096iV0SaM0cZxey1EACDbuLmQBA====>***REMOVED***
-zSxwMnRf3gKKUEDvO8nMmZ5pJJM2SLB6igMVeFFXgjBGvFSil2YjG2qowoe096iV0SaM0cZxey1EACDbuLmQBA====>***REMOVED***
-zqjkb3q6d9qgbjf44xmzn5c3==>***REMOVED***
-AKPAEB227N1760409523==>***REMOVED***
-2kqJ6hkHk2rPrLGOY5wUx4dVTv6WPJ5dpCbCe6wv==>***REMOVED***
-5c6d167a-2c48-4da0-8a21-29340b0f461e==>***REMOVED***
-f2b0b4ad-ba25-4f5e-b72a-2a6c51ebdb73==>***REMOVED***
-planar-root-475103-h7==>***REMOVED***
+your-cosmos-primary-key==>***REMOVED***
+your-cosmos-secondary-key==>***REMOVED***
+your-amazon-access-key==>***REMOVED***
+your-amazon-secret-key==>***REMOVED***
+your-azure-tenant-id==>***REMOVED***
+your-app-client-id==>***REMOVED***
+your-google-project-id==>***REMOVED***
 
 ```
 

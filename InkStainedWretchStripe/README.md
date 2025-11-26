@@ -130,7 +130,7 @@ These settings are read from user secrets, environment variables, or local.setti
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AzureWebJobsStorage": "your-connection-string",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "STRIPE_API_KEY": "sk_test_***",
     "STRIPE_WEBHOOK_SECRET": "whsec_***",

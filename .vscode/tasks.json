@@ -86,7 +86,7 @@
 			"type": "func",
 			"dependsOn": "build (functions)",
 			"options": {
-				"cwd": "${workspaceFolder}/function-app/bin/Debug/net9.0"
+				"cwd": "${workspaceFolder}/function-app/bin/Debug/net10.0"
 			},
 			"command": "host start",
 			"isBackground": true,
@@ -155,7 +155,10 @@
 			"label": "func-imageapi",
 			"dependsOn": "build-imageapi",
 			"command": "func",
-			"args": ["host", "start"],
+			"args": [
+				"host",
+				"start"
+			],
 			"options": {
 				"cwd": "${workspaceFolder}/ImageAPI"
 			},
@@ -167,7 +170,10 @@
 			"label": "func-inkstainedwretchfunctions",
 			"dependsOn": "build-inkstainedwretchfunctions",
 			"command": "func",
-			"args": ["host", "start"],
+			"args": [
+				"host",
+				"start"
+			],
 			"options": {
 				"cwd": "${workspaceFolder}/InkStainedWretchFunctions"
 			},
@@ -179,7 +185,10 @@
 			"label": "func-inkstainedwretchstripe",
 			"dependsOn": "build-inkstainedwretchstripe",
 			"command": "func",
-			"args": ["host", "start"],
+			"args": [
+				"host",
+				"start"
+			],
 			"options": {
 				"cwd": "${workspaceFolder}/InkStainedWretchStripe"
 			},

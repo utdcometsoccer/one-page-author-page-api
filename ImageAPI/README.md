@@ -303,8 +303,13 @@ Create a `local.settings.json` file:
   "Values": {
     "AzureWebJobsStorage": "your-storage-connection-string",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "CosmosDbConnectionString": "your-cosmos-connection-string",
-    "BlobStorageConnectionString": "your-blob-storage-connection-string"
+    "COSMOSDB_ENDPOINT_URI": "https://your-account.documents.azure.com:443/",
+    "COSMOSDB_PRIMARY_KEY": "your-cosmos-primary-key",
+    "COSMOSDB_DATABASE_ID": "OnePageAuthorDb",
+    "AZURE_STORAGE_CONNECTION_STRING": "your-storage-connection-string",
+    "AAD_TENANT_ID": "your-tenant-id",
+    "AAD_AUDIENCE": "your-client-id",
+    "AAD_AUTHORITY": "https://login.microsoftonline.com/consumers/v2.0"
   }
 }
 
