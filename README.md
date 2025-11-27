@@ -1,18 +1,18 @@
 # OnePageAuthor API Platform
 
 [![Build Status](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml/badge.svg)](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml)
-[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
+[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download)
 [![Azure Functions](https://img.shields.io/badge/Azure%20Functions-v4-orange.svg)](https://docs.microsoft.com/en-us/azure/azure-functions/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A comprehensive .NET 9 platform providing APIs and utilities for author management, content publishing, and subscription services. Built with Azure Functions (isolated worker), Azure Cosmos DB for persistence, Stripe for billing, and Microsoft Entra ID for authentication.
+A comprehensive .NET 10 platform providing APIs and utilities for author management, content publishing, and subscription services. Built with Azure Functions (isolated worker), Azure Cosmos DB for persistence, Stripe for billing, and Microsoft Entra ID for authentication.
 
 ## 🚀 Platform Overview
 
 ### Key Features
 
 
-- **.NET 9** Azure Functions with isolated worker runtime
+- **.NET 10** Azure Functions with isolated worker runtime
 - **Azure Cosmos DB** with NoSQL document storage and repository patterns
 - **Stripe Integration** for subscription management, checkout, and webhook processing
 - **Microsoft Entra ID** JWT authentication for secure API access
@@ -56,7 +56,7 @@ A comprehensive .NET 9 platform providing APIs and utilities for author manageme
 ### System Requirements
 
 
-- **.NET SDK 9.0** or later
+- **.NET SDK 10.0** or later
 - **Azure Functions Core Tools v4** (optional for local development)
 - **Azure Cosmos DB** account or local emulator
 - **Stripe Account** with API keys for payment processing
@@ -389,7 +389,7 @@ dotnet test --filter "Category=Unit"
 ### Azure Resources Required
 
 
-- **Azure Functions Apps** (v4, .NET 9 isolated)
+- **Azure Functions Apps** (v4, .NET 10 isolated)
 - **Azure Cosmos DB** account with containers
 - **Azure Storage** account for function app storage
 - **Microsoft Entra ID** app registration
@@ -1380,7 +1380,7 @@ Successfully implemented migration from Cosmos DB-based ImageStorageTierMembersh
 
 **Location**: `/EntraIdRoleManager/`
 
-A .NET 9.0 console application that:
+A .NET 10.0 console application that:
 
 - Creates app roles in Azure AD for each ImageStorageTier
 - Migrates existing users from Cosmos DB to Entra ID role assignments
@@ -6397,7 +6397,7 @@ Stops all running Azure Functions background jobs and cleans up completed jobs.
 
 
 - **PowerShell 5.1+** or **PowerShell Core 7+**
-- **.NET SDK 9.0** or later
+- **.NET SDK 10.0** or later
 - **Azure Functions Core Tools v4** (`func`)
 - **dotnet-update tool** (automatically installed if missing)
 

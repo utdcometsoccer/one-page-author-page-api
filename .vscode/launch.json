@@ -65,6 +65,82 @@
                 "order": 1
             },
             "stopOnEntry": false
+        },
+        {
+            "name": "Debug ImageAPI (Production)",
+            "type": "coreclr",
+            "request": "attach",
+            "preLaunchTask": "func-imageapi",
+            "processId": "${command:azureFunctions.pickProcess}",
+            "env": {
+                "TESTING_MODE": "true",
+                "MOCK_AZURE_INFRASTRUCTURE": "false",
+                "MOCK_STRIPE_PAYMENTS": "false",
+                "STRIPE_TEST_MODE": "false",
+                "TEST_SCENARIO": "production-test",
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "logging": {
+                "moduleLoad": false
+            },
+            "justMyCode": false,
+            "suppressJITOptimizations": true,
+            "presentation": {
+                "hidden": false,
+                "group": "Production Testing",
+                "order": 1
+            }
+        },
+        {
+            "name": "Debug InkStainedWretchFunctions (Production)",
+            "type": "coreclr",
+            "request": "attach",
+            "preLaunchTask": "func-inkstainedwretchfunctions",
+            "processId": "${command:azureFunctions.pickProcess}",
+            "env": {
+                "TESTING_MODE": "true",
+                "MOCK_AZURE_INFRASTRUCTURE": "false",
+                "MOCK_GOOGLE_DOMAINS": "false",
+                "MOCK_EXTERNAL_APIS": "false",
+                "SKIP_DOMAIN_PURCHASE": "false",
+                "TEST_SCENARIO": "production-test",
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "logging": {
+                "moduleLoad": false
+            },
+            "justMyCode": false,
+            "suppressJITOptimizations": true,
+            "presentation": {
+                "hidden": false,
+                "group": "Production Testing",
+                "order": 2
+            }
+        },
+        {
+            "name": "Debug InkStainedWretchStripe (Production)",
+            "type": "coreclr",
+            "request": "attach",
+            "preLaunchTask": "func-inkstainedwretchstripe",
+            "processId": "${command:azureFunctions.pickProcess}",
+            "env": {
+                "TESTING_MODE": "true",
+                "MOCK_STRIPE_PAYMENTS": "false",
+                "STRIPE_TEST_MODE": "false",
+                "MAX_TEST_COST_LIMIT": "50.00",
+                "TEST_SCENARIO": "production-test",
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "logging": {
+                "moduleLoad": false
+            },
+            "justMyCode": false,
+            "suppressJITOptimizations": true,
+            "presentation": {
+                "hidden": false,
+                "group": "Production Testing",
+                "order": 3
+            }
         }
     ],
     "compounds": [
@@ -95,6 +171,20 @@
                 "hidden": false,
                 "group": "All Services",
                 "order": 2
+            }
+        },
+        {
+            "name": "⚠️ Production Testing (Scenario 3) - REAL MONEY",
+            "configurations": [
+                "Debug ImageAPI (Production)",
+                "Debug InkStainedWretchFunctions (Production)",
+                "Debug InkStainedWretchStripe (Production)"
+            ],
+            "stopAll": true,
+            "presentation": {
+                "hidden": false,
+                "group": "Production Testing",
+                "order": 1
             }
         }
     ]

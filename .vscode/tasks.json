@@ -157,7 +157,9 @@
 			"command": "func",
 			"args": [
 				"host",
-				"start"
+				"start",
+				"--port",
+				"7000"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}/ImageAPI"
@@ -172,7 +174,9 @@
 			"command": "func",
 			"args": [
 				"host",
-				"start"
+				"start",
+				"--port",
+				"7001"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}/InkStainedWretchFunctions"
@@ -187,7 +191,9 @@
 			"command": "func",
 			"args": [
 				"host",
-				"start"
+				"start",
+				"--port",
+				"7002"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}/InkStainedWretchStripe"

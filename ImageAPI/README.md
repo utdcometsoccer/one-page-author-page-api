@@ -1,7 +1,7 @@
 # ImageAPI
 
 [![Build Status](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml/badge.svg)](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml)
-[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
+[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download)
 [![Azure Functions](https://img.shields.io/badge/Azure%20Functions-v4-orange.svg)](https://docs.microsoft.com/en-us/azure/azure-functions/)
 
 Azure Functions app for image management operations including upload, retrieval, and deletion with subscription tier validation.
@@ -12,7 +12,7 @@ The ImageAPI provides a comprehensive image management system for the OnePageAut
 
 ## 🏗️ Architecture
 
-- **Runtime**: Azure Functions v4 (.NET 9)
+- **Runtime**: Azure Functions v4 (.NET 10)
 - **Storage**: Azure Blob Storage
 - **Authentication**: JWT Bearer tokens
 - **Authorization**: User-based access control
@@ -293,25 +293,73 @@ func start
 
 ```
 
-### Configuration
+## ⚙️ Configuration
 
-Create a `local.settings.json` file:
+### 🔐 Security Requirements (.NET 10)
 
-```json
-{
-  "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "your-storage-connection-string",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "COSMOSDB_ENDPOINT_URI": "https://your-account.documents.azure.com:443/",
-    "COSMOSDB_PRIMARY_KEY": "your-cosmos-primary-key",
-    "COSMOSDB_DATABASE_ID": "OnePageAuthorDb",
-    "AZURE_STORAGE_CONNECTION_STRING": "your-storage-connection-string",
-    "AAD_TENANT_ID": "your-tenant-id",
-    "AAD_AUDIENCE": "your-client-id",
-    "AAD_AUTHORITY": "https://login.microsoftonline.com/consumers/v2.0"
-  }
-}
+**CRITICAL**: This project uses sensitive credentials that must NOT be stored in source control.
+
+### Development Setup (Required)
+
+#### 1. Initialize User Secrets
+
+```bash
+cd ImageAPI
+dotnet user-secrets init
+```
+
+#### 2. Add Required Configuration
+
+```bash
+# Azure Functions Core
+dotnet user-secrets set "AzureWebJobsStorage" "your-storage-connection-string"
+dotnet user-secrets set "FUNCTIONS_WORKER_RUNTIME" "dotnet-isolated"
+
+# Azure Cosmos DB (Required)
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "your-cosmos-primary-key"
+dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthorDb"
+
+# Azure Blob Storage (Required for Image Upload)
+dotnet user-secrets set "AZURE_STORAGE_CONNECTION_STRING" "your-storage-connection-string"
+
+# Azure AD Authentication (Optional for local testing)
+dotnet user-secrets set "AAD_TENANT_ID" "your-tenant-id"
+dotnet user-secrets set "AAD_AUDIENCE" "your-client-id"
+dotnet user-secrets set "AAD_AUTHORITY" "https://login.microsoftonline.com/consumers/v2.0"
+```
+
+#### 3. Verify Configuration
+
+```bash
+dotnet user-secrets list
+```
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `COSMOSDB_ENDPOINT_URI` | ✅ Yes | Azure Cosmos DB endpoint URL |
+| `COSMOSDB_PRIMARY_KEY` | ✅ Yes | Cosmos DB primary access key |
+| `COSMOSDB_DATABASE_ID` | ✅ Yes | Database name (typically "OnePageAuthorDb") |
+| `AZURE_STORAGE_CONNECTION_STRING` | ✅ Yes | Azure Blob Storage connection string |
+| `AAD_TENANT_ID` | ⚪ Optional | Azure AD tenant ID for authentication |
+| `AAD_AUDIENCE` | ⚪ Optional | Azure AD client ID |
+| `AAD_AUTHORITY` | ⚪ Optional | Azure AD authority URL |
+
+### ⚠️ Migration from local.settings.json
+
+If you have an existing `local.settings.json` file:
+
+1. **DO NOT commit it to source control** - it contains sensitive data
+2. Copy values to user secrets using the commands above
+3. Delete or move the `local.settings.json` file
+4. Add `local.settings.json` to your `.gitignore` if not already present
+
+### Production Deployment
+
+For Azure deployment, configure these values in:
+- Azure Portal → Function App → Configuration → Application Settings
 
 ```
 

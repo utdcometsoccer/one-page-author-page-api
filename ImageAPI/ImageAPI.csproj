@@ -9,6 +9,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\ImageAPI.xml</DocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    <UserSecretsId>ee2b60f8-5e0f-437f-8faa-f9884144eb66</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

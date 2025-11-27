@@ -24,7 +24,7 @@ The function-app is the primary Azure Functions application that provides:
 
 ## 🏗️ Architecture
 
-- **Runtime**: Azure Functions v4 (.NET 9)
+- **Runtime**: Azure Functions v4 (.NET 10)
 - **Database**: Azure Cosmos DB
 - **Authentication**: JWT Bearer tokens (where required)
 - **Deployment**: Automated via GitHub Actions
