@@ -382,5 +382,52 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
         }
+
+        #region Constructor Tests
+
+        [Fact]
+        public void Constructor_WithNullLogger_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => new CreateDnsZoneFunction(
+                null!,
+                _mockDnsZoneService.Object,
+                _mockDomainRegistrationService.Object));
+        }
+
+        [Fact]
+        public void Constructor_WithNullDnsZoneService_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => new CreateDnsZoneFunction(
+                _mockLogger.Object,
+                null!,
+                _mockDomainRegistrationService.Object));
+        }
+
+        [Fact]
+        public void Constructor_WithNullDomainRegistrationService_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => new CreateDnsZoneFunction(
+                _mockLogger.Object,
+                _mockDnsZoneService.Object,
+                null!));
+        }
+
+        [Fact]
+        public void Constructor_WithValidParameters_CreatesInstance()
+        {
+            // Act
+            var function = new CreateDnsZoneFunction(
+                _mockLogger.Object,
+                _mockDnsZoneService.Object,
+                _mockDomainRegistrationService.Object);
+
+            // Assert
+            Assert.NotNull(function);
+        }
+
+        #endregion
     }
 }
