@@ -4,15 +4,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
 using InkStainedWretch.OnePageAuthorAPI;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
-// Read Entra (Azure AD) settings from environment
-var tenantId = Environment.GetEnvironmentVariable("AAD_TENANT_ID");
-var audience = Environment.GetEnvironmentVariable("AAD_AUDIENCE") ?? Environment.GetEnvironmentVariable("AAD_CLIENT_ID");
-var authority = Environment.GetEnvironmentVariable("AAD_AUTHORITY") ?? (string.IsNullOrWhiteSpace(tenantId) ? null : $"https://login.microsoftonline.com/{tenantId}/v2.0");
+// Get configuration (includes User Secrets in development)
+var config = builder.Configuration;
+
+// Read Entra (Azure AD) settings from configuration (includes User Secrets)
+var tenantId = config["AAD_TENANT_ID"];
+var audience = config["AAD_AUDIENCE"] ?? config["AAD_CLIENT_ID"];
+var authority = config["AAD_AUTHORITY"] ?? (string.IsNullOrWhiteSpace(tenantId) ? null : $"https://login.microsoftonline.com/{tenantId}/v2.0");
 
 // Log Azure AD configuration (masked for security)
 Console.WriteLine($"Azure AD Tenant ID configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(tenantId)}");
@@ -64,10 +68,10 @@ builder.Services.AddAuthorization(options =>
 // Note: In Functions isolated v2, calling ConfigureFunctionsWebApplication wires the ASP.NET Core pipeline.
 // Authentication/Authorization middleware are added automatically when services are registered above.
 
-// Cosmos + repositories
-var endpointUri = Environment.GetEnvironmentVariable("COSMOSDB_ENDPOINT_URI") ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
-var primaryKey = Environment.GetEnvironmentVariable("COSMOSDB_PRIMARY_KEY") ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
-var databaseId = Environment.GetEnvironmentVariable("COSMOSDB_DATABASE_ID") ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
+// Cosmos + repositories (reads from User Secrets in development)
+var endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
+var primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
+var databaseId = config["COSMOSDB_DATABASE_ID"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
 // Log Cosmos DB configuration (masked for security)
 Console.WriteLine($"Cosmos DB Endpoint configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(endpointUri)}");
@@ -85,10 +89,10 @@ builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
-// Azure Blob Storage
+// Azure Blob Storage (reads from User Secrets in development)
 builder.Services.AddSingleton(sp =>
 {
-    var connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING") ?? throw new InvalidOperationException("AZURE_STORAGE_CONNECTION_STRING is required");
+    var connectionString = config["AZURE_STORAGE_CONNECTION_STRING"] ?? throw new InvalidOperationException("AZURE_STORAGE_CONNECTION_STRING is required");
     
     // Log Azure Storage configuration (masked for security)
     Console.WriteLine($"Azure Storage Connection String configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(connectionString)}");
