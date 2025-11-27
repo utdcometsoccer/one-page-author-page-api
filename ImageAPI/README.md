@@ -427,7 +427,6 @@ If you have an existing `local.settings.json` file:
 
 For Azure deployment, configure these values in:
 - Azure Portal → Function App → Configuration → Application Settings
-```
 
 ## 🧪 Testing
 
