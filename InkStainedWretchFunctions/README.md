@@ -1,7 +1,7 @@
 # InkStainedWretchFunctions
 
 [![Build Status](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml/badge.svg)](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml)
-[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
+[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download)
 [![Azure Functions](https://img.shields.io/badge/Azure%20Functions-v4-orange.svg)](https://docs.microsoft.com/en-us/azure/azure-functions/)
 
 Azure Functions application providing domain registration management, external API integrations, and localized UI text services.
@@ -63,52 +63,114 @@ func start
 
 ```
 
-## Configuration
+## ⚙️ Configuration (.NET 10)
 
-### Required Environment Variables
+### 🔐 Security Requirements
 
-Add these settings to your Azure Function App configuration or `local.settings.json`:
+**CRITICAL**: This project uses sensitive credentials that must NOT be stored in source control.
 
-```json
-{
-  "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "your-connection-string",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "COSMOSDB_ENDPOINT_URI": "https://<account>.documents.azure.com:443/",
-    "COSMOSDB_PRIMARY_KEY": "<secret>",
-    "COSMOSDB_DATABASE_ID": "<db-name>",
-    "COSMOSDB_CONNECTION_STRING": "AccountEndpoint=https://<account>.documents.azure.com:443/;AccountKey=<key>;",
-    "AZURE_SUBSCRIPTION_ID": "<subscription-id>",
-    "AZURE_RESOURCE_GROUP_NAME": "<resource-group-name>",
-    "AZURE_FRONTDOOR_PROFILE_NAME": "<frontdoor-profile-name>",
-    "AZURE_DNS_RESOURCE_GROUP": "<dns-resource-group-name>",
-    "GOOGLE_CLOUD_PROJECT_ID": "<google-project-id>",
-    "GOOGLE_DOMAINS_LOCATION": "global",
-    "AMAZON_PRODUCT_ACCESS_KEY": "your-aws-access-key",
-    "AMAZON_PRODUCT_SECRET_KEY": "your-aws-secret-key",
-    "AMAZON_PRODUCT_PARTNER_TAG": "yourtag-20",
-    "AMAZON_PRODUCT_REGION": "us-east-1",
-    "AMAZON_PRODUCT_MARKETPLACE": "www.amazon.com",
-    "PENGUIN_RANDOM_HOUSE_API_KEY": "your-api-key",
-    "PENGUIN_RANDOM_HOUSE_API_DOMAIN": "PRH.US"
-  }
-}
+### Development Setup (Required)
 
+#### 1. Initialize User Secrets
+
+```bash
+cd InkStainedWretchFunctions
+dotnet user-secrets init
 ```
 
-### Configuration Details
+#### 2. Core Configuration
 
-| Setting | Description | Required For |
-|---------|-------------|--------------|
-| `COSMOSDB_*` | Cosmos DB connection settings | All functions |
-| `AZURE_SUBSCRIPTION_ID` | Azure subscription for Front Door/DNS | Domain triggers |
-| `AZURE_RESOURCE_GROUP_NAME` | Resource group for Front Door | Front Door trigger |
-| `AZURE_FRONTDOOR_PROFILE_NAME` | Front Door profile name | Front Door trigger |
-| `AZURE_DNS_RESOURCE_GROUP` | Resource group for DNS zones | DNS trigger |
-| `GOOGLE_CLOUD_PROJECT_ID` | Google Cloud project ID | Google Domains trigger |
-| `AMAZON_PRODUCT_*` | Amazon Product Advertising API credentials | Amazon API functions |
-| `PENGUIN_RANDOM_HOUSE_*` | Penguin Random House API credentials | Penguin API functions |
+```bash
+# Azure Functions Core
+dotnet user-secrets set "AzureWebJobsStorage" "your-connection-string"
+dotnet user-secrets set "FUNCTIONS_WORKER_RUNTIME" "dotnet-isolated"
+
+# Azure Cosmos DB (Required)
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "your-cosmos-primary-key"
+dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthorDb"
+dotnet user-secrets set "CosmosDBConnection" "AccountEndpoint=https://your-account.documents.azure.com:443/;AccountKey=your-key;"
+
+# Azure AD Authentication (Optional)
+dotnet user-secrets set "AAD_TENANT_ID" "your-tenant-id"
+dotnet user-secrets set "AAD_AUDIENCE" "your-client-id"
+```
+
+#### 3. External API Integration (Optional)
+
+```bash
+# Amazon Product Advertising API
+dotnet user-secrets set "AMAZON_PRODUCT_ACCESS_KEY" "your-aws-access-key"
+dotnet user-secrets set "AMAZON_PRODUCT_SECRET_KEY" "your-aws-secret-key"
+dotnet user-secrets set "AMAZON_PRODUCT_PARTNER_TAG" "yourtag-20"
+dotnet user-secrets set "AMAZON_PRODUCT_REGION" "us-east-1"
+dotnet user-secrets set "AMAZON_PRODUCT_MARKETPLACE" "www.amazon.com"
+
+# Penguin Random House API
+dotnet user-secrets set "PENGUIN_RANDOM_HOUSE_API_KEY" "your-api-key"
+dotnet user-secrets set "PENGUIN_RANDOM_HOUSE_API_DOMAIN" "PRH.US"
+```
+
+#### 4. Azure Infrastructure (For Domain Registration Features)
+
+```bash
+# Azure Resource Management
+dotnet user-secrets set "AZURE_SUBSCRIPTION_ID" "your-subscription-id"
+dotnet user-secrets set "AZURE_DNS_RESOURCE_GROUP" "your-dns-resource-group"
+
+# Google Domains (Optional)
+dotnet user-secrets set "GOOGLE_CLOUD_PROJECT_ID" "your-google-project-id"
+dotnet user-secrets set "GOOGLE_DOMAINS_LOCATION" "global"
+```
+
+#### 5. Testing Configuration (Optional)
+
+```bash
+# Testing Mode Settings
+dotnet user-secrets set "TESTING_MODE" "true"
+dotnet user-secrets set "MOCK_AZURE_INFRASTRUCTURE" "true"
+dotnet user-secrets set "MOCK_GOOGLE_DOMAINS" "true"
+dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
+```
+
+### Environment Variables Reference
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `COSMOSDB_ENDPOINT_URI` | ✅ Yes | Azure Cosmos DB endpoint URL |
+| `COSMOSDB_PRIMARY_KEY` | ✅ Yes | Cosmos DB primary access key |
+| `COSMOSDB_DATABASE_ID` | ✅ Yes | Database name (typically "OnePageAuthorDb") |
+| `CosmosDBConnection` | ✅ Yes | Full Cosmos DB connection string (for triggers) |
+| `AZURE_SUBSCRIPTION_ID` | ⚪ Optional | Azure subscription for DNS/Front Door operations |
+| `AZURE_DNS_RESOURCE_GROUP` | ⚪ Optional | Resource group for DNS zones |
+| `GOOGLE_CLOUD_PROJECT_ID` | ⚪ Optional | Google Cloud project for domain registration |
+| `AMAZON_PRODUCT_ACCESS_KEY` | ⚪ Optional | AWS access key for Amazon API |
+| `AMAZON_PRODUCT_SECRET_KEY` | ⚪ Optional | AWS secret key for Amazon API |
+| `AMAZON_PRODUCT_PARTNER_TAG` | ⚪ Optional | Amazon Associates partner tag |
+| `PENGUIN_RANDOM_HOUSE_API_KEY` | ⚪ Optional | API key for Penguin Random House |
+| `AAD_TENANT_ID` | ⚪ Optional | Azure AD tenant ID for authentication |
+| `AAD_AUDIENCE` | ⚪ Optional | Azure AD client ID |
+
+### ⚠️ Migration from local.settings.json
+
+**If you have an existing `local.settings.json` file with real credentials:**
+
+1. **STOP** - Do not commit it to source control
+2. **MIGRATE** - Copy values to user secrets using commands above
+3. **SECURE** - Delete or rename the local.settings.json file
+4. **VERIFY** - Ensure .gitignore includes `local.settings.json`
+
+```bash
+# Quick migration helper
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "$(jq -r '.Values.COSMOSDB_ENDPOINT_URI' local.settings.json)"
+# Repeat for other sensitive values, then delete local.settings.json
+```
+
+### Production Deployment
+
+For Azure deployment, configure these values in:
+- Azure Portal → Function App → Configuration → Application Settings
+- Or use Azure CLI: `az functionapp config appsettings set`
 
 ## HTTP API Endpoints
 

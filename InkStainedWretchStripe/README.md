@@ -1,7 +1,7 @@
 # InkStainedWretchStripe
 
 [![Build Status](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml/badge.svg)](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml)
-[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
+[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download)
 [![Azure Functions](https://img.shields.io/badge/Azure%20Functions-v4-orange.svg)](https://docs.microsoft.com/en-us/azure/azure-functions/)
 [![Stripe](https://img.shields.io/badge/Stripe-API-blueviolet.svg)](https://stripe.com/docs)
 
@@ -80,88 +80,87 @@ dotnet user-secrets list
 
 You should see your secrets listed (values will be hidden for security).
 
-### Configuration Values
+### Environment Variables
 
-These settings are read from user secrets, environment variables, or local.settings.json:
+The following environment variables are required for the application to run:
 
-| Setting | Description | Required |
-|---------|-------------|----------|
-| `STRIPE_API_KEY` | Stripe API secret key | Yes |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | Yes (for webhooks) |
-| `COSMOSDB_PRIMARY_KEY` | Cosmos DB access key | Yes |
-| `AAD_TENANT_ID` | Azure AD tenant ID | Yes |
-| `AAD_CLIENT_ID` | Azure AD application client ID | Yes |
-| `AAD_AUDIENCE` | Azure AD API audience | Yes |
+| Variable | Description | Required | Where to Find |
+|----------|-------------|----------|---------------|
+| `STRIPE_API_KEY` | Stripe API secret key | Yes | Stripe Dashboard → Developers → API keys |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook endpoint secret | Yes (webhooks) | Stripe Dashboard → Developers → Webhooks → [Your endpoint] → Signing secret |
+| `COSMOSDB_ENDPOINT_URI` | Cosmos DB account endpoint | Yes | Azure Portal → Cosmos DB account → Keys → URI |
+| `COSMOSDB_PRIMARY_KEY` | Cosmos DB primary access key | Yes | Azure Portal → Cosmos DB account → Keys → Primary Key |
+| `COSMOSDB_DATABASE_ID` | Cosmos DB database name | Yes | Your database name (e.g., "OnePageAuthor") |
+| `AAD_TENANT_ID` | Azure Active Directory tenant ID | Yes | Azure Portal → Azure Active Directory → Properties → Directory ID |
+| `AAD_CLIENT_ID` | Azure AD application client ID | Yes | Azure Portal → Azure Active Directory → App registrations → [Your app] → Application ID |
+| `AAD_AUDIENCE` | Azure AD API audience/scope | Yes | Usually same as Client ID |
 
-### Where to Find Your Values
+### Configuration Sources Priority
 
-**Stripe API Key:**
+The application reads configuration in this order (later sources override earlier ones):
 
-1. Go to [Stripe Dashboard](https://dashboard.stripe.com/)
-2. Navigate to Developers > API Keys
-3. Copy the "Secret key" (starts with `sk_test_` for test mode)
+1. **appsettings.json** (default values)
+2. **Environment Variables** (production)
+3. **User Secrets** (development) 
+4. **local.settings.json** (⚠️ **NOT RECOMMENDED** - contains exposed credentials)
 
-**Stripe Webhook Secret:**
+### Security Requirements
 
-1. Go to [Stripe Dashboard](https://dashboard.stripe.com/)
-2. Navigate to Developers > Webhooks
-3. Create or select a webhook endpoint
-4. Copy the "Signing secret" (starts with `whsec_`)
+**⚠️ IMPORTANT SECURITY NOTICE:**
+- **DO NOT** use `local.settings.json` for storing credentials
+- **DO NOT** commit secrets to version control
+- **ALWAYS** use User Secrets for local development
+- **ALWAYS** use Environment Variables or Azure Key Vault for production
 
-**Cosmos DB Primary Key:**
+**Step 1:** Set up User Secrets (one-time setup)
 
-1. Go to [Azure Portal](https://portal.azure.com/)
-2. Navigate to your Cosmos DB account
-3. Go to Settings > Keys
-4. Copy the "Primary Key"
-
-**Azure AD Values:**
-
-1. Go to [Azure Portal](https://portal.azure.com/)
-2. Navigate to Azure Active Directory > App registrations
-3. Select your app registration
-4. Copy the "Application (client) ID" and "Directory (tenant) ID"
-
-### Example local.settings.json (Alternative Configuration Method)
-
-⚠️ **WARNING**: Do not commit secrets to source control!
-
-```json
-{
-  "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "your-connection-string",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "STRIPE_API_KEY": "sk_test_***",
-    "STRIPE_WEBHOOK_SECRET": "whsec_***",
-    "COSMOSDB_PRIMARY_KEY": "***",
-    "AAD_TENANT_ID": "***",
-    "AAD_CLIENT_ID": "***",
-    "AAD_AUDIENCE": "***"
-  }
-}
-
+```bash
+cd InkStainedWretchStripe
+dotnet user-secrets init
 ```
 
-Add library/service configuration via `OnePageAuthorLib` as needed.
+**Step 2:** Add your secrets (replace with actual values)
+
+```bash
+# Stripe Configuration
+dotnet user-secrets set "STRIPE_API_KEY" "sk_test_YOUR_ACTUAL_STRIPE_KEY"
+dotnet user-secrets set "STRIPE_WEBHOOK_SECRET" "whsec_YOUR_ACTUAL_WEBHOOK_SECRET"
+
+# Cosmos DB Configuration  
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "YOUR_ACTUAL_COSMOS_KEY"
+dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthor"
+
+# Azure AD Configuration
+dotnet user-secrets set "AAD_TENANT_ID" "YOUR_ACTUAL_TENANT_ID"
+dotnet user-secrets set "AAD_CLIENT_ID" "YOUR_ACTUAL_CLIENT_ID"
+dotnet user-secrets set "AAD_AUDIENCE" "YOUR_ACTUAL_CLIENT_ID"
+```
+
+**Step 3:** Verify Setup
+
+```bash
+dotnet user-secrets list
+```
 
 ## Deployment
 
 ### Production Deployment
 
-For production deployments:
+For Azure deployments:
 
-1. Deploy as an Azure Functions app (v4, dotnet-isolated)
-2. Configure settings as Azure App Settings (not in local.settings.json):
-
-   - `STRIPE_API_KEY`
+1. **Deploy as Azure Functions v4** (.NET 10.0, isolated worker)
+2. **Configure Application Settings** in Azure Portal (Function App → Configuration):
+   - `STRIPE_API_KEY` (use production `sk_live_` key)
    - `STRIPE_WEBHOOK_SECRET`
+   - `COSMOSDB_ENDPOINT_URI`
    - `COSMOSDB_PRIMARY_KEY`
+   - `COSMOSDB_DATABASE_ID`
    - `AAD_TENANT_ID`
    - `AAD_CLIENT_ID`
    - `AAD_AUDIENCE`
 
-3. Optionally use Azure Key Vault for enhanced security:
+3. **Enhanced Security**: Use Azure Key Vault integration
 
 
    ```bash
