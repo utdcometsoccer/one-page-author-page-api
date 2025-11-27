@@ -64,17 +64,36 @@ dotnet test --logger "console;verbosity=detailed"
 
 ```
 
-### Test Configuration
+### ⚙️ Test Configuration
 
 For integration tests, configure connection strings in user secrets:
 
 ```bash
+cd OnePageAuthor.Test
+dotnet user-secrets init
+
+# Cosmos DB Configuration (use emulator for local testing)
 dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://localhost:8081/"
 dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
 dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthorDb"
+
+# Azure Storage (for integration tests)
 dotnet user-secrets set "AZURE_STORAGE_CONNECTION_STRING" "your-test-storage-connection"
 
+# Verify configuration
+dotnet user-secrets list
 ```
+
+### Why These Settings Are Needed
+
+| Variable | Purpose | Where to Find |
+|----------|---------|---------------|
+| `COSMOSDB_ENDPOINT_URI` | Connect to Cosmos DB for integration tests | Azure Portal → Cosmos DB → Keys → URI (or `https://localhost:8081` for emulator) |
+| `COSMOSDB_PRIMARY_KEY` | Authenticate database operations | Azure Portal → Cosmos DB → Keys → Primary Key |
+| `COSMOSDB_DATABASE_ID` | Identify test database | Your test database name |
+| `AZURE_STORAGE_CONNECTION_STRING` | Test image upload/download operations | Azure Portal → Storage Account → Access keys → Connection string |
+
+**Note**: For local development, use the [Azure Cosmos DB Emulator](https://aka.ms/cosmosdb-emulator) with the well-known emulator key shown above.
 
 ## 📊 Test Results
 

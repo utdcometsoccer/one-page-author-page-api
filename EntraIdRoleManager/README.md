@@ -65,14 +65,56 @@ Your existing ImageAPI app registration should be configured for Microsoft Accou
 - Cosmos DB access to read ImageStorageTiers and ImageStorageTierMemberships
 - Both applications must be in the same Azure AD tenant
 
-## Configuration
+## ⚙️ Configuration
 
-### Using User Secrets (Recommended)
+### Required Settings
+
+| Variable | Description | Where to Find | Why It's Needed |
+|----------|-------------|---------------|-----------------|
+| `COSMOSDB_ENDPOINT_URI` | Cosmos DB account endpoint | Azure Portal → Cosmos DB → Keys → URI | Read ImageStorageTiers and existing memberships |
+| `COSMOSDB_PRIMARY_KEY` | Cosmos DB primary access key | Azure Portal → Cosmos DB → Keys → Primary Key | Authenticate database operations |
+| `COSMOSDB_DATABASE_ID` | Database name | Your database name (e.g., "OnePageAuthorDb") | Identify target database |
+| `AAD_TENANT_ID` | Azure AD tenant ID | Azure Portal → Microsoft Entra ID → Overview → Tenant ID | Connect to correct Azure AD tenant |
+| `AAD_MANAGEMENT_CLIENT_ID` | Management app client ID | Azure Portal → App registrations → [Management App] → Application ID | Authenticate this console app |
+| `AAD_MANAGEMENT_CLIENT_SECRET` | Management app client secret | Azure Portal → App registrations → [Management App] → Certificates & secrets | Authenticate this console app |
+| `AAD_TARGET_CLIENT_ID` | Target ImageAPI app client ID | Azure Portal → App registrations → [ImageAPI App] → Application ID | Create roles in the target application |
+
+### Why These Settings Are Needed
+
+<details>
+<summary>🗄️ Cosmos DB Configuration</summary>
+
+**Purpose**: Read ImageStorageTier definitions and existing user memberships to configure app roles.
+
+| Variable | Why It's Needed |
+|----------|-----------------|
+| `COSMOSDB_ENDPOINT_URI` | Connect to database to read tier configurations (Starter, Pro, Elite) |
+| `COSMOSDB_PRIMARY_KEY` | Authenticate read operations against the database |
+| `COSMOSDB_DATABASE_ID` | Identify which database contains the ImageStorageTiers container |
+
+</details>
+
+<details>
+<summary>🔐 Azure AD Configuration</summary>
+
+**Purpose**: Connect to Microsoft Graph API to manage app roles and read application configurations.
+
+| Variable | Why It's Needed |
+|----------|-----------------|
+| `AAD_TENANT_ID` | Identifies your Azure AD tenant for Graph API operations |
+| `AAD_MANAGEMENT_CLIENT_ID` | The Application ID of this management tool's app registration |
+| `AAD_MANAGEMENT_CLIENT_SECRET` | Client secret for authenticating as the management app |
+| `AAD_TARGET_CLIENT_ID` | The ImageAPI app where roles will be created |
+
+</details>
+
+### Setting Up User Secrets (Recommended)
 
 Navigate to the EntraIdRoleManager directory and configure user secrets:
 
 ```bash
 cd EntraIdRoleManager
+dotnet user-secrets init
 
 # Cosmos DB Configuration
 dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://your-account.documents.azure.com:443/"
@@ -89,29 +131,46 @@ dotnet user-secrets set "AAD_MANAGEMENT_CLIENT_SECRET" "your-management-app-clie
 # Target App (ImageAPI app configured for Microsoft Account users)
 dotnet user-secrets set "AAD_TARGET_CLIENT_ID" "your-imageapi-app-client-id"
 
+# Verify configuration
+dotnet user-secrets list
 ```
+
+### How to Obtain Configuration Values
+
+1. **Cosmos DB Values**:
+   - Go to [Azure Portal](https://portal.azure.com)
+   - Navigate to your Cosmos DB account
+   - Click "Keys" in the left sidebar
+   - Copy URI and Primary Key
+
+2. **Tenant ID**:
+   - Azure Portal → Microsoft Entra ID (Azure Active Directory)
+   - Overview page → Tenant ID
+
+3. **Management App Client ID/Secret**:
+   - Azure Portal → Microsoft Entra ID → App registrations
+   - Select your management app (e.g., "OnePageAuthor-RoleManager")
+   - **Client ID**: Application (client) ID on Overview page
+   - **Client Secret**: Certificates & secrets → New client secret → Copy value immediately
+
+4. **Target App Client ID**:
+   - Azure Portal → Microsoft Entra ID → App registrations
+   - Select your ImageAPI app
+   - Copy Application (client) ID from Overview page
 
 ### Environment Variables Alternative
 
 You can also set these as environment variables:
 
+```bash
+export COSMOSDB_ENDPOINT_URI="https://your-account.documents.azure.com:443/"
+export COSMOSDB_PRIMARY_KEY="your-cosmos-key"
+export COSMOSDB_DATABASE_ID="OnePageAuthorDb"
+export AAD_TENANT_ID="your-tenant-id"
+export AAD_MANAGEMENT_CLIENT_ID="management-app-client-id"
+export AAD_MANAGEMENT_CLIENT_SECRET="management-app-client-secret"
+export AAD_TARGET_CLIENT_ID="target-app-client-id"
 ```
-COSMOSDB_ENDPOINT_URI=<your-cosmos-endpoint>
-COSMOSDB_PRIMARY_KEY=<your-cosmos-key>
-COSMOSDB_DATABASE_ID=<your-database-id>
-AAD_TENANT_ID=<your-tenant-id>
-AAD_MANAGEMENT_CLIENT_ID=<management-app-client-id>
-AAD_MANAGEMENT_CLIENT_SECRET=<management-app-client-secret>
-AAD_TARGET_CLIENT_ID=<target-app-client-id>
-
-```
-
-### Finding Your Configuration Values
-
-1. **Cosmos DB Values**: Available in Azure Portal → Cosmos DB Account → Keys
-2. **Tenant ID**: Azure Portal → Azure Active Directory → Overview → Tenant ID
-3. **Management Client ID/Secret**: Azure Portal → App registrations → [Management App] → Overview/Certificates & secrets
-4. **Target Client ID**: Azure Portal → App registrations → [ImageAPI App] → Overview
 
 ## Usage
 

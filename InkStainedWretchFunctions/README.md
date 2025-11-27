@@ -151,6 +151,102 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 | `AAD_TENANT_ID` | ⚪ Optional | Azure AD tenant ID for authentication |
 | `AAD_AUDIENCE` | ⚪ Optional | Azure AD client ID |
 
+### Why These Settings Are Needed
+
+<details>
+<summary>🗄️ Cosmos DB Configuration</summary>
+
+**Required for all functionality** - Cosmos DB stores all application data including domain registrations, localized text, countries, languages, and state/province data.
+
+| Variable | Purpose | How to Obtain |
+|----------|---------|---------------|
+| `COSMOSDB_ENDPOINT_URI` | Database connection endpoint | Azure Portal → Cosmos DB → Keys → URI |
+| `COSMOSDB_PRIMARY_KEY` | Authentication for database access | Azure Portal → Cosmos DB → Keys → Primary Key |
+| `COSMOSDB_DATABASE_ID` | Identifies the application database | Your database name in Cosmos DB |
+| `CosmosDBConnection` | Connection string for Cosmos DB triggers | Combine endpoint and key: `AccountEndpoint={URI};AccountKey={KEY};` |
+
+**Note**: The `CosmosDBConnection` is specifically required for Cosmos DB-triggered functions (change feed triggers).
+
+</details>
+
+<details>
+<summary>🌐 Azure Infrastructure (Domain Management)</summary>
+
+**Required for domain registration features** - These enable automatic DNS zone creation and Azure Front Door integration.
+
+| Variable | Purpose | How to Obtain |
+|----------|---------|---------------|
+| `AZURE_SUBSCRIPTION_ID` | Identifies your Azure subscription for resource management | Azure Portal → Subscriptions → Select subscription → Subscription ID |
+| `AZURE_DNS_RESOURCE_GROUP` | Resource group where DNS zones will be created | Azure Portal → Resource Groups → Name of your DNS resource group |
+
+**RBAC Permissions Required**:
+- DNS Zone Contributor role on the DNS resource group
+- CDN Profile Contributor on the Front Door profile (if using Front Door integration)
+
+</details>
+
+<details>
+<summary>🌍 Google Domains Integration</summary>
+
+**Required for automatic domain registration** - Enables registering domains via Google Domains API.
+
+| Variable | Purpose | How to Obtain |
+|----------|---------|---------------|
+| `GOOGLE_CLOUD_PROJECT_ID` | Your Google Cloud project identifier | [Google Cloud Console](https://console.cloud.google.com) → Project selector → Project ID |
+| `GOOGLE_DOMAINS_LOCATION` | Regional location for domain operations | Usually "global" |
+
+**Setup Steps**:
+1. Create a project in [Google Cloud Console](https://console.cloud.google.com)
+2. Enable the Cloud Domains API
+3. Set up authentication via Workload Identity Federation or service account
+4. Grant Domain Registration Admin permissions
+
+</details>
+
+<details>
+<summary>📚 Amazon Product Advertising API</summary>
+
+**Required for Amazon book search functionality** - Enables searching Amazon's catalog for book information.
+
+| Variable | Purpose | How to Obtain |
+|----------|---------|---------------|
+| `AMAZON_PRODUCT_ACCESS_KEY` | AWS Access Key ID | [AWS Console](https://console.aws.amazon.com) → Security Credentials → Access keys |
+| `AMAZON_PRODUCT_SECRET_KEY` | AWS Secret Access Key | Created with Access Key (save immediately - shown only once) |
+| `AMAZON_PRODUCT_PARTNER_TAG` | Your Associates tracking ID | [Amazon Associates](https://affiliate-program.amazon.com) → Your tracking IDs |
+| `AMAZON_PRODUCT_REGION` | AWS region for API calls | Based on your marketplace (e.g., "us-east-1") |
+| `AMAZON_PRODUCT_MARKETPLACE` | Target Amazon marketplace | E.g., "www.amazon.com", "www.amazon.co.uk" |
+
+**Prerequisites**:
+1. Join [Amazon Associates Program](https://affiliate-program.amazon.com)
+2. Apply for Product Advertising API access (separate approval required)
+3. Partner tag format varies by region: US `-20`, UK `-21`, DE `-03`
+
+</details>
+
+<details>
+<summary>🐧 Penguin Random House API</summary>
+
+**Required for Penguin Random House book search** - Enables searching their catalog for author and book information.
+
+| Variable | Purpose | How to Obtain |
+|----------|---------|---------------|
+| `PENGUIN_RANDOM_HOUSE_API_KEY` | API authentication key | Request via [PRH Developer Portal](https://developer.penguinrandomhouse.com) |
+| `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | API domain identifier | Provided with API access (e.g., "PRH.US") |
+
+</details>
+
+<details>
+<summary>🔐 Azure AD Authentication</summary>
+
+**Required for JWT-protected endpoints** - Validates bearer tokens for secure API access.
+
+| Variable | Purpose | How to Obtain |
+|----------|---------|---------------|
+| `AAD_TENANT_ID` | Your Azure AD tenant identifier | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
+| `AAD_AUDIENCE` | API application client ID | Azure Portal → Microsoft Entra ID → App registrations → Your App → Application (client) ID |
+
+</details>
+
 ### ⚠️ Migration from local.settings.json
 
 **If you have an existing `local.settings.json` file with real credentials:**

@@ -25,19 +25,55 @@ dotnet run --project SeedInkStainedWretchesLocale.csproj
 
 ```
 
-## Configuration
+## ⚙️ Configuration
 
-Read from user secrets or environment variables (see Program.cs):
+### Required Settings
 
-- EndpointUri
-- PrimaryKey
-- DatabaseId
+| Variable | Description | Where to Find | Why It's Needed |
+|----------|-------------|---------------|-----------------|
+| `EndpointUri` | Cosmos DB account endpoint | Azure Portal → Cosmos DB → Keys → URI | Establishes database connection for seeding localization data |
+| `PrimaryKey` | Cosmos DB primary access key | Azure Portal → Cosmos DB → Keys → Primary Key | Authenticates write operations to create localization records |
+| `DatabaseId` | Database name | Your database name (e.g., "OnePageAuthorDb") | Identifies target database for localization containers |
 
-Example user-secrets (dotnet user-secrets set):
+### Setting Up User Secrets (Recommended)
 
-- EndpointUri = https://<account>.documents.azure.com:443/
-- PrimaryKey = <secret>
-- DatabaseId = <db-name>
+```bash
+cd SeedInkStainedWretchesLocale
+dotnet user-secrets init
+
+# Set required configuration
+dotnet user-secrets set "EndpointUri" "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "PrimaryKey" "your-cosmos-primary-key"
+dotnet user-secrets set "DatabaseId" "OnePageAuthorDb"
+
+# Verify configuration
+dotnet user-secrets list
+```
+
+### How to Obtain Configuration Values
+
+1. **EndpointUri**:
+   - Go to [Azure Portal](https://portal.azure.com)
+   - Navigate to your Cosmos DB account
+   - Click "Keys" in the left sidebar
+   - Copy the "URI" value (format: `https://your-account.documents.azure.com:443/`)
+
+2. **PrimaryKey**:
+   - In the same "Keys" section
+   - Copy the "Primary Key" value
+   - ⚠️ Keep this secret and never commit to source control
+
+3. **DatabaseId**:
+   - This is your database name (e.g., "OnePageAuthorDb")
+   - Found in Cosmos DB → Data Explorer → Database name
+
+### Alternative: Environment Variables
+
+```bash
+export EndpointUri="https://your-account.documents.azure.com:443/"
+export PrimaryKey="your-cosmos-primary-key"
+export DatabaseId="OnePageAuthorDb"
+```
 
 ## Data Files
 
@@ -46,8 +82,7 @@ Place JSON files in `data/` with this pattern:
 - **Standard format**: `inkstainedwretch.<language>-<country>.json` (e.g., `inkstainedwretch.en-us.json`)
 - **Extended format**: `inkstainedwretch.<language-variant>-<country>.json` (e.g., `inkstainedwretch.zh-cn-us.json`, `inkstainedwretch.zh-tw-ca.json`)
 
-Each top-level property name should match a POCO/container name (e.g.,
-avbar`, `ThankYou`, `ArticleList`). Values can be an object or array.
+Each top-level property name should match a POCO/container name (e.g., `Navbar`, `ThankYou`, `ArticleList`). Values can be an object or array.
 
 ### North America Locales Included
 

@@ -73,18 +73,54 @@ dotnet run
 
 ```
 
-### Configuration
+## ⚙️ Configuration
 
-The application uses user secrets for configuration. Set up your connection strings:
+### Required Settings
+
+| Variable | Description | Where to Find | Why It's Needed |
+|----------|-------------|---------------|-----------------|
+| `COSMOSDB_ENDPOINT_URI` | Cosmos DB account endpoint | Azure Portal → Cosmos DB → Keys → URI | Establishes database connection for seeding tier configurations |
+| `COSMOSDB_PRIMARY_KEY` | Cosmos DB primary access key | Azure Portal → Cosmos DB → Keys → Primary Key | Authenticates write operations to create tier records |
+| `COSMOSDB_DATABASE_ID` | Database name | Your database name (e.g., "OnePageAuthorDb") | Identifies target database for ImageStorageTiers container |
+
+### Setting Up User Secrets (Recommended)
 
 ```bash
-# Set Cosmos DB connection string
-dotnet user-secrets set "CosmosDbConnectionString" "your-cosmos-connection-string"
+cd SeedImageStorageTiers
+dotnet user-secrets init
 
-# Set other required configuration
-dotnet user-secrets set "DatabaseId" "your-database-id"
-dotnet user-secrets set "ContainerId" "your-container-id"
+# Set required configuration
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "your-cosmos-primary-key"
+dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthorDb"
 
+# Verify configuration
+dotnet user-secrets list
+```
+
+### How to Obtain Configuration Values
+
+1. **COSMOSDB_ENDPOINT_URI**:
+   - Go to [Azure Portal](https://portal.azure.com)
+   - Navigate to your Cosmos DB account
+   - Click "Keys" in the left sidebar
+   - Copy the "URI" value
+
+2. **COSMOSDB_PRIMARY_KEY**:
+   - In the same "Keys" section
+   - Copy the "Primary Key" value
+   - ⚠️ Keep this secret and never commit to source control
+
+3. **COSMOSDB_DATABASE_ID**:
+   - This is your database name (e.g., "OnePageAuthorDb")
+   - Found in Cosmos DB → Data Explorer → Database name
+
+### Alternative: Environment Variables
+
+```bash
+export COSMOSDB_ENDPOINT_URI="https://your-account.documents.azure.com:443/"
+export COSMOSDB_PRIMARY_KEY="your-cosmos-primary-key"
+export COSMOSDB_DATABASE_ID="OnePageAuthorDb"
 ```
 
 ## 🔧 Usage
