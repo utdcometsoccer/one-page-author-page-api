@@ -79,19 +79,45 @@ dotnet test
 
 ```
 
-### Configuration
+### ⚙️ Configuration
 
 Set up test database connection:
 
 ```bash
-# For Cosmos DB Emulator
-dotnet user-secrets set "CosmosDbConnectionString" "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
+cd IntegrationTestAuthorDataService
+dotnet user-secrets init
 
-# For test instance
-dotnet user-secrets set "CosmosDbConnectionString" "your-test-cosmos-connection-string"
+# For Azure Cosmos DB (real test instance)
+dotnet user-secrets set "CosmosDbConnectionString" "AccountEndpoint=https://your-account.documents.azure.com:443/;AccountKey=your-primary-key"
 dotnet user-secrets set "DatabaseId" "OnePageAuthorTest"
 
+# For Cosmos DB Emulator (local development)
+dotnet user-secrets set "CosmosDbConnectionString" "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
+dotnet user-secrets set "DatabaseId" "OnePageAuthorTest"
+
+# Verify configuration
+dotnet user-secrets list
 ```
+
+### Why These Settings Are Needed
+
+| Variable | Purpose | Where to Find |
+|----------|---------|---------------|
+| `CosmosDbConnectionString` | Full connection string for AuthorDataService integration testing | Azure Portal → Cosmos DB → Keys → Primary/Secondary Connection String |
+| `DatabaseId` | Identifies which database contains test data | Your test database name (use separate from production) |
+
+### How to Obtain Configuration Values
+
+1. **CosmosDbConnectionString**:
+   - Go to [Azure Portal](https://portal.azure.com)
+   - Navigate to your Cosmos DB account
+   - Click "Keys" in the left sidebar
+   - Copy the "Primary Connection String" or construct from URI + Key
+   - For local emulator, use the well-known emulator connection string shown above
+
+2. **DatabaseId**:
+   - Use a dedicated test database (e.g., "OnePageAuthorTest") 
+   - Keep separate from production to avoid data contamination
 
 ## 🔧 Test Features
 

@@ -98,19 +98,65 @@ Add a project reference to use OnePageAuthorLib:
 
 ```
 
-### Configuration
+### ⚙️ Configuration
 
-The library expects configuration for:
+The library expects configuration values to be provided by the consuming application (Azure Functions, console apps, etc.).
 
-```json
-{
-  "COSMOSDB_ENDPOINT_URI": "https://your-account.documents.azure.com:443/",
-  "COSMOSDB_PRIMARY_KEY": "your-cosmos-primary-key",
-  "COSMOSDB_DATABASE_ID": "OnePageAuthorDb", 
-  "AZURE_STORAGE_CONNECTION_STRING": "your-storage-connection-string",
-  "STRIPE_API_KEY": "your-stripe-secret-key"
-}
+#### Required Configuration Values
 
+| Variable | Description | Where to Find | Why It's Needed |
+|----------|-------------|---------------|-----------------|
+| `COSMOSDB_ENDPOINT_URI` | Cosmos DB account endpoint | Azure Portal → Cosmos DB → Keys → URI | Establishes database connection for all data operations |
+| `COSMOSDB_PRIMARY_KEY` | Cosmos DB primary access key | Azure Portal → Cosmos DB → Keys → Primary Key | Authenticates database requests |
+| `COSMOSDB_DATABASE_ID` | Database name | Your database name in Cosmos DB | Identifies the database containing application containers |
+
+#### Optional Configuration Values
+
+| Variable | Description | Where to Find | Why It's Needed |
+|----------|-------------|---------------|-----------------|
+| `AZURE_STORAGE_CONNECTION_STRING` | Blob Storage connection | Azure Portal → Storage Account → Access keys | Required for image upload services |
+| `STRIPE_API_KEY` | Stripe secret key | [Stripe Dashboard](https://dashboard.stripe.com) → Developers → API keys | Required for payment/subscription services |
+| `AAD_TENANT_ID` | Azure AD tenant ID | Azure Portal → Microsoft Entra ID → Tenant ID | Required for JWT authentication services |
+| `AAD_AUDIENCE` | Azure AD client ID | Azure Portal → App registrations → Application ID | Required for JWT token validation |
+
+#### Configuration Setup in Consuming Applications
+
+The library uses dependency injection. Configure services in your `Program.cs`:
+
+```csharp
+// Example Azure Functions configuration
+var host = new HostBuilder()
+    .ConfigureFunctionsWorkerDefaults()
+    .ConfigureServices((context, services) =>
+    {
+        var config = context.Configuration;
+        
+        // Add Cosmos DB client
+        services.AddCosmosClient(
+            config["COSMOSDB_ENDPOINT_URI"],
+            config["COSMOSDB_PRIMARY_KEY"]);
+        
+        // Add database
+        services.AddCosmosDatabase(config["COSMOSDB_DATABASE_ID"]);
+        
+        // Add repositories and services
+        services.AddAuthorRepositories();
+        services.AddAuthorDataService();
+        services.AddStripeServices();  // If using Stripe
+    })
+    .Build();
+```
+
+#### Using User Secrets for Development
+
+Projects consuming this library should use .NET User Secrets:
+
+```bash
+cd YourProjectDirectory
+dotnet user-secrets init
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "your-primary-key"
+dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthorDb"
 ```
 
 ## 📖 Documentation

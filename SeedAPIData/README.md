@@ -49,17 +49,37 @@ dotnet run
 
 ```
 
-### Configuration
+## ⚙️ Configuration
 
-Set up your database connection using user secrets:
+### Required Settings
+
+| Variable | Description | Where to Find | Why It's Needed |
+|----------|-------------|---------------|-----------------|
+| `COSMOSDB_ENDPOINT_URI` | Cosmos DB account endpoint | Azure Portal → Cosmos DB → Keys → URI | Establishes database connection for seeding operations |
+| `COSMOSDB_PRIMARY_KEY` | Cosmos DB primary access key | Azure Portal → Cosmos DB → Keys → Primary Key | Authenticates write operations to the database |
+| `COSMOSDB_DATABASE_ID` | Database name | Your database name (e.g., "OnePageAuthorDb") | Identifies target database for author, book, and article data |
+
+### Setting Up User Secrets (Recommended)
 
 ```bash
-# Set Cosmos DB connection string
-dotnet user-secrets set "CosmosDbConnectionString" "your-cosmos-connection-string"
+cd SeedAPIData
+dotnet user-secrets init
 
-# Set database configuration
-dotnet user-secrets set "DatabaseId" "OnePageAuthorDB"
+# Set required configuration
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "your-cosmos-primary-key"
+dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthorDb"
 
+# Verify configuration
+dotnet user-secrets list
+```
+
+### Alternative: Environment Variables
+
+```bash
+export COSMOSDB_ENDPOINT_URI="https://your-account.documents.azure.com:443/"
+export COSMOSDB_PRIMARY_KEY="your-cosmos-primary-key"
+export COSMOSDB_DATABASE_ID="OnePageAuthorDb"
 ```
 
 ## 📋 Sample Data
@@ -137,8 +157,3 @@ Total records: 23 entities created
 4. Commit your changes (`git commit -m 'Add new sample data'`)
 5. Push to the branch (`git push origin feature/new-seed-data`)
 6. Open a Pull Request
-
-## Configuration
-
-
-- Provide any required connection/configuration values via environment variables or user-secrets.

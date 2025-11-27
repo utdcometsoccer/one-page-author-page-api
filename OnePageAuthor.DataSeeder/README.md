@@ -47,18 +47,53 @@ The seeder integrates with the existing OnePageAuthorLib infrastructure:
 - Follows established error handling and logging patterns
 - Enhanced data model with separate Country field for efficient querying
 
-## Configuration
+## ⚙️ Configuration
 
-### User Secrets (Recommended for Development)
+### Required Settings
 
-The application uses user secrets for secure configuration storage in development:
+| Variable | Description | Where to Find | Why It's Needed |
+|----------|-------------|---------------|-----------------|
+| `CosmosDb:Endpoint` | Cosmos DB account endpoint | Azure Portal → Cosmos DB → Keys → URI | Establishes database connection for seeding StateProvince data |
+| `CosmosDb:Key` | Cosmos DB primary access key | Azure Portal → Cosmos DB → Keys → Primary Key | Authenticates write operations to create StateProvince records |
+| `CosmosDb:Database` | Database name | Your database name (e.g., "OnePageAuthorDB") | Identifies target database for the StateProvinces container |
+
+### How to Obtain Configuration Values
+
+1. **CosmosDb:Endpoint**:
+   - Go to [Azure Portal](https://portal.azure.com)
+   - Navigate to your Cosmos DB account
+   - Click "Keys" in the left sidebar
+   - Copy the "URI" value (format: `https://your-account.documents.azure.com:443/`)
+   - For local development with emulator: `https://localhost:8081`
+
+2. **CosmosDb:Key**:
+   - In the same "Keys" section
+   - Copy the "Primary Key" value
+   - For local emulator: Use the well-known emulator key
+   - ⚠️ Keep production keys secret and never commit to source control
+
+3. **CosmosDb:Database**:
+   - This is your database name (e.g., "OnePageAuthorDB")
+   - Found in Cosmos DB → Data Explorer → Database name
+
+### Setting Up User Secrets (Recommended for Development)
 
 ```powershell
-# Set up user secrets (already configured)
-dotnet user-secrets set "CosmosDb:Endpoint" "https://localhost:8081" --project OnePageAuthor.DataSeeder
-dotnet user-secrets set "CosmosDb:Key" "your-cosmos-key" --project OnePageAuthor.DataSeeder  
-dotnet user-secrets set "CosmosDb:Database" "OnePageAuthorDB" --project OnePageAuthor.DataSeeder
+cd OnePageAuthor.DataSeeder
+dotnet user-secrets init
 
+# For Azure Cosmos DB
+dotnet user-secrets set "CosmosDb:Endpoint" "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "CosmosDb:Key" "your-cosmos-primary-key"
+dotnet user-secrets set "CosmosDb:Database" "OnePageAuthorDB"
+
+# For local Cosmos DB Emulator
+dotnet user-secrets set "CosmosDb:Endpoint" "https://localhost:8081"
+dotnet user-secrets set "CosmosDb:Key" "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
+dotnet user-secrets set "CosmosDb:Database" "OnePageAuthorDB"
+
+# Verify configuration
+dotnet user-secrets list
 ```
 
 ### Environment Variables (Alternative)
@@ -66,10 +101,9 @@ dotnet user-secrets set "CosmosDb:Database" "OnePageAuthorDB" --project OnePageA
 Set these environment variables as an alternative to user secrets:
 
 ```bash
-COSMOS_DB_ENDPOINT=https://your-cosmos-account.documents.azure.com:443/
-COSMOS_DB_KEY=your-cosmos-primary-key
-COSMOS_DB_DATABASE=OnePageAuthorDB
-
+export COSMOS_DB_ENDPOINT="https://your-cosmos-account.documents.azure.com:443/"
+export COSMOS_DB_KEY="your-cosmos-primary-key"
+export COSMOS_DB_DATABASE="OnePageAuthorDB"
 ```
 
 ### Configuration Priority

@@ -57,19 +57,45 @@ All products include comprehensive features from the Ink Stained Wretch platform
 - Enterprise security & compliance
 - Real-time analytics & monitoring
 
-## Setup Instructions
+## ⚙️ Configuration
 
-### 1. Configure Stripe API Key
+### Required Settings
 
-**Option A: User Secrets (Recommended)**
+| Variable | Description | Where to Find | Why It's Needed |
+|----------|-------------|---------------|-----------------|
+| `Stripe:SecretKey` | Stripe API secret key | [Stripe Dashboard](https://dashboard.stripe.com) → Developers → API keys → Secret key | Authenticate API calls to create products and prices |
+
+### Why This Setting Is Needed
+
+**`Stripe:SecretKey`**
+- **Purpose**: Authenticates all Stripe API operations including creating products, prices, and updating metadata
+- **Key Types**:
+  - Test keys (`sk_test_...`): Use for development and testing - creates products in test mode
+  - Live keys (`sk_live_...`): Use for production - creates real products visible to customers
+- **Security**: Never commit this key to source control or share it publicly
+
+### How to Obtain Your Stripe API Key
+
+1. Sign up or log in at [Stripe Dashboard](https://dashboard.stripe.com)
+2. Navigate to **Developers** → **API keys**
+3. For development: Copy the **Secret key** in test mode (toggle "Test mode" in the header)
+4. For production: Copy the **Secret key** in live mode
+5. **Important**: The secret key is shown only once for live mode - save it securely
+
+### Setup Instructions
+
+#### Option A: User Secrets (Recommended for Development)
 
 ```bash
 cd StripeProductManager
+dotnet user-secrets init
 dotnet user-secrets set "Stripe:SecretKey" "sk_test_your_actual_stripe_secret_key"
 
+# Verify
+dotnet user-secrets list
 ```
 
-**Option B: Environment Variable**
+#### Option B: Environment Variable
 
 ```bash
 # Windows (PowerShell)
@@ -83,7 +109,9 @@ export STRIPE__SECRETKEY=sk_test_your_actual_stripe_secret_key
 
 ```
 
-**Option C: Update appsettings.json**
+#### Option C: Update appsettings.json
+
+⚠️ **Warning**: Only use for non-sensitive test keys. Never commit production keys.
 
 ```json
 {
@@ -94,7 +122,7 @@ export STRIPE__SECRETKEY=sk_test_your_actual_stripe_secret_key
 
 ```
 
-**Option D: Environment-Specific Configuration**
+#### Option D: Environment-Specific Configuration
 
 Create environment-specific configuration files:
 

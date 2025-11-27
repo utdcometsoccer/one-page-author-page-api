@@ -95,6 +95,83 @@ The following environment variables are required for the application to run:
 | `AAD_CLIENT_ID` | Azure AD application client ID | Yes | Azure Portal → Azure Active Directory → App registrations → [Your app] → Application ID |
 | `AAD_AUDIENCE` | Azure AD API audience/scope | Yes | Usually same as Client ID |
 
+### Why These Settings Are Needed
+
+<details>
+<summary>💳 Stripe Configuration Details</summary>
+
+**`STRIPE_API_KEY`**
+- **Purpose**: Authenticates all API calls to Stripe's servers for payment processing
+- **Why It's Needed**: Required for creating customers, managing subscriptions, processing payments, and retrieving price/product information
+- **Key Types**:
+  - Test keys (`sk_test_...`): Use for development and testing - no real charges
+  - Live keys (`sk_live_...`): Use for production - processes real payments
+- **How to Obtain**:
+  1. Log in to [Stripe Dashboard](https://dashboard.stripe.com)
+  2. Navigate to **Developers** → **API keys**
+  3. Copy the **Secret key** (click "Reveal test key" for test mode)
+
+**`STRIPE_WEBHOOK_SECRET`**
+- **Purpose**: Validates that incoming webhook events genuinely originate from Stripe
+- **Why It's Needed**: Prevents malicious actors from spoofing payment events and fraudulently triggering business logic (e.g., activating subscriptions without payment)
+- **Security**: Uses HMAC-SHA256 signature verification with a 5-minute timestamp tolerance
+- **How to Obtain**:
+  1. In Stripe Dashboard, go to **Developers** → **Webhooks**
+  2. Click **Add endpoint** and enter your webhook URL (e.g., `https://your-app.azurewebsites.net/api/WebHook`)
+  3. Select events to receive (e.g., `invoice.payment_succeeded`, `customer.subscription.updated`)
+  4. After creation, click on the endpoint and copy the **Signing secret** (starts with `whsec_`)
+
+</details>
+
+<details>
+<summary>🗄️ Cosmos DB Configuration Details</summary>
+
+**`COSMOSDB_ENDPOINT_URI`**
+- **Purpose**: Specifies the URL of your Cosmos DB account
+- **Why It's Needed**: Required to establish the database connection for storing user profiles, subscription data, and customer information
+- **Format**: `https://your-account-name.documents.azure.com:443/`
+- **How to Obtain**:
+  1. Go to [Azure Portal](https://portal.azure.com)
+  2. Navigate to your Cosmos DB account
+  3. Click **Keys** in the left menu
+  4. Copy the **URI** value
+
+**`COSMOSDB_PRIMARY_KEY`**
+- **Purpose**: Authentication key for Cosmos DB access
+- **Why It's Needed**: Grants read/write permissions to the database. Without this, the application cannot store or retrieve data.
+- **Security**: This is a sensitive credential - never commit to source control
+- **How to Obtain**: In the same **Keys** section, copy the **Primary Key**
+
+**`COSMOSDB_DATABASE_ID`**
+- **Purpose**: Identifies the specific database within your Cosmos DB account
+- **Why It's Needed**: An account can contain multiple databases; this tells the app which one holds the application data
+- **Value**: Typically "OnePageAuthor" or "OnePageAuthorDb"
+
+</details>
+
+<details>
+<summary>🔐 Azure AD (Entra ID) Configuration Details</summary>
+
+**`AAD_TENANT_ID`**
+- **Purpose**: Identifies your Azure AD tenant (organization)
+- **Why It's Needed**: Used during JWT token validation to ensure tokens were issued by your tenant. Tokens from other tenants will be rejected.
+- **Format**: GUID (e.g., `12345678-1234-1234-1234-123456789abc`)
+- **How to Obtain**:
+  1. Go to [Azure Portal](https://portal.azure.com)
+  2. Navigate to **Microsoft Entra ID** (formerly Azure Active Directory)
+  3. Copy the **Tenant ID** from the Overview page
+
+**`AAD_CLIENT_ID` / `AAD_AUDIENCE`**
+- **Purpose**: Identifies your API application and validates token audience claims
+- **Why It's Needed**: Ensures tokens were specifically issued for your API, not another application. Provides an additional layer of security.
+- **Note**: These are typically the same value for API applications
+- **How to Obtain**:
+  1. In Microsoft Entra ID, go to **App registrations**
+  2. Select your API application
+  3. Copy the **Application (client) ID**
+
+</details>
+
 ### Configuration Sources Priority
 
 The application reads configuration in this order (later sources override earlier ones):

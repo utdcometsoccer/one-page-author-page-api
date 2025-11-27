@@ -82,61 +82,155 @@ dotnet test OnePageAuthorAPI.sln -c Debug
 
 ### Core Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `COSMOSDB_ENDPOINT_URI` | Azure Cosmos DB endpoint URI | ✅ Yes |
-| `COSMOSDB_PRIMARY_KEY` | Cosmos DB primary access key | ✅ Yes |
-| `COSMOSDB_DATABASE_ID` | Database name (e.g., "OnePageAuthor") | ✅ Yes |
-| `STRIPE_API_KEY` | Stripe secret API key | ✅ Yes |
-| `AAD_TENANT_ID` | Microsoft Entra ID tenant GUID | ✅ Yes |
-| `AAD_AUDIENCE` | API application/client ID | ✅ Yes |
-| `STRIPE_WEBHOOK_SECRET` | Webhook endpoint secret for verification | For webhooks |
+| Variable | Description | Required | Where to Find |
+|----------|-------------|----------|---------------|
+| `COSMOSDB_ENDPOINT_URI` | Azure Cosmos DB endpoint URI | ✅ Yes | Azure Portal → Cosmos DB → Keys → URI |
+| `COSMOSDB_PRIMARY_KEY` | Cosmos DB primary access key | ✅ Yes | Azure Portal → Cosmos DB → Keys → Primary Key |
+| `COSMOSDB_DATABASE_ID` | Database name (e.g., "OnePageAuthor") | ✅ Yes | Your database name in Cosmos DB |
+| `STRIPE_API_KEY` | Stripe secret API key | ✅ Yes | [Stripe Dashboard](https://dashboard.stripe.com) → Developers → API Keys → Secret key |
+| `AAD_TENANT_ID` | Microsoft Entra ID tenant GUID | ✅ Yes | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
+| `AAD_AUDIENCE` | API application/client ID | ✅ Yes | Azure Portal → Microsoft Entra ID → App Registrations → Your App → Application (client) ID |
+| `STRIPE_WEBHOOK_SECRET` | Webhook endpoint secret for verification | For webhooks | [Stripe Dashboard](https://dashboard.stripe.com) → Developers → Webhooks → Select endpoint → Signing secret |
+
+### Why These Settings Are Needed
+
+<details>
+<summary>🗄️ Azure Cosmos DB Configuration</summary>
+
+**Purpose**: Cosmos DB serves as the primary NoSQL database for storing all application data including author profiles, books, articles, user profiles, and localization content.
+
+| Variable | Why It's Needed |
+|----------|-----------------|
+| `COSMOSDB_ENDPOINT_URI` | Required to establish a connection to your Cosmos DB account. This is the HTTPS endpoint that the application uses to communicate with the database. |
+| `COSMOSDB_PRIMARY_KEY` | Authentication key that grants read/write access to your database. Keep this secret and never commit it to source control. |
+| `COSMOSDB_DATABASE_ID` | Identifies which database within your Cosmos DB account contains the application containers (Authors, Books, Articles, Locales, etc.). |
+
+**How to Obtain**:
+1. Navigate to [Azure Portal](https://portal.azure.com)
+2. Go to your Cosmos DB account
+3. Click on "Keys" in the left sidebar
+4. Copy the URI and Primary Key values
+
+</details>
+
+<details>
+<summary>💳 Stripe Configuration</summary>
+
+**Purpose**: Stripe handles all subscription billing, payment processing, and customer management for the platform.
+
+| Variable | Why It's Needed |
+|----------|-----------------|
+| `STRIPE_API_KEY` | Authenticates API calls to Stripe for creating customers, subscriptions, and processing payments. Use test keys (starting with `sk_test_`) for development. |
+| `STRIPE_WEBHOOK_SECRET` | Validates that webhook events are genuinely from Stripe. Used to verify the signature of incoming webhook payloads to prevent spoofing attacks. |
+
+**How to Obtain**:
+1. Sign up at [Stripe Dashboard](https://dashboard.stripe.com)
+2. Navigate to Developers → API keys
+3. Copy the Secret key (use Test mode key for development)
+4. For webhooks: Developers → Webhooks → Add endpoint → Copy the Signing secret
+
+**Important**: Never use production keys (`sk_live_`) in development environments.
+
+</details>
+
+<details>
+<summary>🔐 Microsoft Entra ID (Azure AD) Configuration</summary>
+
+**Purpose**: Provides JWT-based authentication and authorization for securing API endpoints and managing user identity.
+
+| Variable | Why It's Needed |
+|----------|-----------------|
+| `AAD_TENANT_ID` | Identifies your Azure AD tenant for token validation. This ensures tokens are issued by your organization. |
+| `AAD_AUDIENCE` | Specifies which application the tokens are intended for. Tokens without this audience claim will be rejected. |
+
+**How to Obtain**:
+1. Navigate to [Azure Portal](https://portal.azure.com)
+2. Go to Microsoft Entra ID (formerly Azure Active Directory)
+3. **Tenant ID**: Found on the Overview page
+4. **Client ID**: Go to App registrations → Select your app → Application (client) ID
+
+**Additional Setup**:
+- For personal Microsoft accounts, configure the app registration with `signInAudience: "PersonalMicrosoftAccount"`
+- For organizational accounts, use `signInAudience: "AzureADMyOrg"`
+
+</details>
 
 ### External API Integration (Optional)
 
 <details>
 <summary>🐧 Penguin Random House API Configuration</summary>
 
-| Variable | Description |
-|----------|-------------|
-| `PENGUIN_RANDOM_HOUSE_API_URL` | Base API URL |
-| `PENGUIN_RANDOM_HOUSE_API_KEY` | Authentication key |
-| `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | API domain (e.g., "PRH.US") |
-| `PENGUIN_RANDOM_HOUSE_SEARCH_API` | Search endpoint template |
-| `PENGUIN_RANDOM_HOUSE_LIST_TITLES_BY_AUTHOR_API` | Author titles endpoint |
+**Purpose**: Enables searching for book information and author details from the Penguin Random House catalog.
+
+| Variable | Description | How to Obtain |
+|----------|-------------|---------------|
+| `PENGUIN_RANDOM_HOUSE_API_URL` | Base API URL | Contact Penguin Random House Developer Relations |
+| `PENGUIN_RANDOM_HOUSE_API_KEY` | Authentication key | Request via [PRH Developer Portal](https://developer.penguinrandomhouse.com) |
+| `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | API domain (e.g., "PRH.US") | Provided with API access approval |
+| `PENGUIN_RANDOM_HOUSE_SEARCH_API` | Search endpoint template | API documentation |
+| `PENGUIN_RANDOM_HOUSE_LIST_TITLES_BY_AUTHOR_API` | Author titles endpoint | API documentation |
+
+**Why It's Needed**: Allows the platform to search and display book information from Penguin Random House's extensive catalog, enriching author pages with published works.
+
 </details>
 
 <details>
 <summary>📚 Amazon Product Advertising API Configuration</summary>
 
-| Variable | Description |
-|----------|-------------|
-| `AMAZON_PRODUCT_ACCESS_KEY` | AWS Access Key ID |
-| `AMAZON_PRODUCT_SECRET_KEY` | AWS Secret Access Key |
-| `AMAZON_PRODUCT_PARTNER_TAG` | Associates Partner Tag |
-| `AMAZON_PRODUCT_REGION` | AWS region (e.g., "us-east-1") |
-| `AMAZON_PRODUCT_MARKETPLACE` | Marketplace domain |
+**Purpose**: Enables searching for books on Amazon and displaying product information with affiliate links.
+
+| Variable | Description | How to Obtain |
+|----------|-------------|---------------|
+| `AMAZON_PRODUCT_ACCESS_KEY` | AWS Access Key ID | [AWS Console](https://console.aws.amazon.com) → Security Credentials → Access keys |
+| `AMAZON_PRODUCT_SECRET_KEY` | AWS Secret Access Key | Created with the Access Key ID (save immediately, shown only once) |
+| `AMAZON_PRODUCT_PARTNER_TAG` | Associates Partner Tag | [Amazon Associates](https://affiliate-program.amazon.com) → Your tracking IDs |
+| `AMAZON_PRODUCT_REGION` | AWS region (e.g., "us-east-1") | Based on your marketplace location |
+| `AMAZON_PRODUCT_MARKETPLACE` | Marketplace domain | Your target Amazon marketplace (e.g., www.amazon.com) |
+
+**Why It's Needed**: Allows the platform to search Amazon's catalog for book information and generate affiliate links for author pages.
+
+**Setup Steps**:
+1. Sign up for [Amazon Associates Program](https://affiliate-program.amazon.com)
+2. Apply for [Product Advertising API](https://webservices.amazon.com/paapi5/documentation/) access (separate approval required)
+3. After approval, create AWS credentials with PA API permissions
+4. Note: Partner Tag format varies by region (US: `-20`, UK: `-21`, DE: `-03`)
+
 </details>
+
+### Setting Up User Secrets (Recommended for Development)
+
+**Important**: Never store sensitive values in source control. Use .NET User Secrets for local development.
+
+```bash
+# Initialize user secrets for the project
+cd [project-directory]
+dotnet user-secrets init
+
+# Set required configuration
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "your-cosmos-primary-key"
+dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthorDb"
+dotnet user-secrets set "STRIPE_API_KEY" "sk_test_your-stripe-key"
+dotnet user-secrets set "AAD_TENANT_ID" "your-tenant-id"
+dotnet user-secrets set "AAD_AUDIENCE" "your-client-id"
+
+# Verify configuration
+dotnet user-secrets list
+```
 
 ### Example Configuration (local.settings.json)
 
+⚠️ **Warning**: Only use for non-sensitive development settings. Store secrets in User Secrets instead.
 
 ```json
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "your-connection-string",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "COSMOSDB_ENDPOINT_URI": "https://your-cosmos-account.documents.azure.com:443/",
-    "COSMOSDB_PRIMARY_KEY": "<your-cosmos-db-key>",
-    "COSMOSDB_DATABASE_ID": "OnePageAuthorDb",
-    "STRIPE_API_KEY": "<your-stripe-secret-key>",
-    "AAD_TENANT_ID": "<your-tenant-id>",
-    "AAD_AUDIENCE": "<your-client-id>",
-    "STRIPE_WEBHOOK_SECRET": "<your-webhook-secret>"
+    "COSMOSDB_DATABASE_ID": "OnePageAuthorDb"
   }
 }
-
 ```
 
 ## 🏗️ Development & Deployment

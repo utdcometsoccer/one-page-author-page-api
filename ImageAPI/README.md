@@ -347,6 +347,73 @@ dotnet user-secrets list
 | `AAD_AUDIENCE` | ⚪ Optional | Azure AD client ID |
 | `AAD_AUTHORITY` | ⚪ Optional | Azure AD authority URL |
 
+### Why These Settings Are Needed
+
+<details>
+<summary>🗄️ Azure Cosmos DB Configuration</summary>
+
+**Purpose**: Stores image metadata, user profiles, and subscription tier information.
+
+| Variable | Purpose | How to Obtain |
+|----------|---------|---------------|
+| `COSMOSDB_ENDPOINT_URI` | Database connection endpoint | Azure Portal → Cosmos DB account → Keys → URI |
+| `COSMOSDB_PRIMARY_KEY` | Authentication for database access | Azure Portal → Cosmos DB account → Keys → Primary Key |
+| `COSMOSDB_DATABASE_ID` | Identifies the application database | Your database name (e.g., "OnePageAuthorDb") |
+
+**Why It's Needed**: The ImageAPI uses Cosmos DB to:
+- Store image metadata (ID, URL, size, upload timestamp)
+- Track user image counts for subscription tier limits
+- Look up user subscription tiers for upload validation
+
+</details>
+
+<details>
+<summary>📦 Azure Blob Storage Configuration</summary>
+
+**Purpose**: Stores the actual image files uploaded by users.
+
+| Variable | Purpose | How to Obtain |
+|----------|---------|---------------|
+| `AZURE_STORAGE_CONNECTION_STRING` | Full connection string for Blob Storage | Azure Portal → Storage Account → Access keys → Connection string |
+
+**How to Obtain**:
+1. Go to [Azure Portal](https://portal.azure.com)
+2. Navigate to your Storage Account
+3. Click **Access keys** in the left menu
+4. Click **Show** next to the connection string
+5. Copy the full connection string
+
+**Format**: 
+```
+DefaultEndpointsProtocol=https;AccountName=your-account;AccountKey=your-key;EndpointSuffix=core.windows.net
+```
+
+**Why It's Needed**: 
+- Images are uploaded directly to Blob Storage containers
+- Provides persistent, scalable storage for user images
+- Enables CDN integration for fast image delivery
+
+</details>
+
+<details>
+<summary>🔐 Azure AD Authentication Configuration</summary>
+
+**Purpose**: Validates JWT tokens to authenticate users and enforce access control.
+
+| Variable | Purpose | How to Obtain |
+|----------|---------|---------------|
+| `AAD_TENANT_ID` | Your Azure AD tenant identifier | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
+| `AAD_AUDIENCE` | API application client ID | Azure Portal → Microsoft Entra ID → App registrations → Your App → Application (client) ID |
+| `AAD_AUTHORITY` | Token issuer URL | `https://login.microsoftonline.com/{tenant-id}/v2.0` or `https://login.microsoftonline.com/consumers/v2.0` for personal accounts |
+
+**Why It's Needed**:
+- All ImageAPI endpoints require authentication
+- JWT tokens identify users and their subscription tiers
+- Ensures users can only access and delete their own images
+- Subscription tier limits are enforced based on authenticated user identity
+
+</details>
+
 ### ⚠️ Migration from local.settings.json
 
 If you have an existing `local.settings.json` file:

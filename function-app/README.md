@@ -39,6 +39,66 @@ func start
 
 ```
 
-## Configuration
+## ⚙️ Configuration
+
+### Environment Variables
+
+| Variable | Required | Description | Where to Find |
+|----------|----------|-------------|---------------|
+| `COSMOSDB_ENDPOINT_URI` | ✅ Yes | Azure Cosmos DB endpoint URL | Azure Portal → Cosmos DB → Keys → URI |
+| `COSMOSDB_PRIMARY_KEY` | ✅ Yes | Cosmos DB primary access key | Azure Portal → Cosmos DB → Keys → Primary Key |
+| `COSMOSDB_DATABASE_ID` | ✅ Yes | Database name | Your database name (e.g., "OnePageAuthorDb") |
+| `AAD_TENANT_ID` | ⚪ Optional | Azure AD tenant ID | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
+| `AAD_AUDIENCE` | ⚪ Optional | Azure AD client ID | Azure Portal → Microsoft Entra ID → App registrations → Your App |
+
+### Why These Settings Are Needed
+
+<details>
+<summary>🗄️ Cosmos DB Configuration</summary>
+
+**Purpose**: The function-app uses Cosmos DB to store and retrieve author profiles, books, articles, and localized content.
+
+| Variable | Why It's Needed |
+|----------|-----------------|
+| `COSMOSDB_ENDPOINT_URI` | Establishes connection to your Cosmos DB account for author data retrieval |
+| `COSMOSDB_PRIMARY_KEY` | Authenticates database operations - required for reading author and locale data |
+| `COSMOSDB_DATABASE_ID` | Identifies which database contains the Authors, Articles, Books, and Locales containers |
+
+</details>
+
+<details>
+<summary>🔐 Azure AD Authentication</summary>
+
+**Purpose**: Optional JWT validation for protected endpoints.
+
+| Variable | Why It's Needed |
+|----------|-----------------|
+| `AAD_TENANT_ID` | Validates that JWT tokens are issued by your Azure AD tenant |
+| `AAD_AUDIENCE` | Ensures tokens are intended for your API application |
+
+</details>
+
+### Setting Up User Secrets (Development)
+
+```bash
+cd function-app
+dotnet user-secrets init
+
+# Required settings
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY" "your-cosmos-primary-key"
+dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthorDb"
+
+# Optional authentication settings
+dotnet user-secrets set "AAD_TENANT_ID" "your-tenant-id"
+dotnet user-secrets set "AAD_AUDIENCE" "your-client-id"
+
+# Verify
+dotnet user-secrets list
+```
+
+### Production Deployment
+
+Configure settings in Azure Portal → Function App → Configuration → Application Settings
 
 See `Program.cs` for required settings and bindings.
