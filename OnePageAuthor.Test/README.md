@@ -80,8 +80,8 @@ dotnet user-secrets set "AZURE_STORAGE_CONNECTION_STRING" "your-test-storage-con
 
 Current test statistics:
 
-- **Total Tests**: 154 tests
-- **Pass Rate**: 100% (154/154 passing)
+- **Total Tests**: 540 tests
+- **Pass Rate**: 100% (538 passing, 2 skipped integration tests)
 - **Code Coverage**: ~85% line coverage
 - **Performance**: Average execution time <30 seconds
 
@@ -185,6 +185,85 @@ var (authenticatedUser, authError) = await _jwtAuthenticationHelper.ValidateJwtT
 ```powershell
 dotnet test --filter "FullyQualifiedName~DomainRegistrationFunctionTests"
 
+```
+
+### CosmosDB Triggered Function Tests
+
+The test suite includes comprehensive coverage for all CosmosDB triggered functions that process domain registrations:
+
+#### DomainRegistrationTriggerFunctionTests (17 tests)
+
+Tests for the `DomainRegistrationTriggerFunction` which adds domains to Azure Front Door when triggered by changes in the DomainRegistrations Cosmos DB container.
+
+**Constructor Tests (4 tests):**
+- `Constructor_WithNullLogger_ThrowsArgumentNullException`
+- `Constructor_WithNullFrontDoorService_ThrowsArgumentNullException`
+- `Constructor_WithNullDomainRegistrationService_ThrowsArgumentNullException`
+- `Constructor_WithValidParameters_CreatesInstance`
+
+**Null/Empty Input Tests (2 tests):**
+- `Run_WithNullInput_LogsInformationAndReturns`
+- `Run_WithEmptyInput_LogsInformationAndReturns`
+
+**Successful Processing Tests (2 tests):**
+- `Run_WithPendingDomainRegistration_AddsDomainToFrontDoorSuccessfully`
+- `Run_WithMultipleDomainRegistrations_ProcessesAll`
+
+**Status Filtering Tests (5 tests):**
+- `Run_WithNonPendingStatus_SkipsFrontDoorAddition` (InProgress, Completed, Failed, Cancelled)
+- `Run_WithMixedStatuses_ProcessesOnlyPendingRegistrations`
+
+**Null Domain Tests (2 tests):**
+- `Run_WithNullDomainRegistration_SkipsProcessing`
+- `Run_WithNullDomain_SkipsProcessing`
+
+**Error Handling Tests (2 tests):**
+- `Run_WhenFrontDoorAdditionFails_LogsError`
+- `Run_WhenFrontDoorServiceThrowsException_LogsErrorAndContinues`
+
+#### GoogleDomainRegistrationFunctionTests (15 tests)
+
+Tests for the `GoogleDomainRegistrationFunction` which registers domains using the Google Domains API.
+
+**Constructor Tests (3 tests):**
+- `Constructor_WithNullLogger_ThrowsArgumentNullException`
+- `Constructor_WithNullGoogleDomainsService_ThrowsArgumentNullException`
+- `Constructor_WithValidParameters_CreatesInstance`
+
+**Run Method Tests (12 tests):**
+- Tests for null/empty input handling
+- Tests for successful domain registration
+- Tests for status filtering (only processes Pending registrations)
+- Tests for null domain/registration handling
+- Tests for error handling and exception recovery
+
+#### CreateDnsZoneFunctionTests (16 tests)
+
+Tests for the `CreateDnsZoneFunction` which creates Azure DNS zones when domain registrations are added or modified.
+
+**Constructor Tests (4 tests):**
+- `Constructor_WithNullLogger_ThrowsArgumentNullException`
+- `Constructor_WithNullDnsZoneService_ThrowsArgumentNullException`
+- `Constructor_WithNullDomainRegistrationService_ThrowsArgumentNullException`
+- `Constructor_WithValidParameters_CreatesInstance`
+
+**Run Method Tests (12 tests):**
+- Tests for null/empty input handling
+- Tests for successful DNS zone creation (Pending and InProgress statuses)
+- Tests for status filtering (skips Completed, Failed, Cancelled)
+- Tests for null domain/registration handling
+- Tests for error handling and exception recovery
+
+#### Running CosmosDB Triggered Function Tests
+
+```powershell
+# Run all CosmosDB triggered function tests
+dotnet test --filter "FullyQualifiedName~DnsZone|FullyQualifiedName~GoogleDomainRegistration|FullyQualifiedName~DomainRegistrationTrigger|FullyQualifiedName~FrontDoor"
+
+# Run specific test class
+dotnet test --filter "FullyQualifiedName~DomainRegistrationTriggerFunctionTests"
+dotnet test --filter "FullyQualifiedName~GoogleDomainRegistrationFunctionTests"
+dotnet test --filter "FullyQualifiedName~CreateDnsZoneFunctionTests"
 ```
 
 ### Additional Documentation

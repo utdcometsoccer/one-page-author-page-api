@@ -401,5 +401,39 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
         }
+
+        #region Constructor Tests
+
+        [Fact]
+        public void Constructor_WithNullLogger_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => new GoogleDomainRegistrationFunction(
+                null!,
+                _mockGoogleDomainsService.Object));
+        }
+
+        [Fact]
+        public void Constructor_WithNullGoogleDomainsService_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => new GoogleDomainRegistrationFunction(
+                _mockLogger.Object,
+                null!));
+        }
+
+        [Fact]
+        public void Constructor_WithValidParameters_CreatesInstance()
+        {
+            // Act
+            var function = new GoogleDomainRegistrationFunction(
+                _mockLogger.Object,
+                _mockGoogleDomainsService.Object);
+
+            // Assert
+            Assert.NotNull(function);
+        }
+
+        #endregion
     }
 }
