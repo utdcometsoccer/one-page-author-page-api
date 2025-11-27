@@ -270,7 +270,7 @@ curl -X GET "https://your-api.azurewebsites.net/api/whoami" \
 ### Prerequisites
 
 
-- .NET 9.0 SDK
+- .NET 10.0 SDK
 - Azure Storage Account
 - Azure Functions Core Tools v4
 
@@ -361,15 +361,13 @@ If you have an existing `local.settings.json` file:
 For Azure deployment, configure these values in:
 - Azure Portal → Function App → Configuration → Application Settings
 
-```
-
 ## 🧪 Testing
 
 Run unit tests:
 
 ```bash
 cd ../OnePageAuthor.Test
-dotnet test --filter "Category=ImageAPI"
+dotnet test --filter "FullyQualifiedName~ImageAPI"
 
 ```
 
