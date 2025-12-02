@@ -35,7 +35,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             [CosmosDBTrigger(
                 databaseName: "%COSMOSDB_DATABASE_ID%",
                 containerName: "DomainRegistrations",
-                Connection = "COSMOSDB_CONNECTION_STRING",
+                Connection = "CosmosDBConnection",
                 LeaseContainerName = "leases",
                 LeaseContainerPrefix = "googledomainregistration",
                 CreateLeaseContainerIfNotExists = true)]
