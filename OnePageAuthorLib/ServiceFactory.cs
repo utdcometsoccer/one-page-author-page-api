@@ -421,6 +421,36 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
                 return new AuthorManagementContainerManager<SocialList>(database, "SocialList");
             });
+            services.AddTransient<IContainerManager<App>, AuthorManagementContainerManager<App>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<App>(database, "App");
+            });
+            services.AddTransient<IContainerManager<Toast>, AuthorManagementContainerManager<Toast>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<Toast>(database, "Toast");
+            });
+            services.AddTransient<IContainerManager<ToastMessages>, AuthorManagementContainerManager<ToastMessages>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<ToastMessages>(database, "ToastMessages");
+            });
+            services.AddTransient<IContainerManager<WelcomePage>, AuthorManagementContainerManager<WelcomePage>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<WelcomePage>(database, "WelcomePage");
+            });
+            services.AddTransient<IContainerManager<ErrorBoundary>, AuthorManagementContainerManager<ErrorBoundary>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<ErrorBoundary>(database, "ErrorBoundary");
+            });
+            services.AddTransient<IContainerManager<ProgressIndicator>, AuthorManagementContainerManager<ProgressIndicator>>(servicesProvider =>
+            {
+                var database = servicesProvider.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                return new AuthorManagementContainerManager<ProgressIndicator>(database, "ProgressIndicator");
+            });
             return services;
         }
 
