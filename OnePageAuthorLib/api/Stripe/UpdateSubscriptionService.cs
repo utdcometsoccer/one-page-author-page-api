@@ -76,9 +76,8 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     LatestInvoicePaymentIntentId = string.Empty
                 };
 
-                // If caller requested expansion, try to read expanded nested objects first.
-                // Note: Some SDK versions may not surface PaymentIntent directly on Invoice.
-                // We rely on explicit hydration helper for consistent retrieval.
+                // Note: Even if expansion is requested, we do not attempt to read expanded nested objects directly here.
+                // Some SDK versions may not surface PaymentIntent directly on Invoice, so we always rely on the explicit hydration helper for consistent retrieval.
 
                 // Fallback hydration: if PI is still missing but we have an invoice id, fetch via helper
                 if (request.ExpandLatestInvoicePaymentIntent && string.IsNullOrWhiteSpace(response.LatestInvoicePaymentIntentId) && !string.IsNullOrWhiteSpace(response.LatestInvoiceId))

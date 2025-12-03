@@ -29,12 +29,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 var options = new SubscriptionCreateOptions
                 {
                     Customer = request.CustomerId,
-                    // With default_incomplete, the subscription is created and requires payment confirmation
 
                     Items = new List<SubscriptionItemOptions>
                     {
                         new SubscriptionItemOptions { Price = request.PriceId }
                     },
+                    // With default_incomplete, the subscription is created and requires payment confirmation
                     PaymentBehavior = "default_incomplete"
                 };
 
@@ -42,23 +42,22 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 var subscription = await svc.CreateAsync(options);
                 var invoiceSvc = new InvoiceService(_stripeClient);
                 var invoice = await invoiceSvc.GetAsync(subscription.LatestInvoiceId);
-                var paymentsSvc = new InvoicePaymentService(_stripeClient);
+                var invoicePaymentService = new InvoicePaymentService(_stripeClient);
                 var invoicePaymentOptions = new InvoicePaymentListOptions
                 {
                     Invoice = invoice.Id,
                     Limit = 1
                 };
-                var invoicePayment = (await paymentsSvc.ListAsync(invoicePaymentOptions)).FirstOrDefault();
-                switch (invoicePayment)
+                var invoicePayment = (await invoicePaymentService.ListAsync(invoicePaymentOptions)).FirstOrDefault();
+                if (invoicePayment?.Payment?.PaymentIntentId is { } paymentIntentId)
                 {
-                    case { Payment: { PaymentIntentId: var paymentIntentId } }:
-                        var paymentIntentService = new PaymentIntentService(_stripeClient);
-                        var paymentIntent = await paymentIntentService.GetAsync(paymentIntentId);
-                        clientSecret = paymentIntent.ClientSecret;
-                        break;
-                    default:
-                        _logger.LogWarning("No payment found on invoice {InvoiceId} while creating subscription {SubscriptionId}", invoice.Id, subscription.Id);
-                        break;
+                    var paymentIntentService = new PaymentIntentService(_stripeClient);
+                    var paymentIntent = await paymentIntentService.GetAsync(paymentIntentId);
+                    clientSecret = paymentIntent.ClientSecret;
+                }
+                else
+                {
+                    _logger.LogWarning("No payment found on invoice {InvoiceId} while creating subscription {SubscriptionId}", invoice.Id, subscription.Id);
                 }
                 return new SubscriptionCreateResponse
                 {

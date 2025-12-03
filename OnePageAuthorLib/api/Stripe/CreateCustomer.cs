@@ -22,9 +22,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         /// Initializes a new instance of the <see cref="CreateCustomer"/> class.
         /// </summary>
         /// <param name="logger">The logger used for diagnostics and operational telemetry.</param>
-        /// <summary>
-        /// Initializes a new instance of the CreateCustomer service.
-        /// </summary>
+
         /// <param name="stripeClient">Injected Stripe client used to call Stripe APIs.</param>
         public CreateCustomer(ILogger<CreateCustomer> logger, StripeClient stripeClient)
         {

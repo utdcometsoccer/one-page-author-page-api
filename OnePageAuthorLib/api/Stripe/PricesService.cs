@@ -12,7 +12,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         public PricesService(ILogger<PricesService> logger, StripeClient stripeClient)
         {
             _logger = logger;
-            _stripeClient = stripeClient;
+            _stripeClient = stripeClient ?? throw new ArgumentNullException(nameof(stripeClient));
         }
         public async Task<PriceListResponse> GetPricesAsync(PriceListRequest request)
         {

@@ -15,7 +15,6 @@ var stripeApiKey = config["STRIPE_API_KEY"] ?? throw new InvalidOperationExcepti
 Console.WriteLine($"Stripe API key configured: {Utility.MaskSensitiveValue(stripeApiKey)}");
 
 // Optional: remove global static assignment to avoid accidental drift.
-// Stripe.StripeConfiguration.ApiKey = stripeApiKey; // Prefer DI-injected client
 
 builder.ConfigureFunctionsWebApplication();
 
