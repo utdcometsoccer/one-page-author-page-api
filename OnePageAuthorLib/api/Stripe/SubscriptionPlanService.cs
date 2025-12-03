@@ -10,10 +10,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     public class SubscriptionPlanService : ISubscriptionPlanService
     {
         private readonly ILogger<SubscriptionPlanService> _logger;
+        private readonly StripeClient _stripeClient;
 
-        public SubscriptionPlanService(ILogger<SubscriptionPlanService> logger)
+        public SubscriptionPlanService(ILogger<SubscriptionPlanService> logger, StripeClient stripeClient)
         {
             _logger = logger;
+            _stripeClient = stripeClient ?? throw new ArgumentNullException(nameof(stripeClient));
         }
 
         public async Task<SubscriptionPlan> MapToSubscriptionPlanAsync(PriceDto priceDto, string? culture = null)
@@ -98,7 +100,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             {
                 _logger.LogInformation("Retrieving features for Stripe product {ProductId}", productId);
 
-                var productService = new ProductService();
+                var productService = new ProductService(_stripeClient);
                 var product = await productService.GetAsync(productId);
 
                 if (product == null)
@@ -356,7 +358,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
             try
             {
-                var productService = new ProductService();
+                var productService = new ProductService(_stripeClient);
                 var product = await productService.GetAsync(productId);
 
                 if (product?.Metadata == null)

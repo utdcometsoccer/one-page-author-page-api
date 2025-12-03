@@ -16,14 +16,20 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     {
         // Logger used to capture operational and diagnostic information for this service
         private readonly ILogger<CreateCustomer> _logger;
+        private readonly StripeClient _stripeClient;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateCustomer"/> class.
         /// </summary>
         /// <param name="logger">The logger used for diagnostics and operational telemetry.</param>
-        public CreateCustomer(ILogger<CreateCustomer> logger)
+        /// <summary>
+        /// Initializes a new instance of the CreateCustomer service.
+        /// </summary>
+        /// <param name="stripeClient">Injected Stripe client used to call Stripe APIs.</param>
+        public CreateCustomer(ILogger<CreateCustomer> logger, StripeClient stripeClient)
         {
             _logger = logger;
+            _stripeClient = stripeClient;
         }
         /// <summary>
         /// Creates an initialized <see cref="CreateCustomerResponse"/> from the provided request.
@@ -40,7 +46,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             {
                 // Create the customer service
                 // First, check if a customer with this email already exists
-                var service = new CustomerService();
+                var service = new CustomerService(_stripeClient);
 
                 // First, check if a customer with this email already exists
                 var existingCustomer = service.List(new CustomerListOptions

@@ -1,18 +1,19 @@
-using System.Net.Http.Headers;
-using System.Text.Json;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using Microsoft.Extensions.Logging;
 using Stripe;
+using System.Collections.Generic;
 
 namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 {
     public class SubscriptionsService : ISubscriptionService
     {
         private readonly ILogger<SubscriptionsService> _logger;
+        private readonly StripeClient _stripeClient;
 
-        public SubscriptionsService(ILogger<SubscriptionsService> logger)
+        public SubscriptionsService(ILogger<SubscriptionsService> logger, StripeClient stripeClient)
         {
             _logger = logger;
+            _stripeClient = stripeClient ?? throw new ArgumentNullException(nameof(stripeClient));
         }
 
         public async Task<SubscriptionCreateResponse> CreateAsync(CreateSubscriptionRequest request)
@@ -23,73 +24,49 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
             try
             {
-                var svc = new SubscriptionService();
+                string clientSecret = string.Empty;
+                var svc = new SubscriptionService(_stripeClient);
                 var options = new SubscriptionCreateOptions
                 {
+                    Customer = request.CustomerId,
                     // With default_incomplete, the subscription is created and requires payment confirmation
-                    PaymentBehavior = "default_incomplete",
+
                     Items = new List<SubscriptionItemOptions>
                     {
                         new SubscriptionItemOptions { Price = request.PriceId }
                     },
-                    Expand = new List<string>
-                    {
-                        "latest_invoice"
-                    }
+                    PaymentBehavior = "default_incomplete"
                 };
 
-                options.Customer = request.CustomerId;
-                options.AddExpand("latest_invoice.payment_intent");
 
                 var subscription = await svc.CreateAsync(options);
-
-                // Retrieve client secret from the first invoice via Stripe REST API
-                string clientSecret = string.Empty;
-                var latestInvoiceId = subscription?.LatestInvoiceId;
-                var apiKey = StripeConfiguration.ApiKey;
-                if (!string.IsNullOrWhiteSpace(latestInvoiceId) && !string.IsNullOrWhiteSpace(apiKey))
+                var invoiceSvc = new InvoiceService(_stripeClient);
+                var invoice = await invoiceSvc.GetAsync(subscription.LatestInvoiceId);
+                var paymentsSvc = new InvoicePaymentService(_stripeClient);
+                var invoicePaymentOptions = new InvoicePaymentListOptions
                 {
-                    try
-                    {
-                        using var http = new HttpClient();
-                        http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-                        var url = $"https://api.stripe.com/v1/invoices/{latestInvoiceId}?expand[]=payment_intent";
-                        using var resp = await http.GetAsync(url);
-                        resp.EnsureSuccessStatusCode();
-                        var json = await resp.Content.ReadAsStringAsync();
-                        using var doc = JsonDocument.Parse(json);
-                        if (doc.RootElement.TryGetProperty("payment_intent", out var pi) &&
-                            pi.ValueKind == JsonValueKind.Object)
-                        {
-                            string? paymentIntentId = null;
-                            if (pi.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.String)
-                                paymentIntentId = idProp.GetString();
-                            string masked = paymentIntentId != null && paymentIntentId.Length >= 8
-                                ? $"{paymentIntentId[..4]}****{paymentIntentId[^4..]}"
-                                : "(set)";
-                            _logger.LogInformation("Stripe payment intent for invoice {InvoiceId}: {MaskedId}", latestInvoiceId, masked);
-
-                            if (pi.TryGetProperty("client_secret", out var cs) && cs.ValueKind == JsonValueKind.String)
-                            {
-                                clientSecret = cs.GetString() ?? string.Empty;
-                            }
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Payment intent or client secret not found in invoice {InvoiceId}", latestInvoiceId);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Failed to retrieve client secret from invoice {InvoiceId}", latestInvoiceId);
-                    }
+                    Invoice = invoice.Id,
+                    Limit = 1
+                };
+                var invoicePayment = (await paymentsSvc.ListAsync(invoicePaymentOptions)).FirstOrDefault();
+                switch (invoicePayment)
+                {
+                    case { Payment: { PaymentIntentId: var paymentIntentId } }:
+                        var paymentIntentService = new PaymentIntentService(_stripeClient);
+                        var paymentIntent = await paymentIntentService.GetAsync(paymentIntentId);
+                        clientSecret = paymentIntent.ClientSecret;
+                        break;
+                    default:
+                        _logger.LogWarning("No payment found on invoice {InvoiceId} while creating subscription {SubscriptionId}", invoice.Id, subscription.Id);
+                        break;
                 }
-
                 return new SubscriptionCreateResponse
                 {
-                    SubscriptionId = subscription?.Id ?? string.Empty,
+                    SubscriptionId = subscription.Id,
                     ClientSecret = clientSecret
                 };
+
+            
             }
             catch (StripeException ex)
             {

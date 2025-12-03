@@ -57,7 +57,7 @@ namespace InkStainedWretch.StripeProductManager
                     {
                         throw new InvalidOperationException("Stripe:SecretKey is required. Set it in appsettings.json or user secrets.");
                     }
-                    StripeConfiguration.ApiKey = stripeSettings.SecretKey;
+                    var stripeClient = new StripeClient(stripeSettings.SecretKey);
                 });
     }
 
@@ -73,7 +73,7 @@ namespace InkStainedWretch.StripeProductManager
             _logger = logger;
             _stripeSettings = stripeSettings;
             _productService = new ProductService();
-            _priceService = new PriceService();
+            _priceService = new PriceService(stripeClient);
         }
 
         public async Task CreateOrUpdateProductsAsync()

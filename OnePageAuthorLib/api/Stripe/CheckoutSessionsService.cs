@@ -8,10 +8,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     public class CheckoutSessionsService : ICheckoutSessionService
     {
         private readonly ILogger<CheckoutSessionsService> _logger;
+        private readonly StripeClient _stripeClient;
 
-        public CheckoutSessionsService(ILogger<CheckoutSessionsService> logger)
+        public CheckoutSessionsService(ILogger<CheckoutSessionsService> logger, StripeClient stripeClient)
         {
             _logger = logger;
+            _stripeClient = stripeClient;
         }
 
         public async Task<CreateCheckoutSessionResponse> CreateAsync(CreateCheckoutSessionRequest request)
@@ -23,7 +25,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
             try
             {
-                var service = new SessionService();
+                var service = new SessionService(_stripeClient);
                 var options = new SessionCreateOptions
                 {
                     Mode = "subscription",
@@ -67,7 +69,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
             try
             {
-                var service = new SessionService();
+                var service = new SessionService(_stripeClient);
                 var session = await service.GetAsync(checkoutSessionId);
                 if (session == null) return null;
 

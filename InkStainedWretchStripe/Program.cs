@@ -7,9 +7,15 @@ using Stripe;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 var config = builder.Configuration;
-StripeConfiguration.ApiKey = config["STRIPE_API_KEY"] ?? throw new InvalidOperationException("Configuration value 'STRIPE_API_KEY' is missing or empty. Please set it to your Stripe API key.");
+var stripeApiKey = config["STRIPE_API_KEY"] ?? throw new InvalidOperationException("Configuration value 'STRIPE_API_KEY' is missing or empty. Please set it to your Stripe API key.");
+// Configure Stripe client lifetime
+// Best practice: StripeClient is thread-safe; reuse via Singleton for app-wide API key.
+// If you ever need per-user/tenant keys, switch to Scoped and construct with the appropriate key per request.
 // Masked confirmation log (do not log full secret)
-Console.WriteLine($"Stripe API key configured: {Utility.MaskSensitiveValue(StripeConfiguration.ApiKey)}");
+Console.WriteLine($"Stripe API key configured: {Utility.MaskSensitiveValue(stripeApiKey)}");
+
+// Optional: remove global static assignment to avoid accidental drift.
+// Stripe.StripeConfiguration.ApiKey = stripeApiKey; // Prefer DI-injected client
 
 builder.ConfigureFunctionsWebApplication();
 
@@ -41,6 +47,8 @@ builder.Services
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights()
+    // Register a StripeClient for DI so services can depend on it
+    .AddSingleton<StripeClient>(_ => new StripeClient(stripeApiKey))
     .AddStripeServices()
     .AddStripeOrchestrators()
     .AddUserProfileServices();

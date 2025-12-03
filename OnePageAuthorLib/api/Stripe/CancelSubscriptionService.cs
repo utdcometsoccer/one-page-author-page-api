@@ -7,10 +7,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     public class CancelSubscriptionService : ICancelSubscription
     {
         private readonly ILogger<CancelSubscriptionService> _logger;
+        private readonly StripeClient _stripeClient;
 
-        public CancelSubscriptionService(ILogger<CancelSubscriptionService> logger)
+        public CancelSubscriptionService(ILogger<CancelSubscriptionService> logger, StripeClient stripeClient)
         {
             _logger = logger;
+            _stripeClient = stripeClient ?? throw new ArgumentNullException(nameof(stripeClient));
         }
 
         public async Task<CancelSubscriptionResponse> CancelAsync(string subscriptionId, CancelSubscriptionRequest? request = null)
@@ -20,7 +22,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
             try
             {
-                var svc = new SubscriptionService();
+                var svc = new SubscriptionService(_stripeClient);
                 var options = new SubscriptionCancelOptions();
 
                 if (request?.InvoiceNow is not null)

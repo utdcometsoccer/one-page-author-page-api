@@ -10,10 +10,11 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     public class ListSubscriptions : IListSubscriptions
     {
         private readonly ILogger<ListSubscriptions> _logger;
-
-        public ListSubscriptions(ILogger<ListSubscriptions> logger)
+        private readonly StripeClient _stripeClient;
+        public ListSubscriptions(ILogger<ListSubscriptions> logger, StripeClient stripeClient)
         {
             _logger = logger;
+            _stripeClient = stripeClient ?? throw new ArgumentNullException(nameof(stripeClient));
         }
 
         /// <summary>
@@ -38,7 +39,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
             try
             {
-                var service = new SubscriptionService();
+                var service = new SubscriptionService(_stripeClient);
                 var options = new SubscriptionListOptions
                 {
                     Limit = limit ?? 100,
