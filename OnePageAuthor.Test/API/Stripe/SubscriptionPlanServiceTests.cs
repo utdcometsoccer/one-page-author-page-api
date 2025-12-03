@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using Stripe;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 
@@ -9,12 +10,15 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
     public class SubscriptionPlanServiceTests
     {
         private readonly Mock<ILogger<SubscriptionPlanService>> _loggerMock;
+        private readonly StripeClient _stripeClient;
         private readonly SubscriptionPlanService _service;
 
         public SubscriptionPlanServiceTests()
         {
             _loggerMock = new Mock<ILogger<SubscriptionPlanService>>();
-            _service = new SubscriptionPlanService(_loggerMock.Object);
+            // Use a test API key for the StripeClient - API calls will fail but fallback logic will handle it
+            _stripeClient = new StripeClient("sk_test_placeholder_for_unit_tests");
+            _service = new SubscriptionPlanService(_loggerMock.Object, _stripeClient);
         }
 
         [Fact]
@@ -28,11 +32,11 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [Fact]
         public async Task MapToSubscriptionPlanAsync_ValidPriceDto_ReturnsSubscriptionPlan()
         {
-            // Arrange
+            // Arrange - Use empty ProductId to skip Stripe API calls in unit tests
             var priceDto = new PriceDto
             {
                 Id = "price_123",
-                ProductId = "prod_456",
+                ProductId = "", // Empty ProductId to use fallback logic and avoid Stripe API calls
                 ProductName = "Professional Plan",
                 ProductDescription = "A professional subscription plan",
                 UnitAmount = 1999,
@@ -87,13 +91,13 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [Fact]
         public async Task MapToSubscriptionPlansAsync_ValidPriceDtos_ReturnsSubscriptionPlans()
         {
-            // Arrange
+            // Arrange - Use empty ProductId to skip Stripe API calls in unit tests
             var priceDtos = new List<PriceDto>
             {
                 new PriceDto
                 {
                     Id = "price_123",
-                    ProductId = "prod_456",
+                    ProductId = "", // Empty ProductId to use fallback logic
                     ProductName = "Basic Plan",
                     ProductDescription = "A basic subscription plan",
                     UnitAmount = 999,
@@ -107,7 +111,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
                 new PriceDto
                 {
                     Id = "price_789",
-                    ProductId = "prod_101",
+                    ProductId = "", // Empty ProductId to use fallback logic
                     ProductName = "Professional Plan",
                     ProductDescription = "A professional subscription plan",
                     UnitAmount = 1999,
@@ -137,11 +141,11 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [InlineData("Custom Plan", new[] { "Author profile", "Book listings", "Contact information", "Social media links" })]
         public async Task MapToSubscriptionPlanAsync_DefaultFeatures_ReturnsExpectedFeatures(string productName, string[] expectedFeatures)
         {
-            // Arrange
+            // Arrange - Use empty ProductId to skip Stripe API calls and test fallback logic
             var priceDto = new PriceDto
             {
                 Id = "price_test",
-                ProductId = "prod_test",
+                ProductId = "", // Empty ProductId to use fallback logic and avoid Stripe API calls
                 ProductName = productName,
                 ProductDescription = "Test plan",
                 UnitAmount = 1000,
@@ -191,13 +195,13 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [Fact]
         public async Task MapToSubscriptionPlansAsync_WithInvalidPriceDto_ContinuesProcessingOthers()
         {
-            // Arrange
+            // Arrange - Use empty ProductId to skip Stripe API calls in unit tests
             var priceDtos = new List<PriceDto>
             {
                 new PriceDto
                 {
                     Id = "price_valid",
-                    ProductId = "prod_valid",
+                    ProductId = "", // Empty ProductId to use fallback logic
                     ProductName = "Valid Plan",
                     ProductDescription = "A valid plan",
                     UnitAmount = 999,
@@ -209,7 +213,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
                 new PriceDto
                 {
                     Id = "price_valid2",
-                    ProductId = "prod_valid2",
+                    ProductId = "", // Empty ProductId to use fallback logic
                     ProductName = "Another Valid Plan",
                     ProductDescription = "Another valid plan",
                     UnitAmount = 1999,
@@ -241,11 +245,11 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [InlineData("My Custom Label", "Some Product", "My Custom Label")] // Valid nickname should take precedence
         public async Task MapToSubscriptionPlanAsync_Label_AlwaysHasValidValue(string? nickname, string? productName, string expectedLabel)
         {
-            // Arrange
+            // Arrange - Use empty ProductId to skip Stripe API calls in unit tests
             var priceDto = new PriceDto
             {
                 Id = "price_test",
-                ProductId = "prod_test",
+                ProductId = "", // Empty ProductId to use fallback logic and avoid Stripe API calls
                 ProductName = productName ?? string.Empty,
                 ProductDescription = "Test description",
                 Nickname = nickname ?? string.Empty,
@@ -268,11 +272,11 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [Fact]
         public async Task MapToSubscriptionPlanAsync_Label_HandlesComplexProductNames()
         {
-            // Arrange
+            // Arrange - Use empty ProductId to skip Stripe API calls in unit tests
             var priceDto = new PriceDto
             {
                 Id = "price_test",
-                ProductId = "prod_test",
+                ProductId = "", // Empty ProductId to use fallback logic and avoid Stripe API calls
                 ProductName = "  Advanced   Premium   Solution  ",
                 ProductDescription = "Test description",
                 Nickname = string.Empty,
