@@ -8,11 +8,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     {
         private readonly ILogger<UpdateSubscriptionService> _logger;
         private readonly IStripeInvoiceServiceHelper _invoiceHelper;
+        private readonly StripeClient _stripeClient;
 
-        public UpdateSubscriptionService(ILogger<UpdateSubscriptionService> logger, IStripeInvoiceServiceHelper invoiceHelper)
+        public UpdateSubscriptionService(ILogger<UpdateSubscriptionService> logger, IStripeInvoiceServiceHelper invoiceHelper, StripeClient stripeClient)
         {
             _logger = logger;
             _invoiceHelper = invoiceHelper;
+            _stripeClient = stripeClient ?? throw new ArgumentNullException(nameof(stripeClient));
         }
 
         public async Task<UpdateSubscriptionResponse> UpdateAsync(string subscriptionId, UpdateSubscriptionRequest request)
@@ -24,7 +26,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
             try
             {
-                var svc = new SubscriptionService();
+                var svc = new SubscriptionService(_stripeClient);
                 var options = new SubscriptionUpdateOptions
                 {
                     CancelAtPeriodEnd = request.CancelAtPeriodEnd
@@ -74,11 +76,15 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     LatestInvoicePaymentIntentId = string.Empty
                 };
 
-                if (request.ExpandLatestInvoicePaymentIntent && !string.IsNullOrWhiteSpace(response.LatestInvoiceId))
+                // Note: Even if expansion is requested, we do not attempt to read expanded nested objects directly here.
+                // Some SDK versions may not surface PaymentIntent directly on Invoice, so we always rely on the explicit hydration helper for consistent retrieval.
+
+                // Fallback hydration: if PI is still missing but we have an invoice id, fetch via helper
+                if (request.ExpandLatestInvoicePaymentIntent && string.IsNullOrWhiteSpace(response.LatestInvoicePaymentIntentId) && !string.IsNullOrWhiteSpace(response.LatestInvoiceId))
                 {
                     var (piId, clientSecret) = await _invoiceHelper.TryGetPaymentIntentAsync(response.LatestInvoiceId);
                     response.LatestInvoicePaymentIntentId = piId;
-                    // clientSecret is available if needed by callers later
+                    // clientSecret returned if needed by callers later
                 }
 
                 return response;

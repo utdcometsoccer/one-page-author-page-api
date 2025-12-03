@@ -7,20 +7,20 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     public class PricesService : IPriceService
     {
         private readonly ILogger<PricesService> _logger;
+        private readonly StripeClient _stripeClient;
 
-        public PricesService(ILogger<PricesService> logger)
+        public PricesService(ILogger<PricesService> logger, StripeClient stripeClient)
         {
             _logger = logger;
+            _stripeClient = stripeClient ?? throw new ArgumentNullException(nameof(stripeClient));
         }
-
         public async Task<PriceListResponse> GetPricesAsync(PriceListRequest request)
         {
             _logger.LogInformation("Retrieving Stripe prices with filters: Active={Active}, ProductId={ProductId}",
                 request?.Active, request?.ProductId);
-
             try
             {
-                var service = new PriceService();
+                var service = new PriceService(_stripeClient);
                 var options = new PriceListOptions
                 {
                     // Pass Active filter to Stripe API for efficiency (reduces data transfer)
@@ -63,7 +63,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     var activePrices = allPrices.Count(p => p.Active);
                     var activeProducts = allPrices.Count(p => p.ProductActive);
                     var fullyActive = allPrices.Count(p => p.Active && p.ProductActive);
-                    
+
                     _logger.LogDebug("Before filtering: Total={Total}, ActivePrices={ActivePrices}, ActiveProducts={ActiveProducts}, FullyActive={FullyActive}",
                         allPrices.Count, activePrices, activeProducts, fullyActive);
                 }
@@ -74,12 +74,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 var response = new PriceListResponse
                 {
                     Prices = filteredPrices,
+
                     HasMore = stripeResponse.HasMore,
                     // Use LastId from Stripe response for proper cursor-based pagination
                     LastId = stripeResponse.Data.LastOrDefault()?.Id ?? string.Empty
                 };
 
-                _logger.LogInformation("Retrieved {Count} Stripe prices (filtered from {TotalCount}) with Active filter: {ActiveFilter}", 
+                _logger.LogInformation("Retrieved {Count} Stripe prices (filtered from {TotalCount}) with Active filter: {ActiveFilter}",
                     response.Prices.Count, stripeResponse.Data.Count, request?.Active?.ToString() ?? "null");
                 return response;
             }
@@ -106,7 +107,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
             try
             {
-                var service = new PriceService();
+                var service = new PriceService(_stripeClient);
                 var options = new PriceGetOptions
                 {
                     Expand = new List<string> { "product" }
@@ -147,7 +148,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             if (request.Active.HasValue)
             {
                 _logger.LogDebug("Applying LINQ filter for Active={Active}", request.Active.Value);
-                
+
                 if (request.Active.Value)
                 {
                     // When filtering for active items, ensure BOTH price and product are active
@@ -160,11 +161,11 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     // When filtering for inactive items, show items where price is inactive
                     prices = prices.Where(p => p.Active == false);
                 }
-            }
 
+
+            }
             return prices;
         }
-
         private PriceDto? MapStripePriceToDto(Price? price)
         {
             if (price == null) return null;

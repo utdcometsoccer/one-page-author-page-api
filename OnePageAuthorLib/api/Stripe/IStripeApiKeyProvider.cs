@@ -7,6 +7,10 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
     public class StripeApiKeyProvider : IStripeApiKeyProvider
     {
-        public string GetApiKey() => global::Stripe.StripeConfiguration.ApiKey ?? string.Empty;
+        // Deprecated: prefer injecting StripeClient via DI and avoid static ApiKey.
+        public string GetApiKey()
+        {
+            throw new NotSupportedException("IStripeApiKeyProvider is deprecated. Use StripeClient injection via DI instead. See MIGRATION_GUIDE_ENTRA_ID_ROLES.md for migration steps.");
+        }
     }
 }
