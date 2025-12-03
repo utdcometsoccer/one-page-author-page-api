@@ -9,6 +9,10 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
 {
     public class SubscriptionPlanServiceTests
     {
+        // Placeholder API key for unit tests - no actual API calls are made
+        // Tests use empty ProductId to skip Stripe API calls and test mapping logic
+        private const string TestApiKey = "sk_test_unit_tests_placeholder_key";
+        
         private readonly Mock<ILogger<SubscriptionPlanService>> _loggerMock;
         private readonly StripeClient _stripeClient;
         private readonly SubscriptionPlanService _service;
@@ -16,9 +20,40 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         public SubscriptionPlanServiceTests()
         {
             _loggerMock = new Mock<ILogger<SubscriptionPlanService>>();
-            // Use a test API key for the StripeClient - API calls will fail but fallback logic will handle it
-            _stripeClient = new StripeClient("sk_test_placeholder_for_unit_tests");
+            _stripeClient = new StripeClient(TestApiKey);
             _service = new SubscriptionPlanService(_loggerMock.Object, _stripeClient);
+        }
+
+        /// <summary>
+        /// Creates a test PriceDto with empty ProductId to skip Stripe API calls during unit testing.
+        /// </summary>
+        private static PriceDto CreateTestPriceDto(
+            string id = "price_test",
+            string productName = "Test Plan",
+            string productDescription = "Test description",
+            string nickname = "",
+            long unitAmount = 1000,
+            string currency = "usd",
+            bool active = true,
+            bool isRecurring = false,
+            string? recurringInterval = null,
+            int? recurringIntervalCount = null)
+        {
+            return new PriceDto
+            {
+                Id = id,
+                ProductId = string.Empty, // Empty ProductId skips Stripe API calls
+                ProductName = productName,
+                ProductDescription = productDescription,
+                Nickname = nickname,
+                UnitAmount = unitAmount,
+                Currency = currency,
+                Active = active,
+                IsRecurring = isRecurring,
+                RecurringInterval = recurringInterval ?? string.Empty,
+                RecurringIntervalCount = recurringIntervalCount,
+                CreatedDate = DateTime.UtcNow
+            };
         }
 
         [Fact]
@@ -32,11 +67,11 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [Fact]
         public async Task MapToSubscriptionPlanAsync_ValidPriceDto_ReturnsSubscriptionPlan()
         {
-            // Arrange - Use empty ProductId to skip Stripe API calls in unit tests
+            // Arrange
             var priceDto = new PriceDto
             {
                 Id = "price_123",
-                ProductId = "", // Empty ProductId to use fallback logic and avoid Stripe API calls
+                ProductId = string.Empty, // Empty ProductId skips Stripe API calls
                 ProductName = "Professional Plan",
                 ProductDescription = "A professional subscription plan",
                 UnitAmount = 1999,
@@ -91,37 +126,25 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [Fact]
         public async Task MapToSubscriptionPlansAsync_ValidPriceDtos_ReturnsSubscriptionPlans()
         {
-            // Arrange - Use empty ProductId to skip Stripe API calls in unit tests
+            // Arrange
             var priceDtos = new List<PriceDto>
             {
-                new PriceDto
-                {
-                    Id = "price_123",
-                    ProductId = "", // Empty ProductId to use fallback logic
-                    ProductName = "Basic Plan",
-                    ProductDescription = "A basic subscription plan",
-                    UnitAmount = 999,
-                    Currency = "usd",
-                    Active = true,
-                    IsRecurring = true,
-                    RecurringInterval = "month",
-                    RecurringIntervalCount = 1,
-                    CreatedDate = DateTime.UtcNow
-                },
-                new PriceDto
-                {
-                    Id = "price_789",
-                    ProductId = "", // Empty ProductId to use fallback logic
-                    ProductName = "Professional Plan",
-                    ProductDescription = "A professional subscription plan",
-                    UnitAmount = 1999,
-                    Currency = "usd",
-                    Active = true,
-                    IsRecurring = true,
-                    RecurringInterval = "month",
-                    RecurringIntervalCount = 1,
-                    CreatedDate = DateTime.UtcNow
-                }
+                CreateTestPriceDto(
+                    id: "price_123",
+                    productName: "Basic Plan",
+                    productDescription: "A basic subscription plan",
+                    unitAmount: 999,
+                    isRecurring: true,
+                    recurringInterval: "month",
+                    recurringIntervalCount: 1),
+                CreateTestPriceDto(
+                    id: "price_789",
+                    productName: "Professional Plan",
+                    productDescription: "A professional subscription plan",
+                    unitAmount: 1999,
+                    isRecurring: true,
+                    recurringInterval: "month",
+                    recurringIntervalCount: 1)
             };
 
             // Act
@@ -141,18 +164,8 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [InlineData("Custom Plan", new[] { "Author profile", "Book listings", "Contact information", "Social media links" })]
         public async Task MapToSubscriptionPlanAsync_DefaultFeatures_ReturnsExpectedFeatures(string productName, string[] expectedFeatures)
         {
-            // Arrange - Use empty ProductId to skip Stripe API calls and test fallback logic
-            var priceDto = new PriceDto
-            {
-                Id = "price_test",
-                ProductId = "", // Empty ProductId to use fallback logic and avoid Stripe API calls
-                ProductName = productName,
-                ProductDescription = "Test plan",
-                UnitAmount = 1000,
-                Currency = "usd",
-                Active = true,
-                CreatedDate = DateTime.UtcNow
-            };
+            // Arrange
+            var priceDto = CreateTestPriceDto(productName: productName, productDescription: "Test plan");
 
             // Act
             var result = await _service.MapToSubscriptionPlanAsync(priceDto);
@@ -169,17 +182,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         public async Task MapToSubscriptionPlanAsync_EmptyProductId_ReturnsDefaultFeatures()
         {
             // Arrange
-            var priceDto = new PriceDto
-            {
-                Id = "price_test",
-                ProductId = "",
-                ProductName = "Test Plan",
-                ProductDescription = "Test plan",
-                UnitAmount = 1000,
-                Currency = "usd",
-                Active = true,
-                CreatedDate = DateTime.UtcNow
-            };
+            var priceDto = CreateTestPriceDto(productName: "Test Plan", productDescription: "Test plan");
 
             // Act
             var result = await _service.MapToSubscriptionPlanAsync(priceDto);
@@ -195,32 +198,20 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [Fact]
         public async Task MapToSubscriptionPlansAsync_WithInvalidPriceDto_ContinuesProcessingOthers()
         {
-            // Arrange - Use empty ProductId to skip Stripe API calls in unit tests
+            // Arrange
             var priceDtos = new List<PriceDto>
             {
-                new PriceDto
-                {
-                    Id = "price_valid",
-                    ProductId = "", // Empty ProductId to use fallback logic
-                    ProductName = "Valid Plan",
-                    ProductDescription = "A valid plan",
-                    UnitAmount = 999,
-                    Currency = "usd",
-                    Active = true,
-                    CreatedDate = DateTime.UtcNow
-                },
+                CreateTestPriceDto(
+                    id: "price_valid",
+                    productName: "Valid Plan",
+                    productDescription: "A valid plan",
+                    unitAmount: 999),
                 null!, // This will cause an error but should be handled gracefully
-                new PriceDto
-                {
-                    Id = "price_valid2",
-                    ProductId = "", // Empty ProductId to use fallback logic
-                    ProductName = "Another Valid Plan",
-                    ProductDescription = "Another valid plan",
-                    UnitAmount = 1999,
-                    Currency = "usd",
-                    Active = true,
-                    CreatedDate = DateTime.UtcNow
-                }
+                CreateTestPriceDto(
+                    id: "price_valid2",
+                    productName: "Another Valid Plan",
+                    productDescription: "Another valid plan",
+                    unitAmount: 1999)
             };
 
             // Act
@@ -245,19 +236,10 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [InlineData("My Custom Label", "Some Product", "My Custom Label")] // Valid nickname should take precedence
         public async Task MapToSubscriptionPlanAsync_Label_AlwaysHasValidValue(string? nickname, string? productName, string expectedLabel)
         {
-            // Arrange - Use empty ProductId to skip Stripe API calls in unit tests
-            var priceDto = new PriceDto
-            {
-                Id = "price_test",
-                ProductId = "", // Empty ProductId to use fallback logic and avoid Stripe API calls
-                ProductName = productName ?? string.Empty,
-                ProductDescription = "Test description",
-                Nickname = nickname ?? string.Empty,
-                UnitAmount = 1000,
-                Currency = "usd",
-                Active = true,
-                CreatedDate = DateTime.UtcNow
-            };
+            // Arrange
+            var priceDto = CreateTestPriceDto(
+                productName: productName ?? string.Empty,
+                nickname: nickname ?? string.Empty);
 
             // Act
             var result = await _service.MapToSubscriptionPlanAsync(priceDto);
@@ -272,19 +254,10 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         [Fact]
         public async Task MapToSubscriptionPlanAsync_Label_HandlesComplexProductNames()
         {
-            // Arrange - Use empty ProductId to skip Stripe API calls in unit tests
-            var priceDto = new PriceDto
-            {
-                Id = "price_test",
-                ProductId = "", // Empty ProductId to use fallback logic and avoid Stripe API calls
-                ProductName = "  Advanced   Premium   Solution  ",
-                ProductDescription = "Test description",
-                Nickname = string.Empty,
-                UnitAmount = 1000,
-                Currency = "usd",
-                Active = true,
-                CreatedDate = DateTime.UtcNow
-            };
+            // Arrange
+            var priceDto = CreateTestPriceDto(
+                productName: "  Advanced   Premium   Solution  ",
+                nickname: string.Empty);
 
             // Act
             var result = await _service.MapToSubscriptionPlanAsync(priceDto);
