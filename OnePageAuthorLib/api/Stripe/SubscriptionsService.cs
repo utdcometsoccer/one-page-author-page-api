@@ -1,4 +1,5 @@
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using Microsoft.Extensions.Logging;
 using OnePageAuthorLib.Interfaces.Stripe;
 using Stripe;
@@ -10,12 +11,14 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         private readonly ILogger<SubscriptionsService> _logger;
         private readonly StripeClient _stripeClient;
         private readonly IClientSecretFromInvoice _clientSecretFromInvoice;
+        private readonly IStripeTelemetryService? _telemetryService;
 
-        public SubscriptionsService(ILogger<SubscriptionsService> logger, StripeClient stripeClient, IClientSecretFromInvoice clientSecretFromInvoice)
+        public SubscriptionsService(ILogger<SubscriptionsService> logger, StripeClient stripeClient, IClientSecretFromInvoice clientSecretFromInvoice, IStripeTelemetryService? telemetryService = null)
         {
             _logger = logger;
             _stripeClient = stripeClient ?? throw new ArgumentNullException(nameof(stripeClient));
             _clientSecretFromInvoice = clientSecretFromInvoice ?? throw new ArgumentNullException(nameof(clientSecretFromInvoice));
+            _telemetryService = telemetryService;
         }
 
         public async Task<SubscriptionCreateResponse> CreateAsync(CreateSubscriptionRequest request)
@@ -53,6 +56,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     _ => throw new InvalidOperationException($"Subscription {subscription.Id} has no latest invoice (LatestInvoice was null). Ensure Expand option is set.")
                 };
 
+                // Track subscription creation in Application Insights
+                _telemetryService?.TrackSubscriptionCreated(
+                    subscription.Id,
+                    request.CustomerId,
+                    request.PriceId);
+
                 return new SubscriptionCreateResponse
                 {
                     SubscriptionId = subscription.Id,
@@ -65,6 +74,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             {
                 _logger.LogError(ex, "Stripe error creating subscription. Status={Status} Code={Code} Type={Type}",
                     ex.HttpStatusCode, ex.StripeError?.Code, ex.StripeError?.Type);
+                _telemetryService?.TrackStripeError("CreateSubscription", ex.StripeError?.Code, ex.StripeError?.Type, request.CustomerId);
                 throw;
             }
             catch (Exception ex)

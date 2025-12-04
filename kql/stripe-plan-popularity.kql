@@ -1,0 +1,15 @@
+// KQL Query: Price/Plan Popularity
+// Shows which subscription plans are most popular
+// Recommended visualization: Pie chart or donut chart
+
+customEvents
+| where name in ('StripeSubscriptionCreated', 'StripeCheckoutSessionCreated')
+| extend PriceId = tostring(customDimensions["PriceId"])
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| where isnotempty(PriceId)
+| summarize 
+    SelectionCount = count(),
+    UniqueCustomers = dcount(CustomerId)
+    by PriceId
+| order by SelectionCount desc
+| render piechart

@@ -1,4 +1,5 @@
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using Microsoft.Extensions.Logging;
 using Stripe;
 
@@ -11,10 +12,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     {
         private readonly ILogger<ListSubscriptions> _logger;
         private readonly StripeClient _stripeClient;
-        public ListSubscriptions(ILogger<ListSubscriptions> logger, StripeClient stripeClient)
+        private readonly IStripeTelemetryService? _telemetryService;
+
+        public ListSubscriptions(ILogger<ListSubscriptions> logger, StripeClient stripeClient, IStripeTelemetryService? telemetryService = null)
         {
             _logger = logger;
             _stripeClient = stripeClient ?? throw new ArgumentNullException(nameof(stripeClient));
+            _telemetryService = telemetryService;
         }
 
         /// <summary>
@@ -69,6 +73,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
                 var wrapper = SubscriptionMappers.Map(subscriptions.Data, subscriptions.HasMore);
 
+                // Track subscriptions list in Application Insights
+                if (!string.IsNullOrWhiteSpace(customerId))
+                {
+                    _telemetryService?.TrackSubscriptionsListed(customerId, subscriptions.Data.Count);
+                }
+
                 return new SubscriptionsResponse
                 {
                     Subscriptions = subscriptions,
@@ -79,6 +89,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             {
                 _logger.LogError(ex, "Stripe error listing subscriptions. Status={Status} Code={Code} Type={Type}",
                     ex.HttpStatusCode, ex.StripeError?.Code, ex.StripeError?.Type);
+                _telemetryService?.TrackStripeError("ListSubscriptions", ex.StripeError?.Code, ex.StripeError?.Type, customerId);
                 throw;
             }
             catch (Exception ex)
@@ -89,4 +100,3 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         }
     }
 }
-

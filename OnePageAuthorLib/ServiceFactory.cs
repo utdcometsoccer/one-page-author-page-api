@@ -8,6 +8,7 @@ using InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces.Authormanagement;
 using OnePageAuthorLib.Api.Stripe;
 using OnePageAuthorLib.Interfaces.Stripe;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 
 namespace InkStainedWretch.OnePageAuthorAPI
 {
@@ -257,6 +258,8 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<IStripeWebhookHandler, StripeWebhookHandler>();
             // Register service to fetch client secret from Invoice
             services.AddScoped<IClientSecretFromInvoice, ClientSecretFromInvoice>();
+            // Register telemetry service for Application Insights Stripe event tracking
+            services.AddScoped<IStripeTelemetryService, StripeTelemetryService>();
             return services;
         }
 

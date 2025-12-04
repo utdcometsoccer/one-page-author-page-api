@@ -1,4 +1,5 @@
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using Microsoft.Extensions.Logging;
 using Stripe.Checkout;
 using Stripe;
@@ -9,11 +10,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     {
         private readonly ILogger<CheckoutSessionsService> _logger;
         private readonly StripeClient _stripeClient;
+        private readonly IStripeTelemetryService? _telemetryService;
 
-        public CheckoutSessionsService(ILogger<CheckoutSessionsService> logger, StripeClient stripeClient)
+        public CheckoutSessionsService(ILogger<CheckoutSessionsService> logger, StripeClient stripeClient, IStripeTelemetryService? telemetryService = null)
         {
             _logger = logger;
             _stripeClient = stripeClient;
+            _telemetryService = telemetryService;
         }
 
         public async Task<CreateCheckoutSessionResponse> CreateAsync(CreateCheckoutSessionRequest request)
@@ -43,6 +46,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 };
 
                 var session = await service.CreateAsync(options);
+                
+                // Track checkout session creation in Application Insights
+                _telemetryService?.TrackCheckoutSessionCreated(
+                    session.Id ?? string.Empty,
+                    request.CustomerId,
+                    request.PriceId);
+                
                 return new CreateCheckoutSessionResponse
                 {
                     CheckoutSessionId = session.Id ?? string.Empty,
@@ -53,6 +63,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             {
                 _logger.LogError(ex, "Stripe error creating checkout session. Status={Status} Code={Code} Type={Type}",
                     ex.HttpStatusCode, ex.StripeError?.Code, ex.StripeError?.Type);
+                _telemetryService?.TrackStripeError("CreateCheckoutSession", ex.StripeError?.Code, ex.StripeError?.Type, request.CustomerId);
                 throw;
             }
             catch (Exception ex)
@@ -73,7 +84,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 var session = await service.GetAsync(checkoutSessionId);
                 if (session == null) return null;
 
-                return new GetCheckoutSessionResponse
+                var response = new GetCheckoutSessionResponse
                 {
                     CheckoutSessionId = session.Id ?? string.Empty,
                     Status = session.Status ?? string.Empty,
@@ -82,6 +93,15 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     Mode = session.Mode ?? string.Empty,
                     Url = session.Url ?? string.Empty
                 };
+
+                // Track checkout session retrieval in Application Insights
+                _telemetryService?.TrackCheckoutSessionRetrieved(
+                    response.CheckoutSessionId,
+                    response.CustomerId,
+                    response.Status,
+                    response.PaymentStatus);
+
+                return response;
             }
             catch (StripeException ex)
             {
@@ -91,6 +111,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     return null;
                 }
                 _logger.LogError(ex, "Stripe error retrieving checkout session {CheckoutSessionId}", checkoutSessionId);
+                _telemetryService?.TrackStripeError("GetCheckoutSession", ex.StripeError?.Code, ex.StripeError?.Type);
                 throw;
             }
             catch (Exception ex)

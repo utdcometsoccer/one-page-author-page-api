@@ -1,0 +1,19 @@
+// KQL Query: Webhook Events Summary
+// Shows distribution of all Stripe webhook events
+// Recommended visualization: Bar chart or pie chart
+
+customEvents
+| where name == 'StripeWebhookEvent'
+| extend EventType = tostring(customDimensions["EventType"])
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| extend SubscriptionId = tostring(customDimensions["SubscriptionId"])
+| extend InvoiceId = tostring(customDimensions["InvoiceId"])
+| extend PaymentIntentId = tostring(customDimensions["PaymentIntentId"])
+| extend PriceId = tostring(customDimensions["PriceId"])
+| summarize 
+    EventCount = count(),
+    UniqueCustomers = dcount(CustomerId),
+    UniqueSubscriptions = dcount(SubscriptionId)
+    by EventType
+| order by EventCount desc
+| render barchart
