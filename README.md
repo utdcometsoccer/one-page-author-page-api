@@ -321,7 +321,7 @@ The platform provides comprehensive DI extensions through `OnePageAuthorLib`:
 - **API Protection** with `[Authorize]` attributes on sensitive endpoints
 - **Webhook Security** with Stripe signature verification
 - **RBAC Integration** for Azure resource management
-- See [`SECURITY.md`](SECURITY.md) for vulnerability reporting
+- See [`SECURITY.md`](docs/SECURITY.md) for vulnerability reporting
 
 ## 📊 Data Management & Seeding
 
@@ -506,9 +506,9 @@ dotnet test --filter "Category=Unit"
 ### Development Workflow
 
 
-1. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines
-2. Follow [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) for community standards
-3. Review [`SECURITY.md`](SECURITY.md) for security considerations
+1. Read [`CONTRIBUTING.md`](docs/CONTRIBUTING.md) for guidelines
+2. Follow [`CODE_OF_CONDUCT.md`](docs/CODE_OF_CONDUCT.md) for community standards
+3. Review [`SECURITY.md`](docs/SECURITY.md) for security considerations
 4. Check existing issues and PRs before creating new ones
 
 ### Getting Help
@@ -516,7 +516,7 @@ dotnet test --filter "Category=Unit"
 
 - **Documentation**: Check project-specific README files for detailed information
 - **Issues**: Use GitHub Issues for bug reports and feature requests
-- **Security**: Follow responsible disclosure via [`SECURITY.md`](SECURITY.md)
+- **Security**: Follow responsible disclosure via [`SECURITY.md`](docs/SECURITY.md)
 
 
 ## 📖 Enhancement Documentation
@@ -6690,6 +6690,119 @@ The scripts can be modified to suit your development preferences:
 
 ---
 
+## 📖 Documentation
+
+All detailed documentation has been organized in the [`docs/`](docs/) folder:
+
+### Core Documentation
+| Document | Description |
+|----------|-------------|
+| [CONTRIBUTING.md](docs/CONTRIBUTING.md) | Guidelines for contributing to the project |
+| [CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md) | Community standards and expectations |
+| [SECURITY.md](docs/SECURITY.md) | Security policies and vulnerability reporting |
+
+### API Documentation
+| Document | Description |
+|----------|-------------|
+| [API-Documentation.md](docs/API-Documentation.md) | Comprehensive API reference |
+| [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) | Additional API documentation |
+| [Complete-System-Documentation.md](docs/Complete-System-Documentation.md) | Full system overview |
+| [LocalizationREADME.md](docs/LocalizationREADME.md) | Internationalization guide |
+| [WIKIPEDIA_API.md](docs/WIKIPEDIA_API.md) | Wikipedia API integration |
+
+### Implementation Guides
+| Document | Description |
+|----------|-------------|
+| [IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md) | Feature implementation details |
+| [IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES.md](docs/IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES.md) | Entra ID integration |
+| [IMPLEMENTATION_SUMMARY_LANGUAGES.md](docs/IMPLEMENTATION_SUMMARY_LANGUAGES.md) | Language support |
+| [COUNTRIES_IMPLEMENTATION_SUMMARY.md](docs/COUNTRIES_IMPLEMENTATION_SUMMARY.md) | Country data implementation |
+| [STATEPROVINCE_BOILERPLATE_SUMMARY.md](docs/STATEPROVINCE_BOILERPLATE_SUMMARY.md) | Geographic data |
+| [GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY.md](docs/GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY.md) | Google Domains integration |
+| [INK_STAINED_WRETCH_USER_FEATURES.md](docs/INK_STAINED_WRETCH_USER_FEATURES.md) | User features documentation |
+
+### Enhancement Documentation
+| Document | Description |
+|----------|-------------|
+| [CULTURE_SUPPORT_ENHANCEMENT.md](docs/CULTURE_SUPPORT_ENHANCEMENT.md) | Culture/localization features |
+| [ACTIVE_PRODUCTS_FILTER_ENHANCEMENT.md](docs/ACTIVE_PRODUCTS_FILTER_ENHANCEMENT.md) | Product filtering |
+| [LABEL_VALIDATION_ENHANCEMENT.md](docs/LABEL_VALIDATION_ENHANCEMENT.md) | Validation improvements |
+| [SUBSCRIPTION_PLAN_SERVICE_REFACTORING.md](docs/SUBSCRIPTION_PLAN_SERVICE_REFACTORING.md) | Service refactoring |
+| [REFACTORING_SUMMARY.md](docs/REFACTORING_SUMMARY.md) | Refactoring documentation |
+
+### Configuration & Setup
+| Document | Description |
+|----------|-------------|
+| [ConfigurationValidation.md](docs/ConfigurationValidation.md) | Configuration validation guide |
+| [ConfigurationMaskingStandardization.md](docs/ConfigurationMaskingStandardization.md) | Config masking standards |
+| [LOCAL_SETTINGS_SETUP.md](docs/LOCAL_SETTINGS_SETUP.md) | Local development setup |
+| [AZURE_STORAGE_EMULATOR_SETUP.md](docs/AZURE_STORAGE_EMULATOR_SETUP.md) | Azure Storage emulator setup |
+| [DOTNET_10_UPGRADE.md](docs/DOTNET_10_UPGRADE.md) | .NET 10 upgrade guide |
+
+### Migration & Testing
+| Document | Description |
+|----------|-------------|
+| [MIGRATION_GUIDE_ENTRA_ID_ROLES.md](docs/MIGRATION_GUIDE_ENTRA_ID_ROLES.md) | Entra ID migration guide |
+| [TESTING_SCENARIOS_GUIDE.md](docs/TESTING_SCENARIOS_GUIDE.md) | Testing scenarios |
+| [SECURITY_AUDIT_REPORT.md](docs/SECURITY_AUDIT_REPORT.md) | Security audit findings |
+
+### Development
+| Document | Description |
+|----------|-------------|
+| [DEVELOPMENT_SCRIPTS.md](docs/DEVELOPMENT_SCRIPTS.md) | Development automation scripts |
+| [README-Documentation.md](docs/README-Documentation.md) | Documentation overview |
+| [FIND_PARTNER_TAG.md](docs/FIND_PARTNER_TAG.md) | Amazon Partner Tag guide |
+| [UPDATE_STRIPE_PRICE_NICKNAME_EXAMPLES.md](docs/UPDATE_STRIPE_PRICE_NICKNAME_EXAMPLES.md) | Stripe price configuration |
+| [STEP_BY_STEP_CLEANUP.md](docs/STEP_BY_STEP_CLEANUP.md) | Cleanup procedures |
+
+---
+
+## 🔗 External References
+
+The following external resources are referenced throughout this project:
+
+### Azure Services
+| Resource | URL | Description |
+|----------|-----|-------------|
+| Azure Portal | https://portal.azure.com | Azure management portal |
+| Azure Functions Docs | https://docs.microsoft.com/en-us/azure/azure-functions/ | Azure Functions documentation |
+| Azure Cosmos DB Trigger | https://learn.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger | Cosmos DB trigger bindings |
+| Azure Managed Identity | https://learn.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview | Managed identity documentation |
+
+### Stripe
+| Resource | URL | Description |
+|----------|-----|-------------|
+| Stripe Dashboard | https://dashboard.stripe.com | Stripe management dashboard |
+
+### Amazon Services
+| Resource | URL | Description |
+|----------|-----|-------------|
+| Amazon Associates | https://affiliate-program.amazon.com | Amazon affiliate program |
+| Amazon Associates Help | https://affiliate-program.amazon.com/help/ | Affiliate program documentation |
+| PA API Documentation | https://webservices.amazon.com/paapi5/documentation/ | Product Advertising API docs |
+| Amazon Developer Portal | https://developer.amazon.com/apps-and-games/services/paapi | Developer services |
+| AWS Console | https://console.aws.amazon.com | AWS management console |
+
+### Google Cloud
+| Resource | URL | Description |
+|----------|-----|-------------|
+| Google Cloud Domains API | https://cloud.google.com/domains/docs | Domain registration API |
+| Workload Identity Federation | https://cloud.google.com/iam/docs/workload-identity-federation | Identity federation docs |
+
+### Development Tools
+| Resource | URL | Description |
+|----------|-----|-------------|
+| .NET Downloads | https://dotnet.microsoft.com/download | .NET SDK downloads |
+| Penguin Random House API | https://developer.penguinrandomhouse.com | PRH developer portal |
+| BFG Repo Cleaner | https://rtyley.github.io/bfg-repo-cleaner/ | Git history cleaning tool |
+
+### Project Links
+| Resource | URL | Description |
+|----------|-----|-------------|
+| GitHub Repository | https://github.com/utdcometsoccer/one-page-author-page-api | Source code repository |
+| CI/CD Pipeline | https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml | Build status |
+
+---
 
 ## 📄 License
 
