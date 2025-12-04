@@ -1,0 +1,16 @@
+// KQL Query: Daily Active Customers
+// Shows number of unique customers interacting with Stripe daily
+// Recommended visualization: Line chart or area chart
+
+customEvents
+| where name in ('StripeCustomerCreated', 'StripeCheckoutSessionCreated', 'StripeCheckoutSessionRetrieved', 
+                'StripeSubscriptionCreated', 'StripeSubscriptionCancelled', 'StripeSubscriptionUpdated', 
+                'StripeSubscriptionsListed', 'StripeInvoicePreview')
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| where isnotempty(CustomerId)
+| summarize 
+    UniqueCustomers = dcount(CustomerId),
+    TotalEvents = count()
+    by bin(timestamp, 1d)
+| order by timestamp asc
+| render linechart

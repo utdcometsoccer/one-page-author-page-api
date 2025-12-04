@@ -1,0 +1,16 @@
+// KQL Query: Stripe API Errors Analysis
+// Shows distribution and trends of Stripe API errors
+// Recommended visualization: Multi-line chart and table
+
+customEvents
+| where name == 'StripeApiError'
+| extend Operation = tostring(customDimensions["Operation"])
+| extend ErrorCode = tostring(customDimensions["ErrorCode"])
+| extend ErrorType = tostring(customDimensions["ErrorType"])
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| summarize 
+    ErrorCount = count(),
+    AffectedCustomers = dcount(CustomerId)
+    by bin(timestamp, 1h), Operation, ErrorCode, ErrorType
+| order by timestamp desc, ErrorCount desc
+| render timechart

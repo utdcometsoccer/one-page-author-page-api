@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 
 namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 {
@@ -26,11 +27,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     {
         private readonly ILogger<StripeWebhookHandler> _logger;
         private readonly IStripeWebhookSecretProvider _secretProvider;
+        private readonly IStripeTelemetryService? _telemetryService;
 
-        public StripeWebhookHandler(ILogger<StripeWebhookHandler> logger, IStripeWebhookSecretProvider secretProvider)
+        public StripeWebhookHandler(ILogger<StripeWebhookHandler> logger, IStripeWebhookSecretProvider secretProvider, IStripeTelemetryService? telemetryService = null)
         {
             _logger = logger;
             _secretProvider = secretProvider;
+            _telemetryService = telemetryService;
         }
 
         public Task<WebhookResult> HandleAsync(string? payload, string? signatureHeader)
@@ -68,12 +71,27 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 string priceId = evt?.Data?.Object?.Lines?.Data?.FirstOrDefault()?.Price?.Id ?? string.Empty;
                 string customerId = evt?.Data?.Object?.GetCustomerId() ?? ExtractCustomerId(root);
 
+                // Extract additional IDs for telemetry
+                string subscriptionId = ExtractSubscriptionId(root, eventType, objId);
+                string invoiceId = ExtractInvoiceId(eventType, objId);
+                string paymentIntentId = ExtractPaymentIntentId(root);
+
                 if (string.IsNullOrEmpty(eventType))
                 {
                     eventType = root.TryGetProperty("type", out var typeEl) ? typeEl.GetString() ?? string.Empty : string.Empty;
                     objId = string.IsNullOrEmpty(objId) ? ExtractObjectId(root) : objId;
                     priceId = string.IsNullOrEmpty(priceId) ? ExtractPriceIdFromLine(root) : priceId;
                 }
+
+                // Track webhook event in Application Insights
+                _telemetryService?.TrackWebhookEvent(
+                    eventType,
+                    objId,
+                    customerId,
+                    subscriptionId,
+                    invoiceId,
+                    paymentIntentId,
+                    priceId);
 
                 switch (eventType)
                 {
@@ -219,6 +237,66 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                         {
                             return cid.GetString() ?? string.Empty;
                         }
+                    }
+                }
+            }
+            catch { }
+            return string.Empty;
+        }
+
+        private static string ExtractSubscriptionId(JsonElement root, string eventType, string objectId)
+        {
+            // If the event type starts with "customer.subscription", the objectId is the subscription ID
+            if (eventType.StartsWith("customer.subscription", StringComparison.OrdinalIgnoreCase))
+            {
+                return objectId;
+            }
+
+            try
+            {
+                if (root.TryGetProperty("data", out var data) &&
+                    data.TryGetProperty("object", out var obj) &&
+                    obj.TryGetProperty("subscription", out var sub))
+                {
+                    if (sub.ValueKind == JsonValueKind.String)
+                    {
+                        return sub.GetString() ?? string.Empty;
+                    }
+                    if (sub.ValueKind == JsonValueKind.Object && sub.TryGetProperty("id", out var sid))
+                    {
+                        return sid.GetString() ?? string.Empty;
+                    }
+                }
+            }
+            catch { }
+            return string.Empty;
+        }
+
+        private static string ExtractInvoiceId(string eventType, string objectId)
+        {
+            // If the event type starts with "invoice.", the objectId is the invoice ID
+            if (eventType.StartsWith("invoice.", StringComparison.OrdinalIgnoreCase))
+            {
+                return objectId;
+            }
+            return string.Empty;
+        }
+
+        private static string ExtractPaymentIntentId(JsonElement root)
+        {
+            try
+            {
+                if (root.TryGetProperty("data", out var data) &&
+                    data.TryGetProperty("object", out var obj) &&
+                    obj.TryGetProperty("payment_intent", out var pi))
+                {
+                    if (pi.ValueKind == JsonValueKind.String)
+                    {
+                        return pi.GetString() ?? string.Empty;
+                    }
+                    if (pi.ValueKind == JsonValueKind.Object && pi.TryGetProperty("id", out var pid))
+                    {
+                        return pid.GetString() ?? string.Empty;
                     }
                 }
             }

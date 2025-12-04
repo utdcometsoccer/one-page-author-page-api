@@ -1,0 +1,21 @@
+// KQL Query: Payment Success vs Failure Analysis
+// Tracks invoice payment outcomes from webhook events
+// Recommended visualization: Pie chart or stacked bar chart
+
+customEvents
+| where name == 'StripeWebhookEvent'
+| extend EventType = tostring(customDimensions["EventType"])
+| where EventType startswith "invoice."
+| extend PaymentOutcome = case(
+    EventType == 'invoice.paid', 'Paid',
+    EventType == 'invoice.payment_failed', 'Failed',
+    EventType == 'invoice.finalized', 'Finalized',
+    'Other')
+| extend InvoiceId = tostring(customDimensions["InvoiceId"])
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| summarize 
+    EventCount = count(),
+    UniqueCustomers = dcount(CustomerId)
+    by PaymentOutcome
+| order by EventCount desc
+| render piechart

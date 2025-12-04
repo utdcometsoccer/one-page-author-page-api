@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using Microsoft.Extensions.Logging;
 
 namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
@@ -16,12 +17,14 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         private readonly ILogger<InvoicePreviewService> _logger;
         private readonly HttpClient _http;
         private readonly IStripeApiKeyProvider _apiKeyProvider;
+        private readonly IStripeTelemetryService? _telemetryService;
 
-        public InvoicePreviewService(ILogger<InvoicePreviewService> logger, HttpClient http, IStripeApiKeyProvider apiKeyProvider)
+        public InvoicePreviewService(ILogger<InvoicePreviewService> logger, HttpClient http, IStripeApiKeyProvider apiKeyProvider, IStripeTelemetryService? telemetryService = null)
         {
             _logger = logger;
             _http = http;
             _apiKeyProvider = apiKeyProvider;
+            _telemetryService = telemetryService;
         }
 
         public async Task<InvoicePreviewResponse> PreviewAsync(InvoicePreviewRequest request)
@@ -76,11 +79,17 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 resp.EnsureSuccessStatusCode();
 
                 var json = await resp.Content.ReadAsStringAsync();
-                return MapFromJson(json);
+                var result = MapFromJson(json);
+
+                // Track invoice preview in Application Insights
+                _telemetryService?.TrackInvoicePreview(request.CustomerId, request.SubscriptionId, request.PriceId);
+
+                return result;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating invoice preview for customer {Customer}", request.CustomerId);
+                _telemetryService?.TrackStripeError("InvoicePreview", null, null, request.CustomerId);
                 throw;
             }
         }

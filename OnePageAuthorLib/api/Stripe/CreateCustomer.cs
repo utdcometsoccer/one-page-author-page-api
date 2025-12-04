@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 
 namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 {
@@ -17,17 +18,19 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         // Logger used to capture operational and diagnostic information for this service
         private readonly ILogger<CreateCustomer> _logger;
         private readonly StripeClient _stripeClient;
+        private readonly IStripeTelemetryService? _telemetryService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateCustomer"/> class.
         /// </summary>
         /// <param name="logger">The logger used for diagnostics and operational telemetry.</param>
-
         /// <param name="stripeClient">Injected Stripe client used to call Stripe APIs.</param>
-        public CreateCustomer(ILogger<CreateCustomer> logger, StripeClient stripeClient)
+        /// <param name="telemetryService">Optional telemetry service for tracking Stripe events.</param>
+        public CreateCustomer(ILogger<CreateCustomer> logger, StripeClient stripeClient, IStripeTelemetryService? telemetryService = null)
         {
             _logger = logger;
             _stripeClient = stripeClient;
+            _telemetryService = telemetryService;
         }
         /// <summary>
         /// Creates an initialized <see cref="CreateCustomerResponse"/> from the provided request.
@@ -73,6 +76,9 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 // Create the actual Stripe customer
                 var customer = service.Create(options);
 
+                // Track customer creation in Application Insights
+                _telemetryService?.TrackCustomerCreated(customer.Id, request.Email);
+
                 return new CreateCustomerResponse
                 {
                     Customer = customer
@@ -86,6 +92,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     ex.HttpStatusCode,
                     ex.StripeError?.Code,
                     ex.StripeError?.Type);
+                _telemetryService?.TrackStripeError("CreateCustomer", ex.StripeError?.Code, ex.StripeError?.Type);
                 throw;
             }
             catch (Exception ex)

@@ -1,0 +1,32 @@
+// KQL Query: Customer Lifecycle Stages
+// Shows distribution of customers across different lifecycle stages
+// Recommended visualization: Funnel chart or bar chart
+
+let customerCreated = customEvents
+| where name == 'StripeCustomerCreated'
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| summarize CustomerCreatedCount = dcount(CustomerId);
+
+let checkoutStarted = customEvents
+| where name == 'StripeCheckoutSessionCreated'
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| summarize CheckoutStartedCount = dcount(CustomerId);
+
+let subscriptionActive = customEvents
+| where name == 'StripeSubscriptionCreated'
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| summarize SubscriptionCreatedCount = dcount(CustomerId);
+
+let subscriptionCancelled = customEvents
+| where name == 'StripeSubscriptionCancelled'
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| summarize SubscriptionCancelledCount = dcount(CustomerId);
+
+customerCreated
+| extend Stage = 'Customer Created', Count = CustomerCreatedCount, Order = 1
+| union (checkoutStarted | extend Stage = 'Checkout Started', Count = CheckoutStartedCount, Order = 2)
+| union (subscriptionActive | extend Stage = 'Subscription Created', Count = SubscriptionCreatedCount, Order = 3)
+| union (subscriptionCancelled | extend Stage = 'Subscription Cancelled', Count = SubscriptionCancelledCount, Order = 4)
+| project Stage, Count, Order
+| order by Order asc
+| render barchart

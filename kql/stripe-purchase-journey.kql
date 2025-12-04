@@ -1,0 +1,29 @@
+// KQL Query: Purchase Journey Timeline
+// Visualizes the user's purchase journey through the Stripe subscription lifecycle
+// Recommended visualization: Line/Area chart with time on X-axis
+
+customEvents
+| where name in ('StripeCustomerCreated', 'StripeCheckoutSessionCreated', 'StripeSubscriptionCreated', 'StripeWebhookEvent')
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| extend EventType = tostring(customDimensions["EventType"])
+| extend SubscriptionId = tostring(customDimensions["SubscriptionId"])
+| extend CheckoutSessionId = tostring(customDimensions["CheckoutSessionId"])
+| extend PaymentStatus = tostring(customDimensions["PaymentStatus"])
+| where isnotempty(CustomerId)
+| project 
+    timestamp,
+    CustomerId,
+    EventName = name,
+    EventType,
+    SubscriptionId,
+    CheckoutSessionId,
+    PaymentStatus
+| order by CustomerId, timestamp asc
+| summarize 
+    JourneyEvents = count(),
+    FirstEvent = min(timestamp),
+    LastEvent = max(timestamp),
+    JourneyDuration = datetime_diff('minute', max(timestamp), min(timestamp))
+    by CustomerId
+| order by FirstEvent desc
+| render timechart

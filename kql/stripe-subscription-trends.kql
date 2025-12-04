@@ -1,0 +1,17 @@
+// KQL Query: Subscription Trends Over Time
+// Shows subscription creation, cancellation, and update trends
+// Recommended visualization: Multi-line area chart
+
+customEvents
+| where name in ('StripeSubscriptionCreated', 'StripeSubscriptionCancelled', 'StripeSubscriptionUpdated')
+| extend ActionType = case(
+    name == 'StripeSubscriptionCreated', 'Created',
+    name == 'StripeSubscriptionCancelled', 'Cancelled',
+    name == 'StripeSubscriptionUpdated', 'Updated',
+    'Other')
+| extend PriceId = tostring(customDimensions["PriceId"])
+| extend NewPriceId = tostring(customDimensions["NewPriceId"])
+| summarize 
+    EventCount = count()
+    by bin(timestamp, 1d), ActionType
+| render areachart
