@@ -1,7 +1,7 @@
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using Microsoft.Extensions.Logging;
+using OnePageAuthorLib.Interfaces.Stripe;
 using Stripe;
-using System.Collections.Generic;
 
 namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 {
@@ -9,11 +9,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     {
         private readonly ILogger<SubscriptionsService> _logger;
         private readonly StripeClient _stripeClient;
+        private readonly IClientSecretFromInvoice _clientSecretFromInvoice;
 
-        public SubscriptionsService(ILogger<SubscriptionsService> logger, StripeClient stripeClient)
+        public SubscriptionsService(ILogger<SubscriptionsService> logger, StripeClient stripeClient, IClientSecretFromInvoice clientSecretFromInvoice)
         {
             _logger = logger;
             _stripeClient = stripeClient ?? throw new ArgumentNullException(nameof(stripeClient));
+            _clientSecretFromInvoice = clientSecretFromInvoice ?? throw new ArgumentNullException(nameof(clientSecretFromInvoice));
         }
 
         public async Task<SubscriptionCreateResponse> CreateAsync(CreateSubscriptionRequest request)
@@ -25,7 +27,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             try
             {
                 string clientSecret = string.Empty;
-                var svc = new SubscriptionService(_stripeClient);
+                var subscriptionService = new SubscriptionService(_stripeClient);
                 var options = new SubscriptionCreateOptions
                 {
                     Customer = request.CustomerId,
@@ -35,37 +37,29 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                         new SubscriptionItemOptions { Price = request.PriceId }
                     },
                     // With default_incomplete, the subscription is created and requires payment confirmation
-                    PaymentBehavior = "default_incomplete"
+                    PaymentBehavior = "default_incomplete",
+                    Expand = new List<string> {
+                        "latest_invoice",
+                        "latest_invoice.payments",
+                        "latest_invoice.payment_intent"
+                         }
                 };
 
-
-                var subscription = await svc.CreateAsync(options);
-                var invoiceSvc = new InvoiceService(_stripeClient);
-                var invoice = await invoiceSvc.GetAsync(subscription.LatestInvoiceId);
-                var invoicePaymentService = new InvoicePaymentService(_stripeClient);
-                var invoicePaymentOptions = new InvoicePaymentListOptions
+                Subscription subscription = await subscriptionService.CreateAsync(options);
+                // LatestInvoice is populated when expanded via 'latest_invoice.payment_intent'
+                clientSecret = subscription.LatestInvoice switch
                 {
-                    Invoice = invoice.Id,
-                    Limit = 1
+                    Invoice latestInvoiceObject => await _clientSecretFromInvoice.ExtractAsync(latestInvoiceObject),
+                    _ => throw new InvalidOperationException($"Subscription {subscription.Id} has no latest invoice (LatestInvoice was null). Ensure Expand option is set.")
                 };
-                var invoicePayment = (await invoicePaymentService.ListAsync(invoicePaymentOptions)).FirstOrDefault();
-                if (invoicePayment?.Payment?.PaymentIntentId is { } paymentIntentId)
-                {
-                    var paymentIntentService = new PaymentIntentService(_stripeClient);
-                    var paymentIntent = await paymentIntentService.GetAsync(paymentIntentId);
-                    clientSecret = paymentIntent.ClientSecret;
-                }
-                else
-                {
-                    _logger.LogWarning("No payment found on invoice {InvoiceId} while creating subscription {SubscriptionId}", invoice.Id, subscription.Id);
-                }
+
                 return new SubscriptionCreateResponse
                 {
                     SubscriptionId = subscription.Id,
                     ClientSecret = clientSecret
                 };
 
-            
+
             }
             catch (StripeException ex)
             {
