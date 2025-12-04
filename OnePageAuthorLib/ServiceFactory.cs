@@ -6,6 +6,8 @@ using InkStainedWretch.OnePageAuthorLib.API.Penguin;
 using InkStainedWretch.OnePageAuthorLib.API.Amazon;
 using InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces.Authormanagement;
+using OnePageAuthorLib.Api.Stripe;
+using OnePageAuthorLib.Interfaces.Stripe;
 
 namespace InkStainedWretch.OnePageAuthorAPI
 {
@@ -234,6 +236,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<ICancelSubscription, CancelSubscriptionService>();
             services.AddScoped<IUpdateSubscription, UpdateSubscriptionService>();
             services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
+            services.AddScoped<IPaymentIntentClientSecretExtractor, PaymentIntentClientSecretExtractor>();
             services.AddScoped<IInvoicePreview>(sp =>
             {
                 var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<InvoicePreviewService>>();
@@ -241,6 +244,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 var keyProvider = sp.GetRequiredService<IStripeApiKeyProvider>();
                 return new InvoicePreviewService(logger, http, keyProvider);
             });
+            services.AddScoped<IInvoicePaymentIntentExtractor, InvoicePaymentIntentExtractor>();
             services.AddScoped<IStripeApiKeyProvider, StripeApiKeyProvider>();
             services.AddScoped<IStripeInvoiceServiceHelper>(sp =>
             {
@@ -251,6 +255,8 @@ namespace InkStainedWretch.OnePageAuthorAPI
             });
             services.AddScoped<IStripeWebhookSecretProvider, StripeWebhookSecretProvider>();
             services.AddScoped<IStripeWebhookHandler, StripeWebhookHandler>();
+            // Register service to fetch client secret from Invoice
+            services.AddScoped<IClientSecretFromInvoice, ClientSecretFromInvoice>();
             return services;
         }
 
