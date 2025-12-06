@@ -1,0 +1,60 @@
+[
+  {
+    "upn": "testuser@example.com",
+    "domain": {
+      "topLevelDomain": "com",
+      "secondLevelDomain": "testdomain"
+    },
+    "contactInformation": {
+      "firstName": "Test",
+      "lastName": "User",
+      "address": "123 Test Street",
+      "address2": "Suite 100",
+      "city": "Test City",
+      "state": "TX",
+      "country": "United States",
+      "zipCode": "75001",
+      "emailAddress": "testuser@example.com",
+      "telephoneNumber": "+1-555-123-4567"
+    },
+    "status": 0
+  },
+  {
+    "upn": "testuser@example.com",
+    "domain": {
+      "topLevelDomain": "org",
+      "secondLevelDomain": "mytestsite"
+    },
+    "contactInformation": {
+      "firstName": "Test",
+      "lastName": "User",
+      "address": "123 Test Street",
+      "city": "Test City",
+      "state": "TX",
+      "country": "United States",
+      "zipCode": "75001",
+      "emailAddress": "testuser@example.com",
+      "telephoneNumber": "+1-555-123-4567"
+    },
+    "status": 0
+  },
+  {
+    "upn": "anotheruser@example.com",
+    "domain": {
+      "topLevelDomain": "net",
+      "secondLevelDomain": "anothertest"
+    },
+    "contactInformation": {
+      "firstName": "Another",
+      "lastName": "User",
+      "address": "456 Another Street",
+      "city": "Another City",
+      "state": "CA",
+      "country": "United States",
+      "zipCode": "90210",
+      "emailAddress": "anotheruser@example.com",
+      "telephoneNumber": "+1-555-987-6543"
+    },
+    "status": 0
+  }
+]
