@@ -10,9 +10,6 @@ param appServicePlanName string = '${functionAppName}-plan'
 @description('The name of the Storage Account')
 param storageAccountName string = toLower(replace('${functionAppName}storage', '-', ''))
 
-@description('The .NET version to use')
-param dotnetVersion string = '9.0'
-
 // Storage Account for Function App
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageAccountName
@@ -75,7 +72,6 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           value: '1'
         }
       ]
-      netFrameworkVersion: 'v${dotnetVersion}'
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
     }

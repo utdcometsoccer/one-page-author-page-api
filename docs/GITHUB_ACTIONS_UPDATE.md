@@ -14,7 +14,7 @@ This document describes the updates made to the GitHub Actions workflows for the
 
 ### 2. Updated Main Workflow
 - **Updated**: `.github/workflows/main_onepageauthorapi.yml`
-  - Fixed .NET version from `10.0.x` to `9.0.x` (matching the actual project version)
+  - Confirmed .NET version is `10.0.x` (matching the actual project version)
   - Added conditional checks for all Azure deployment steps
   - Added infrastructure deployment step using Bicep templates
   - Workflow now gracefully skips Azure deployment if required secrets are missing
@@ -25,7 +25,7 @@ This document describes the updates made to the GitHub Actions workflows for the
   - Includes:
     - Storage Account (for Function App runtime)
     - App Service Plan (Consumption Y1 tier)
-    - Function App (.NET 9 isolated worker)
+    - Function App (.NET 10 isolated worker)
   - Configured with security best practices (HTTPS only, TLS 1.2, disabled public blob access)
 
 ### 4. Updated .gitignore
@@ -37,7 +37,7 @@ The updated workflow (`main_onepageauthorapi.yml`) performs the following steps:
 
 1. **Build Phase** (Always runs):
    - Checks out code
-   - Sets up .NET 9.0.x
+   - Sets up .NET 10.0.x
    - Builds and publishes the function-app project
    - Creates a zip package of the published output
 
@@ -114,7 +114,7 @@ The Bicep template (`infra/functionapp.bicep`) creates:
 - **Tier**: Dynamic (pay-per-execution)
 
 ### Function App
-- **Runtime**: .NET 9 isolated worker
+- **Runtime**: .NET 10 isolated worker
 - **Functions Version**: v4
 - **Configuration**:
   - `FUNCTIONS_WORKER_RUNTIME`: dotnet-isolated
@@ -160,7 +160,7 @@ The workflow will:
 ## Troubleshooting
 
 ### Build Fails
-- Ensure .NET 9.0.x SDK is available in the build environment
+- Ensure .NET 10.0.x SDK is available in the build environment
 - Check that `function-app/function-app.csproj` exists and is valid
 
 ### Infrastructure Deployment Fails
@@ -190,7 +190,7 @@ If you were using the old `main_authorpageapi.yml` workflow:
 3. **Secure**: Uses service principal authentication instead of hard-coded credentials
 4. **Modern**: Uses Bicep for infrastructure as code
 5. **Maintainable**: Single workflow file with clear conditional logic
-6. **Up-to-Date**: Uses correct .NET version (9.0.x) matching the project
+6. **Up-to-Date**: Uses correct .NET version (10.0.x) matching the project
 
 ## Future Enhancements
 
