@@ -269,3 +269,6 @@ __azurite_db_*.json
 
 # Local settings files are sanitized and safe to commit
 # Real credentials should be stored in User Secrets
+
+# Bicep compiled templates
+infra/*.json
