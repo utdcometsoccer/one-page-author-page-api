@@ -48,6 +48,15 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                          }
                 };
 
+                // Add domain name to metadata if provided
+                if (!string.IsNullOrWhiteSpace(request.DomainName))
+                {
+                    options.Metadata = new Dictionary<string, string>
+                    {
+                        { "domain_name", request.DomainName }
+                    };
+                }
+
                 Subscription subscription = await subscriptionService.CreateAsync(options);
                 // LatestInvoice is populated when expanded via 'latest_invoice.payment_intent'
                 clientSecret = subscription.LatestInvoice switch

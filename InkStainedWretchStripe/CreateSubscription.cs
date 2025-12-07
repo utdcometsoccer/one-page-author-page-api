@@ -17,7 +17,7 @@ namespace InkStainedWretchStripe;
 /// - Route: /api/CreateSubscription
 /// - Auth: Anonymous
 /// - Body: JSON with PascalCase properties matching <see cref="InkStainedWretch.OnePageAuthorLib.Entities.Stripe.CreateSubscriptionRequest"/>
-///   { "PriceId": "price_...", "CustomerId": "cus_..." }
+///   { "PriceId": "price_...", "CustomerId": "cus_...", "DomainName": "example.com" }
 /// - Response: 200 OK with <see cref="InkStainedWretch.OnePageAuthorLib.Entities.Stripe.SubscriptionCreateResponse"/>
 ///   { "SubscriptionId": "sub_...", "ClientSecret": "..." }
 /// - 400 on invalid JSON or missing required fields
@@ -27,6 +27,7 @@ namespace InkStainedWretchStripe;
 /// export type CreateSubscriptionRequest = {
 ///   PriceId: string;
 ///   CustomerId: string;
+///   DomainName?: string;
 /// };
 ///
 /// export type SubscriptionCreateResponse = {
@@ -51,7 +52,11 @@ namespace InkStainedWretchStripe;
 /// }
 ///
 /// Example call:
-///   await createSubscription("https://localhost:7292", { PriceId: "price_123", CustomerId: "cus_456" });
+///   await createSubscription("https://localhost:7292", { 
+///     PriceId: "price_123", 
+///     CustomerId: "cus_456",
+///     DomainName: "example.com"
+///   });
 /// </remarks>
 public class CreateSubscription
 {
