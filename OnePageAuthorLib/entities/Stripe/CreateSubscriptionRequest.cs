@@ -14,6 +14,12 @@ namespace InkStainedWretch.OnePageAuthorLib.Entities.Stripe
         /// The Stripe Customer ID (e.g., cus_...). Required by Stripe to create a subscription.
         /// </summary>
         public string CustomerId { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The domain name to associate with this subscription (e.g., "example.com").
+        /// Optional field that will be stored in Stripe subscription metadata.
+        /// </summary>
+        public string? DomainName { get; set; }
     }
 }
 
