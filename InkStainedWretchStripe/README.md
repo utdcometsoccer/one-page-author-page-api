@@ -20,6 +20,7 @@ Key functions and routes:
 - POST /api/CancelSubscription/{subscriptionId} — cancel a subscription
 - POST /api/UpdateSubscription/{subscriptionId} — update a subscription
 - GET  /api/ListSubscription/{customerId} — list subscriptions for a customer (supports query params)
+- GET  /api/FindSubscription — find subscriptions by customer email and domain (requires email and domain query params)
 - POST /api/InvoicePreview — preview upcoming invoice for a customer/subscription change
 - POST /api/WebHook — Stripe webhook receiver (Stripe sends events here)
 - POST /api/GetStripePriceInformation — retrieve filtered prices (body-driven)
@@ -339,6 +340,13 @@ List subscriptions for a customer with filters
 
 ```pwsh
 Invoke-RestMethod -Method Get -Uri "https://localhost:7292/api/ListSubscription/cus_123?status=active&limit=10"
+
+```
+
+Find subscriptions by customer email and domain
+
+```pwsh
+Invoke-RestMethod -Method Get -Uri "https://localhost:7292/api/FindSubscription?email=user@example.com&domain=example.com"
 
 ```
 
