@@ -106,6 +106,127 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # =========================================
+      # Deploy Cosmos DB Account (Conditional)
+      # =========================================
+
+      - name: 'Deploy Cosmos DB Account'
+        continue-on-error: true
+        shell: bash
+        env:
+          COSMOSDB_RESOURCE_GROUP: ${{ secrets.COSMOSDB_RESOURCE_GROUP }}
+          COSMOSDB_ACCOUNT_NAME: ${{ secrets.COSMOSDB_ACCOUNT_NAME }}
+          COSMOSDB_LOCATION: ${{ secrets.COSMOSDB_LOCATION }}
+          COSMOSDB_ENABLE_FREE_TIER: ${{ secrets.COSMOSDB_ENABLE_FREE_TIER }}
+          COSMOSDB_ENABLE_ZONE_REDUNDANCY: ${{ secrets.COSMOSDB_ENABLE_ZONE_REDUNDANCY }}
+        run: |
+          # Validate required secrets are available
+          if [ -z "$COSMOSDB_RESOURCE_GROUP" ] || [ -z "$COSMOSDB_ACCOUNT_NAME" ] || [ -z "$COSMOSDB_LOCATION" ]; then
+            echo "⚠️ Skipping Cosmos DB deployment: Required secrets not configured"
+            echo "   Required: COSMOSDB_RESOURCE_GROUP, COSMOSDB_ACCOUNT_NAME, COSMOSDB_LOCATION"
+            exit 0
+          fi
+
+          echo "✓ Checking if Cosmos DB Account exists..."
+          
+          # Check if resource group exists, create if it doesn't
+          if ! az group show --name "$COSMOSDB_RESOURCE_GROUP" &> /dev/null; then
+            echo "📦 Creating resource group: $COSMOSDB_RESOURCE_GROUP"
+            az group create --name "$COSMOSDB_RESOURCE_GROUP" --location "$COSMOSDB_LOCATION"
+          else
+            echo "✓ Resource group exists: $COSMOSDB_RESOURCE_GROUP"
+          fi
+
+          # Check if Cosmos DB Account exists
+          if ! az cosmosdb show --name "$COSMOSDB_ACCOUNT_NAME" --resource-group "$COSMOSDB_RESOURCE_GROUP" &> /dev/null; then
+            echo "📦 Cosmos DB Account does not exist. Deploying..."
+            
+            # Build deployment parameters
+            PARAMS="cosmosDbAccountName=$COSMOSDB_ACCOUNT_NAME location=$COSMOSDB_LOCATION"
+            
+            # Add optional free tier parameter if configured
+            if [ "$COSMOSDB_ENABLE_FREE_TIER" = "true" ]; then
+              PARAMS="$PARAMS enableFreeTier=true"
+              echo "✓ Free tier will be enabled"
+            else
+              PARAMS="$PARAMS enableFreeTier=false"
+            fi
+            
+            # Add optional zone redundancy parameter if configured
+            if [ "$COSMOSDB_ENABLE_ZONE_REDUNDANCY" = "true" ]; then
+              PARAMS="$PARAMS enableZoneRedundancy=true"
+              echo "✓ Zone redundancy will be enabled"
+            else
+              PARAMS="$PARAMS enableZoneRedundancy=false"
+              echo "⚠️ Zone redundancy disabled (recommended for development)"
+            fi
+            
+            # Deploy Cosmos DB Account
+            az deployment group create \
+              --resource-group "$COSMOSDB_RESOURCE_GROUP" \
+              --template-file infra/cosmosdb.bicep \
+              --parameters $PARAMS \
+              --output none
+            
+            echo "✓ Cosmos DB Account deployed successfully"
+            
+            # Note: Connection string and keys are available in deployment outputs
+            # but not displayed here for security reasons. They can be retrieved from
+            # Azure Portal or using Azure CLI: az cosmosdb keys list
+          else
+            echo "✓ Cosmos DB Account already exists. Skipping deployment."
+          fi
+
+      # =========================================
+      # Deploy Application Insights (Conditional)
+      # =========================================
+
+      - name: 'Deploy Application Insights'
+        continue-on-error: true
+        shell: bash
+        env:
+          COSMOSDB_RESOURCE_GROUP: ${{ secrets.COSMOSDB_RESOURCE_GROUP }}
+          APPINSIGHTS_NAME: ${{ secrets.APPINSIGHTS_NAME }}
+          COSMOSDB_LOCATION: ${{ secrets.COSMOSDB_LOCATION }}
+        run: |
+          # Validate required secrets are available
+          if [ -z "$COSMOSDB_RESOURCE_GROUP" ] || [ -z "$APPINSIGHTS_NAME" ] || [ -z "$COSMOSDB_LOCATION" ]; then
+            echo "⚠️ Skipping Application Insights deployment: Required secrets not configured"
+            echo "   Required: COSMOSDB_RESOURCE_GROUP, APPINSIGHTS_NAME, COSMOSDB_LOCATION"
+            exit 0
+          fi
+
+          echo "✓ Checking if Application Insights exists..."
+          
+          # Check if resource group exists (should exist from Cosmos DB step)
+          if ! az group show --name "$COSMOSDB_RESOURCE_GROUP" &> /dev/null; then
+            echo "📦 Creating resource group: $COSMOSDB_RESOURCE_GROUP"
+            az group create --name "$COSMOSDB_RESOURCE_GROUP" --location "$COSMOSDB_LOCATION"
+          else
+            echo "✓ Resource group exists: $COSMOSDB_RESOURCE_GROUP"
+          fi
+
+          # Check if Application Insights exists
+          if ! az monitor app-insights component show --app "$APPINSIGHTS_NAME" --resource-group "$COSMOSDB_RESOURCE_GROUP" &> /dev/null; then
+            echo "📦 Application Insights does not exist. Deploying..."
+            
+            # Deploy Application Insights
+            az deployment group create \
+              --resource-group "$COSMOSDB_RESOURCE_GROUP" \
+              --template-file infra/applicationinsights.bicep \
+              --parameters appInsightsName="$APPINSIGHTS_NAME" \
+                          location="$COSMOSDB_LOCATION" \
+              --output none
+            
+            echo "✓ Application Insights deployed successfully"
+            
+            # Note: Instrumentation key and connection string are available in deployment outputs
+            # but not displayed here for security reasons. They can be retrieved from
+            # Azure Portal or using Azure CLI: az monitor app-insights component show
+          else
+            echo "✓ Application Insights already exists. Skipping deployment."
+          fi
+
+      # =========================================
       # Deploy Existing function-app Infrastructure
       # =========================================
 
