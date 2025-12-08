@@ -1,4 +1,4 @@
-name: Build and deploy dotnet core project to Azure Function App - onepageauthorapi
+name: Build and deploy Azure Functions and Infrastructure
 
 on:
   push:
@@ -7,8 +7,12 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'function-app'
   DOTNET_VERSION: '10.0.x'
+  # Function App paths
+  FUNCTION_APP_PATH: 'function-app'
+  IMAGE_API_PATH: 'ImageAPI'
+  INK_STAINED_WRETCH_FUNCTIONS_PATH: 'InkStainedWretchFunctions'
+  INK_STAINED_WRETCH_STRIPE_PATH: 'InkStainedWretchStripe'
 
 jobs:
   build-and-deploy:
@@ -23,20 +27,77 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: 'Build and Publish Function App'
+      # =========================================
+      # Build all Function Apps
+      # =========================================
+
+      - name: 'Build and Publish function-app'
         shell: bash
         run: |
-          pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          echo "Building function-app..."
+          pushd '${{ env.FUNCTION_APP_PATH }}'
           dotnet build --configuration Release
           dotnet publish --configuration Release --output ./output
           popd
 
-      - name: 'Zip Published Output'
+      - name: 'Zip function-app Output'
         shell: bash
         run: |
-          cd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+          cd '${{ env.FUNCTION_APP_PATH }}/output'
           zip -r ../functionapp.zip .
           cd ../..
+
+      - name: 'Build and Publish ImageAPI'
+        shell: bash
+        run: |
+          echo "Building ImageAPI..."
+          pushd '${{ env.IMAGE_API_PATH }}'
+          dotnet build --configuration Release
+          dotnet publish --configuration Release --output ./output
+          popd
+
+      - name: 'Zip ImageAPI Output'
+        shell: bash
+        run: |
+          cd '${{ env.IMAGE_API_PATH }}/output'
+          zip -r ../imageapi.zip .
+          cd ../..
+
+      - name: 'Build and Publish InkStainedWretchFunctions'
+        shell: bash
+        run: |
+          echo "Building InkStainedWretchFunctions..."
+          pushd '${{ env.INK_STAINED_WRETCH_FUNCTIONS_PATH }}'
+          dotnet build --configuration Release
+          dotnet publish --configuration Release --output ./output
+          popd
+
+      - name: 'Zip InkStainedWretchFunctions Output'
+        shell: bash
+        run: |
+          cd '${{ env.INK_STAINED_WRETCH_FUNCTIONS_PATH }}/output'
+          zip -r ../inkstainedwretchfunctions.zip .
+          cd ../..
+
+      - name: 'Build and Publish InkStainedWretchStripe'
+        shell: bash
+        run: |
+          echo "Building InkStainedWretchStripe..."
+          pushd '${{ env.INK_STAINED_WRETCH_STRIPE_PATH }}'
+          dotnet build --configuration Release
+          dotnet publish --configuration Release --output ./output
+          popd
+
+      - name: 'Zip InkStainedWretchStripe Output'
+        shell: bash
+        run: |
+          cd '${{ env.INK_STAINED_WRETCH_STRIPE_PATH }}/output'
+          zip -r ../inkstainedwretchstripe.zip .
+          cd ../..
+
+      # =========================================
+      # Azure Authentication
+      # =========================================
 
       - name: 'Login to Azure'
         continue-on-error: true
@@ -44,7 +105,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: 'Deploy Azure Function Infrastructure'
+      # =========================================
+      # Deploy Existing function-app Infrastructure
+      # =========================================
+
+      - name: 'Deploy function-app Infrastructure'
         continue-on-error: true
         shell: bash
         env:
@@ -54,23 +119,26 @@ jobs:
         run: |
           # Validate required secrets are available
           if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ] || [ -z "$LOCATION" ]; then
-            echo "Skipping infrastructure deployment: Required secrets (AZURE_FUNCTIONAPP_NAME, AZURE_RESOURCE_GROUP, or AZURE_LOCATION) not configured"
+            echo "⚠️ Skipping function-app infrastructure deployment: Required secrets not configured"
+            echo "   Required: AZURE_FUNCTIONAPP_NAME, AZURE_RESOURCE_GROUP, AZURE_LOCATION"
             exit 0
           fi
-          
+
+          echo "✓ Checking if function-app exists..."
           # Check if Function App exists
           if ! az functionapp show --name "$FUNCTION_APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
-            echo "Function App does not exist. Deploying infrastructure..."
+            echo "📦 Function App does not exist. Deploying infrastructure..."
             az deployment group create \
               --resource-group "$RESOURCE_GROUP" \
               --template-file infra/functionapp.bicep \
               --parameters functionAppName="$FUNCTION_APP_NAME" \
                           location="$LOCATION"
+            echo "✓ Infrastructure deployed successfully"
           else
-            echo "Function App already exists. Skipping infrastructure deployment."
+            echo "✓ Function App already exists. Skipping infrastructure deployment."
           fi
 
-      - name: 'Deploy to Azure Function App using config-zip'
+      - name: 'Deploy to function-app'
         continue-on-error: true
         shell: bash
         env:
@@ -79,11 +147,171 @@ jobs:
         run: |
           # Validate required secrets are available
           if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ]; then
-            echo "Skipping deployment: Required secrets (AZURE_FUNCTIONAPP_NAME or AZURE_RESOURCE_GROUP) not configured"
+            echo "⚠️ Skipping function-app deployment: Required secrets not configured"
+            echo "   Required: AZURE_FUNCTIONAPP_NAME, AZURE_RESOURCE_GROUP"
             exit 0
           fi
-          
+
+          echo "🚀 Deploying function-app..."
           az functionapp deployment source config-zip \
             --name "$FUNCTION_APP_NAME" \
             --resource-group "$RESOURCE_GROUP" \
-            --src '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/functionapp.zip'
+            --src '${{ env.FUNCTION_APP_PATH }}/functionapp.zip'
+          echo "✓ function-app deployed successfully"
+
+      # =========================================
+      # Deploy Ink Stained Wretches Infrastructure
+      # =========================================
+
+      - name: 'Deploy Ink Stained Wretches Infrastructure'
+        continue-on-error: true
+        shell: bash
+        env:
+          ISW_RESOURCE_GROUP: ${{ secrets.ISW_RESOURCE_GROUP }}
+          ISW_LOCATION: ${{ secrets.ISW_LOCATION }}
+          ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
+          ISW_DNS_ZONE_NAME: ${{ secrets.ISW_DNS_ZONE_NAME }}
+          COSMOSDB_CONNECTION_STRING: ${{ secrets.COSMOSDB_CONNECTION_STRING }}
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          AAD_TENANT_ID: ${{ secrets.AAD_TENANT_ID }}
+          AAD_AUDIENCE: ${{ secrets.AAD_AUDIENCE }}
+        run: |
+          # Validate required secrets are available
+          if [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_LOCATION" ] || [ -z "$ISW_BASE_NAME" ]; then
+            echo "⚠️ Skipping Ink Stained Wretches infrastructure deployment: Required secrets not configured"
+            echo "   Required: ISW_RESOURCE_GROUP, ISW_LOCATION, ISW_BASE_NAME"
+            exit 0
+          fi
+
+          echo "📦 Deploying Ink Stained Wretches Infrastructure..."
+
+          # Check if resource group exists, create if it doesn't
+          if ! az group show --name "$ISW_RESOURCE_GROUP" &> /dev/null; then
+            echo "Creating resource group: $ISW_RESOURCE_GROUP"
+            az group create --name "$ISW_RESOURCE_GROUP" --location "$ISW_LOCATION"
+          else
+            echo "✓ Resource group exists: $ISW_RESOURCE_GROUP"
+          fi
+
+          # Build deployment parameters
+          PARAMS="baseName=$ISW_BASE_NAME location=$ISW_LOCATION"
+
+          # Add optional parameters if configured
+          if [ -n "$ISW_DNS_ZONE_NAME" ]; then
+            PARAMS="$PARAMS deployDnsZone=true dnsZoneName=$ISW_DNS_ZONE_NAME"
+            echo "✓ DNS Zone will be deployed: $ISW_DNS_ZONE_NAME"
+          else
+            PARAMS="$PARAMS deployDnsZone=false"
+            echo "⚠️ DNS Zone deployment skipped (ISW_DNS_ZONE_NAME not set)"
+          fi
+
+          # Deploy infrastructure
+          echo "🚀 Starting infrastructure deployment..."
+          az deployment group create \
+            --resource-group "$ISW_RESOURCE_GROUP" \
+            --template-file infra/inkstainedwretches.bicep \
+            --parameters $PARAMS \
+                        cosmosDbConnectionString="$COSMOSDB_CONNECTION_STRING" \
+                        stripeApiKey="$STRIPE_API_KEY" \
+                        aadTenantId="$AAD_TENANT_ID" \
+                        aadAudience="$AAD_AUDIENCE" \
+            --output json > deployment-output.json
+
+          echo "✓ Infrastructure deployment completed"
+
+          # Extract and display outputs
+          echo "📋 Deployment outputs:"
+          cat deployment-output.json | jq '.properties.outputs'
+
+      # =========================================
+      # Deploy ImageAPI Function App
+      # =========================================
+
+      - name: 'Deploy ImageAPI Function App'
+        continue-on-error: true
+        shell: bash
+        env:
+          ISW_RESOURCE_GROUP: ${{ secrets.ISW_RESOURCE_GROUP }}
+          ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
+          DEPLOY_IMAGE_API: ${{ secrets.DEPLOY_IMAGE_API }}
+        run: |
+          # Skip if ImageAPI deployment is not enabled
+          if [ "$DEPLOY_IMAGE_API" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
+            echo "⚠️ Skipping ImageAPI deployment"
+            echo "   DEPLOY_IMAGE_API=$DEPLOY_IMAGE_API"
+            echo "   ISW_RESOURCE_GROUP=$ISW_RESOURCE_GROUP"
+            echo "   ISW_BASE_NAME=$ISW_BASE_NAME"
+            exit 0
+          fi
+
+          FUNCTION_APP_NAME="${ISW_BASE_NAME}-imageapi"
+          echo "🚀 Deploying ImageAPI to: $FUNCTION_APP_NAME"
+
+          az functionapp deployment source config-zip \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$ISW_RESOURCE_GROUP" \
+            --src '${{ env.IMAGE_API_PATH }}/imageapi.zip'
+
+          echo "✓ ImageAPI deployed successfully"
+
+      # =========================================
+      # Deploy InkStainedWretchFunctions Function App
+      # =========================================
+
+      - name: 'Deploy InkStainedWretchFunctions Function App'
+        continue-on-error: true
+        shell: bash
+        env:
+          ISW_RESOURCE_GROUP: ${{ secrets.ISW_RESOURCE_GROUP }}
+          ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
+          DEPLOY_ISW_FUNCTIONS: ${{ secrets.DEPLOY_ISW_FUNCTIONS }}
+        run: |
+          # Skip if InkStainedWretchFunctions deployment is not enabled
+          if [ "$DEPLOY_ISW_FUNCTIONS" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
+            echo "⚠️ Skipping InkStainedWretchFunctions deployment"
+            echo "   DEPLOY_ISW_FUNCTIONS=$DEPLOY_ISW_FUNCTIONS"
+            echo "   ISW_RESOURCE_GROUP=$ISW_RESOURCE_GROUP"
+            echo "   ISW_BASE_NAME=$ISW_BASE_NAME"
+            exit 0
+          fi
+
+          FUNCTION_APP_NAME="${ISW_BASE_NAME}-functions"
+          echo "🚀 Deploying InkStainedWretchFunctions to: $FUNCTION_APP_NAME"
+
+          az functionapp deployment source config-zip \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$ISW_RESOURCE_GROUP" \
+            --src '${{ env.INK_STAINED_WRETCH_FUNCTIONS_PATH }}/inkstainedwretchfunctions.zip'
+
+          echo "✓ InkStainedWretchFunctions deployed successfully"
+
+      # =========================================
+      # Deploy InkStainedWretchStripe Function App
+      # =========================================
+
+      - name: 'Deploy InkStainedWretchStripe Function App'
+        continue-on-error: true
+        shell: bash
+        env:
+          ISW_RESOURCE_GROUP: ${{ secrets.ISW_RESOURCE_GROUP }}
+          ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
+          DEPLOY_ISW_STRIPE: ${{ secrets.DEPLOY_ISW_STRIPE }}
+        run: |
+          # Skip if InkStainedWretchStripe deployment is not enabled
+          if [ "$DEPLOY_ISW_STRIPE" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
+            echo "⚠️ Skipping InkStainedWretchStripe deployment"
+            echo "   DEPLOY_ISW_STRIPE=$DEPLOY_ISW_STRIPE"
+            echo "   ISW_RESOURCE_GROUP=$ISW_RESOURCE_GROUP"
+            echo "   ISW_BASE_NAME=$ISW_BASE_NAME"
+            exit 0
+          fi
+
+          FUNCTION_APP_NAME="${ISW_BASE_NAME}-stripe"
+          echo "🚀 Deploying InkStainedWretchStripe to: $FUNCTION_APP_NAME"
+
+          az functionapp deployment source config-zip \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$ISW_RESOURCE_GROUP" \
+            --src '${{ env.INK_STAINED_WRETCH_STRIPE_PATH }}/inkstainedwretchstripe.zip'
+
+          echo "✓ InkStainedWretchStripe deployed successfully"
