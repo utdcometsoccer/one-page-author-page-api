@@ -171,8 +171,6 @@ jobs:
           ISW_LOCATION: ${{ secrets.ISW_LOCATION }}
           ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
           ISW_DNS_ZONE_NAME: ${{ secrets.ISW_DNS_ZONE_NAME }}
-          ISW_STATIC_WEB_APP_REPO_URL: ${{ secrets.ISW_STATIC_WEB_APP_REPO_URL }}
-          ISW_STATIC_WEB_APP_BRANCH: ${{ secrets.ISW_STATIC_WEB_APP_BRANCH }}
           COSMOSDB_CONNECTION_STRING: ${{ secrets.COSMOSDB_CONNECTION_STRING }}
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
           AAD_TENANT_ID: ${{ secrets.AAD_TENANT_ID }}
@@ -205,17 +203,6 @@ jobs:
           else
             PARAMS="$PARAMS deployDnsZone=false"
             echo "⚠️ DNS Zone deployment skipped (ISW_DNS_ZONE_NAME not set)"
-          fi
-
-          if [ -n "$ISW_STATIC_WEB_APP_REPO_URL" ]; then
-            PARAMS="$PARAMS deployStaticWebApp=true staticWebAppRepoUrl=$ISW_STATIC_WEB_APP_REPO_URL"
-            if [ -n "$ISW_STATIC_WEB_APP_BRANCH" ]; then
-              PARAMS="$PARAMS staticWebAppBranch=$ISW_STATIC_WEB_APP_BRANCH"
-            fi
-            echo "✓ Static Web App will be deployed: $ISW_STATIC_WEB_APP_REPO_URL"
-          else
-            PARAMS="$PARAMS deployStaticWebApp=false"
-            echo "⚠️ Static Web App deployment skipped (ISW_STATIC_WEB_APP_REPO_URL not set)"
           fi
 
           # Deploy infrastructure

@@ -7,7 +7,6 @@
 // - Key Vault
 // - DNS Zone
 // - Application Insights
-// - Static Web App
 // - Three Function Apps (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStripe)
 
 @description('The base name for all resources (used to generate unique names)')
@@ -30,15 +29,6 @@ param dnsZoneName string = ''
 
 @description('Whether to deploy Application Insights')
 param deployAppInsights bool = true
-
-@description('Whether to deploy the Static Web App')
-param deployStaticWebApp bool = true
-
-@description('GitHub repository URL for Static Web App')
-param staticWebAppRepoUrl string = ''
-
-@description('GitHub branch for Static Web App')
-param staticWebAppBranch string = 'main'
 
 @description('Whether to deploy the ImageAPI Function App')
 param deployImageApi bool = true
@@ -72,7 +62,6 @@ var storageAccountNameRaw = toLower(replace(replace(baseName, '-', ''), '_', '')
 var storageAccountName = length(storageAccountNameRaw) > 24 ? substring(storageAccountNameRaw, 0, 24) : storageAccountNameRaw
 var keyVaultName = toLower('${baseName}-kv')
 var appInsightsName = '${baseName}-insights'
-var staticWebAppName = '${baseName}-webapp'
 var imageApiFunctionName = '${baseName}-imageapi'
 var inkStainedWretchFunctionsName = '${baseName}-functions'
 var inkStainedWretchStripeName = '${baseName}-stripe'
@@ -168,26 +157,6 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = if (deployAppI
 }
 
 // =========================================
-// Static Web App
-// =========================================
-
-resource staticWebApp 'Microsoft.Web/staticSites@2024-04-01' = if (deployStaticWebApp && !empty(staticWebAppRepoUrl)) {
-  name: staticWebAppName
-  location: location
-  sku: {
-    name: 'Free'
-    tier: 'Free'
-  }
-  properties: {
-    repositoryUrl: staticWebAppRepoUrl
-    branch: staticWebAppBranch
-    stagingEnvironmentPolicy: 'Enabled'
-    allowConfigFileUpdates: true
-    provider: 'GitHub'
-    enterpriseGradeCdnStatus: 'Disabled'
-  }
-}
-
 // =========================================
 // App Service Plan (Consumption)
 // =========================================
@@ -398,8 +367,6 @@ output dnsZoneName string = deployDnsZone && !empty(dnsZoneName) ? dnsZone.name 
 output appInsightsName string = deployAppInsights ? appInsights.name : ''
 output appInsightsInstrumentationKey string = deployAppInsights ? appInsights.properties.InstrumentationKey : ''
 output appInsightsConnectionString string = deployAppInsights ? appInsights.properties.ConnectionString : ''
-output staticWebAppName string = deployStaticWebApp && !empty(staticWebAppRepoUrl) ? staticWebApp.name : ''
-output staticWebAppUrl string = deployStaticWebApp && !empty(staticWebAppRepoUrl) ? 'https://${staticWebApp.properties.defaultHostname}' : ''
 output imageApiFunctionName string = deployImageApi && deployStorageAccount ? imageApiFunctionApp.name : ''
 output imageApiFunctionUrl string = deployImageApi && deployStorageAccount ? 'https://${imageApiFunctionApp.properties.defaultHostName}' : ''
 output inkStainedWretchFunctionsName string = deployInkStainedWretchFunctions && deployStorageAccount ? inkStainedWretchFunctionsApp.name : ''
