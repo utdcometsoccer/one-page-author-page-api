@@ -594,6 +594,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 var response = DomainRegistrationResponse.FromEntity(updatedRegistration);
                 return new OkObjectResult(response);
             }
+            // Catch subscription-specific InvalidOperationException first (more specific handler)
             catch (InvalidOperationException ex) when (ex.Message.Contains("subscription"))
             {
                 _logger.LogWarning(ex, "Subscription validation failed for user updating domain registration {RegistrationId}", registrationId);
@@ -607,6 +608,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 _logger.LogWarning(ex, "Validation error in domain registration update request");
                 return new BadRequestObjectResult(new { error = ex.Message });
             }
+            // Catch other InvalidOperationException instances (general handler)
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Invalid operation in domain registration update request");

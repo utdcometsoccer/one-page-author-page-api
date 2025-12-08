@@ -198,7 +198,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 status: "active",
                 limit: 1);
 
-            if (subscriptionsResponse?.Subscriptions?.Data == null || !subscriptionsResponse.Subscriptions.Data.Any())
+            if (subscriptionsResponse?.Subscriptions?.Data == null || subscriptionsResponse.Subscriptions.Data.Count == 0)
             {
                 _logger.LogWarning("User {Upn} does not have any active subscriptions", upn);
                 throw new InvalidOperationException("User does not have an active subscription. Please subscribe to update domain registrations.");
