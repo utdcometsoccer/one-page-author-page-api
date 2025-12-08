@@ -117,6 +117,74 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             return await _repository.UpdateAsync(existingRegistration);
         }
 
+        public async Task<DomainRegistration?> UpdateDomainRegistrationAsync(
+            ClaimsPrincipal user,
+            string registrationId,
+            Domain? domain = null,
+            ContactInformation? contactInformation = null,
+            DomainRegistrationStatus? status = null)
+        {
+            var upn = _userIdentityService.GetUserUpn(user);
+            
+            _logger.LogInformation("Updating domain registration {RegistrationId} for user {Upn}", 
+                registrationId, upn);
+
+            // Get existing registration first to know the domain
+            var existingRegistration = await _repository.GetByIdAsync(registrationId, upn);
+            if (existingRegistration == null)
+            {
+                _logger.LogWarning("Domain registration {RegistrationId} not found for user {Upn}", 
+                    registrationId, upn);
+                return null;
+            }
+
+            // Validate subscription for the domain
+            var domainToValidate = domain?.FullDomainName ?? existingRegistration.Domain.FullDomainName;
+            var hasValidSubscription = await _subscriptionValidationService.HasValidSubscriptionAsync(user, domainToValidate);
+            if (!hasValidSubscription)
+            {
+                _logger.LogWarning("User {Upn} does not have a valid subscription for domain {Domain}", upn, domainToValidate);
+                throw new InvalidOperationException($"User does not have an active subscription for domain '{domainToValidate}'. Please subscribe to update domain registrations.");
+            }
+
+            // Update domain if provided
+            if (domain != null)
+            {
+                // Validate domain information using the dedicated service
+                var domainValidationResult = _domainValidationService.ValidateDomain(domain);
+                if (!domainValidationResult.IsValid)
+                {
+                    var errorMessage = string.Join("; ", domainValidationResult.Errors);
+                    _logger.LogWarning("Domain validation failed for user {Upn}: {Errors}", upn, errorMessage);
+                    throw new ArgumentException($"Domain validation failed: {errorMessage}", nameof(domain));
+                }
+                
+                existingRegistration.Domain = domain;
+            }
+
+            // Update contact information if provided
+            if (contactInformation != null)
+            {
+                // Validate contact information using the dedicated service
+                var contactValidationResult = _contactValidationService.ValidateContactInformation(contactInformation);
+                if (!contactValidationResult.IsValid)
+                {
+                    var errorMessage = string.Join("; ", contactValidationResult.Errors);
+                    _logger.LogWarning("Contact information validation failed for user {Upn}: {Errors}", upn, errorMessage);
+                    throw new ArgumentException($"Contact information validation failed: {errorMessage}", nameof(contactInformation));
+                }
+                
+                existingRegistration.ContactInformation = contactInformation;
+            }
+
+            // Update status if provided
+            if (status.HasValue)
+            {
+                existingRegistration.Status = status.Value;
+            }
+
+            return await _repository.UpdateAsync(existingRegistration);
+        }
 
     }
 }

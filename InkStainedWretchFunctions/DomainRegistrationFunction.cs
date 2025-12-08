@@ -414,5 +414,211 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 return new StatusCodeResult(500);
             }
         }
+
+        /// <summary>
+        /// Updates an existing domain registration for the authenticated user.
+        /// Requires an active subscription to perform updates.
+        /// </summary>
+        /// <param name="req">HTTP request containing the update data</param>
+        /// <param name="registrationId">The registration ID from the route</param>
+        /// <param name="payload">Domain registration update payload with optional fields</param>
+        /// <returns>
+        /// <list type="table">
+        /// <item>
+        /// <term>200 OK</term>
+        /// <description>Domain registration updated successfully - returns DomainRegistrationResponse</description>
+        /// </item>
+        /// <item>
+        /// <term>400 Bad Request</term>
+        /// <description>Invalid request body, validation failed, or missing registration ID</description>
+        /// </item>
+        /// <item>
+        /// <term>401 Unauthorized</term>
+        /// <description>Invalid or missing JWT token</description>
+        /// </item>
+        /// <item>
+        /// <term>403 Forbidden</term>
+        /// <description>User does not have an active subscription</description>
+        /// </item>
+        /// <item>
+        /// <term>404 Not Found</term>
+        /// <description>Domain registration not found or doesn't belong to user</description>
+        /// </item>
+        /// <item>
+        /// <term>500 Internal Server Error</term>
+        /// <description>Unexpected server error during update</description>
+        /// </item>
+        /// </list>
+        /// </returns>
+        /// <example>
+        /// <para><strong>TypeScript Example:</strong></para>
+        /// <code>
+        /// interface UpdateDomainRequest {
+        ///   Domain?: {                        // Optional - only updated if provided
+        ///     TopLevelDomain: string;
+        ///     SecondLevelDomain: string;
+        ///   };
+        ///   ContactInformation?: {            // Optional - only updated if provided
+        ///     FirstName: string;
+        ///     LastName: string;
+        ///     Email: string;
+        ///     Phone: string;
+        ///     Address: {
+        ///       Street: string;
+        ///       City: string;
+        ///       State: string;
+        ///       PostalCode: string;
+        ///       Country: string;
+        ///     };
+        ///   };
+        ///   Status?: string;                  // Optional - only updated if provided
+        /// }
+        /// 
+        /// const updateDomain = async (
+        ///   registrationId: string,
+        ///   updates: UpdateDomainRequest,
+        ///   token: string
+        /// ) => {
+        ///   const response = await fetch(`/api/domain-registrations/${registrationId}`, {
+        ///     method: 'PUT',
+        ///     headers: {
+        ///       'Authorization': `Bearer ${token}`,
+        ///       'Content-Type': 'application/json'
+        ///     },
+        ///     body: JSON.stringify(updates)
+        ///   });
+        /// 
+        ///   if (response.ok) {
+        ///     return await response.json();
+        ///   } else if (response.status === 403) {
+        ///     throw new Error('Active subscription required to update domain');
+        ///   } else if (response.status === 404) {
+        ///     throw new Error('Domain registration not found');
+        ///   } else if (response.status === 400) {
+        ///     const error = await response.json();
+        ///     throw new Error(`Invalid request: ${error.error}`);
+        ///   }
+        /// 
+        ///   throw new Error('Domain update failed');
+        /// };
+        /// 
+        /// // Usage - update contact information only
+        /// try {
+        ///   const result = await updateDomain(
+        ///     'registration-123',
+        ///     {
+        ///       ContactInformation: {
+        ///         FirstName: "Jane",
+        ///         LastName: "Smith",
+        ///         Email: "jane@example.com",
+        ///         Phone: "+1234567890",
+        ///         Address: {
+        ///           Street: "456 Oak Ave",
+        ///           City: "Newtown",
+        ///           State: "NY",
+        ///           PostalCode: "54321",
+        ///           Country: "US"
+        ///         }
+        ///       }
+        ///     },
+        ///     userToken
+        ///   );
+        ///   console.log('Domain updated:', result);
+        /// } catch (error) {
+        ///   console.error('Update failed:', error.message);
+        /// }
+        /// </code>
+        /// </example>
+        [Function("UpdateDomainRegistration")]
+        public async Task<IActionResult> UpdateDomainRegistration(
+            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "domain-registrations/{registrationId}")] HttpRequest req,
+            string registrationId,
+            [FromBody] UpdateDomainRegistrationRequest payload)
+        {
+            _logger.LogInformation("UpdateDomainRegistration function processed a request for ID: {RegistrationId}", registrationId);
+
+            // Validate JWT token and get authenticated user
+            var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+            if (authError != null)
+            {
+                return authError;
+            }
+
+            try
+            {
+                // Ensure user profile exists
+                var userProfile = await _userProfileService.EnsureUserProfileAsync(authenticatedUser!);
+                _logger.LogInformation("User profile validated for user: {Upn}", userProfile.Upn);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "User profile validation failed for UpdateDomainRegistration");
+                return new UnauthorizedObjectResult(new { error = "User profile validation failed" });
+            }
+
+            if (string.IsNullOrWhiteSpace(registrationId))
+            {
+                return new BadRequestObjectResult(new { error = "Registration ID is required" });
+            }
+
+            if (payload is null)
+            {
+                return new BadRequestObjectResult(new { error = "Request body is required." });
+            }
+
+            // Validate that at least one field is provided for update
+            if (payload.Domain == null && payload.ContactInformation == null && payload.Status == null)
+            {
+                return new BadRequestObjectResult(new { error = "At least one field must be provided for update (Domain, ContactInformation, or Status)." });
+            }
+
+            try
+            {
+                // Update domain registration with subscription validation
+                var updatedRegistration = await _domainRegistrationService.UpdateDomainRegistrationAsync(
+                    authenticatedUser!,
+                    registrationId,
+                    payload.Domain?.ToEntity(),
+                    payload.ContactInformation?.ToEntity(),
+                    payload.Status);
+
+                if (updatedRegistration == null)
+                {
+                    _logger.LogInformation("Domain registration {RegistrationId} not found for user", registrationId);
+                    return new NotFoundObjectResult(new { error = $"Domain registration {registrationId} not found" });
+                }
+
+                _logger.LogInformation("Domain registration {RegistrationId} updated successfully", registrationId);
+
+                // Return updated response
+                var response = DomainRegistrationResponse.FromEntity(updatedRegistration);
+                return new OkObjectResult(response);
+            }
+            // Catch subscription-specific InvalidOperationException first (more specific handler)
+            catch (InvalidOperationException ex) when (ex.Message.Contains("subscription"))
+            {
+                _logger.LogWarning(ex, "Subscription validation failed for user updating domain registration {RegistrationId}", registrationId);
+                return new ObjectResult(new { error = ex.Message })
+                {
+                    StatusCode = StatusCodes.Status403Forbidden
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Validation error in domain registration update request");
+                return new BadRequestObjectResult(new { error = ex.Message });
+            }
+            // Catch other InvalidOperationException instances (general handler)
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Invalid operation in domain registration update request");
+                return new BadRequestObjectResult(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating domain registration {RegistrationId}", registrationId);
+                return new StatusCodeResult(500);
+            }
+        }
     }
 }
