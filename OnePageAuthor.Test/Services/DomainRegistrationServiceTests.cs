@@ -19,6 +19,8 @@ namespace OnePageAuthor.Test.Services
         private readonly Mock<IUserIdentityService> _mockUserIdentityService;
         private readonly Mock<IDomainValidationService> _mockDomainValidationService;
         private readonly Mock<IContactInformationValidationService> _mockContactValidationService;
+        private readonly Mock<IUserProfileRepository> _mockUserProfileRepository;
+        private readonly Mock<InkStainedWretch.OnePageAuthorLib.API.Stripe.IListSubscriptions> _mockListSubscriptions;
         private readonly DomainRegistrationService _service;
         private readonly ClaimsPrincipal _testUser;
 
@@ -29,13 +31,17 @@ namespace OnePageAuthor.Test.Services
             _mockUserIdentityService = new Mock<IUserIdentityService>();
             _mockDomainValidationService = new Mock<IDomainValidationService>();
             _mockContactValidationService = new Mock<IContactInformationValidationService>();
+            _mockUserProfileRepository = new Mock<IUserProfileRepository>();
+            _mockListSubscriptions = new Mock<InkStainedWretch.OnePageAuthorLib.API.Stripe.IListSubscriptions>();
             
             _service = new DomainRegistrationService(
                 _mockLogger.Object,
                 _mockRepository.Object,
                 _mockUserIdentityService.Object,
                 _mockDomainValidationService.Object,
-                _mockContactValidationService.Object);
+                _mockContactValidationService.Object,
+                _mockUserProfileRepository.Object,
+                _mockListSubscriptions.Object);
 
             _testUser = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
@@ -52,7 +58,9 @@ namespace OnePageAuthor.Test.Services
                 _mockRepository.Object,
                 _mockUserIdentityService.Object,
                 _mockDomainValidationService.Object,
-                _mockContactValidationService.Object));
+                _mockContactValidationService.Object,
+                _mockUserProfileRepository.Object,
+                _mockListSubscriptions.Object));
         }
 
         [Fact]
@@ -64,7 +72,9 @@ namespace OnePageAuthor.Test.Services
                 null!,
                 _mockUserIdentityService.Object,
                 _mockDomainValidationService.Object,
-                _mockContactValidationService.Object));
+                _mockContactValidationService.Object,
+                _mockUserProfileRepository.Object,
+                _mockListSubscriptions.Object));
         }
 
         [Fact]
@@ -76,7 +86,9 @@ namespace OnePageAuthor.Test.Services
                 _mockRepository.Object,
                 null!,
                 _mockDomainValidationService.Object,
-                _mockContactValidationService.Object));
+                _mockContactValidationService.Object,
+                _mockUserProfileRepository.Object,
+                _mockListSubscriptions.Object));
         }
 
         [Fact]
@@ -88,7 +100,9 @@ namespace OnePageAuthor.Test.Services
                 _mockRepository.Object,
                 _mockUserIdentityService.Object,
                 null!,
-                _mockContactValidationService.Object));
+                _mockContactValidationService.Object,
+                _mockUserProfileRepository.Object,
+                _mockListSubscriptions.Object));
         }
 
         [Fact]
@@ -100,7 +114,9 @@ namespace OnePageAuthor.Test.Services
                 _mockRepository.Object,
                 _mockUserIdentityService.Object,
                 _mockDomainValidationService.Object,
-                null!));
+                null!,
+                _mockUserProfileRepository.Object,
+                _mockListSubscriptions.Object));
         }
 
         [Fact]
