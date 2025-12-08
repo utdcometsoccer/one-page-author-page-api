@@ -23,6 +23,9 @@ param enableFreeTier bool = false
 ])
 param capacityMode string = 'Serverless'
 
+@description('Enable zone redundancy for high availability (may increase costs)')
+param enableZoneRedundancy bool = false
+
 @description('Minimum TLS version')
 @allowed([
   'Tls'
@@ -70,7 +73,7 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
       {
         locationName: location
         failoverPriority: 0
-        isZoneRedundant: true
+        isZoneRedundant: enableZoneRedundancy
       }
     ]
     cors: []

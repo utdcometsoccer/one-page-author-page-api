@@ -19,6 +19,7 @@ To enable Cosmos DB and Application Insights deployment, configure the following
 | `COSMOSDB_ACCOUNT_NAME` | Cosmos DB account name (globally unique) | ✅ Yes | `one-page-author-db-account` |
 | `COSMOSDB_LOCATION` | Azure region for deployment | ✅ Yes | `eastus`, `westus2`, `centralus` |
 | `COSMOSDB_ENABLE_FREE_TIER` | Enable free tier (one per subscription) | ❌ Optional | `true` or `false` |
+| `COSMOSDB_ENABLE_ZONE_REDUNDANCY` | Enable zone redundancy for HA (increases cost) | ❌ Optional | `true` or `false` (default: `false`) |
 
 ### Application Insights Deployment Secrets
 
@@ -69,8 +70,8 @@ The workflow will:
 - **API**: Core (SQL) API
 - **Consistency Level**: Session (default)
 - **Automatic Failover**: Enabled
+- **Zone Redundancy**: Optional (disabled by default to reduce costs, enable for production with `COSMOSDB_ENABLE_ZONE_REDUNDANCY=true`)
 - **TLS Version**: 1.2 (minimum)
-- **Zone Redundancy**: Enabled for high availability
 - **Backup**: Periodic mode with geo-redundant storage
 
 ### Application Insights Deployment
@@ -167,6 +168,7 @@ COSMOSDB_RESOURCE_GROUP=rg-data-prod
 COSMOSDB_ACCOUNT_NAME=onepageauthor-db-prod
 COSMOSDB_LOCATION=eastus
 COSMOSDB_ENABLE_FREE_TIER=false
+COSMOSDB_ENABLE_ZONE_REDUNDANCY=true
 APPINSIGHTS_NAME=onepageauthor-insights-prod
 
 # Function Apps (existing)
@@ -183,6 +185,7 @@ COSMOSDB_RESOURCE_GROUP=rg-data-dev
 COSMOSDB_ACCOUNT_NAME=onepageauthor-db-dev
 COSMOSDB_LOCATION=westus2
 COSMOSDB_ENABLE_FREE_TIER=true
+COSMOSDB_ENABLE_ZONE_REDUNDANCY=false
 APPINSIGHTS_NAME=onepageauthor-insights-dev
 
 # Function Apps (existing)
