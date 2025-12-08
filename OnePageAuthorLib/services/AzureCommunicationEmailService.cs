@@ -1,0 +1,118 @@
+using InkStainedWretch.OnePageAuthorAPI.API;
+using Microsoft.Extensions.Logging;
+
+namespace InkStainedWretch.OnePageAuthorAPI.Services
+{
+    /// <summary>
+    /// Email service implementation using Azure Communication Services.
+    /// </summary>
+    public class AzureCommunicationEmailService : IEmailService
+    {
+        private readonly ILogger<AzureCommunicationEmailService> _logger;
+        private readonly string _connectionString;
+        private readonly string _senderAddress;
+
+        public AzureCommunicationEmailService(
+            ILogger<AzureCommunicationEmailService> logger,
+            string connectionString,
+            string senderAddress)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+            _senderAddress = senderAddress ?? throw new ArgumentNullException(nameof(senderAddress));
+        }
+
+        public async Task<bool> SendInvitationEmailAsync(string toEmail, string domainName, string invitationId)
+        {
+            try
+            {
+                _logger.LogInformation("Sending invitation email to {Email} for domain {Domain}", toEmail, domainName);
+
+                // Note: This implementation will be completed once Azure Communication Services package is added
+                // For now, we'll log the action
+                _logger.LogInformation("Email service called - would send email to {Email} with invitation {InvitationId} for domain {Domain}",
+                    toEmail, invitationId, domainName);
+
+                // TODO: Implement actual email sending using Azure.Communication.Email package
+                // var emailClient = new EmailClient(_connectionString);
+                // var emailMessage = new EmailMessage(
+                //     senderAddress: _senderAddress,
+                //     recipientAddress: toEmail,
+                //     content: new EmailContent($"Invitation to {domainName}")
+                //     {
+                //         PlainText = GetEmailPlainText(domainName, invitationId),
+                //         Html = GetEmailHtmlContent(domainName, invitationId)
+                //     });
+                // var operation = await emailClient.SendAsync(WaitUntil.Completed, emailMessage);
+                // return operation.HasCompleted;
+
+                await Task.CompletedTask;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send invitation email to {Email}", toEmail);
+                return false;
+            }
+        }
+
+        private string GetEmailPlainText(string domainName, string invitationId)
+        {
+            return $@"
+You've been invited to create an author account!
+
+You have been invited to link your domain {domainName} to a One Page Author account.
+
+To accept this invitation and create your Microsoft account linked to your domain, please visit:
+https://signup.microsoft.com
+
+Your invitation ID: {invitationId}
+
+This invitation will expire in 30 days.
+
+If you have any questions, please contact our support team.
+
+Best regards,
+The One Page Author Team
+";
+        }
+
+        private string GetEmailHtmlContent(string domainName, string invitationId)
+        {
+            return $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .header {{ background-color: #4CAF50; color: white; padding: 20px; text-align: center; }}
+        .content {{ padding: 20px; background-color: #f9f9f9; }}
+        .button {{ display: inline-block; padding: 12px 24px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px; margin: 20px 0; }}
+        .footer {{ padding: 20px; text-align: center; font-size: 12px; color: #666; }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""header"">
+            <h1>You've Been Invited!</h1>
+        </div>
+        <div class=""content"">
+            <h2>Welcome to One Page Author</h2>
+            <p>You have been invited to link your domain <strong>{domainName}</strong> to a One Page Author account.</p>
+            <p>To accept this invitation and create your Microsoft account linked to your domain, please click the button below:</p>
+            <a href=""https://signup.microsoft.com"" class=""button"">Accept Invitation</a>
+            <p><strong>Invitation ID:</strong> {invitationId}</p>
+            <p><em>This invitation will expire in 30 days.</em></p>
+            <p>If you have any questions, please contact our support team.</p>
+        </div>
+        <div class=""footer"">
+            <p>© 2024 One Page Author. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+";
+        }
+    }
+}

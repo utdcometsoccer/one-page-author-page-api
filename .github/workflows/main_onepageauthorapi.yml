@@ -175,6 +175,7 @@ jobs:
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
           AAD_TENANT_ID: ${{ secrets.AAD_TENANT_ID }}
           AAD_AUDIENCE: ${{ secrets.AAD_AUDIENCE }}
+          DEPLOY_COMMUNICATION_SERVICES: ${{ secrets.DEPLOY_COMMUNICATION_SERVICES }}
         run: |
           # Validate required secrets are available
           if [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_LOCATION" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -203,6 +204,15 @@ jobs:
           else
             PARAMS="$PARAMS deployDnsZone=false"
             echo "⚠️ DNS Zone deployment skipped (ISW_DNS_ZONE_NAME not set)"
+          fi
+
+          # Add Communication Services deployment parameter
+          if [ "$DEPLOY_COMMUNICATION_SERVICES" = "true" ]; then
+            PARAMS="$PARAMS deployCommunicationServices=true"
+            echo "✓ Azure Communication Services will be deployed for email notifications"
+          else
+            PARAMS="$PARAMS deployCommunicationServices=false"
+            echo "⚠️ Communication Services deployment skipped (DEPLOY_COMMUNICATION_SERVICES not set to 'true')"
           fi
 
           # Deploy infrastructure
