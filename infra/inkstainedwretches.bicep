@@ -67,7 +67,9 @@ param aadAudience string = ''
 // Variables
 // =========================================
 
-var storageAccountName = toLower(replace('${baseName}storage', '-', ''))
+// Sanitize storage account name - remove all non-alphanumeric characters and convert to lowercase
+var storageAccountNameRaw = toLower(replace(replace(baseName, '-', ''), '_', ''))
+var storageAccountName = length(storageAccountNameRaw) > 24 ? substring(storageAccountNameRaw, 0, 24) : storageAccountNameRaw
 var keyVaultName = toLower('${baseName}-kv')
 var appInsightsName = '${baseName}-insights'
 var staticWebAppName = '${baseName}-webapp'
@@ -75,6 +77,9 @@ var imageApiFunctionName = '${baseName}-imageapi'
 var inkStainedWretchFunctionsName = '${baseName}-functions'
 var inkStainedWretchStripeName = '${baseName}-stripe'
 var appServicePlanName = '${baseName}-plan'
+
+// Storage account connection string (used by all Function Apps)
+var storageConnectionString = deployStorageAccount ? 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}' : ''
 
 // =========================================
 // Storage Account
@@ -213,11 +218,11 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+          value: storageConnectionString
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+          value: storageConnectionString
         }
         {
           name: 'WEBSITE_CONTENTSHARE'
@@ -273,11 +278,11 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+          value: storageConnectionString
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+          value: storageConnectionString
         }
         {
           name: 'WEBSITE_CONTENTSHARE'
@@ -333,11 +338,11 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+          value: storageConnectionString
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+          value: storageConnectionString
         }
         {
           name: 'WEBSITE_CONTENTSHARE'
