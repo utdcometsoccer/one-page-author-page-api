@@ -28,6 +28,20 @@ To enable Cosmos DB and Application Insights deployment, configure the following
 
 **Note**: Application Insights uses the same resource group and location as Cosmos DB (`COSMOSDB_RESOURCE_GROUP` and `COSMOSDB_LOCATION`).
 
+### Relationship with Existing Cosmos DB Connection String
+
+The workflow also references an existing `COSMOSDB_CONNECTION_STRING` secret that is used by the Ink Stained Wretches infrastructure deployment. This secret serves two purposes:
+
+1. **For existing deployments**: If you already have a Cosmos DB instance, `COSMOSDB_CONNECTION_STRING` should point to that existing instance
+2. **For new deployments**: After deploying a new Cosmos DB Account using this workflow, you should update the `COSMOSDB_CONNECTION_STRING` secret with the connection string from the newly deployed account
+
+**To retrieve the connection string after deployment:**
+```bash
+az cosmosdb keys list --name <COSMOSDB_ACCOUNT_NAME> --resource-group <COSMOSDB_RESOURCE_GROUP> --type connection-strings --query "connectionStrings[0].connectionString" -o tsv
+```
+
+Then update the `COSMOSDB_CONNECTION_STRING` secret in GitHub with this value.
+
 ## How to Configure Secrets
 
 1. Navigate to your GitHub repository
@@ -195,12 +209,22 @@ Ensure your Azure credentials (`AZURE_CREDENTIALS` secret) have permission to cr
 
 ## Security Considerations
 
-1. **Secrets Protection**: The Bicep templates output sensitive information (keys, connection strings) which are only visible in deployment logs for authorized users
-2. **Public Network Access**: Both resources are configured with public network access enabled. For production, consider:
+1. **Sensitive Outputs Protection**: 
+   - Connection strings and keys are NOT displayed in workflow logs to prevent exposure
+   - Sensitive values can be retrieved securely using Azure CLI or Azure Portal after deployment
+   - For Cosmos DB: `az cosmosdb keys list --name <account-name> --resource-group <rg-name>`
+   - For Application Insights: `az monitor app-insights component show --app <app-name> --resource-group <rg-name>`
+   
+2. **Secrets Protection**: The Bicep templates output sensitive information which is only accessible to authorized users with proper Azure permissions
+
+3. **Public Network Access**: Both resources are configured with public network access enabled. For production, consider:
    - Implementing private endpoints
    - Configuring IP firewall rules
    - Using managed identities instead of connection strings
-3. **TLS Version**: Minimum TLS 1.2 is enforced for Cosmos DB
+   
+4. **TLS Version**: Minimum TLS 1.2 is enforced for Cosmos DB
+
+5. **Access Control**: Ensure GitHub Actions secrets are properly secured and only accessible to authorized repository collaborators
 
 ## Cost Considerations
 

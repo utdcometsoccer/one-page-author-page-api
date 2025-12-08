@@ -159,9 +159,9 @@ jobs:
             
             echo "✓ Cosmos DB Account deployed successfully"
             
-            # Extract and display outputs
-            echo "📋 Cosmos DB deployment outputs:"
-            cat cosmosdb-deployment-output.json | jq '.properties.outputs'
+            # Note: Connection string and keys are available in deployment outputs
+            # but not displayed here for security reasons. They can be retrieved from
+            # Azure Portal or using Azure CLI: az cosmosdb keys list
           else
             echo "✓ Cosmos DB Account already exists. Skipping deployment."
           fi
@@ -209,9 +209,9 @@ jobs:
             
             echo "✓ Application Insights deployed successfully"
             
-            # Extract and display outputs
-            echo "📋 Application Insights deployment outputs:"
-            cat appinsights-deployment-output.json | jq '.properties.outputs'
+            # Note: Instrumentation key and connection string are available in deployment outputs
+            # but not displayed here for security reasons. They can be retrieved from
+            # Azure Portal or using Azure CLI: az monitor app-insights component show
           else
             echo "✓ Application Insights already exists. Skipping deployment."
           fi

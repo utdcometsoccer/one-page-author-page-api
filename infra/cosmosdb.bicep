@@ -55,9 +55,6 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
     disableKeyBasedMetadataWriteAccess: false
     enableFreeTier: enableFreeTier
     enableAnalyticalStorage: false
-    analyticalStorageConfiguration: {
-      schemaType: 'WellDefined'
-    }
     databaseAccountOfferType: 'Standard'
     defaultIdentity: 'FirstPartyIdentity'
     networkAclBypass: 'None'
