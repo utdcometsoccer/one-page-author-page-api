@@ -46,5 +46,23 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
             ClaimsPrincipal user, 
             string registrationId, 
             DomainRegistrationStatus status);
+
+        /// <summary>
+        /// Updates a domain registration for an authenticated user.
+        /// Validates that the user has an active subscription before allowing updates.
+        /// </summary>
+        /// <param name="user">The authenticated user's claims principal</param>
+        /// <param name="registrationId">The registration id</param>
+        /// <param name="domain">Optional domain information to update</param>
+        /// <param name="contactInformation">Optional contact information to update</param>
+        /// <param name="status">Optional status to update</param>
+        /// <returns>The updated domain registration if found and belongs to the user, null otherwise</returns>
+        /// <exception cref="InvalidOperationException">Thrown if user doesn't have an active subscription</exception>
+        Task<DomainRegistration?> UpdateDomainRegistrationAsync(
+            ClaimsPrincipal user,
+            string registrationId,
+            Domain? domain = null,
+            ContactInformation? contactInformation = null,
+            DomainRegistrationStatus? status = null);
     }
 }

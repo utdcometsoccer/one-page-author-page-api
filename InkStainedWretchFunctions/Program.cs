@@ -5,6 +5,7 @@ using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Stripe;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -20,14 +21,26 @@ var endpointUri = configuration["COSMOSDB_ENDPOINT_URI"] ?? throw new InvalidOpe
 var primaryKey = configuration["COSMOSDB_PRIMARY_KEY"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
 var databaseId = configuration["COSMOSDB_DATABASE_ID"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
+// Stripe configuration (optional for domain registration updates)
+var stripeApiKey = configuration["STRIPE_API_KEY"];
+
 // Log Cosmos DB configuration (masked for security)
 Console.WriteLine($"Cosmos DB Endpoint configured: {Utility.MaskUrl(endpointUri)}");
 Console.WriteLine($"Cosmos DB Primary Key configured: {Utility.MaskSensitiveValue(primaryKey)}");
 Console.WriteLine($"Cosmos DB Database ID configured: {databaseId}");
 
+if (!string.IsNullOrWhiteSpace(stripeApiKey))
+{
+    Console.WriteLine($"Stripe API key configured: {Utility.MaskSensitiveValue(stripeApiKey)}");
+}
+else
+{
+    Console.WriteLine("Warning: STRIPE_API_KEY not configured. Subscription validation for domain updates will not work.");
+}
+
 builder.ConfigureFunctionsWebApplication();
 
-builder.Services
+var services = builder.Services
     .AddCosmosClient(endpointUri, primaryKey)
     .AddCosmosDatabase(databaseId)
     .AddUserProfileRepository()
@@ -52,6 +65,14 @@ builder.Services
     .AddTestingServices() // Add testing services for mock implementations and test harnesses
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
+
+// Add Stripe services if API key is configured (needed for subscription validation)
+if (!string.IsNullOrWhiteSpace(stripeApiKey))
+{
+    services.AddSingleton<StripeClient>(_ => new StripeClient(stripeApiKey))
+            .AddStripeServices()
+            .AddStripeOrchestrators();
+}
 
 builder.Build().Run();
 

@@ -21,6 +21,27 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistrations
     }
 
     /// <summary>
+    /// Data transfer object for updating a domain registration request.
+    /// </summary>
+    public class UpdateDomainRegistrationRequest
+    {
+        /// <summary>
+        /// Domain information for the registration request (optional - only updated if provided).
+        /// </summary>
+        public DomainDto? Domain { get; set; }
+
+        /// <summary>
+        /// Contact information for the domain registration (optional - only updated if provided).
+        /// </summary>
+        public ContactInformationDto? ContactInformation { get; set; }
+
+        /// <summary>
+        /// Status of the domain registration (optional - only updated if provided).
+        /// </summary>
+        public DomainRegistrationStatus? Status { get; set; }
+    }
+
+    /// <summary>
     /// Data transfer object for domain information.
     /// </summary>
     public class DomainDto
