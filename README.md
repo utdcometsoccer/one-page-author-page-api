@@ -44,6 +44,7 @@ A comprehensive .NET 10 platform providing APIs and utilities for author managem
 - **SeedInkStainedWretchesLocale** — Comprehensive multi-language localization and UI text (North America: EN, ES, FR, AR, ZH-CN, ZH-TW)
 - **SeedImageStorageTiers** — Image storage tier configuration
 - **OnePageAuthor.DataSeeder** — StateProvince and geographical data seeding
+- **AuthorInvitationTool** — Command-line tool for inviting authors to create Microsoft accounts linked to their domains
 
 #### 🧪 Testing & Quality Assurance
 
