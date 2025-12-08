@@ -39,32 +39,51 @@ jobs:
           cd ../..
 
       - name: 'Login to Azure'
-        if: ${{ secrets.AZURE_CREDENTIALS != '' && secrets.AZURE_FUNCTIONAPP_NAME != '' && secrets.AZURE_RESOURCE_GROUP != '' }}
+        continue-on-error: true
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: 'Deploy Azure Function Infrastructure'
-        if: ${{ secrets.AZURE_CREDENTIALS != '' && secrets.AZURE_FUNCTIONAPP_NAME != '' && secrets.AZURE_RESOURCE_GROUP != '' && secrets.AZURE_LOCATION != '' }}
+        continue-on-error: true
         shell: bash
+        env:
+          FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
+          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          LOCATION: ${{ secrets.AZURE_LOCATION }}
         run: |
+          # Validate required secrets are available
+          if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ] || [ -z "$LOCATION" ]; then
+            echo "Skipping infrastructure deployment: Required secrets (AZURE_FUNCTIONAPP_NAME, AZURE_RESOURCE_GROUP, or AZURE_LOCATION) not configured"
+            exit 0
+          fi
+          
           # Check if Function App exists
-          if ! az functionapp show --name ${{ secrets.AZURE_FUNCTIONAPP_NAME }} --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} &> /dev/null; then
+          if ! az functionapp show --name "$FUNCTION_APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
             echo "Function App does not exist. Deploying infrastructure..."
             az deployment group create \
-              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --resource-group "$RESOURCE_GROUP" \
               --template-file infra/functionapp.bicep \
-              --parameters functionAppName=${{ secrets.AZURE_FUNCTIONAPP_NAME }} \
-                          location=${{ secrets.AZURE_LOCATION }}
+              --parameters functionAppName="$FUNCTION_APP_NAME" \
+                          location="$LOCATION"
           else
             echo "Function App already exists. Skipping infrastructure deployment."
           fi
 
       - name: 'Deploy to Azure Function App using config-zip'
-        if: ${{ secrets.AZURE_CREDENTIALS != '' && secrets.AZURE_FUNCTIONAPP_NAME != '' && secrets.AZURE_RESOURCE_GROUP != '' }}
+        continue-on-error: true
         shell: bash
+        env:
+          FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
+          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
         run: |
+          # Validate required secrets are available
+          if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ]; then
+            echo "Skipping deployment: Required secrets (AZURE_FUNCTIONAPP_NAME or AZURE_RESOURCE_GROUP) not configured"
+            exit 0
+          fi
+          
           az functionapp deployment source config-zip \
-            --name ${{ secrets.AZURE_FUNCTIONAPP_NAME }} \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
             --src '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/functionapp.zip'
