@@ -4,6 +4,7 @@ using System.Security.Claims;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using static InkStainedWretch.OnePageAuthorAPI.Interfaces.ValidationResult;
 
 namespace OnePageAuthor.Test.DomainRegistration
@@ -15,8 +16,7 @@ namespace OnePageAuthor.Test.DomainRegistration
         private readonly Mock<IUserIdentityService> _userIdentityServiceMock;
         private readonly Mock<IDomainValidationService> _domainValidationServiceMock;
         private readonly Mock<IContactInformationValidationService> _contactValidationServiceMock;
-        private readonly Mock<IUserProfileRepository> _userProfileRepositoryMock;
-        private readonly Mock<InkStainedWretch.OnePageAuthorLib.API.Stripe.IListSubscriptions> _listSubscriptionsMock;
+        private readonly Mock<ISubscriptionValidationService> _subscriptionValidationServiceMock;
         private readonly DomainRegistrationService _service;
 
         public DomainRegistrationServiceTests()
@@ -26,22 +26,22 @@ namespace OnePageAuthor.Test.DomainRegistration
             _userIdentityServiceMock = new Mock<IUserIdentityService>();
             _domainValidationServiceMock = new Mock<IDomainValidationService>();
             _contactValidationServiceMock = new Mock<IContactInformationValidationService>();
-            _userProfileRepositoryMock = new Mock<IUserProfileRepository>();
-            _listSubscriptionsMock = new Mock<InkStainedWretch.OnePageAuthorLib.API.Stripe.IListSubscriptions>();
+            _subscriptionValidationServiceMock = new Mock<ISubscriptionValidationService>();
             _service = new DomainRegistrationService(
                 _loggerMock.Object, 
                 _repositoryMock.Object, 
                 _userIdentityServiceMock.Object,
                 _domainValidationServiceMock.Object,
                 _contactValidationServiceMock.Object,
-                _userProfileRepositoryMock.Object,
-                _listSubscriptionsMock.Object);
+                _subscriptionValidationServiceMock.Object);
 
             // Setup default behavior for user identity service
             _userIdentityServiceMock.Setup(x => x.GetUserUpn(It.IsAny<ClaimsPrincipal>()))
                                    .Returns("test@example.com");
 
             // Setup default successful validation behavior
+            _subscriptionValidationServiceMock.Setup(x => x.HasValidSubscriptionAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
+                                              .ReturnsAsync(true);
             _domainValidationServiceMock.Setup(x => x.ValidateDomain(It.IsAny<Domain>()))
                                        .Returns(ValidationResult.Success());
             _contactValidationServiceMock.Setup(x => x.ValidateContactInformation(It.IsAny<ContactInformation>()))

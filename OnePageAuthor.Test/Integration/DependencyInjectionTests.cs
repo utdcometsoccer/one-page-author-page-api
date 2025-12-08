@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using InkStainedWretch.OnePageAuthorAPI;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 
 namespace OnePageAuthor.Test.Integration
 {
@@ -63,6 +64,14 @@ namespace OnePageAuthor.Test.Integration
             // Mock the repository dependency
             var mockRepo = new Moq.Mock<IDomainRegistrationRepository>();
             services.AddSingleton(mockRepo.Object);
+            
+            // Mock the subscription validation service dependency
+            var mockSubscriptionValidationService = new Moq.Mock<ISubscriptionValidationService>();
+            services.AddSingleton(mockSubscriptionValidationService.Object);
+            
+            // Mock user profile repository (needed by SubscriptionValidationService)
+            var mockUserProfileRepo = new Moq.Mock<IUserProfileRepository>();
+            services.AddSingleton(mockUserProfileRepo.Object);
             
             services.AddDomainRegistrationServices();
             

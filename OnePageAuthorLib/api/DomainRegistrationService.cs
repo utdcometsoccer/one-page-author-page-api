@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
-using InkStainedWretch.OnePageAuthorLib.API.Stripe;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using Microsoft.Extensions.Logging;
 
 namespace InkStainedWretch.OnePageAuthorAPI.API
@@ -16,8 +16,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         private readonly IUserIdentityService _userIdentityService;
         private readonly IDomainValidationService _domainValidationService;
         private readonly IContactInformationValidationService _contactValidationService;
-        private readonly IUserProfileRepository _userProfileRepository;
-        private readonly IListSubscriptions _listSubscriptions;
+        private readonly ISubscriptionValidationService _subscriptionValidationService;
 
         public DomainRegistrationService(
             ILogger<DomainRegistrationService> logger,
@@ -25,16 +24,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             IUserIdentityService userIdentityService,
             IDomainValidationService domainValidationService,
             IContactInformationValidationService contactValidationService,
-            IUserProfileRepository userProfileRepository,
-            IListSubscriptions listSubscriptions)
+            ISubscriptionValidationService subscriptionValidationService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _userIdentityService = userIdentityService ?? throw new ArgumentNullException(nameof(userIdentityService));
             _domainValidationService = domainValidationService ?? throw new ArgumentNullException(nameof(domainValidationService));
             _contactValidationService = contactValidationService ?? throw new ArgumentNullException(nameof(contactValidationService));
-            _userProfileRepository = userProfileRepository ?? throw new ArgumentNullException(nameof(userProfileRepository));
-            _listSubscriptions = listSubscriptions ?? throw new ArgumentNullException(nameof(listSubscriptions));
+            _subscriptionValidationService = subscriptionValidationService ?? throw new ArgumentNullException(nameof(subscriptionValidationService));
         }
 
         public async Task<DomainRegistration> CreateDomainRegistrationAsync(
@@ -44,13 +41,21 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         {
             var upn = _userIdentityService.GetUserUpn(user);
             
-            // Validate domain information using the dedicated service
+            // Validate domain information first to ensure it's not null
             var domainValidationResult = _domainValidationService.ValidateDomain(domain);
             if (!domainValidationResult.IsValid)
             {
                 var errorMessage = string.Join("; ", domainValidationResult.Errors);
                 _logger.LogWarning("Domain validation failed for user {Upn}: {Errors}", upn, errorMessage);
                 throw new ArgumentException($"Domain validation failed: {errorMessage}", nameof(domain));
+            }
+            
+            // Validate that user has an active subscription for this domain
+            var hasValidSubscription = await _subscriptionValidationService.HasValidSubscriptionAsync(user, domain.FullDomainName);
+            if (!hasValidSubscription)
+            {
+                _logger.LogWarning("Domain registration denied for user {Upn}: No valid subscription for domain {DomainName}", upn, domain.FullDomainName);
+                throw new InvalidOperationException($"A valid subscription is required to register the domain '{domain.FullDomainName}'");
             }
             
             // Validate contact information using the dedicated service
