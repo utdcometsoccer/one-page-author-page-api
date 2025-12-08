@@ -207,7 +207,7 @@ Track costs in Azure Portal:
 ## Support
 
 - Full documentation: [`docs/COSMOS_APPINSIGHTS_DEPLOYMENT.md`](../docs/COSMOS_APPINSIGHTS_DEPLOYMENT.md)
-- Implementation details: [`IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS.md`](../IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS.md)
+- Implementation details: [`IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS.md`](IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS.md)
 - Azure documentation: [https://docs.microsoft.com/azure](https://docs.microsoft.com/azure)
 
 ## Cleanup
