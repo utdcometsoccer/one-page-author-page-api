@@ -41,21 +41,21 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         {
             var upn = _userIdentityService.GetUserUpn(user);
             
-            // Validate that user has an active subscription
-            var hasValidSubscription = await _subscriptionValidationService.HasValidSubscriptionAsync(user);
-            if (!hasValidSubscription)
-            {
-                _logger.LogWarning("Domain registration denied for user {Upn}: No valid subscription", upn);
-                throw new InvalidOperationException("A valid subscription is required to register a domain");
-            }
-            
-            // Validate domain information using the dedicated service
+            // Validate domain information first to ensure it's not null
             var domainValidationResult = _domainValidationService.ValidateDomain(domain);
             if (!domainValidationResult.IsValid)
             {
                 var errorMessage = string.Join("; ", domainValidationResult.Errors);
                 _logger.LogWarning("Domain validation failed for user {Upn}: {Errors}", upn, errorMessage);
                 throw new ArgumentException($"Domain validation failed: {errorMessage}", nameof(domain));
+            }
+            
+            // Validate that user has an active subscription for this domain
+            var hasValidSubscription = await _subscriptionValidationService.HasValidSubscriptionAsync(user, domain.FullDomainName);
+            if (!hasValidSubscription)
+            {
+                _logger.LogWarning("Domain registration denied for user {Upn}: No valid subscription for domain {DomainName}", upn, domain.FullDomainName);
+                throw new InvalidOperationException($"A valid subscription is required to register the domain '{domain.FullDomainName}'");
             }
             
             // Validate contact information using the dedicated service

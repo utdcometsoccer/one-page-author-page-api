@@ -40,7 +40,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                                    .Returns("test@example.com");
 
             // Setup default successful validation behavior
-            _subscriptionValidationServiceMock.Setup(x => x.HasValidSubscriptionAsync(It.IsAny<ClaimsPrincipal>()))
+            _subscriptionValidationServiceMock.Setup(x => x.HasValidSubscriptionAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
                                               .ReturnsAsync(true);
             _domainValidationServiceMock.Setup(x => x.ValidateDomain(It.IsAny<Domain>()))
                                        .Returns(ValidationResult.Success());

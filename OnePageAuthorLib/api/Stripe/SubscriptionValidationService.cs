@@ -29,16 +29,23 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         }
 
         /// <summary>
-        /// Validates that a user has at least one active subscription.
+        /// Validates that a user has at least one active subscription for the specified domain.
         /// Active subscriptions include those with status "active" or "trialing".
+        /// The domain name must match the "domain_name" metadata in the subscription.
         /// </summary>
         /// <param name="user">The authenticated user's claims principal</param>
-        /// <returns>True if the user has at least one active subscription, false otherwise</returns>
-        public async Task<bool> HasValidSubscriptionAsync(ClaimsPrincipal user)
+        /// <param name="domainName">The domain name to validate the subscription for</param>
+        /// <returns>True if the user has at least one active subscription for the domain, false otherwise</returns>
+        public async Task<bool> HasValidSubscriptionAsync(ClaimsPrincipal user, string domainName)
         {
+            if (string.IsNullOrWhiteSpace(domainName))
+            {
+                throw new ArgumentException("Domain name is required", nameof(domainName));
+            }
+
             var upn = _userIdentityService.GetUserUpn(user);
             
-            _logger.LogInformation("Validating subscription for user {Upn}", upn);
+            _logger.LogInformation("Validating subscription for user {Upn} and domain {DomainName}", upn, domainName);
             
             // Get user profile to retrieve Stripe customer ID
             var userProfile = await _userProfileRepository.GetByUpnAsync(upn);
@@ -63,21 +70,36 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     status: "all",
                     limit: 100);
                 
-                // Check if any subscription is active or trialing
-                var hasValidSubscription = subscriptionsResponse.Wrapper?.Items
-                    .Any(s => s.Status == "active" || s.Status == "trialing") ?? false;
-                
-                if (hasValidSubscription)
+                // Check if any subscription is active/trialing AND matches the domain in metadata
+                var hasValidSubscription = false;
+                if (subscriptionsResponse.Subscriptions?.Data != null)
                 {
-                    _logger.LogInformation(
-                        "User {Upn} has valid subscription (customer: {CustomerId})",
-                        upn, userProfile.StripeCustomerId);
+                    foreach (var subscription in subscriptionsResponse.Subscriptions.Data)
+                    {
+                        // Check if subscription is active or trialing
+                        var isActiveStatus = subscription.Status == "active" || subscription.Status == "trialing";
+                        
+                        // Check if domain name matches metadata
+                        var domainMatches = subscription.Metadata != null &&
+                                          subscription.Metadata.TryGetValue("domain_name", out var metadataDomain) &&
+                                          string.Equals(metadataDomain, domainName, StringComparison.OrdinalIgnoreCase);
+                        
+                        if (isActiveStatus && domainMatches)
+                        {
+                            hasValidSubscription = true;
+                            _logger.LogInformation(
+                                "User {Upn} has valid subscription {SubscriptionId} for domain {DomainName} (customer: {CustomerId})",
+                                upn, subscription.Id, domainName, userProfile.StripeCustomerId);
+                            break;
+                        }
+                    }
                 }
-                else
+                
+                if (!hasValidSubscription)
                 {
                     _logger.LogWarning(
-                        "User {Upn} has no valid subscriptions (customer: {CustomerId})",
-                        upn, userProfile.StripeCustomerId);
+                        "User {Upn} has no valid subscription for domain {DomainName} (customer: {CustomerId})",
+                        upn, domainName, userProfile.StripeCustomerId);
                 }
                 
                 return hasValidSubscription;
@@ -85,8 +107,8 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             catch (Exception ex)
             {
                 _logger.LogError(ex, 
-                    "Error validating subscriptions for user {Upn} (customer: {CustomerId})",
-                    upn, userProfile.StripeCustomerId);
+                    "Error validating subscriptions for user {Upn} and domain {DomainName} (customer: {CustomerId})",
+                    upn, domainName, userProfile.StripeCustomerId);
                 throw;
             }
         }

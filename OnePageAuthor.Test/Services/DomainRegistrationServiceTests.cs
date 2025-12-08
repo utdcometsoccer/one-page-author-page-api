@@ -135,7 +135,7 @@ namespace OnePageAuthor.Test.Services
             var expectedRegistration = new DomainRegistrationEntity(expectedUpn, domain, contactInfo);
 
             _mockUserIdentityService.Setup(x => x.GetUserUpn(_testUser)).Returns(expectedUpn);
-            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser)).ReturnsAsync(true);
+            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>())).ReturnsAsync(true);
             _mockDomainValidationService.Setup(x => x.ValidateDomain(domain)).Returns(ValidationResult.Success());
             _mockContactValidationService.Setup(x => x.ValidateContactInformation(contactInfo)).Returns(ValidationResult.Success());
             _mockRepository.Setup(x => x.CreateAsync(It.IsAny<DomainRegistrationEntity>())).ReturnsAsync(expectedRegistration);
@@ -148,7 +148,7 @@ namespace OnePageAuthor.Test.Services
             Assert.Equal(expectedUpn, result.Upn);
             Assert.Equal(domain.FullDomainName, result.Domain.FullDomainName);
             
-            _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser), Times.Once);
+            _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>()), Times.Once);
             _mockDomainValidationService.Verify(x => x.ValidateDomain(domain), Times.Once);
             _mockContactValidationService.Verify(x => x.ValidateContactInformation(contactInfo), Times.Once);
             _mockRepository.Verify(x => x.CreateAsync(It.IsAny<DomainRegistrationEntity>()), Times.Once);
@@ -164,7 +164,6 @@ namespace OnePageAuthor.Test.Services
             var validationResult = ValidationResult.Failure("Invalid domain");
 
             _mockUserIdentityService.Setup(x => x.GetUserUpn(_testUser)).Returns(expectedUpn);
-            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser)).ReturnsAsync(true);
             _mockDomainValidationService.Setup(x => x.ValidateDomain(domain)).Returns(validationResult);
 
             // Act & Assert
@@ -174,7 +173,8 @@ namespace OnePageAuthor.Test.Services
             Assert.Contains("Domain validation failed", exception.Message);
             Assert.Contains("Invalid domain", exception.Message);
             
-            _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser), Times.Once);
+            // Domain validation happens first, so subscription validation should NOT be called
+            _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>()), Times.Never);
             _mockDomainValidationService.Verify(x => x.ValidateDomain(domain), Times.Once);
             _mockContactValidationService.Verify(x => x.ValidateContactInformation(It.IsAny<ContactInformation>()), Times.Never);
             _mockRepository.Verify(x => x.CreateAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
@@ -190,7 +190,7 @@ namespace OnePageAuthor.Test.Services
             var validationResult = ValidationResult.Failure("Error 1", "Error 2", "Error 3");
 
             _mockUserIdentityService.Setup(x => x.GetUserUpn(_testUser)).Returns(expectedUpn);
-            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser)).ReturnsAsync(true);
+            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>())).ReturnsAsync(true);
             _mockDomainValidationService.Setup(x => x.ValidateDomain(domain)).Returns(validationResult);
 
             // Act & Assert
@@ -211,7 +211,7 @@ namespace OnePageAuthor.Test.Services
             var validationResult = ValidationResult.Failure("Invalid contact info");
 
             _mockUserIdentityService.Setup(x => x.GetUserUpn(_testUser)).Returns(expectedUpn);
-            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser)).ReturnsAsync(true);
+            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>())).ReturnsAsync(true);
             _mockDomainValidationService.Setup(x => x.ValidateDomain(domain)).Returns(ValidationResult.Success());
             _mockContactValidationService.Setup(x => x.ValidateContactInformation(contactInfo)).Returns(validationResult);
 
@@ -222,7 +222,7 @@ namespace OnePageAuthor.Test.Services
             Assert.Contains("Contact information validation failed", exception.Message);
             Assert.Contains("Invalid contact info", exception.Message);
             
-            _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser), Times.Once);
+            _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>()), Times.Once);
             _mockDomainValidationService.Verify(x => x.ValidateDomain(domain), Times.Once);
             _mockContactValidationService.Verify(x => x.ValidateContactInformation(contactInfo), Times.Once);
             _mockRepository.Verify(x => x.CreateAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
@@ -238,7 +238,7 @@ namespace OnePageAuthor.Test.Services
             var validationResult = ValidationResult.Failure("Contact Error 1", "Contact Error 2");
 
             _mockUserIdentityService.Setup(x => x.GetUserUpn(_testUser)).Returns(expectedUpn);
-            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser)).ReturnsAsync(true);
+            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>())).ReturnsAsync(true);
             _mockDomainValidationService.Setup(x => x.ValidateDomain(domain)).Returns(ValidationResult.Success());
             _mockContactValidationService.Setup(x => x.ValidateContactInformation(contactInfo)).Returns(validationResult);
 

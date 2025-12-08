@@ -8,10 +8,11 @@ namespace InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe
     public interface ISubscriptionValidationService
     {
         /// <summary>
-        /// Validates that a user has at least one active subscription.
+        /// Validates that a user has at least one active subscription for the specified domain.
         /// </summary>
         /// <param name="user">The authenticated user's claims principal</param>
-        /// <returns>True if the user has at least one active subscription, false otherwise</returns>
-        Task<bool> HasValidSubscriptionAsync(ClaimsPrincipal user);
+        /// <param name="domainName">The domain name to validate the subscription for</param>
+        /// <returns>True if the user has at least one active subscription for the domain, false otherwise</returns>
+        Task<bool> HasValidSubscriptionAsync(ClaimsPrincipal user, string domainName);
     }
 }
