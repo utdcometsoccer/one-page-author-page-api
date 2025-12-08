@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
-using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using Microsoft.Extensions.Logging;
 
