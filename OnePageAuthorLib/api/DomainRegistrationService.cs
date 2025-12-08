@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using Microsoft.Extensions.Logging;
 
 namespace InkStainedWretch.OnePageAuthorAPI.API
@@ -15,19 +16,22 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         private readonly IUserIdentityService _userIdentityService;
         private readonly IDomainValidationService _domainValidationService;
         private readonly IContactInformationValidationService _contactValidationService;
+        private readonly ISubscriptionValidationService _subscriptionValidationService;
 
         public DomainRegistrationService(
             ILogger<DomainRegistrationService> logger,
             IDomainRegistrationRepository repository,
             IUserIdentityService userIdentityService,
             IDomainValidationService domainValidationService,
-            IContactInformationValidationService contactValidationService)
+            IContactInformationValidationService contactValidationService,
+            ISubscriptionValidationService subscriptionValidationService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _userIdentityService = userIdentityService ?? throw new ArgumentNullException(nameof(userIdentityService));
             _domainValidationService = domainValidationService ?? throw new ArgumentNullException(nameof(domainValidationService));
             _contactValidationService = contactValidationService ?? throw new ArgumentNullException(nameof(contactValidationService));
+            _subscriptionValidationService = subscriptionValidationService ?? throw new ArgumentNullException(nameof(subscriptionValidationService));
         }
 
         public async Task<DomainRegistration> CreateDomainRegistrationAsync(
@@ -36,6 +40,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             ContactInformation contactInformation)
         {
             var upn = _userIdentityService.GetUserUpn(user);
+            
+            // Validate that user has an active subscription
+            var hasValidSubscription = await _subscriptionValidationService.HasValidSubscriptionAsync(user);
+            if (!hasValidSubscription)
+            {
+                _logger.LogWarning("Domain registration denied for user {Upn}: No valid subscription", upn);
+                throw new InvalidOperationException("A valid subscription is required to register a domain");
+            }
             
             // Validate domain information using the dedicated service
             var domainValidationResult = _domainValidationService.ValidateDomain(domain);

@@ -238,6 +238,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<ICancelSubscription, CancelSubscriptionService>();
             services.AddScoped<IUpdateSubscription, UpdateSubscriptionService>();
             services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
+            services.AddScoped<ISubscriptionValidationService, SubscriptionValidationService>();
             services.AddScoped<IPaymentIntentClientSecretExtractor, PaymentIntentClientSecretExtractor>();
             services.AddScoped<IInvoicePreview>(sp =>
             {

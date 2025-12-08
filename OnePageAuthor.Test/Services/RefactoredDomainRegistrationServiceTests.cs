@@ -2,6 +2,7 @@ using System.Security.Claims;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
+using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -18,6 +19,7 @@ namespace OnePageAuthor.Test.Services
         private readonly Mock<IUserIdentityService> _mockUserIdentityService;
         private readonly Mock<IDomainValidationService> _mockDomainValidationService;
         private readonly Mock<IContactInformationValidationService> _mockContactValidationService;
+        private readonly Mock<ISubscriptionValidationService> _mockSubscriptionValidationService;
         private readonly DomainRegistrationService _service;
         private readonly ClaimsPrincipal _testUser;
 
@@ -28,13 +30,15 @@ namespace OnePageAuthor.Test.Services
             _mockUserIdentityService = new Mock<IUserIdentityService>();
             _mockDomainValidationService = new Mock<IDomainValidationService>();
             _mockContactValidationService = new Mock<IContactInformationValidationService>();
+            _mockSubscriptionValidationService = new Mock<ISubscriptionValidationService>();
             
             _service = new DomainRegistrationService(
                 _mockLogger.Object,
                 _mockRepository.Object,
                 _mockUserIdentityService.Object,
                 _mockDomainValidationService.Object,
-                _mockContactValidationService.Object);
+                _mockContactValidationService.Object,
+                _mockSubscriptionValidationService.Object);
 
             _testUser = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
@@ -51,7 +55,8 @@ namespace OnePageAuthor.Test.Services
                 _mockRepository.Object,
                 _mockUserIdentityService.Object,
                 _mockDomainValidationService.Object,
-                _mockContactValidationService.Object));
+                _mockContactValidationService.Object,
+                _mockSubscriptionValidationService.Object));
         }
 
         [Fact]
@@ -63,7 +68,8 @@ namespace OnePageAuthor.Test.Services
                 null!,
                 _mockUserIdentityService.Object,
                 _mockDomainValidationService.Object,
-                _mockContactValidationService.Object));
+                _mockContactValidationService.Object,
+                _mockSubscriptionValidationService.Object));
         }
 
         [Fact]
@@ -75,7 +81,8 @@ namespace OnePageAuthor.Test.Services
                 _mockRepository.Object,
                 null!,
                 _mockDomainValidationService.Object,
-                _mockContactValidationService.Object));
+                _mockContactValidationService.Object,
+                _mockSubscriptionValidationService.Object));
         }
 
         [Fact]
@@ -87,7 +94,8 @@ namespace OnePageAuthor.Test.Services
                 _mockRepository.Object,
                 _mockUserIdentityService.Object,
                 null!,
-                _mockContactValidationService.Object));
+                _mockContactValidationService.Object,
+                _mockSubscriptionValidationService.Object));
         }
 
         [Fact]
@@ -99,6 +107,20 @@ namespace OnePageAuthor.Test.Services
                 _mockRepository.Object,
                 _mockUserIdentityService.Object,
                 _mockDomainValidationService.Object,
+                null!,
+                _mockSubscriptionValidationService.Object));
+        }
+
+        [Fact]
+        public void Constructor_WithNullSubscriptionValidationService_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => new DomainRegistrationService(
+                _mockLogger.Object,
+                _mockRepository.Object,
+                _mockUserIdentityService.Object,
+                _mockDomainValidationService.Object,
+                _mockContactValidationService.Object,
                 null!));
         }
 
@@ -112,6 +134,7 @@ namespace OnePageAuthor.Test.Services
             var expectedRegistration = new InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration(expectedUpn, domain, contactInfo);
 
             _mockUserIdentityService.Setup(x => x.GetUserUpn(_testUser)).Returns(expectedUpn);
+            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser)).ReturnsAsync(true);
             _mockDomainValidationService.Setup(x => x.ValidateDomain(domain)).Returns(ValidationResult.Success());
             _mockContactValidationService.Setup(x => x.ValidateContactInformation(contactInfo)).Returns(ValidationResult.Success());
             _mockRepository.Setup(x => x.CreateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>())).ReturnsAsync(expectedRegistration);
@@ -139,6 +162,7 @@ namespace OnePageAuthor.Test.Services
             var validationResult = ValidationResult.Failure("Invalid domain");
 
             _mockUserIdentityService.Setup(x => x.GetUserUpn(_testUser)).Returns(expectedUpn);
+            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser)).ReturnsAsync(true);
             _mockDomainValidationService.Setup(x => x.ValidateDomain(domain)).Returns(validationResult);
 
             // Act & Assert
@@ -148,6 +172,7 @@ namespace OnePageAuthor.Test.Services
             Assert.Contains("Domain validation failed", exception.Message);
             Assert.Contains("Invalid domain", exception.Message);
             
+            _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser), Times.Once);
             _mockDomainValidationService.Verify(x => x.ValidateDomain(domain), Times.Once);
             _mockContactValidationService.Verify(x => x.ValidateContactInformation(It.IsAny<ContactInformation>()), Times.Never);
             _mockRepository.Verify(x => x.CreateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()), Times.Never);
@@ -163,6 +188,7 @@ namespace OnePageAuthor.Test.Services
             var validationResult = ValidationResult.Failure("Invalid contact info");
 
             _mockUserIdentityService.Setup(x => x.GetUserUpn(_testUser)).Returns(expectedUpn);
+            _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser)).ReturnsAsync(true);
             _mockDomainValidationService.Setup(x => x.ValidateDomain(domain)).Returns(ValidationResult.Success());
             _mockContactValidationService.Setup(x => x.ValidateContactInformation(contactInfo)).Returns(validationResult);
 
@@ -173,6 +199,7 @@ namespace OnePageAuthor.Test.Services
             Assert.Contains("Contact information validation failed", exception.Message);
             Assert.Contains("Invalid contact info", exception.Message);
             
+            _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser), Times.Once);
             _mockDomainValidationService.Verify(x => x.ValidateDomain(domain), Times.Once);
             _mockContactValidationService.Verify(x => x.ValidateContactInformation(contactInfo), Times.Once);
             _mockRepository.Verify(x => x.CreateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()), Times.Never);
