@@ -840,5 +840,40 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<Interfaces.ILanguageService, API.LanguageService>();
             return services;
         }
+
+        /// <summary>
+        /// Registers AuthorInvitation repository services for managing author invitations.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddAuthorInvitationRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.AuthorInvitation>>(sp =>
+                new NoSQL.AuthorInvitationsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<API.IAuthorInvitationRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.AuthorInvitation>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.AuthorInvitationRepository(container);
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Email service for sending invitation emails.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <param name="connectionString">Azure Communication Services connection string.</param>
+        /// <param name="senderAddress">Sender email address.</param>
+        public static IServiceCollection AddEmailService(this IServiceCollection services, string connectionString, string senderAddress)
+        {
+            services.AddSingleton<API.IEmailService>(sp =>
+            {
+                var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Services.AzureCommunicationEmailService>>();
+                return new Services.AzureCommunicationEmailService(logger, connectionString, senderAddress);
+            });
+            return services;
+        }
     }
 }

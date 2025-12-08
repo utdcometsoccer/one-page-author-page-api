@@ -8,6 +8,7 @@
 // - DNS Zone
 // - Application Insights
 // - Three Function Apps (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStripe)
+// - Azure Communication Services (optional, for email notifications)
 
 @description('The base name for all resources (used to generate unique names)')
 param baseName string
@@ -29,6 +30,9 @@ param dnsZoneName string = ''
 
 @description('Whether to deploy Application Insights')
 param deployAppInsights bool = true
+
+@description('Whether to deploy Azure Communication Services for email')
+param deployCommunicationServices bool = false
 
 @description('Whether to deploy the ImageAPI Function App')
 param deployImageApi bool = true
@@ -373,3 +377,23 @@ output inkStainedWretchFunctionsName string = deployInkStainedWretchFunctions &&
 output inkStainedWretchFunctionsUrl string = deployInkStainedWretchFunctions && deployStorageAccount ? 'https://${inkStainedWretchFunctionsApp.properties.defaultHostName}' : ''
 output inkStainedWretchStripeName string = deployInkStainedWretchStripe && deployStorageAccount ? inkStainedWretchStripeApp.name : ''
 output inkStainedWretchStripeUrl string = deployInkStainedWretchStripe && deployStorageAccount ? 'https://${inkStainedWretchStripeApp.properties.defaultHostName}' : ''
+output communicationServicesDeployed string = deployCommunicationServices ? 'true' : 'false'
+output communicationServicesNote string = deployCommunicationServices ? 'Communication Services deployed. Retrieve connection string from Azure Portal -> Communication Services -> Keys' : 'Communication Services not deployed'
+
+// =========================================
+// Azure Communication Services (Optional)
+// =========================================
+
+module communicationServices 'communication-services.bicep' = if (deployCommunicationServices) {
+  name: 'communication-services-deployment'
+  params: {
+    baseName: baseName
+    location: location
+    dataLocation: 'United States'
+    tags: {
+      environment: 'production'
+      project: 'OnePageAuthor'
+      component: 'EmailService'
+    }
+  }
+}
