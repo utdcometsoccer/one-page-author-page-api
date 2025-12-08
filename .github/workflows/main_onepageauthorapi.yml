@@ -48,6 +48,12 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
+          # Validate required secrets are available
+          if [ -z "${{ secrets.AZURE_FUNCTIONAPP_NAME }}" ] || [ -z "${{ secrets.AZURE_RESOURCE_GROUP }}" ] || [ -z "${{ secrets.AZURE_LOCATION }}" ]; then
+            echo "Skipping infrastructure deployment: Required secrets (AZURE_FUNCTIONAPP_NAME, AZURE_RESOURCE_GROUP, or AZURE_LOCATION) not configured"
+            exit 0
+          fi
+          
           # Check if Function App exists
           if ! az functionapp show --name ${{ secrets.AZURE_FUNCTIONAPP_NAME }} --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} &> /dev/null; then
             echo "Function App does not exist. Deploying infrastructure..."
@@ -64,6 +70,12 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
+          # Validate required secrets are available
+          if [ -z "${{ secrets.AZURE_FUNCTIONAPP_NAME }}" ] || [ -z "${{ secrets.AZURE_RESOURCE_GROUP }}" ]; then
+            echo "Skipping deployment: Required secrets (AZURE_FUNCTIONAPP_NAME or AZURE_RESOURCE_GROUP) not configured"
+            exit 0
+          fi
+          
           az functionapp deployment source config-zip \
             --name ${{ secrets.AZURE_FUNCTIONAPP_NAME }} \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
