@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -39,11 +39,29 @@ jobs:
           cd ../..
 
       - name: 'Login to Azure'
+        if: ${{ secrets.AZURE_CREDENTIALS != '' && secrets.AZURE_FUNCTIONAPP_NAME != '' && secrets.AZURE_RESOURCE_GROUP != '' }}
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: 'Deploy Azure Function Infrastructure'
+        if: ${{ secrets.AZURE_CREDENTIALS != '' && secrets.AZURE_FUNCTIONAPP_NAME != '' && secrets.AZURE_RESOURCE_GROUP != '' && secrets.AZURE_LOCATION != '' }}
+        shell: bash
+        run: |
+          # Check if Function App exists
+          if ! az functionapp show --name ${{ secrets.AZURE_FUNCTIONAPP_NAME }} --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} &> /dev/null; then
+            echo "Function App does not exist. Deploying infrastructure..."
+            az deployment group create \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --template-file infra/functionapp.bicep \
+              --parameters functionAppName=${{ secrets.AZURE_FUNCTIONAPP_NAME }} \
+                          location=${{ secrets.AZURE_LOCATION }}
+          else
+            echo "Function App already exists. Skipping infrastructure deployment."
+          fi
+
       - name: 'Deploy to Azure Function App using config-zip'
+        if: ${{ secrets.AZURE_CREDENTIALS != '' && secrets.AZURE_FUNCTIONAPP_NAME != '' && secrets.AZURE_RESOURCE_GROUP != '' }}
         shell: bash
         run: |
           az functionapp deployment source config-zip \
