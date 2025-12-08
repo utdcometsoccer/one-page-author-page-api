@@ -480,26 +480,63 @@ dotnet test --filter "Category=Unit"
 
 ## 🚀 Production Deployment
 
-### Azure Resources Required
+### Automated CI/CD Deployment
 
+The platform uses GitHub Actions for automated deployment to Azure. See the comprehensive guides:
+
+- **[Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Complete deployment workflow documentation
+- **[GitHub Secrets Reference](docs/GITHUB_SECRETS_REFERENCE.md)** - Quick reference for all required secrets
+
+### Azure Resources Required
 
 - **Azure Functions Apps** (v4, .NET 10 isolated)
 - **Azure Cosmos DB** account with containers
-- **Azure Storage** account for function app storage
-- **Microsoft Entra ID** app registration
-- **Azure Front Door** profile for domain management
+- **Azure Storage** account for function app storage and blobs
+- **Azure Key Vault** for secure secrets management
+- **Microsoft Entra ID** app registration for authentication
+- **Azure Front Door** profile for domain management (optional)
 - **Application Insights** for monitoring and logging
+- **DNS Zone** for custom domains (optional)
+- **Static Web App** for frontend hosting (optional)
+
+### Quick Deployment Setup
+
+1. **Configure GitHub Secrets** (see [GitHub Secrets Reference](docs/GITHUB_SECRETS_REFERENCE.md))
+   - Azure credentials (`AZURE_CREDENTIALS`)
+   - Infrastructure settings (`ISW_RESOURCE_GROUP`, `ISW_LOCATION`, `ISW_BASE_NAME`)
+   - Application configuration (`COSMOSDB_CONNECTION_STRING`, `STRIPE_API_KEY`, etc.)
+
+2. **Push to main branch** - Deployment runs automatically
+
+3. **Monitor deployment** - Check GitHub Actions tab for progress
 
 ### Deployment Checklist
 
-
 - [ ] Configure all required environment variables
-- [ ] Set up managed identity for Azure resource access
+- [ ] Set up Azure Service Principal with appropriate permissions
 - [ ] Configure CORS policies for frontend integration
 - [ ] Set up Application Insights monitoring
 - [ ] Configure Stripe webhook endpoints
 - [ ] Validate JWT token configuration
 - [ ] Run smoke tests on deployed endpoints
+
+### Manual Deployment (Alternative)
+
+For manual deployment using Azure CLI:
+
+```bash
+# Deploy infrastructure
+az deployment group create \
+  --resource-group InkStainedWretches-RG \
+  --template-file infra/inkstainedwretches.bicep \
+  --parameters baseName=yourbasename location="West US 2"
+
+# Deploy function apps
+az functionapp deployment source config-zip \
+  --name yourbasename-imageapi \
+  --resource-group InkStainedWretches-RG \
+  --src ImageAPI/imageapi.zip
+```
 
 ## 🤝 Contributing & Community
 
