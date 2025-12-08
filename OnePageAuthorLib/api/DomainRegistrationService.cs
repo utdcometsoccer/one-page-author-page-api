@@ -129,16 +129,22 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             _logger.LogInformation("Updating domain registration {RegistrationId} for user {Upn}", 
                 registrationId, upn);
 
-            // Validate subscription first
-            await ValidateUserSubscriptionAsync(upn);
-
-            // Get existing registration
+            // Get existing registration first to know the domain
             var existingRegistration = await _repository.GetByIdAsync(registrationId, upn);
             if (existingRegistration == null)
             {
                 _logger.LogWarning("Domain registration {RegistrationId} not found for user {Upn}", 
                     registrationId, upn);
                 return null;
+            }
+
+            // Validate subscription for the domain
+            var domainToValidate = domain?.FullDomainName ?? existingRegistration.Domain.FullDomainName;
+            var hasValidSubscription = await _subscriptionValidationService.HasValidSubscriptionAsync(user, domainToValidate);
+            if (!hasValidSubscription)
+            {
+                _logger.LogWarning("User {Upn} does not have a valid subscription for domain {Domain}", upn, domainToValidate);
+                throw new InvalidOperationException($"User does not have an active subscription for domain '{domainToValidate}'. Please subscribe to update domain registrations.");
             }
 
             // Update domain if provided
@@ -179,39 +185,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
             return await _repository.UpdateAsync(existingRegistration);
         }
-
-        /// <summary>
-        /// Validates that the user has an active subscription.
-        /// </summary>
-        /// <param name="upn">User Principal Name</param>
-        /// <exception cref="InvalidOperationException">Thrown if user doesn't have an active subscription</exception>
-        private async Task ValidateUserSubscriptionAsync(string upn)
-        {
-            _logger.LogInformation("Validating subscription for user {Upn}", upn);
-            
-            // Get user profile to retrieve Stripe customer ID
-            var userProfile = await _userProfileRepository.GetByUpnAsync(upn);
-            if (userProfile == null || string.IsNullOrWhiteSpace(userProfile.StripeCustomerId))
-            {
-                _logger.LogWarning("User {Upn} does not have a Stripe customer ID", upn);
-                throw new InvalidOperationException("User does not have an active subscription. Please subscribe to update domain registrations.");
-            }
-
-            // Check if user has any active subscriptions
-            var subscriptionsResponse = await _listSubscriptions.ListAsync(
-                customerId: userProfile.StripeCustomerId,
-                status: "active",
-                limit: 1);
-
-            if (subscriptionsResponse?.Subscriptions?.Data == null || subscriptionsResponse.Subscriptions.Data.Count == 0)
-            {
-                _logger.LogWarning("User {Upn} does not have any active subscriptions", upn);
-                throw new InvalidOperationException("User does not have an active subscription. Please subscribe to update domain registrations.");
-            }
-
-            _logger.LogInformation("User {Upn} has active subscription validated", upn);
-        }
-
 
     }
 }
