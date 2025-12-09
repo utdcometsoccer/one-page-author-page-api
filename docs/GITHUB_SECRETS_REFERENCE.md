@@ -31,6 +31,7 @@ Use this checklist when setting up the deployment workflow:
 - [ ] `DEPLOY_IMAGE_API` - Set to "true" to deploy ImageAPI Function App
 - [ ] `DEPLOY_ISW_FUNCTIONS` - Set to "true" to deploy InkStainedWretchFunctions
 - [ ] `DEPLOY_ISW_STRIPE` - Set to "true" to deploy InkStainedWretchStripe
+- [ ] `DEPLOY_ISW_CONFIG` - Set to "true" to deploy InkStainedWretchesConfig
 
 ### 💳 Payment Processing Secret (Required for Stripe functionality)
 
@@ -241,6 +242,18 @@ az account show --query tenantId -o tsv
 - Requires `STRIPE_API_KEY` to be configured
 - Infrastructure must be deployed first
 
+### DEPLOY_ISW_CONFIG
+
+**Format**: String (`"true"` or `"false"`)
+**Required**: No (optional)
+**Example**: `true`
+**Description**: Flag to enable/disable InkStainedWretchesConfig deployment.
+**Notes**:
+- Set to `"true"` to deploy
+- Leave empty or set to `"false"` to skip
+- Provides configuration management and Key Vault integration endpoints
+- Infrastructure must be deployed first
+
 ## 🚀 Deployment Scenarios
 
 ### Scenario 1: Full Deployment (All Resources)
@@ -249,9 +262,10 @@ Configure all required secrets plus:
 - `DEPLOY_IMAGE_API=true`
 - `DEPLOY_ISW_FUNCTIONS=true`
 - `DEPLOY_ISW_STRIPE=true`
+- `DEPLOY_ISW_CONFIG=true`
 - `STRIPE_API_KEY` (required for Stripe)
 
-**Result**: All infrastructure and all three Function Apps deployed.
+**Result**: All infrastructure and all four Function Apps deployed.
 
 ### Scenario 2: Infrastructure Only
 

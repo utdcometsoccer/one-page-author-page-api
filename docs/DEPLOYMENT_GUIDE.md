@@ -12,10 +12,11 @@ The deployment workflow (`main_onepageauthorapi.yml`) automatically builds and d
    - Key Vault
    - DNS Zone (optional)
    - Application Insights
-   - Three Function Apps:
+   - Four Function Apps:
      - **ImageAPI** - Image upload and management services
      - **InkStainedWretchFunctions** - Domain registration, localization, and external API integrations
      - **InkStainedWretchStripe** - Stripe payment processing and subscription management
+     - **InkStainedWretchesConfig** - Configuration management and Key Vault integration
 
 All deployments are **conditional** and only execute when the required GitHub Secrets are configured.
 
@@ -86,6 +87,7 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 | `DEPLOY_IMAGE_API` | Optional | Enable ImageAPI deployment | `true` or `false` |
 | `DEPLOY_ISW_FUNCTIONS` | Optional | Enable InkStainedWretchFunctions deployment | `true` or `false` |
 | `DEPLOY_ISW_STRIPE` | Optional | Enable InkStainedWretchStripe deployment | `true` or `false` |
+| `DEPLOY_ISW_CONFIG` | Optional | Enable InkStainedWretchesConfig deployment | `true` or `false` |
 
 ## 🚀 Deployment Workflow
 
@@ -104,6 +106,7 @@ The workflow runs automatically on:
    - ImageAPI
    - InkStainedWretchFunctions
    - InkStainedWretchStripe
+   - InkStainedWretchesConfig
 4. **Azure Authentication** - Login using Service Principal
 5. **Deploy Cosmos DB Account** (Conditional)
    - Checks if Cosmos DB account exists
@@ -126,6 +129,8 @@ The workflow runs automatically on:
     - Only if `DEPLOY_ISW_FUNCTIONS=true`
 12. **Deploy InkStainedWretchStripe** (Conditional)
     - Only if `DEPLOY_ISW_STRIPE=true`
+13. **Deploy InkStainedWretchesConfig** (Conditional)
+    - Only if `DEPLOY_ISW_CONFIG=true`
 
 ## 🏗️ Infrastructure Components
 
