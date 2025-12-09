@@ -2,6 +2,7 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using InkStainedWretch.OnePageAuthorAPI;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Services
 {

@@ -192,6 +192,9 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
   name: imageApiFunctionName
   location: location
   kind: 'functionapp'
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlan.id
     siteConfig: {
@@ -260,6 +263,9 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
   name: inkStainedWretchFunctionsName
   location: location
   kind: 'functionapp'
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlan.id
     siteConfig: {
@@ -328,6 +334,9 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
   name: inkStainedWretchStripeName
   location: location
   kind: 'functionapp'
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlan.id
     siteConfig: {
@@ -400,6 +409,9 @@ resource inkStainedWretchesConfigApp 'Microsoft.Web/sites@2024-04-01' = if (depl
   name: inkStainedWretchesConfigName
   location: location
   kind: 'functionapp'
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlan.id
     siteConfig: {
@@ -445,6 +457,54 @@ resource inkStainedWretchesConfigApp 'Microsoft.Web/sites@2024-04-01' = if (depl
       minTlsVersion: '1.2'
     }
     httpsOnly: true
+  }
+}
+
+// =========================================
+// Key Vault Role Assignments
+// =========================================
+
+// Grant ImageAPI access to Key Vault
+resource imageApiKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployImageApi && deployStorageAccount) {
+  name: guid(keyVault.id, imageApiFunctionApp.id, 'Key Vault Secrets User')
+  scope: keyVault
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
+    principalId: imageApiFunctionApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Grant InkStainedWretchFunctions access to Key Vault
+resource functionsKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployInkStainedWretchFunctions && deployStorageAccount) {
+  name: guid(keyVault.id, inkStainedWretchFunctionsApp.id, 'Key Vault Secrets User')
+  scope: keyVault
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
+    principalId: inkStainedWretchFunctionsApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Grant InkStainedWretchStripe access to Key Vault
+resource stripeKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployInkStainedWretchStripe && deployStorageAccount) {
+  name: guid(keyVault.id, inkStainedWretchStripeApp.id, 'Key Vault Secrets User')
+  scope: keyVault
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
+    principalId: inkStainedWretchStripeApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Grant InkStainedWretchesConfig access to Key Vault
+resource configKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployInkStainedWretchesConfig && deployStorageAccount) {
+  name: guid(keyVault.id, inkStainedWretchesConfigApp.id, 'Key Vault Secrets User')
+  scope: keyVault
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
+    principalId: inkStainedWretchesConfigApp.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 
