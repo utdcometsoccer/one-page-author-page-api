@@ -7,7 +7,7 @@
 // - Key Vault
 // - DNS Zone
 // - Application Insights
-// - Three Function Apps (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStripe)
+// - Four Function Apps (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStripe, InkStainedWretchesConfig)
 // - Azure Communication Services (optional, for email notifications)
 
 @description('The base name for all resources (used to generate unique names)')
