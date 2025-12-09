@@ -7,7 +7,7 @@
 // - Key Vault
 // - DNS Zone
 // - Application Insights
-// - Three Function Apps (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStripe)
+// - Four Function Apps (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStripe, InkStainedWretchesConfig)
 // - Azure Communication Services (optional, for email notifications)
 
 @description('The base name for all resources (used to generate unique names)')
@@ -172,7 +172,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = if (deployAppI
 // App Service Plan (Consumption)
 // =========================================
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = if (deployImageApi || deployInkStainedWretchFunctions || deployInkStainedWretchStripe) {
+resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = if (deployImageApi || deployInkStainedWretchFunctions || deployInkStainedWretchStripe || deployInkStainedWretchesConfig) {
   name: appServicePlanName
   location: location
   sku: {
