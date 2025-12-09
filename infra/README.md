@@ -81,7 +81,7 @@ az deployment group create \
   --resource-group MyResourceGroup \
   --template-file keyvault.bicep \
   --parameters keyVaultName=myapp-secrets-kv \
-              location="West US 2" \
+              location="westus2" \
               enableRbacAuthorization=true \
               enablePurgeProtection=true
 ```

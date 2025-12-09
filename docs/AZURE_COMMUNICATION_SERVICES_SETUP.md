@@ -43,7 +43,7 @@ The infrastructure includes an optional Azure Communication Services deployment 
 # Set variables
 RESOURCE_GROUP="your-resource-group"
 BASE_NAME="onepageauthor"
-LOCATION="eastus"
+LOCATION="westus2"
 
 # Register the provider (if not already done)
 az provider register --namespace Microsoft.Communication --wait
