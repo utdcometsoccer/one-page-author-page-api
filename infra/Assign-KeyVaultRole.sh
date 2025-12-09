@@ -241,8 +241,24 @@ main() {
     create_role_assignment
 }
 
+# Function to handle errors
+handle_error() {
+    echo ""
+    echo -e "${RED}========================================${NC}"
+    echo -e "${RED}✗ Error occurred${NC}"
+    echo -e "${RED}========================================${NC}"
+    echo ""
+    echo -e "${YELLOW}Please ensure that:${NC}"
+    echo -e "${YELLOW}  1. You are logged in to Azure CLI (az login)${NC}"
+    echo -e "${YELLOW}  2. You have sufficient permissions to assign roles${NC}"
+    echo -e "${YELLOW}  3. The Key Vault '$KEY_VAULT_NAME' exists${NC}"
+    echo -e "${YELLOW}  4. The service principal '$SERVICE_PRINCIPAL_NAME' exists${NC}"
+    echo ""
+    exit 1
+}
+
 # Trap errors
-trap 'echo -e "${RED}"; echo "========================================"; echo "✗ Error occurred"; echo "========================================"; echo "${NC}"; echo -e "${YELLOW}Please ensure that:${NC}"; echo -e "${YELLOW}  1. You are logged in to Azure CLI (az login)${NC}"; echo -e "${YELLOW}  2. You have sufficient permissions to assign roles${NC}"; echo -e "${YELLOW}  3. The Key Vault '\''$KEY_VAULT_NAME'\'' exists${NC}"; echo -e "${YELLOW}  4. The service principal '\''$SERVICE_PRINCIPAL_NAME'\'' exists${NC}"; echo ""; exit 1' ERR
+trap 'handle_error' ERR
 
 # Run main function
 main
