@@ -37,12 +37,6 @@ A comprehensive Infrastructure as Code template that conditionally deploys:
   - Global location
   - Conditional on ISW_DNS_ZONE_NAME secret
 
-- ✅ **Static Web App** - Frontend hosting (optional)
-  - Free tier
-  - GitHub integration
-  - Staging environments enabled
-  - Conditional on ISW_STATIC_WEB_APP_REPO_URL secret
-
 #### Function Apps
 
 Three Azure Functions deployed on a shared Consumption Plan:
@@ -214,8 +208,6 @@ The implementation includes intelligent conditional deployment at multiple level
 
 ### Optional Secrets (for additional features)
 - `ISW_DNS_ZONE_NAME` - Custom domain
-- `ISW_STATIC_WEB_APP_REPO_URL` - Static web app repository
-- `ISW_STATIC_WEB_APP_BRANCH` - Repository branch
 - `STRIPE_API_KEY` - Payment processing
 - `DEPLOY_IMAGE_API` - Enable ImageAPI deployment
 - `DEPLOY_ISW_FUNCTIONS` - Enable InkStainedWretchFunctions deployment
@@ -231,7 +223,7 @@ The implementation includes intelligent conditional deployment at multiple level
 ### Scenario 1: Full Deployment
 **Configuration**: All secrets configured
 **Result**: 
-- Complete infrastructure (Storage, Key Vault, App Insights, DNS, Static Web App)
+- Complete infrastructure (Storage, Key Vault, App Insights, DNS)
 - All three Function Apps deployed
 - Full monitoring and logging
 

@@ -25,8 +25,6 @@ Use this checklist when setting up the deployment workflow:
 ### ➕ Optional Infrastructure Secrets
 
 - [ ] `ISW_DNS_ZONE_NAME` - Custom domain name (e.g., "yourdomain.com")
-- [ ] `ISW_STATIC_WEB_APP_REPO_URL` - GitHub repository URL for Static Web App
-- [ ] `ISW_STATIC_WEB_APP_BRANCH` - GitHub branch (default: "main")
 
 ### 🎛️ Optional Deployment Control Secrets
 
@@ -208,24 +206,6 @@ az account show --query tenantId -o tsv
 - Do not include "https://" or "www"
 - Must be a valid domain name you own
 - Used for custom domain mapping
-
-### ISW_STATIC_WEB_APP_REPO_URL
-
-**Format**: String (GitHub repository URL)
-**Required**: No (optional)
-**Example**: `https://github.com/username/repository`
-**Description**: GitHub repository URL for Static Web App deployment.
-**Notes**:
-- Must be a valid GitHub repository URL
-- Repository should contain a static web application
-- GitHub token will be used for authentication
-
-### ISW_STATIC_WEB_APP_BRANCH
-
-**Format**: String (git branch name)
-**Required**: No (optional, defaults to "main")
-**Example**: `main`, `master`, `production`
-**Description**: Git branch to deploy for Static Web App.
 
 ### DEPLOY_IMAGE_API
 

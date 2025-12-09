@@ -12,7 +12,6 @@ The deployment workflow (`main_onepageauthorapi.yml`) automatically builds and d
    - Key Vault
    - DNS Zone (optional)
    - Application Insights
-   - Static Web App (optional)
    - Three Function Apps:
      - **ImageAPI** - Image upload and management services
      - **InkStainedWretchFunctions** - Domain registration, localization, and external API integrations
@@ -70,8 +69,6 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 | `ISW_LOCATION` | ✅ Yes | Azure region for deployment | `West US 2` |
 | `ISW_BASE_NAME` | ✅ Yes | Base name for all resources (must be globally unique) | `inkstainedwretches` |
 | `ISW_DNS_ZONE_NAME` | Optional | DNS Zone name (e.g., your custom domain) | `yourdomain.com` |
-| `ISW_STATIC_WEB_APP_REPO_URL` | Optional | GitHub repository URL for Static Web App | `https://github.com/user/repo` |
-| `ISW_STATIC_WEB_APP_BRANCH` | Optional | GitHub branch for Static Web App | `main` |
 
 ### Function App Configuration Secrets
 
@@ -122,7 +119,7 @@ The workflow runs automatically on:
 9. **Deploy Ink Stained Wretches Infrastructure** (Conditional)
     - Creates resource group if it doesn't exist
     - Deploys all infrastructure using `inkstainedwretches.bicep`
-    - Includes: Storage Account, Key Vault, App Insights, DNS Zone (optional), Static Web App (optional), Function Apps
+    - Includes: Storage Account, Key Vault, App Insights, DNS Zone (optional), Function Apps
 10. **Deploy ImageAPI** (Conditional)
     - Only if `DEPLOY_IMAGE_API=true`
 11. **Deploy InkStainedWretchFunctions** (Conditional)
@@ -175,16 +172,6 @@ The workflow runs automatically on:
 - Zone type: Public
 - Location: Global
 - Deployed only if `ISW_DNS_ZONE_NAME` is provided
-
-### Static Web App
-
-**Purpose**: Host static web application with GitHub integration.
-
-**Configuration**:
-- SKU: Free
-- GitHub integration: Automatic deployments
-- Staging environments: Enabled
-- Deployed only if `ISW_STATIC_WEB_APP_REPO_URL` is provided
 
 ### Function Apps
 
@@ -276,8 +263,6 @@ Three Azure Functions are deployed on a shared Consumption Plan (Y1/Dynamic):
 
 5. **Add Optional Infrastructure Secrets**
    - `ISW_DNS_ZONE_NAME`: Your custom domain (e.g., "yourdomain.com")
-   - `ISW_STATIC_WEB_APP_REPO_URL`: GitHub repo URL
-   - `ISW_STATIC_WEB_APP_BRANCH`: Branch name (default: "main")
 
 6. **Add Application Configuration Secrets** (Required)
    ```bash
