@@ -276,17 +276,6 @@ az account show --query tenantId -o tsv
 - Once enabled, cannot be disabled
 - Not needed for development/test environments
 
-### ISW_DNS_ZONE_NAME
-
-**Format**: String (domain name)
-**Required**: No (optional)
-**Example**: `yourdomain.com`, `example.org`
-**Description**: Custom domain name for DNS zone creation.
-**Notes**:
-- Do not include "https://" or "www"
-- Must be a valid domain name you own
-- Used for custom domain mapping
-
 ### ISW_STATIC_WEB_APP_REPO_URL
 
 **Format**: String (GitHub repository URL)
