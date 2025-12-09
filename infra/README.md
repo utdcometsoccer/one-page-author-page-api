@@ -1,6 +1,55 @@
 # Infrastructure Templates
 
-This directory contains Bicep templates for deploying Azure infrastructure components.
+This directory contains Bicep templates and management scripts for deploying and configuring Azure infrastructure components.
+
+## Management Scripts
+
+### Assign-KeyVaultRole.ps1 / Assign-KeyVaultRole.sh
+Assigns the Key Vault Secrets Officer role (or any other specified role) to a service principal for a specific Key Vault. The script checks if the role assignment already exists before creating it, making it idempotent.
+
+**PowerShell Usage:**
+```powershell
+# Basic usage with required parameter
+./Assign-KeyVaultRole.ps1 -KeyVaultName "mykeyvault"
+
+# With resource group specified
+./Assign-KeyVaultRole.ps1 -KeyVaultName "mykeyvault" -ResourceGroupName "MyResourceGroup"
+
+# With custom service principal and role
+./Assign-KeyVaultRole.ps1 -KeyVaultName "mykeyvault" -ServicePrincipalName "my-sp" -RoleName "Key Vault Administrator"
+```
+
+**Bash Usage:**
+```bash
+# Basic usage with required parameter
+./Assign-KeyVaultRole.sh -k mykeyvault
+
+# With resource group specified
+./Assign-KeyVaultRole.sh -k mykeyvault -r MyResourceGroup
+
+# With custom service principal and role
+./Assign-KeyVaultRole.sh -k mykeyvault -s my-sp -R "Key Vault Administrator"
+
+# Show help
+./Assign-KeyVaultRole.sh -h
+```
+
+**Default Values:**
+- Service Principal Name: `github-actions-inkstainedwretches`
+- Role Name: `Key Vault Secrets Officer`
+
+**Features:**
+- Idempotent - Safe to run multiple times
+- Validates Azure CLI installation and authentication
+- Checks if role assignment already exists
+- Clear, colorful output with progress indicators
+- Comprehensive error handling
+- Uses variables to avoid hardcoding values
+
+**Requirements:**
+- Azure CLI installed
+- User authenticated with `az login`
+- Sufficient permissions to assign roles (typically Owner or User Access Administrator)
 
 ## Available Templates
 
