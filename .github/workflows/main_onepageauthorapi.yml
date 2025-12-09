@@ -302,9 +302,9 @@ jobs:
       # =========================================
 
       - name: 'Register Microsoft.Communication Resource Provider'
-        # Note: continue-on-error allows deployment to proceed even if provider
-        # registration fails (useful for subscriptions where this is already handled
-        # or when Communication Services deployment is disabled)
+        # Note: continue-on-error allows optional Communication Services deployment
+        # to not block other infrastructure deployments. If registration fails,
+        # the subsequent deployment step will fail with a clear error message.
         continue-on-error: true
         shell: bash
         env:
@@ -318,37 +318,47 @@ jobs:
 
           echo "📦 Checking Microsoft.Communication resource provider registration..."
 
-          # Check if provider is already registered
-          if ! PROVIDER_STATE=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv 2>&1); then
+          # Check if provider is already registered (capture stderr separately)
+          PROVIDER_STATE_OUTPUT=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv 2>&1)
+          PROVIDER_CHECK_EXIT=$?
+
+          if [ $PROVIDER_CHECK_EXIT -ne 0 ]; then
             echo "⚠️ Warning: Unable to check provider status. This may be due to:"
             echo "   - Authentication issues"
             echo "   - Insufficient permissions"
             echo "   - Azure CLI not properly configured"
-            echo "   Error details: $PROVIDER_STATE"
+            echo "   Error output: $PROVIDER_STATE_OUTPUT"
             echo "   Attempting to register provider anyway..."
             PROVIDER_STATE="Unknown"
+          else
+            PROVIDER_STATE="$PROVIDER_STATE_OUTPUT"
           fi
 
           if [ "$PROVIDER_STATE" = "Registered" ]; then
             echo "✓ Microsoft.Communication provider is already registered"
           else
-            echo "📝 Registering Microsoft.Communication provider..."
-            if ! az provider register --namespace Microsoft.Communication --wait; then
+            echo "📝 Registering Microsoft.Communication provider (current state: $PROVIDER_STATE)..."
+            if ! REGISTER_OUTPUT=$(az provider register --namespace Microsoft.Communication --wait 2>&1); then
               echo "❌ ERROR: Failed to register Microsoft.Communication provider"
+              echo "   Error output: $REGISTER_OUTPUT"
               echo "   This is required for Azure Communication Services deployment"
               echo "   Please ensure you have sufficient permissions (Contributor or Owner role)"
-              exit 1
+              echo "   Continuing anyway - deployment may fail with clear error message"
+              exit 0
             fi
 
-            # Verify registration
-            if ! PROVIDER_STATE=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv 2>&1); then
+            # Verify registration (capture stderr separately)
+            PROVIDER_STATE_OUTPUT=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv 2>&1)
+            PROVIDER_CHECK_EXIT=$?
+
+            if [ $PROVIDER_CHECK_EXIT -ne 0 ]; then
               echo "⚠️ Warning: Unable to verify provider registration status"
-              echo "   Error details: $PROVIDER_STATE"
+              echo "   Error output: $PROVIDER_STATE_OUTPUT"
               echo "   Deployment will proceed, but may fail if registration is incomplete"
-            elif [ "$PROVIDER_STATE" = "Registered" ]; then
+            elif [ "$PROVIDER_STATE_OUTPUT" = "Registered" ]; then
               echo "✓ Microsoft.Communication provider registered successfully"
             else
-              echo "⚠️ Provider registration state: $PROVIDER_STATE (may still be registering)"
+              echo "⚠️ Provider registration state: $PROVIDER_STATE_OUTPUT (may still be registering)"
               echo "   Deployment will proceed, but may fail if registration is not complete"
             fi
           fi
