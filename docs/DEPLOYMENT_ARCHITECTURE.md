@@ -258,10 +258,6 @@ This document provides visual representations of the deployment architecture for
          │   YES → Deploy DNS Zone
          │   NO  → Skip DNS Zone
          │
-         ├─► ISW_STATIC_WEB_APP_REPO_URL configured?
-         │   YES → Deploy Static Web App
-         │   NO  → Skip Static Web App
-         │
          └─► Always Deploy:
              - Storage Account
              - Key Vault
