@@ -302,6 +302,9 @@ jobs:
       # =========================================
 
       - name: 'Register Microsoft.Communication Resource Provider'
+        # Note: continue-on-error allows deployment to proceed even if provider
+        # registration fails (useful for subscriptions where this is already handled
+        # or when Communication Services deployment is disabled)
         continue-on-error: true
         shell: bash
         env:
@@ -316,17 +319,33 @@ jobs:
           echo "📦 Checking Microsoft.Communication resource provider registration..."
 
           # Check if provider is already registered
-          PROVIDER_STATE=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv 2>/dev/null || echo "NotRegistered")
+          if ! PROVIDER_STATE=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv 2>&1); then
+            echo "⚠️ Warning: Unable to check provider status. This may be due to:"
+            echo "   - Authentication issues"
+            echo "   - Insufficient permissions"
+            echo "   - Azure CLI not properly configured"
+            echo "   Error details: $PROVIDER_STATE"
+            echo "   Attempting to register provider anyway..."
+            PROVIDER_STATE="Unknown"
+          fi
 
           if [ "$PROVIDER_STATE" = "Registered" ]; then
             echo "✓ Microsoft.Communication provider is already registered"
           else
             echo "📝 Registering Microsoft.Communication provider..."
-            az provider register --namespace Microsoft.Communication --wait
+            if ! az provider register --namespace Microsoft.Communication --wait; then
+              echo "❌ ERROR: Failed to register Microsoft.Communication provider"
+              echo "   This is required for Azure Communication Services deployment"
+              echo "   Please ensure you have sufficient permissions (Contributor or Owner role)"
+              exit 1
+            fi
 
             # Verify registration
-            PROVIDER_STATE=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv)
-            if [ "$PROVIDER_STATE" = "Registered" ]; then
+            if ! PROVIDER_STATE=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv 2>&1); then
+              echo "⚠️ Warning: Unable to verify provider registration status"
+              echo "   Error details: $PROVIDER_STATE"
+              echo "   Deployment will proceed, but may fail if registration is incomplete"
+            elif [ "$PROVIDER_STATE" = "Registered" ]; then
               echo "✓ Microsoft.Communication provider registered successfully"
             else
               echo "⚠️ Provider registration state: $PROVIDER_STATE (may still be registering)"
