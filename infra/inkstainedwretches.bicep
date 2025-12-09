@@ -76,10 +76,10 @@ var inkStainedWretchesConfigName = '${baseName}-config'
 var appServicePlanName = '${baseName}-plan'
 
 // Storage account connection string (used by all Function Apps)
-var storageConnectionString = deployStorageAccount ? 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}' : ''
+var storageConnectionString = deployStorageAccount ? 'DefaultEndpointsProtocol=https;AccountName=${storageAccount!.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount!.listKeys().keys[0].value}' : ''
 
 // Key Vault URI for configuration
-var keyVaultUri = deployKeyVault ? keyVault.properties.vaultUri : ''
+var keyVaultUri = deployKeyVault ? keyVault!.properties.vaultUri : ''
 
 // =========================================
 // Storage Account
@@ -225,7 +225,7 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
         }
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: deployAppInsights ? appInsights.properties.ConnectionString : ''
+          value: deployAppInsights ? appInsights!.properties.ConnectionString : ''
         }
         {
           name: 'COSMOSDB_CONNECTION_STRING'
@@ -296,7 +296,7 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
         }
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: deployAppInsights ? appInsights.properties.ConnectionString : ''
+          value: deployAppInsights ? appInsights!.properties.ConnectionString : ''
         }
         {
           name: 'COSMOSDB_CONNECTION_STRING'
@@ -367,7 +367,7 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
         }
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: deployAppInsights ? appInsights.properties.ConnectionString : ''
+          value: deployAppInsights ? appInsights!.properties.ConnectionString : ''
         }
         {
           name: 'COSMOSDB_CONNECTION_STRING'
@@ -442,7 +442,7 @@ resource inkStainedWretchesConfigApp 'Microsoft.Web/sites@2024-04-01' = if (depl
         }
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: deployAppInsights ? appInsights.properties.ConnectionString : ''
+          value: deployAppInsights ? appInsights!.properties.ConnectionString : ''
         }
         {
           name: 'KEY_VAULT_URL'
@@ -466,44 +466,44 @@ resource inkStainedWretchesConfigApp 'Microsoft.Web/sites@2024-04-01' = if (depl
 
 // Grant ImageAPI access to Key Vault
 resource imageApiKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployImageApi && deployStorageAccount) {
-  name: guid(keyVault.id, imageApiFunctionApp.id, 'Key Vault Secrets User')
+  name: guid(keyVault!.id, imageApiFunctionApp!.id, 'Key Vault Secrets User')
   scope: keyVault
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-    principalId: imageApiFunctionApp.identity.principalId
+    principalId: imageApiFunctionApp!.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
 // Grant InkStainedWretchFunctions access to Key Vault
 resource functionsKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployInkStainedWretchFunctions && deployStorageAccount) {
-  name: guid(keyVault.id, inkStainedWretchFunctionsApp.id, 'Key Vault Secrets User')
+  name: guid(keyVault!.id, inkStainedWretchFunctionsApp!.id, 'Key Vault Secrets User')
   scope: keyVault
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-    principalId: inkStainedWretchFunctionsApp.identity.principalId
+    principalId: inkStainedWretchFunctionsApp!.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
 // Grant InkStainedWretchStripe access to Key Vault
 resource stripeKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployInkStainedWretchStripe && deployStorageAccount) {
-  name: guid(keyVault.id, inkStainedWretchStripeApp.id, 'Key Vault Secrets User')
+  name: guid(keyVault!.id, inkStainedWretchStripeApp!.id, 'Key Vault Secrets User')
   scope: keyVault
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-    principalId: inkStainedWretchStripeApp.identity.principalId
+    principalId: inkStainedWretchStripeApp!.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
 // Grant InkStainedWretchesConfig access to Key Vault
 resource configKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployInkStainedWretchesConfig && deployStorageAccount) {
-  name: guid(keyVault.id, inkStainedWretchesConfigApp.id, 'Key Vault Secrets User')
+  name: guid(keyVault!.id, inkStainedWretchesConfigApp!.id, 'Key Vault Secrets User')
   scope: keyVault
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-    principalId: inkStainedWretchesConfigApp.identity.principalId
+    principalId: inkStainedWretchesConfigApp!.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -512,21 +512,21 @@ resource configKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-0
 // Outputs
 // =========================================
 
-output storageAccountName string = deployStorageAccount ? storageAccount.name : ''
-output keyVaultName string = deployKeyVault ? keyVault.name : ''
+output storageAccountName string = deployStorageAccount ? storageAccount!.name : ''
+output keyVaultName string = deployKeyVault ? keyVault!.name : ''
 output keyVaultUri string = deployKeyVault ? keyVaultUri : ''
-output dnsZoneName string = deployDnsZone && !empty(dnsZoneName) ? dnsZone.name : ''
-output appInsightsName string = deployAppInsights ? appInsights.name : ''
-output appInsightsInstrumentationKey string = deployAppInsights ? appInsights.properties.InstrumentationKey : ''
-output appInsightsConnectionString string = deployAppInsights ? appInsights.properties.ConnectionString : ''
-output imageApiFunctionName string = deployImageApi && deployStorageAccount ? imageApiFunctionApp.name : ''
-output imageApiFunctionUrl string = deployImageApi && deployStorageAccount ? 'https://${imageApiFunctionApp.properties.defaultHostName}' : ''
-output inkStainedWretchFunctionsName string = deployInkStainedWretchFunctions && deployStorageAccount ? inkStainedWretchFunctionsApp.name : ''
-output inkStainedWretchFunctionsUrl string = deployInkStainedWretchFunctions && deployStorageAccount ? 'https://${inkStainedWretchFunctionsApp.properties.defaultHostName}' : ''
-output inkStainedWretchStripeName string = deployInkStainedWretchStripe && deployStorageAccount ? inkStainedWretchStripeApp.name : ''
-output inkStainedWretchStripeUrl string = deployInkStainedWretchStripe && deployStorageAccount ? 'https://${inkStainedWretchStripeApp.properties.defaultHostName}' : ''
-output inkStainedWretchesConfigName string = deployInkStainedWretchesConfig && deployStorageAccount ? inkStainedWretchesConfigApp.name : ''
-output inkStainedWretchesConfigUrl string = deployInkStainedWretchesConfig && deployStorageAccount ? 'https://${inkStainedWretchesConfigApp.properties.defaultHostName}' : ''
+output dnsZoneName string = deployDnsZone && !empty(dnsZoneName) ? dnsZone!.name : ''
+output appInsightsName string = deployAppInsights ? appInsights!.name : ''
+output appInsightsInstrumentationKey string = deployAppInsights ? appInsights!.properties.InstrumentationKey : ''
+output appInsightsConnectionString string = deployAppInsights ? appInsights!.properties.ConnectionString : ''
+output imageApiFunctionName string = deployImageApi && deployStorageAccount ? imageApiFunctionApp!.name : ''
+output imageApiFunctionUrl string = deployImageApi && deployStorageAccount ? 'https://${imageApiFunctionApp!.properties.defaultHostName}' : ''
+output inkStainedWretchFunctionsName string = deployInkStainedWretchFunctions && deployStorageAccount ? inkStainedWretchFunctionsApp!.name : ''
+output inkStainedWretchFunctionsUrl string = deployInkStainedWretchFunctions && deployStorageAccount ? 'https://${inkStainedWretchFunctionsApp!.properties.defaultHostName}' : ''
+output inkStainedWretchStripeName string = deployInkStainedWretchStripe && deployStorageAccount ? inkStainedWretchStripeApp!.name : ''
+output inkStainedWretchStripeUrl string = deployInkStainedWretchStripe && deployStorageAccount ? 'https://${inkStainedWretchStripeApp!.properties.defaultHostName}' : ''
+output inkStainedWretchesConfigName string = deployInkStainedWretchesConfig && deployStorageAccount ? inkStainedWretchesConfigApp!.name : ''
+output inkStainedWretchesConfigUrl string = deployInkStainedWretchesConfig && deployStorageAccount ? 'https://${inkStainedWretchesConfigApp!.properties.defaultHostName}' : ''
 output communicationServicesDeployed string = deployCommunicationServices ? 'true' : 'false'
 output communicationServicesNote string = deployCommunicationServices ? 'Communication Services deployed. Retrieve connection string from Azure Portal -> Communication Services -> Keys' : 'Communication Services not deployed'
 
