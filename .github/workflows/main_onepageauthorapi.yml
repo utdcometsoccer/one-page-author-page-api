@@ -13,6 +13,7 @@ env:
   IMAGE_API_PATH: 'ImageAPI'
   INK_STAINED_WRETCH_FUNCTIONS_PATH: 'InkStainedWretchFunctions'
   INK_STAINED_WRETCH_STRIPE_PATH: 'InkStainedWretchStripe'
+  INK_STAINED_WRETCHES_CONFIG_PATH: 'InkStainedWretchesConfig'
 
 jobs:
   build-and-deploy:
@@ -93,6 +94,22 @@ jobs:
         run: |
           cd '${{ env.INK_STAINED_WRETCH_STRIPE_PATH }}/output'
           zip -r ../inkstainedwretchstripe.zip .
+          cd ../..
+
+      - name: 'Build and Publish InkStainedWretchesConfig'
+        shell: bash
+        run: |
+          echo "Building InkStainedWretchesConfig..."
+          pushd '${{ env.INK_STAINED_WRETCHES_CONFIG_PATH }}'
+          dotnet build --configuration Release
+          dotnet publish --configuration Release --output ./output
+          popd
+
+      - name: 'Zip InkStainedWretchesConfig Output'
+        shell: bash
+        run: |
+          cd '${{ env.INK_STAINED_WRETCHES_CONFIG_PATH }}/output'
+          zip -r ../inkstainedwretchesconfig.zip .
           cd ../..
 
       # =========================================
@@ -446,3 +463,34 @@ jobs:
             --src '${{ env.INK_STAINED_WRETCH_STRIPE_PATH }}/inkstainedwretchstripe.zip'
 
           echo "✓ InkStainedWretchStripe deployed successfully"
+
+      # =========================================
+      # Deploy InkStainedWretchesConfig Function App
+      # =========================================
+
+      - name: 'Deploy InkStainedWretchesConfig Function App'
+        continue-on-error: true
+        shell: bash
+        env:
+          ISW_RESOURCE_GROUP: ${{ secrets.ISW_RESOURCE_GROUP }}
+          ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
+          DEPLOY_ISW_CONFIG: ${{ secrets.DEPLOY_ISW_CONFIG }}
+        run: |
+          # Skip if InkStainedWretchesConfig deployment is not enabled
+          if [ "$DEPLOY_ISW_CONFIG" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
+            echo "⚠️ Skipping InkStainedWretchesConfig deployment"
+            echo "   DEPLOY_ISW_CONFIG=$DEPLOY_ISW_CONFIG"
+            echo "   ISW_RESOURCE_GROUP=$ISW_RESOURCE_GROUP"
+            echo "   ISW_BASE_NAME=$ISW_BASE_NAME"
+            exit 0
+          fi
+
+          FUNCTION_APP_NAME="${ISW_BASE_NAME}-config"
+          echo "🚀 Deploying InkStainedWretchesConfig to: $FUNCTION_APP_NAME"
+
+          az functionapp deployment source config-zip \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$ISW_RESOURCE_GROUP" \
+            --src '${{ env.INK_STAINED_WRETCHES_CONFIG_PATH }}/inkstainedwretchesconfig.zip'
+
+          echo "✓ InkStainedWretchesConfig deployed successfully"

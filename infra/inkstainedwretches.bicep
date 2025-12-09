@@ -43,6 +43,9 @@ param deployInkStainedWretchFunctions bool = true
 @description('Whether to deploy the InkStainedWretchStripe Function App')
 param deployInkStainedWretchStripe bool = true
 
+@description('Whether to deploy the InkStainedWretchesConfig Function App')
+param deployInkStainedWretchesConfig bool = true
+
 @description('Cosmos DB connection string (required for Function Apps)')
 @secure()
 param cosmosDbConnectionString string = ''
@@ -69,10 +72,14 @@ var appInsightsName = '${baseName}-insights'
 var imageApiFunctionName = '${baseName}-imageapi'
 var inkStainedWretchFunctionsName = '${baseName}-functions'
 var inkStainedWretchStripeName = '${baseName}-stripe'
+var inkStainedWretchesConfigName = '${baseName}-config'
 var appServicePlanName = '${baseName}-plan'
 
 // Storage account connection string (used by all Function Apps)
 var storageConnectionString = deployStorageAccount ? 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}' : ''
+
+// Key Vault URI for configuration
+var keyVaultUri = deployKeyVault ? keyVault.properties.vaultUri : ''
 
 // =========================================
 // Storage Account
@@ -229,6 +236,14 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
           name: 'AAD_AUDIENCE'
           value: aadAudience
         }
+        {
+          name: 'KEY_VAULT_URL'
+          value: keyVaultUri
+        }
+        {
+          name: 'USE_KEY_VAULT'
+          value: 'false'
+        }
       ]
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
@@ -288,6 +303,14 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
         {
           name: 'AAD_AUDIENCE'
           value: aadAudience
+        }
+        {
+          name: 'KEY_VAULT_URL'
+          value: keyVaultUri
+        }
+        {
+          name: 'USE_KEY_VAULT'
+          value: 'false'
         }
       ]
       ftpsState: 'FtpsOnly'
@@ -353,6 +376,70 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
           name: 'AAD_AUDIENCE'
           value: aadAudience
         }
+        {
+          name: 'KEY_VAULT_URL'
+          value: keyVaultUri
+        }
+        {
+          name: 'USE_KEY_VAULT'
+          value: 'false'
+        }
+      ]
+      ftpsState: 'FtpsOnly'
+      minTlsVersion: '1.2'
+    }
+    httpsOnly: true
+  }
+}
+
+// =========================================
+// InkStainedWretchesConfig Function App
+// =========================================
+
+resource inkStainedWretchesConfigApp 'Microsoft.Web/sites@2024-04-01' = if (deployInkStainedWretchesConfig && deployStorageAccount) {
+  name: inkStainedWretchesConfigName
+  location: location
+  kind: 'functionapp'
+  properties: {
+    serverFarmId: appServicePlan.id
+    siteConfig: {
+      appSettings: [
+        {
+          name: 'AzureWebJobsStorage'
+          value: storageConnectionString
+        }
+        {
+          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+          value: storageConnectionString
+        }
+        {
+          name: 'WEBSITE_CONTENTSHARE'
+          value: toLower(inkStainedWretchesConfigName)
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~4'
+        }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME'
+          value: 'dotnet-isolated'
+        }
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1'
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: deployAppInsights ? appInsights.properties.ConnectionString : ''
+        }
+        {
+          name: 'KEY_VAULT_URL'
+          value: keyVaultUri
+        }
+        {
+          name: 'USE_KEY_VAULT'
+          value: 'true'
+        }
       ]
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
@@ -367,6 +454,7 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
 
 output storageAccountName string = deployStorageAccount ? storageAccount.name : ''
 output keyVaultName string = deployKeyVault ? keyVault.name : ''
+output keyVaultUri string = deployKeyVault ? keyVaultUri : ''
 output dnsZoneName string = deployDnsZone && !empty(dnsZoneName) ? dnsZone.name : ''
 output appInsightsName string = deployAppInsights ? appInsights.name : ''
 output appInsightsInstrumentationKey string = deployAppInsights ? appInsights.properties.InstrumentationKey : ''
@@ -377,6 +465,8 @@ output inkStainedWretchFunctionsName string = deployInkStainedWretchFunctions &&
 output inkStainedWretchFunctionsUrl string = deployInkStainedWretchFunctions && deployStorageAccount ? 'https://${inkStainedWretchFunctionsApp.properties.defaultHostName}' : ''
 output inkStainedWretchStripeName string = deployInkStainedWretchStripe && deployStorageAccount ? inkStainedWretchStripeApp.name : ''
 output inkStainedWretchStripeUrl string = deployInkStainedWretchStripe && deployStorageAccount ? 'https://${inkStainedWretchStripeApp.properties.defaultHostName}' : ''
+output inkStainedWretchesConfigName string = deployInkStainedWretchesConfig && deployStorageAccount ? inkStainedWretchesConfigApp.name : ''
+output inkStainedWretchesConfigUrl string = deployInkStainedWretchesConfig && deployStorageAccount ? 'https://${inkStainedWretchesConfigApp.properties.defaultHostName}' : ''
 output communicationServicesDeployed string = deployCommunicationServices ? 'true' : 'false'
 output communicationServicesNote string = deployCommunicationServices ? 'Communication Services deployed. Retrieve connection string from Azure Portal -> Communication Services -> Keys' : 'Communication Services not deployed'
 
