@@ -388,7 +388,6 @@ module communicationServices 'communication-services.bicep' = if (deployCommunic
   name: 'communication-services-deployment'
   params: {
     baseName: baseName
-    location: location
     dataLocation: 'United States'
     tags: {
       environment: 'production'
