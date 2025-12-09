@@ -56,6 +56,8 @@ Assigns the Key Vault Secrets Officer role (or any other specified role) to a se
 ### keyvault.bicep
 Deploys a standalone Azure Key Vault for secure storage of secrets, keys, and certificates.
 
+**Note**: This template is available for manual deployment but is not used by the GitHub Actions workflow. The Key Vault is automatically deployed as part of the `inkstainedwretches.bicep` infrastructure template.
+
 **Parameters:**
 - `keyVaultName` (required) - Name of the Key Vault (3-24 chars, globally unique)
 - `location` (optional) - Azure region (defaults to resource group location)
