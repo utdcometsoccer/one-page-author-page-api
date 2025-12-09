@@ -521,6 +521,26 @@ The platform uses GitHub Actions for automated deployment to Azure. See the comp
 - [ ] Validate JWT token configuration
 - [ ] Run smoke tests on deployed endpoints
 
+### ⚠️ Common Deployment Issues
+
+**Service Principal Permissions Error**
+
+If you encounter this error during deployment:
+```
+ERROR: "The client '***' does not have permission to perform action 
+'Microsoft.Authorization/roleAssignments/write'"
+```
+
+**Quick Fix**: Run the permission script **once** before deploying:
+```bash
+cd infra
+./Grant-ServicePrincipalPermissions.ps1  # Windows PowerShell
+# OR
+./Grant-ServicePrincipalPermissions.sh   # Linux/macOS
+```
+
+This grants your GitHub Actions service principal the required permissions to assign roles during deployment. See [PERMISSIONS_QUICK_FIX.md](PERMISSIONS_QUICK_FIX.md) for detailed instructions.
+
 ### Manual Deployment (Alternative)
 
 For manual deployment using Azure CLI:

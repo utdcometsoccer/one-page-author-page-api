@@ -4,6 +4,61 @@ This directory contains Bicep templates and management scripts for deploying and
 
 ## Management Scripts
 
+### Grant-ServicePrincipalPermissions.ps1 / Grant-ServicePrincipalPermissions.sh
+Grants the User Access Administrator role to a service principal at the subscription or resource group scope. This permission is **required** for the service principal to create role assignments during Bicep deployments (e.g., assigning Key Vault roles to Function Apps).
+
+**PowerShell Usage:**
+```powershell
+# Grant permissions at subscription scope (recommended)
+./Grant-ServicePrincipalPermissions.ps1
+
+# Grant permissions at resource group scope
+./Grant-ServicePrincipalPermissions.ps1 -Scope "resourcegroup" -ResourceGroupName "MyResourceGroup"
+
+# With custom service principal and subscription
+./Grant-ServicePrincipalPermissions.ps1 -ServicePrincipalName "my-sp" -SubscriptionId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+```
+
+**Bash Usage:**
+```bash
+# Grant permissions at subscription scope (recommended)
+./Grant-ServicePrincipalPermissions.sh
+
+# Grant permissions at resource group scope
+./Grant-ServicePrincipalPermissions.sh -S resourcegroup -r MyResourceGroup
+
+# With custom service principal and subscription
+./Grant-ServicePrincipalPermissions.sh -s my-sp -u xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+# Show help
+./Grant-ServicePrincipalPermissions.sh -h
+```
+
+**Default Values:**
+- Service Principal Name: `github-actions-inkstainedwretches`
+- Role Name: `User Access Administrator` (fixed - required for role assignments)
+- Scope: `subscription`
+
+**Features:**
+- Idempotent - Safe to run multiple times
+- Validates Azure CLI installation and authentication
+- Checks if role assignment already exists
+- Supports both subscription and resource group scopes
+- Clear, colorful output with progress indicators
+- Comprehensive error handling
+
+**Requirements:**
+- Azure CLI installed
+- User authenticated with `az login`
+- User must have Owner role or User Access Administrator role at the target scope
+- **jq** command-line JSON processor (for Bash script only)
+  - Ubuntu/Debian: `sudo apt-get install jq`
+  - macOS: `brew install jq`
+  - Other: https://stedolan.github.io/jq/download/
+
+**Why is this needed?**
+The error message `"The client '***' with object id '...' does not have permission to perform action 'Microsoft.Authorization/roleAssignments/write'"` occurs when the service principal lacks permission to create role assignments. The Bicep template `inkstainedwretches.bicep` needs to assign Key Vault roles to Function Apps, which requires the User Access Administrator role.
+
 ### Assign-KeyVaultRole.ps1 / Assign-KeyVaultRole.sh
 Assigns the Key Vault Secrets Officer role (or any other specified role) to a service principal for a specific Key Vault. The script checks if the role assignment already exists before creating it, making it idempotent.
 
