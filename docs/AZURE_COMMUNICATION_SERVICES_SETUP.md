@@ -20,6 +20,17 @@ Verified Domain
 Author's Email Inbox
 ```
 
+## Prerequisites
+
+Before deploying Azure Communication Services, ensure:
+
+1. **Resource Provider Registration**: The `Microsoft.Communication` resource provider must be registered in your Azure subscription.
+   - This is **automatically handled** by the GitHub Actions workflow when `DEPLOY_COMMUNICATION_SERVICES=true`
+   - For manual deployments, register with: `az provider register --namespace Microsoft.Communication --wait`
+   - Verify registration status: `az provider show --namespace Microsoft.Communication --query "registrationState"`
+
+2. **Azure Subscription**: An active Azure subscription with appropriate permissions
+
 ## Deployment Options
 
 ### Option 1: Deploy with Bicep Template (Recommended)
@@ -34,6 +45,9 @@ RESOURCE_GROUP="your-resource-group"
 BASE_NAME="onepageauthor"
 LOCATION="eastus"
 
+# Register the provider (if not already done)
+az provider register --namespace Microsoft.Communication --wait
+
 # Deploy Communication Services
 az deployment group create \
   --resource-group $RESOURCE_GROUP \
@@ -46,6 +60,9 @@ az deployment group create \
 #### Deploy as Part of Main Infrastructure
 
 ```bash
+# Register the provider (if not already done)
+az provider register --namespace Microsoft.Communication --wait
+
 # Deploy with Communication Services enabled
 az deployment group create \
   --resource-group $RESOURCE_GROUP \
@@ -59,15 +76,21 @@ az deployment group create \
                aadAudience="..."
 ```
 
-### Option 2: Deploy via GitHub Actions
+### Option 2: Deploy via GitHub Actions (Recommended)
 
-Update the GitHub Actions workflow to include Communication Services deployment.
+The GitHub Actions workflow automatically handles Communication Services deployment, including resource provider registration.
 
-Add the following secrets to your repository:
+**Setup:**
 
-- `DEPLOY_COMMUNICATION_SERVICES` - Set to `"true"` to enable deployment
+1. Add the following secret to your repository:
+   - `DEPLOY_COMMUNICATION_SERVICES` - Set to `"true"` to enable deployment
 
-The workflow will automatically deploy Communication Services with the infrastructure.
+2. The workflow will automatically:
+   - Check if `Microsoft.Communication` provider is registered
+   - Register the provider if needed
+   - Deploy Communication Services with the infrastructure
+
+**Note**: The workflow step "Register Microsoft.Communication Resource Provider" runs automatically before infrastructure deployment when enabled.
 
 ## Post-Deployment Configuration
 
@@ -189,6 +212,35 @@ az communication email domain show \
 **Check 3: Sender Address**
 - Ensure sender address matches the verified domain
 - Format: `DoNotReply@verifieddomain.com`
+
+### Issue: Resource Provider Not Registered
+
+**Error Message:**
+```
+MissingSubscriptionRegistration: The subscription is not registered to use namespace 'Microsoft.Communication'
+```
+
+**Solution (Manual):**
+```bash
+# Register the provider
+az provider register --namespace Microsoft.Communication
+
+# Wait for registration to complete (can take a few minutes)
+az provider register --namespace Microsoft.Communication --wait
+
+# Verify registration status
+az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv
+# Expected output: Registered
+```
+
+**Solution (Automatic - GitHub Actions):**
+- The workflow automatically registers the provider when `DEPLOY_COMMUNICATION_SERVICES=true`
+- Check the "Register Microsoft.Communication Resource Provider" step in workflow logs
+- If the step failed, verify Azure credentials have permission to register providers
+
+**Required Permissions:**
+- To register a resource provider, you need the `Microsoft.Authorization/roleAssignments/write` permission
+- This is included in Contributor and Owner roles at the subscription level
 
 ### Issue: Emails Going to Spam
 

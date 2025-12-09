@@ -155,9 +155,10 @@ This document outlines all GitHub Secrets required for the OnePageAuthorAPI CI/C
 
 **Secret Name**: `DEPLOY_COMMUNICATION_SERVICES`  
 **Required**: No  
-**Description**: Enable/disable Azure Communication Services deployment  
+**Description**: Enable/disable Azure Communication Services deployment for email notifications  
 **Values**: `true` or `false`  
-**Default**: `false`
+**Default**: `false`  
+**Note**: When set to `true`, the workflow will automatically register the `Microsoft.Communication` resource provider if needed and deploy Azure Communication Services
 
 ## Key Vault Configuration (Future)
 

@@ -120,7 +120,50 @@ Comprehensive deployment template for the Ink Stained Wretches platform includin
 - `deployKeyVault` (optional) - Deploy Key Vault component
 - `deployStorageAccount` (optional)
 - `deployAppInsights` (optional)
+- `deployCommunicationServices` (optional) - Deploy Azure Communication Services for email notifications
 - Various function app deployment flags
+
+**Note**: When deploying with `deployCommunicationServices=true`, the `Microsoft.Communication` resource provider must be registered in your Azure subscription. The GitHub Actions workflow handles this automatically.
+
+### communication-services.bicep
+Deploys Azure Communication Services for email notifications used by the Author Invitation Tool.
+
+**Key parameters:**
+- `baseName` (required) - Base name for the Communication Services resource
+- `dataLocation` (optional) - Data location (default: "United States")
+- `tags` (optional) - Resource tags
+
+**Prerequisites:**
+- The `Microsoft.Communication` resource provider must be registered: `az provider register --namespace Microsoft.Communication --wait`
+- In GitHub Actions, this is handled automatically by the "Register Microsoft.Communication Resource Provider" workflow step
+
+**Resources created:**
+- Communication Services resource (`${baseName}-acs`)
+- Email Service (`${baseName}-email`)
+- Azure Managed Domain for quick setup (e.g., `<uniqueid>.azurecomm.net`)
+
+**Outputs:**
+- `communicationServiceName` - Name of the Communication Services resource
+- `communicationServiceId` - Resource ID
+- `communicationServiceEndpoint` - Endpoint hostname
+- `emailServiceName` - Email Service name
+- `senderDomain` - Azure Managed Domain for sending emails
+- Connection string must be retrieved via Azure Portal or CLI after deployment
+
+**Example deployment:**
+```bash
+# Register provider first
+az provider register --namespace Microsoft.Communication --wait
+
+# Deploy Communication Services
+az deployment group create \
+  --resource-group MyResourceGroup \
+  --template-file communication-services.bicep \
+  --parameters baseName=myapp \
+               dataLocation="United States"
+```
+
+See [AZURE_COMMUNICATION_SERVICES_SETUP.md](../docs/AZURE_COMMUNICATION_SERVICES_SETUP.md) for detailed setup and configuration instructions.
 
 ## Usage in GitHub Actions
 

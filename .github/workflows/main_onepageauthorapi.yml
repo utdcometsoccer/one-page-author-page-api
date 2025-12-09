@@ -298,6 +298,43 @@ jobs:
           echo "✓ function-app deployed successfully"
 
       # =========================================
+      # Register Azure Communication Services Provider (if needed)
+      # =========================================
+
+      - name: 'Register Microsoft.Communication Resource Provider'
+        continue-on-error: true
+        shell: bash
+        env:
+          DEPLOY_COMMUNICATION_SERVICES: ${{ secrets.DEPLOY_COMMUNICATION_SERVICES }}
+        run: |
+          # Only register if Communication Services deployment is enabled
+          if [ "$DEPLOY_COMMUNICATION_SERVICES" != "true" ]; then
+            echo "⚠️ Skipping Microsoft.Communication provider registration (DEPLOY_COMMUNICATION_SERVICES not set to 'true')"
+            exit 0
+          fi
+
+          echo "📦 Checking Microsoft.Communication resource provider registration..."
+          
+          # Check if provider is already registered
+          PROVIDER_STATE=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv 2>/dev/null || echo "NotRegistered")
+          
+          if [ "$PROVIDER_STATE" = "Registered" ]; then
+            echo "✓ Microsoft.Communication provider is already registered"
+          else
+            echo "📝 Registering Microsoft.Communication provider..."
+            az provider register --namespace Microsoft.Communication --wait
+            
+            # Verify registration
+            PROVIDER_STATE=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv)
+            if [ "$PROVIDER_STATE" = "Registered" ]; then
+              echo "✓ Microsoft.Communication provider registered successfully"
+            else
+              echo "⚠️ Provider registration state: $PROVIDER_STATE (may still be registering)"
+              echo "   Deployment will proceed, but may fail if registration is not complete"
+            fi
+          fi
+
+      # =========================================
       # Deploy Ink Stained Wretches Infrastructure
       # =========================================
 
