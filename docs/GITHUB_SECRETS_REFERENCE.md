@@ -24,20 +24,14 @@ Use this checklist when setting up the deployment workflow:
 
 ### ➕ Optional Infrastructure Secrets
 
-- [ ] `KEYVAULT_RESOURCE_GROUP` - Resource group for standalone Key Vault
-- [ ] `KEYVAULT_NAME` - Name for standalone Key Vault
-- [ ] `KEYVAULT_LOCATION` - Azure region for standalone Key Vault
-- [ ] `KEYVAULT_ENABLE_RBAC` - Set to "true" to enable RBAC authorization (recommended)
-- [ ] `KEYVAULT_ENABLE_PURGE_PROTECTION` - Set to "true" to enable purge protection
 - [ ] `ISW_DNS_ZONE_NAME` - Custom domain name (e.g., "yourdomain.com")
-- [ ] `ISW_STATIC_WEB_APP_REPO_URL` - GitHub repository URL for Static Web App
-- [ ] `ISW_STATIC_WEB_APP_BRANCH` - GitHub branch (default: "main")
 
 ### 🎛️ Optional Deployment Control Secrets
 
 - [ ] `DEPLOY_IMAGE_API` - Set to "true" to deploy ImageAPI Function App
 - [ ] `DEPLOY_ISW_FUNCTIONS` - Set to "true" to deploy InkStainedWretchFunctions
 - [ ] `DEPLOY_ISW_STRIPE` - Set to "true" to deploy InkStainedWretchStripe
+- [ ] `DEPLOY_ISW_CONFIG` - Set to "true" to deploy InkStainedWretchesConfig
 
 ### 💳 Payment Processing Secret (Required for Stripe functionality)
 
@@ -214,86 +208,6 @@ az account show --query tenantId -o tsv
 - Must be a valid domain name you own
 - Used for custom domain mapping
 
-### KEYVAULT_RESOURCE_GROUP
-
-**Format**: String
-**Required**: No (optional, for standalone Key Vault deployment)
-**Example**: `KeyVault-RG`, `Secrets-RG`
-**Description**: Resource group where the standalone Key Vault will be deployed.
-**Notes**:
-- Will be created if it doesn't exist
-- Separate from ISW_RESOURCE_GROUP to allow independent Key Vault management
-- Only needed if deploying Key Vault separately from Ink Stained Wretches infrastructure
-
-### KEYVAULT_NAME
-
-**Format**: String (3-24 alphanumeric characters, hyphens allowed)
-**Required**: No (optional, for standalone Key Vault deployment)
-**Example**: `myapp-keyvault`, `secrets-vault-prod`
-**Description**: Name of the standalone Key Vault resource.
-**Constraints**:
-- Must be globally unique across Azure
-- 3-24 characters
-- Alphanumeric and hyphens only
-- Must start with a letter
-- Cannot end with a hyphen
-**Notes**:
-- Only needed if deploying Key Vault separately
-- If using Ink Stained Wretches infrastructure, Key Vault is automatically created as `{ISW_BASE_NAME}-kv`
-
-### KEYVAULT_LOCATION
-
-**Format**: String (Azure region name)
-**Required**: No (optional, for standalone Key Vault deployment)
-**Example**: `West US 2`, `East US`, `Central US`
-**Description**: Azure region where the standalone Key Vault will be deployed.
-**Notes**:
-- Only needed if deploying Key Vault separately
-- Should match the location of resources that will use it
-
-### KEYVAULT_ENABLE_RBAC
-
-**Format**: String (`"true"` or `"false"`)
-**Required**: No (optional, defaults to true)
-**Example**: `true`
-**Description**: Enable Azure RBAC authorization for Key Vault access.
-**Recommended**: `true` (modern authentication model)
-**Notes**:
-- When true, access is controlled via Azure RBAC roles
-- When false, access policies are used (legacy model)
-- RBAC is recommended for better integration with Azure AD
-
-### KEYVAULT_ENABLE_PURGE_PROTECTION
-
-**Format**: String (`"true"` or `"false"`)
-**Required**: No (optional, defaults to false)
-**Example**: `true`
-**Description**: Enable purge protection to prevent permanent deletion during soft-delete retention period.
-**Recommended**: `true` for production, `false` for development
-**Notes**:
-- When enabled, deleted secrets cannot be permanently removed during the 90-day retention period
-- Provides additional protection against accidental or malicious deletion
-- Once enabled, cannot be disabled
-- Not needed for development/test environments
-
-### ISW_STATIC_WEB_APP_REPO_URL
-
-**Format**: String (GitHub repository URL)
-**Required**: No (optional)
-**Example**: `https://github.com/username/repository`
-**Description**: GitHub repository URL for Static Web App deployment.
-**Notes**:
-- Must be a valid GitHub repository URL
-- Repository should contain a static web application
-- GitHub token will be used for authentication
-
-### ISW_STATIC_WEB_APP_BRANCH
-
-**Format**: String (git branch name)
-**Required**: No (optional, defaults to "main")
-**Example**: `main`, `master`, `production`
-**Description**: Git branch to deploy for Static Web App.
-
 ### DEPLOY_IMAGE_API
 
 **Format**: String (`"true"` or `"false"`)
@@ -328,6 +242,18 @@ az account show --query tenantId -o tsv
 - Requires `STRIPE_API_KEY` to be configured
 - Infrastructure must be deployed first
 
+### DEPLOY_ISW_CONFIG
+
+**Format**: String (`"true"` or `"false"`)
+**Required**: No (optional)
+**Example**: `true`
+**Description**: Flag to enable/disable InkStainedWretchesConfig deployment.
+**Notes**:
+- Set to `"true"` to deploy
+- Leave empty or set to `"false"` to skip
+- Provides configuration management and Key Vault integration endpoints
+- Infrastructure must be deployed first
+
 ## 🚀 Deployment Scenarios
 
 ### Scenario 1: Full Deployment (All Resources)
@@ -336,9 +262,10 @@ Configure all required secrets plus:
 - `DEPLOY_IMAGE_API=true`
 - `DEPLOY_ISW_FUNCTIONS=true`
 - `DEPLOY_ISW_STRIPE=true`
+- `DEPLOY_ISW_CONFIG=true`
 - `STRIPE_API_KEY` (required for Stripe)
 
-**Result**: All infrastructure and all three Function Apps deployed.
+**Result**: All infrastructure and all four Function Apps deployed.
 
 ### Scenario 2: Infrastructure Only
 

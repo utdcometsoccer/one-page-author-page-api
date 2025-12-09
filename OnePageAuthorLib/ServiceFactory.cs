@@ -875,5 +875,17 @@ namespace InkStainedWretch.OnePageAuthorAPI
             });
             return services;
         }
+
+        /// <summary>
+        /// Registers Key Vault configuration service for retrieving secrets from Azure Key Vault.
+        /// Supports feature flag controlled access via USE_KEY_VAULT environment variable.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <returns>The IServiceCollection for chaining.</returns>
+        public static IServiceCollection AddKeyVaultConfigService(this IServiceCollection services)
+        {
+            services.AddSingleton<Interfaces.IKeyVaultConfigService, Services.KeyVaultConfigService>();
+            return services;
+        }
     }
 }

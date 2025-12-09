@@ -4,6 +4,61 @@ This directory contains Bicep templates and management scripts for deploying and
 
 ## Management Scripts
 
+### Grant-ServicePrincipalPermissions.ps1 / Grant-ServicePrincipalPermissions.sh
+Grants the User Access Administrator role to a service principal at the subscription or resource group scope. This permission is **required** for the service principal to create role assignments during Bicep deployments (e.g., assigning Key Vault roles to Function Apps).
+
+**PowerShell Usage:**
+```powershell
+# Grant permissions at subscription scope (recommended)
+./Grant-ServicePrincipalPermissions.ps1
+
+# Grant permissions at resource group scope
+./Grant-ServicePrincipalPermissions.ps1 -Scope "resourcegroup" -ResourceGroupName "MyResourceGroup"
+
+# With custom service principal and subscription
+./Grant-ServicePrincipalPermissions.ps1 -ServicePrincipalName "my-sp" -SubscriptionId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+```
+
+**Bash Usage:**
+```bash
+# Grant permissions at subscription scope (recommended)
+./Grant-ServicePrincipalPermissions.sh
+
+# Grant permissions at resource group scope
+./Grant-ServicePrincipalPermissions.sh -S resourcegroup -r MyResourceGroup
+
+# With custom service principal and subscription
+./Grant-ServicePrincipalPermissions.sh -s my-sp -u xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+# Show help
+./Grant-ServicePrincipalPermissions.sh -h
+```
+
+**Default Values:**
+- Service Principal Name: `github-actions-inkstainedwretches`
+- Role Name: `User Access Administrator` (fixed - required for role assignments)
+- Scope: `subscription`
+
+**Features:**
+- Idempotent - Safe to run multiple times
+- Validates Azure CLI installation and authentication
+- Checks if role assignment already exists
+- Supports both subscription and resource group scopes
+- Clear, colorful output with progress indicators
+- Comprehensive error handling
+
+**Requirements:**
+- Azure CLI installed
+- User authenticated with `az login`
+- User must have Owner role or User Access Administrator role at the target scope
+- **jq** command-line JSON processor (for Bash script only)
+  - Ubuntu/Debian: `sudo apt-get install jq`
+  - macOS: `brew install jq`
+  - Other: https://stedolan.github.io/jq/download/
+
+**Why is this needed?**
+The error message `"The client '***' with object id '...' does not have permission to perform action 'Microsoft.Authorization/roleAssignments/write'"` occurs when the service principal lacks permission to create role assignments. The Bicep template `inkstainedwretches.bicep` needs to assign Key Vault roles to Function Apps, which requires the User Access Administrator role.
+
 ### Assign-KeyVaultRole.ps1 / Assign-KeyVaultRole.sh
 Assigns the Key Vault Secrets Officer role (or any other specified role) to a service principal for a specific Key Vault. The script checks if the role assignment already exists before creating it, making it idempotent.
 
@@ -56,6 +111,8 @@ Assigns the Key Vault Secrets Officer role (or any other specified role) to a se
 ### keyvault.bicep
 Deploys a standalone Azure Key Vault for secure storage of secrets, keys, and certificates.
 
+**Note**: This template is available for manual deployment but is not used by the GitHub Actions workflow. The Key Vault is automatically deployed as part of the `inkstainedwretches.bicep` infrastructure template.
+
 **Parameters:**
 - `keyVaultName` (required) - Name of the Key Vault (3-24 chars, globally unique)
 - `location` (optional) - Azure region (defaults to resource group location)
@@ -79,7 +136,7 @@ az deployment group create \
   --resource-group MyResourceGroup \
   --template-file keyvault.bicep \
   --parameters keyVaultName=myapp-secrets-kv \
-              location="West US 2" \
+              location="westus2" \
               enableRbacAuthorization=true \
               enablePurgeProtection=true
 ```
@@ -118,7 +175,50 @@ Comprehensive deployment template for the Ink Stained Wretches platform includin
 - `deployKeyVault` (optional) - Deploy Key Vault component
 - `deployStorageAccount` (optional)
 - `deployAppInsights` (optional)
+- `deployCommunicationServices` (optional) - Deploy Azure Communication Services for email notifications
 - Various function app deployment flags
+
+**Note**: When deploying with `deployCommunicationServices=true`, the `Microsoft.Communication` resource provider must be registered in your Azure subscription. The GitHub Actions workflow handles this automatically.
+
+### communication-services.bicep
+Deploys Azure Communication Services for email notifications used by the Author Invitation Tool.
+
+**Key parameters:**
+- `baseName` (required) - Base name for the Communication Services resource
+- `dataLocation` (optional) - Data location (default: "United States")
+- `tags` (optional) - Resource tags
+
+**Prerequisites:**
+- The `Microsoft.Communication` resource provider must be registered: `az provider register --namespace Microsoft.Communication --wait`
+- In GitHub Actions, this is handled automatically by the "Register Microsoft.Communication Resource Provider" workflow step
+
+**Resources created:**
+- Communication Services resource (`${baseName}-acs`)
+- Email Service (`${baseName}-email`)
+- Azure Managed Domain for quick setup (e.g., `<uniqueid>.azurecomm.net`)
+
+**Outputs:**
+- `communicationServiceName` - Name of the Communication Services resource
+- `communicationServiceId` - Resource ID
+- `communicationServiceEndpoint` - Endpoint hostname
+- `emailServiceName` - Email Service name
+- `senderDomain` - Azure Managed Domain for sending emails
+- Connection string must be retrieved via Azure Portal or CLI after deployment
+
+**Example deployment:**
+```bash
+# Register provider first
+az provider register --namespace Microsoft.Communication --wait
+
+# Deploy Communication Services
+az deployment group create \
+  --resource-group MyResourceGroup \
+  --template-file communication-services.bicep \
+  --parameters baseName=myapp \
+               dataLocation="United States"
+```
+
+See [AZURE_COMMUNICATION_SERVICES_SETUP.md](../docs/AZURE_COMMUNICATION_SERVICES_SETUP.md) for detailed setup and configuration instructions.
 
 ## Usage in GitHub Actions
 

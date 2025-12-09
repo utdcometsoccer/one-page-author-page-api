@@ -165,7 +165,7 @@ Get-Help .\Assign-KeyVaultRole.ps1 -Detailed
 
 The scripts complement the existing infrastructure management tools in the `infra/` directory:
 
-- **Bicep Templates**: Deploy resources (cosmosdb.bicep, keyvault.bicep, etc.)
+- **Bicep Templates**: Deploy resources (cosmosdb.bicep, inkstainedwretches.bicep, etc.)
 - **Role Assignment Scripts**: Configure access to deployed resources
 - **GitHub Actions Workflow**: Can integrate these scripts for automated setup
 

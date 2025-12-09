@@ -12,11 +12,11 @@ The deployment workflow (`main_onepageauthorapi.yml`) automatically builds and d
    - Key Vault
    - DNS Zone (optional)
    - Application Insights
-   - Static Web App (optional)
-   - Three Function Apps:
+   - Four Function Apps:
      - **ImageAPI** - Image upload and management services
      - **InkStainedWretchFunctions** - Domain registration, localization, and external API integrations
      - **InkStainedWretchStripe** - Stripe payment processing and subscription management
+     - **InkStainedWretchesConfig** - Configuration management and Key Vault integration
 
 All deployments are **conditional** and only execute when the required GitHub Secrets are configured.
 
@@ -70,20 +70,6 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 | `ISW_LOCATION` | ✅ Yes | Azure region for deployment | `West US 2` |
 | `ISW_BASE_NAME` | ✅ Yes | Base name for all resources (must be globally unique) | `inkstainedwretches` |
 | `ISW_DNS_ZONE_NAME` | Optional | DNS Zone name (e.g., your custom domain) | `yourdomain.com` |
-| `ISW_STATIC_WEB_APP_REPO_URL` | Optional | GitHub repository URL for Static Web App | `https://github.com/user/repo` |
-| `ISW_STATIC_WEB_APP_BRANCH` | Optional | GitHub branch for Static Web App | `main` |
-
-### Standalone Key Vault Deployment
-
-| Secret Name | Required | Description | Example Value |
-|-------------|----------|-------------|---------------|
-| `KEYVAULT_RESOURCE_GROUP` | Optional | Resource group for standalone Key Vault | `KeyVault-RG` |
-| `KEYVAULT_NAME` | Optional | Name for standalone Key Vault (3-24 chars, globally unique) | `myapp-secrets-kv` |
-| `KEYVAULT_LOCATION` | Optional | Azure region for Key Vault | `West US 2` |
-| `KEYVAULT_ENABLE_RBAC` | Optional | Enable RBAC authorization (recommended: `true`) | `true` or `false` |
-| `KEYVAULT_ENABLE_PURGE_PROTECTION` | Optional | Enable purge protection (recommended for production) | `true` or `false` |
-
-**Note**: Standalone Key Vault deployment is independent of the Ink Stained Wretches infrastructure. Use this when you need a dedicated Key Vault separate from the main application infrastructure.
 
 ### Function App Configuration Secrets
 
@@ -101,6 +87,7 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 | `DEPLOY_IMAGE_API` | Optional | Enable ImageAPI deployment | `true` or `false` |
 | `DEPLOY_ISW_FUNCTIONS` | Optional | Enable InkStainedWretchFunctions deployment | `true` or `false` |
 | `DEPLOY_ISW_STRIPE` | Optional | Enable InkStainedWretchStripe deployment | `true` or `false` |
+| `DEPLOY_ISW_CONFIG` | Optional | Enable InkStainedWretchesConfig deployment | `true` or `false` |
 
 ## 🚀 Deployment Workflow
 
@@ -119,6 +106,7 @@ The workflow runs automatically on:
    - ImageAPI
    - InkStainedWretchFunctions
    - InkStainedWretchStripe
+   - InkStainedWretchesConfig
 4. **Azure Authentication** - Login using Service Principal
 5. **Deploy Cosmos DB Account** (Conditional)
    - Checks if Cosmos DB account exists
@@ -126,25 +114,23 @@ The workflow runs automatically on:
 6. **Deploy Application Insights** (Conditional)
    - Checks if Application Insights exists
    - Creates resource if needed using `applicationinsights.bicep`
-7. **Deploy Key Vault** (Conditional)
-   - Checks if Key Vault exists
-   - Creates resource if needed using `keyvault.bicep`
-   - Supports RBAC authorization and purge protection
-8. **Deploy Existing function-app Infrastructure** (Conditional)
+7. **Deploy Existing function-app Infrastructure** (Conditional)
    - Checks if function app exists
    - Creates infrastructure if needed using `functionapp.bicep`
-9. **Deploy function-app Code** (Conditional)
+8. **Deploy function-app Code** (Conditional)
    - Deploys using `config-zip` method
-10. **Deploy Ink Stained Wretches Infrastructure** (Conditional)
+9. **Deploy Ink Stained Wretches Infrastructure** (Conditional)
     - Creates resource group if it doesn't exist
     - Deploys all infrastructure using `inkstainedwretches.bicep`
-    - Includes: Storage Account, Key Vault, App Insights, DNS Zone (optional), Static Web App (optional), Function Apps
-11. **Deploy ImageAPI** (Conditional)
+    - Includes: Storage Account, Key Vault, App Insights, DNS Zone (optional), Function Apps
+10. **Deploy ImageAPI** (Conditional)
     - Only if `DEPLOY_IMAGE_API=true`
-12. **Deploy InkStainedWretchFunctions** (Conditional)
+11. **Deploy InkStainedWretchFunctions** (Conditional)
     - Only if `DEPLOY_ISW_FUNCTIONS=true`
-13. **Deploy InkStainedWretchStripe** (Conditional)
+12. **Deploy InkStainedWretchStripe** (Conditional)
     - Only if `DEPLOY_ISW_STRIPE=true`
+13. **Deploy InkStainedWretchesConfig** (Conditional)
+    - Only if `DEPLOY_ISW_CONFIG=true`
 
 ## 🏗️ Infrastructure Components
 
@@ -191,16 +177,6 @@ The workflow runs automatically on:
 - Zone type: Public
 - Location: Global
 - Deployed only if `ISW_DNS_ZONE_NAME` is provided
-
-### Static Web App
-
-**Purpose**: Host static web application with GitHub integration.
-
-**Configuration**:
-- SKU: Free
-- GitHub integration: Automatic deployments
-- Staging environments: Enabled
-- Deployed only if `ISW_STATIC_WEB_APP_REPO_URL` is provided
 
 ### Function Apps
 
@@ -292,8 +268,6 @@ Three Azure Functions are deployed on a shared Consumption Plan (Y1/Dynamic):
 
 5. **Add Optional Infrastructure Secrets**
    - `ISW_DNS_ZONE_NAME`: Your custom domain (e.g., "yourdomain.com")
-   - `ISW_STATIC_WEB_APP_REPO_URL`: GitHub repo URL
-   - `ISW_STATIC_WEB_APP_BRANCH`: Branch name (default: "main")
 
 6. **Add Application Configuration Secrets** (Required)
    ```bash

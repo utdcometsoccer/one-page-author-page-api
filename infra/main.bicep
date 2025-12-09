@@ -1,6 +1,5 @@
 param databaseAccounts_one_page_author_db_account_name string = 'one-page-author-db-account'
 param dnszones_edokpayi_com_name string = 'edokpayi.com'
-param staticSites_author_page_demo_name string = 'author-page-demo'
 param dnszones_monicasalmon_com_name string = 'monicasalmon.com'
 param components_author_page_demo_name string = 'author-page-demo'
 param actionGroups_Application_Insights_Smart_Detection_name string = 'Application Insights Smart Detection'
@@ -379,23 +378,6 @@ resource dnszones_monicasalmon_com_name_resource 'Microsoft.Network/dnszones@202
   location: 'global'
   properties: {
     zoneType: 'Public'
-  }
-}
-
-resource staticSites_author_page_demo_name_resource 'Microsoft.Web/staticSites@2024-11-01' = {
-  name: staticSites_author_page_demo_name
-  location: 'West US 2'
-  sku: {
-    name: 'Free'
-    tier: 'Free'
-  }
-  properties: {
-    repositoryUrl: 'https://github.com/utdcometsoccer/one-page-author-page'
-    branch: 'main'
-    stagingEnvironmentPolicy: 'Enabled'
-    allowConfigFileUpdates: true
-    provider: 'GitHub'
-    enterpriseGradeCdnStatus: 'Disabled'
   }
 }
 
@@ -845,62 +827,6 @@ resource Microsoft_Network_dnszones_TXT_dnszones_monicasalmon_com_name 'Microsof
       }
     ]
     targetResource: {}
-    trafficManagementProfile: {}
-  }
-}
-
-resource staticSites_author_page_demo_name_default 'Microsoft.Web/staticSites/basicAuth@2024-11-01' = {
-  parent: staticSites_author_page_demo_name_resource
-  name: 'default'
-  properties: {
-    applicableEnvironmentsMode: 'SpecifiedEnvironments'
-  }
-}
-
-resource staticSites_author_page_demo_name_edokpayi_com 'Microsoft.Web/staticSites/customDomains@2024-11-01' = {
-  parent: staticSites_author_page_demo_name_resource
-  name: 'edokpayi.com'
-  properties: {}
-}
-
-resource staticSites_author_page_demo_name_monicasalmon_com 'Microsoft.Web/staticSites/customDomains@2024-11-01' = {
-  parent: staticSites_author_page_demo_name_resource
-  name: 'monicasalmon.com'
-  properties: {}
-}
-
-resource Microsoft_Network_dnszones_A_dnszones_edokpayi_com_name 'Microsoft.Network/dnszones/A@2023-07-01-preview' = {
-  parent: dnszones_edokpayi_com_name_resource
-  name: '@'
-  properties: {
-    TTL: 3600
-    targetResource: {
-      id: staticSites_author_page_demo_name_resource.id
-    }
-    trafficManagementProfile: {}
-  }
-}
-
-resource Microsoft_Network_dnszones_A_dnszones_monicasalmon_com_name 'Microsoft.Network/dnszones/A@2023-07-01-preview' = {
-  parent: dnszones_monicasalmon_com_name_resource
-  name: '@'
-  properties: {
-    TTL: 3600
-    targetResource: {
-      id: staticSites_author_page_demo_name_resource.id
-    }
-    trafficManagementProfile: {}
-  }
-}
-
-resource dnszones_edokpayi_com_name_www 'Microsoft.Network/dnszones/CNAME@2023-07-01-preview' = {
-  parent: dnszones_edokpayi_com_name_resource
-  name: 'www'
-  properties: {
-    TTL: 3600
-    targetResource: {
-      id: staticSites_author_page_demo_name_resource.id
-    }
     trafficManagementProfile: {}
   }
 }
