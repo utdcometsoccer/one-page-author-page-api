@@ -44,6 +44,24 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 | `AZURE_RESOURCE_GROUP` | ✅ For function-app | Resource group for the existing function app | `OnePageAuthorAPI-RG` |
 | `AZURE_LOCATION` | ✅ For function-app | Azure region | `East US` |
 
+### Standalone Cosmos DB Deployment
+
+| Secret Name | Required | Description | Example Value |
+|-------------|----------|-------------|---------------|
+| `COSMOSDB_RESOURCE_GROUP` | Optional | Resource group for standalone Cosmos DB | `CosmosDB-RG` |
+| `COSMOSDB_ACCOUNT_NAME` | Optional | Cosmos DB account name (globally unique) | `onepageauthor-db` |
+| `COSMOSDB_LOCATION` | Optional | Azure region for Cosmos DB | `Central US` |
+| `COSMOSDB_ENABLE_FREE_TIER` | Optional | Enable free tier (one per subscription) | `true` or `false` |
+| `COSMOSDB_ENABLE_ZONE_REDUNDANCY` | Optional | Enable zone redundancy | `true` or `false` |
+
+### Standalone Application Insights Deployment
+
+| Secret Name | Required | Description | Example Value |
+|-------------|----------|-------------|---------------|
+| `APPINSIGHTS_NAME` | Optional | Application Insights resource name | `onepageauthor-insights` |
+
+**Note**: `COSMOSDB_RESOURCE_GROUP` and `COSMOSDB_LOCATION` are reused for Application Insights deployment if configured.
+
 ### Ink Stained Wretches Infrastructure
 
 | Secret Name | Required | Description | Example Value |
@@ -54,6 +72,18 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 | `ISW_DNS_ZONE_NAME` | Optional | DNS Zone name (e.g., your custom domain) | `yourdomain.com` |
 | `ISW_STATIC_WEB_APP_REPO_URL` | Optional | GitHub repository URL for Static Web App | `https://github.com/user/repo` |
 | `ISW_STATIC_WEB_APP_BRANCH` | Optional | GitHub branch for Static Web App | `main` |
+
+### Standalone Key Vault Deployment
+
+| Secret Name | Required | Description | Example Value |
+|-------------|----------|-------------|---------------|
+| `KEYVAULT_RESOURCE_GROUP` | Optional | Resource group for standalone Key Vault | `KeyVault-RG` |
+| `KEYVAULT_NAME` | Optional | Name for standalone Key Vault (3-24 chars, globally unique) | `myapp-secrets-kv` |
+| `KEYVAULT_LOCATION` | Optional | Azure region for Key Vault | `West US 2` |
+| `KEYVAULT_ENABLE_RBAC` | Optional | Enable RBAC authorization (recommended: `true`) | `true` or `false` |
+| `KEYVAULT_ENABLE_PURGE_PROTECTION` | Optional | Enable purge protection (recommended for production) | `true` or `false` |
+
+**Note**: Standalone Key Vault deployment is independent of the Ink Stained Wretches infrastructure. Use this when you need a dedicated Key Vault separate from the main application infrastructure.
 
 ### Function App Configuration Secrets
 
@@ -90,20 +120,30 @@ The workflow runs automatically on:
    - InkStainedWretchFunctions
    - InkStainedWretchStripe
 4. **Azure Authentication** - Login using Service Principal
-5. **Deploy Existing function-app Infrastructure** (Conditional)
+5. **Deploy Cosmos DB Account** (Conditional)
+   - Checks if Cosmos DB account exists
+   - Creates account if needed using `cosmosdb.bicep`
+6. **Deploy Application Insights** (Conditional)
+   - Checks if Application Insights exists
+   - Creates resource if needed using `applicationinsights.bicep`
+7. **Deploy Key Vault** (Conditional)
+   - Checks if Key Vault exists
+   - Creates resource if needed using `keyvault.bicep`
+   - Supports RBAC authorization and purge protection
+8. **Deploy Existing function-app Infrastructure** (Conditional)
    - Checks if function app exists
    - Creates infrastructure if needed using `functionapp.bicep`
-6. **Deploy function-app Code** (Conditional)
+9. **Deploy function-app Code** (Conditional)
    - Deploys using `config-zip` method
-7. **Deploy Ink Stained Wretches Infrastructure** (Conditional)
-   - Creates resource group if it doesn't exist
-   - Deploys all infrastructure using `inkstainedwretches.bicep`
-   - Includes: Storage Account, Key Vault, App Insights, DNS Zone (optional), Static Web App (optional), Function Apps
-8. **Deploy ImageAPI** (Conditional)
-   - Only if `DEPLOY_IMAGE_API=true`
-9. **Deploy InkStainedWretchFunctions** (Conditional)
-   - Only if `DEPLOY_ISW_FUNCTIONS=true`
-10. **Deploy InkStainedWretchStripe** (Conditional)
+10. **Deploy Ink Stained Wretches Infrastructure** (Conditional)
+    - Creates resource group if it doesn't exist
+    - Deploys all infrastructure using `inkstainedwretches.bicep`
+    - Includes: Storage Account, Key Vault, App Insights, DNS Zone (optional), Static Web App (optional), Function Apps
+11. **Deploy ImageAPI** (Conditional)
+    - Only if `DEPLOY_IMAGE_API=true`
+12. **Deploy InkStainedWretchFunctions** (Conditional)
+    - Only if `DEPLOY_ISW_FUNCTIONS=true`
+13. **Deploy InkStainedWretchStripe** (Conditional)
     - Only if `DEPLOY_ISW_STRIPE=true`
 
 ## 🏗️ Infrastructure Components
