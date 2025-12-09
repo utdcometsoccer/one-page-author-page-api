@@ -75,7 +75,7 @@ output communicationServiceEndpoint string = communicationService.properties.hos
 output emailServiceName string = emailService.name
 output emailServiceId string = emailService.id
 output emailServiceDomainName string = emailServiceDomain.name
-output domainFromSenderDomain string = emailServiceDomain.properties.fromSenderDomain
+output senderDomain string = emailServiceDomain.properties.fromSenderDomain
 
 // Output connection string components (to be used with Key Vault)
 // Note: The actual connection string must be retrieved using Azure CLI or Portal
