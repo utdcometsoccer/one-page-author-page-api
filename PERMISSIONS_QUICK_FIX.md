@@ -36,6 +36,7 @@ Before running the script:
 1. ✅ Install Azure CLI: `az version`
 2. ✅ Login to Azure: `az login`
 3. ✅ Have Owner or User Access Administrator permissions
+4. ✅ Install jq (Bash script only): `sudo apt-get install jq` or `brew install jq`
 
 ## After Running
 

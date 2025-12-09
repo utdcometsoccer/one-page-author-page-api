@@ -51,6 +51,10 @@ Grants the User Access Administrator role to a service principal at the subscrip
 - Azure CLI installed
 - User authenticated with `az login`
 - User must have Owner role or User Access Administrator role at the target scope
+- **jq** command-line JSON processor (for Bash script only)
+  - Ubuntu/Debian: `sudo apt-get install jq`
+  - macOS: `brew install jq`
+  - Other: https://stedolan.github.io/jq/download/
 
 **Why is this needed?**
 The error message `"The client '***' with object id '...' does not have permission to perform action 'Microsoft.Authorization/roleAssignments/write'"` occurs when the service principal lacks permission to create role assignments. The Bicep template `inkstainedwretches.bicep` needs to assign Key Vault roles to Function Apps, which requires the User Access Administrator role.

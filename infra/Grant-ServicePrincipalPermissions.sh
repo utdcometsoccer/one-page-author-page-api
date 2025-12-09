@@ -117,6 +117,18 @@ check_azure_cli() {
     
     local az_version=$(az version --query '"azure-cli"' -o tsv 2>/dev/null)
     echo -e "${GRAY}  Azure CLI version: $az_version${NC}"
+    
+    # Check if jq is installed (required for JSON parsing)
+    echo -e "${GRAY}✓ Checking jq installation...${NC}"
+    if ! command -v jq &> /dev/null; then
+        echo -e "${RED}✗ jq is not installed or not in PATH.${NC}" >&2
+        echo -e "${YELLOW}  jq is required for JSON parsing. Please install jq:${NC}" >&2
+        echo -e "${YELLOW}  - Ubuntu/Debian: sudo apt-get install jq${NC}" >&2
+        echo -e "${YELLOW}  - macOS: brew install jq${NC}" >&2
+        echo -e "${YELLOW}  - Other: https://stedolan.github.io/jq/download/${NC}" >&2
+        exit 1
+    fi
+    echo -e "${GRAY}  jq is installed${NC}"
 }
 
 # Function to check Azure authentication

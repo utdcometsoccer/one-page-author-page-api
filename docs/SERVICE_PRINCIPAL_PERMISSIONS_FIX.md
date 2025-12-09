@@ -67,7 +67,7 @@ cd infra
 ./Grant-ServicePrincipalPermissions.sh
 
 # Or, grant permissions at resource group scope only
-./Grant-ServicePrincialPermissions.sh -S resourcegroup -r ISW_RESOURCE_GROUP_NAME
+./Grant-ServicePrincipalPermissions.sh -S resourcegroup -r ISW_RESOURCE_GROUP_NAME
 
 # With custom service principal name
 ./Grant-ServicePrincipalPermissions.sh -s github-actions-inkstainedwretches
@@ -91,7 +91,18 @@ cd infra
    
    at the target scope (subscription or resource group)
 
-4. **Service Principal Exists**: The service principal must already be created
+4. **jq (for Bash script)**: JSON processor for parsing Azure CLI output
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install jq
+   
+   # macOS
+   brew install jq
+   
+   # Other: https://stedolan.github.io/jq/download/
+   ```
+
+5. **Service Principal Exists**: The service principal must already be created
    - Default name: `github-actions-inkstainedwretches`
    - Object ID shown in error: `3102a205-746e-4c19-b856-18fd3c3b31d8`
 
