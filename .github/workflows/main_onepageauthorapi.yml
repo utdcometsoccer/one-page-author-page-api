@@ -144,7 +144,7 @@ jobs:
           fi
 
           echo "✓ Checking if Cosmos DB Account exists..."
-          
+
           # Check if resource group exists, create if it doesn't
           if ! az group show --name "$COSMOSDB_RESOURCE_GROUP" &> /dev/null; then
             echo "📦 Creating resource group: $COSMOSDB_RESOURCE_GROUP"
@@ -156,10 +156,10 @@ jobs:
           # Check if Cosmos DB Account exists
           if ! az cosmosdb show --name "$COSMOSDB_ACCOUNT_NAME" --resource-group "$COSMOSDB_RESOURCE_GROUP" &> /dev/null; then
             echo "📦 Cosmos DB Account does not exist. Deploying..."
-            
+
             # Build deployment parameters
             PARAMS="cosmosDbAccountName=$COSMOSDB_ACCOUNT_NAME location=$COSMOSDB_LOCATION"
-            
+
             # Add optional free tier parameter if configured
             if [ "$COSMOSDB_ENABLE_FREE_TIER" = "true" ]; then
               PARAMS="$PARAMS enableFreeTier=true"
@@ -167,7 +167,7 @@ jobs:
             else
               PARAMS="$PARAMS enableFreeTier=false"
             fi
-            
+
             # Add optional zone redundancy parameter if configured
             if [ "$COSMOSDB_ENABLE_ZONE_REDUNDANCY" = "true" ]; then
               PARAMS="$PARAMS enableZoneRedundancy=true"
@@ -176,16 +176,16 @@ jobs:
               PARAMS="$PARAMS enableZoneRedundancy=false"
               echo "⚠️ Zone redundancy disabled (recommended for development)"
             fi
-            
+
             # Deploy Cosmos DB Account
             az deployment group create \
               --resource-group "$COSMOSDB_RESOURCE_GROUP" \
               --template-file infra/cosmosdb.bicep \
               --parameters $PARAMS \
               --output none
-            
+
             echo "✓ Cosmos DB Account deployed successfully"
-            
+
             # Note: Connection string and keys are available in deployment outputs
             # but not displayed here for security reasons. They can be retrieved from
             # Azure Portal or using Azure CLI: az cosmosdb keys list
@@ -213,7 +213,7 @@ jobs:
           fi
 
           echo "✓ Checking if Application Insights exists..."
-          
+
           # Check if resource group exists (should exist from Cosmos DB step)
           if ! az group show --name "$COSMOSDB_RESOURCE_GROUP" &> /dev/null; then
             echo "📦 Creating resource group: $COSMOSDB_RESOURCE_GROUP"
@@ -225,7 +225,7 @@ jobs:
           # Check if Application Insights exists
           if ! az monitor app-insights component show --app "$APPINSIGHTS_NAME" --resource-group "$COSMOSDB_RESOURCE_GROUP" &> /dev/null; then
             echo "📦 Application Insights does not exist. Deploying..."
-            
+
             # Deploy Application Insights
             az deployment group create \
               --resource-group "$COSMOSDB_RESOURCE_GROUP" \
@@ -233,9 +233,9 @@ jobs:
               --parameters appInsightsName="$APPINSIGHTS_NAME" \
                           location="$COSMOSDB_LOCATION" \
               --output none
-            
+
             echo "✓ Application Insights deployed successfully"
-            
+
             # Note: Instrumentation key and connection string are available in deployment outputs
             # but not displayed here for security reasons. They can be retrieved from
             # Azure Portal or using Azure CLI: az monitor app-insights component show
@@ -296,6 +296,72 @@ jobs:
             --resource-group "$RESOURCE_GROUP" \
             --src '${{ env.FUNCTION_APP_PATH }}/functionapp.zip'
           echo "✓ function-app deployed successfully"
+
+      # =========================================
+      # Register Azure Communication Services Provider (if needed)
+      # =========================================
+
+      - name: 'Register Microsoft.Communication Resource Provider'
+        # Note: continue-on-error allows optional Communication Services deployment
+        # to not block other infrastructure deployments. If registration fails,
+        # the subsequent deployment step will fail with a clear error message.
+        continue-on-error: true
+        shell: bash
+        env:
+          DEPLOY_COMMUNICATION_SERVICES: ${{ secrets.DEPLOY_COMMUNICATION_SERVICES }}
+        run: |
+          # Only register if Communication Services deployment is enabled
+          if [ "$DEPLOY_COMMUNICATION_SERVICES" != "true" ]; then
+            echo "⚠️ Skipping Microsoft.Communication provider registration (DEPLOY_COMMUNICATION_SERVICES not set to 'true')"
+            exit 0
+          fi
+
+          echo "📦 Checking Microsoft.Communication resource provider registration..."
+
+          # Check if provider is already registered (capture stderr separately)
+          PROVIDER_STATE_OUTPUT=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv 2>&1)
+          PROVIDER_CHECK_EXIT=$?
+
+          if [ $PROVIDER_CHECK_EXIT -ne 0 ]; then
+            echo "⚠️ Warning: Unable to check provider status. This may be due to:"
+            echo "   - Authentication issues"
+            echo "   - Insufficient permissions"
+            echo "   - Azure CLI not properly configured"
+            echo "   Error output: $PROVIDER_STATE_OUTPUT"
+            echo "   Attempting to register provider anyway..."
+            PROVIDER_STATE="Unknown"
+          else
+            PROVIDER_STATE="$PROVIDER_STATE_OUTPUT"
+          fi
+
+          if [ "$PROVIDER_STATE" = "Registered" ]; then
+            echo "✓ Microsoft.Communication provider is already registered"
+          else
+            echo "📝 Registering Microsoft.Communication provider (current state: $PROVIDER_STATE)..."
+            if ! REGISTER_OUTPUT=$(az provider register --namespace Microsoft.Communication --wait 2>&1); then
+              echo "❌ ERROR: Failed to register Microsoft.Communication provider"
+              echo "   Error output: $REGISTER_OUTPUT"
+              echo "   This is required for Azure Communication Services deployment"
+              echo "   Please ensure you have sufficient permissions (Contributor or Owner role)"
+              echo "   Continuing anyway - deployment may fail with clear error message"
+              exit 0
+            fi
+
+            # Verify registration (capture stderr separately)
+            PROVIDER_STATE_OUTPUT=$(az provider show --namespace Microsoft.Communication --query "registrationState" --output tsv 2>&1)
+            PROVIDER_CHECK_EXIT=$?
+
+            if [ $PROVIDER_CHECK_EXIT -ne 0 ]; then
+              echo "⚠️ Warning: Unable to verify provider registration status"
+              echo "   Error output: $PROVIDER_STATE_OUTPUT"
+              echo "   Deployment will proceed, but may fail if registration is incomplete"
+            elif [ "$PROVIDER_STATE_OUTPUT" = "Registered" ]; then
+              echo "✓ Microsoft.Communication provider registered successfully"
+            else
+              echo "⚠️ Provider registration state: $PROVIDER_STATE_OUTPUT (may still be registering)"
+              echo "   Deployment will proceed, but may fail if registration is not complete"
+            fi
+          fi
 
       # =========================================
       # Deploy Ink Stained Wretches Infrastructure
