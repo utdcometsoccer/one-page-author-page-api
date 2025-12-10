@@ -91,12 +91,13 @@ Response: { "apiKey": "...", "source": "KeyVault" }
   - Testing strategies
   - Rollback plan
 
-- `docs/GITHUB_SECRETS_GUIDE.md` - Complete secrets documentation
+- `docs/GITHUB_SECRETS_REFERENCE.md` - Complete secrets configuration guide
   - All required and optional secrets documented
   - Format and examples for each secret
   - Organization by category
   - Setup instructions (UI and CLI)
   - Security best practices
+  - Environment variable mapping
   - Troubleshooting guide
 
 **File Modified:**

@@ -102,12 +102,13 @@ az deployment group create \
 ```
 
 ### 3. Documentation
-**File**: `docs/GITHUB_SECRETS_CONFIGURATION.md`
+**File**: `docs/GITHUB_SECRETS_REFERENCE.md`
 
 Created comprehensive guide including:
 - Mapping of GitHub Secrets to environment variables
 - Required vs optional secrets for each Function App
 - Instructions for setting up secrets via GitHub UI and CLI
+- Deployment scenarios and troubleshooting
 - Default value behavior documentation
 - Security best practices
 - Troubleshooting guide
@@ -194,7 +195,7 @@ Created comprehensive guide including:
 ## Files Changed
 1. `infra/inkstainedwretches.bicep` - Added conditional environment variable configuration
 2. `.github/workflows/main_onepageauthorapi.yml` - Updated to pass optional secrets conditionally
-3. `docs/GITHUB_SECRETS_CONFIGURATION.md` - Created comprehensive configuration guide
+3. `docs/GITHUB_SECRETS_REFERENCE.md` - Created comprehensive configuration guide
 
 ## Migration Guide
 For users with existing deployments:
@@ -217,4 +218,4 @@ For users with existing deployments:
 - [InkStainedWretchFunctions README](../InkStainedWretchFunctions/README.md)
 - [ImageAPI README](../ImageAPI/README.md)
 - [InkStainedWretchStripe README](../InkStainedWretchStripe/README.md)
-- [GitHub Secrets Configuration Guide](../docs/GITHUB_SECRETS_CONFIGURATION.md)
+- [GitHub Secrets Reference Guide](../docs/GITHUB_SECRETS_REFERENCE.md)
