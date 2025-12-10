@@ -4,6 +4,75 @@ This directory contains PowerShell scripts to streamline development workflow fo
 
 ## Scripts Overview
 
+### `Initialize-GitHubSecrets.ps1` - GitHub Secrets Configuration Script
+
+Automates the process of setting up GitHub repository secrets required for CI/CD deployment of the OnePageAuthor API Platform.
+
+**Usage:**
+
+```powershell
+# Interactive mode - prompts for each secret
+.\Initialize-GitHubSecrets.ps1 -Interactive
+
+# Using a configuration file
+.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+
+# Using a text file (legacy format)
+.\Initialize-GitHubSecrets.ps1 -SecretsFile secrets.txt
+
+# Via NPM scripts
+npm run init:secrets:interactive
+npm run init:secrets -- -ConfigFile secrets.json
+
+# Display help
+.\Initialize-GitHubSecrets.ps1 -Help
+npm run init:secrets:help
+```
+
+**What it does:**
+
+1. ✅ **Validates prerequisites** - checks for GitHub CLI (gh) and authentication
+2. ✅ **Prompts for secret values** - interactive mode with clear descriptions and examples
+3. ✅ **Sets GitHub secrets** - uses `gh secret set` command to configure repository secrets
+4. ✅ **Handles sensitive values** - masks sensitive input and displays appropriately
+5. ✅ **Organizes by category** - groups secrets by Core Infrastructure, Cosmos DB, Azure AD, Stripe, etc.
+6. ✅ **Validates configuration** - ensures required secrets are provided before setting
+7. ✅ **Provides feedback** - clear success/failure messages and summary
+
+**Secret Categories:**
+
+- **Core Infrastructure** - Azure Resource Group, Location, Base Name, Azure Credentials
+- **Cosmos DB** - Connection String, Endpoint URI, Primary Key, Database ID
+- **Azure AD Authentication** - Tenant ID, Audience, Client ID (optional)
+- **Azure Storage** - Connection String for ImageAPI (optional)
+- **Stripe** - API Key, Webhook Secret for InkStainedWretchStripe (optional)
+- **Domain Management** - Azure Subscription, DNS Resource Group, DNS Zone Name (optional)
+- **Google Domains** - Project ID, Location (optional)
+- **Amazon Product API** - Access Key, Secret Key, Partner Tag, Region, Marketplace (optional)
+- **Penguin Random House API** - API Key, Domain (optional)
+
+**Configuration File Format:**
+
+See `secrets-template.json` for a complete template. Copy it to `secrets.json` and fill in your values:
+
+```json
+{
+  "ISW_RESOURCE_GROUP": "rg-onepageauthor-prod",
+  "ISW_LOCATION": "eastus",
+  "COSMOSDB_ENDPOINT_URI": "https://your-account.documents.azure.com:443/",
+  "COSMOSDB_PRIMARY_KEY": "your-key-here",
+  "STRIPE_API_KEY": "sk_test_...",
+  ...
+}
+```
+
+**Security Notes:**
+
+- 🔒 Never commit `secrets.json` to source control (already in `.gitignore`)
+- 🔒 Sensitive values are masked in output
+- 🔒 Use separate credentials for development vs production
+- 🔒 Rotate secrets regularly
+
 ### `UpdateAndRun.ps1` - Main Development Script
 
 Comprehensive script that updates packages, builds the solution, and runs Azure Functions projects.
@@ -54,11 +123,12 @@ Stops all running Azure Functions background jobs and cleans up completed jobs.
 
 ### Required Tools
 
-
 - **PowerShell 5.1+** or **PowerShell Core 7+**
 - **.NET SDK 9.0** or later
 - **Azure Functions Core Tools v4** (`func`)
 - **dotnet-update tool** (automatically installed if missing)
+- **GitHub CLI (gh)** (required for Initialize-GitHubSecrets.ps1)
+- **npm** (optional, for running scripts via package.json)
 
 ### Install Prerequisites
 
@@ -67,13 +137,54 @@ Stops all running Azure Functions background jobs and cleans up completed jobs.
 # Install Azure Functions Core Tools (if needed)
 npm install -g azure-functions-core-tools@4 --unsafe-perm true
 
+# Install GitHub CLI (for Initialize-GitHubSecrets.ps1)
+# Windows: winget install --id GitHub.cli
+# macOS: brew install gh
+# Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+
+# Authenticate with GitHub CLI
+gh auth login
+
 # dotnet-update tool will be auto-installed by the script
 # Or install manually:
 dotnet tool install --global dotnet-update
-
 ```
 
 ## Typical Development Workflow
+
+### 🔐 Initial GitHub Secrets Setup (One-Time)
+
+Before deploying to Azure, configure GitHub repository secrets:
+
+```powershell
+# Option 1: Interactive mode (recommended for first-time setup)
+.\Initialize-GitHubSecrets.ps1 -Interactive
+# or via NPM
+npm run init:secrets:interactive
+
+# Option 2: Using a configuration file
+# 1. Copy the template
+Copy-Item secrets-template.json secrets.json
+
+# 2. Edit secrets.json with your values (use your favorite editor)
+code secrets.json  # VS Code
+notepad secrets.json  # Windows Notepad
+
+# 3. Run the script with the config file
+.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+# or via NPM
+npm run init:secrets -- -ConfigFile secrets.json
+
+# Verify secrets were set
+gh secret list
+```
+
+**What to configure:**
+- ✅ **Core Infrastructure** - Azure credentials, resource group, location (REQUIRED)
+- ✅ **Cosmos DB** - Connection string, endpoint, key, database ID (REQUIRED)
+- ⚙️ **Azure Storage** - Required if using ImageAPI
+- ⚙️ **Stripe** - Required if using InkStainedWretchStripe
+- ⚙️ **External APIs** - Amazon, PRH, Google Domains (optional)
 
 ### 🚀 Start Development Session
 

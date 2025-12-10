@@ -1,0 +1,18 @@
+{
+  "name": "one-page-author-api",
+  "version": "1.0.0",
+  "description": "Development scripts for OnePageAuthor API Platform",
+  "private": true,
+  "scripts": {
+    "init:secrets": "pwsh -File ./Initialize-GitHubSecrets.ps1",
+    "init:secrets:interactive": "pwsh -File ./Initialize-GitHubSecrets.ps1 -Interactive",
+    "init:secrets:help": "pwsh -File ./Initialize-GitHubSecrets.ps1 -Help"
+  },
+  "keywords": [
+    "azure-functions",
+    "github-secrets",
+    "development"
+  ],
+  "author": "OnePageAuthor Team",
+  "license": "MIT"
+}

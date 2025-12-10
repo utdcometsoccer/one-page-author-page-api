@@ -65,7 +65,6 @@ A comprehensive .NET 10 platform providing APIs and utilities for author managem
 
 ### Quick Start
 
-
 ```bash
 # Clone the repository
 git clone https://github.com/utdcometsoccer/one-page-author-page-api.git
@@ -76,8 +75,24 @@ dotnet build OnePageAuthorAPI.sln -c Debug
 
 # Run tests
 dotnet test OnePageAuthorAPI.sln -c Debug
-
 ```
+
+### GitHub Secrets Configuration (for CI/CD)
+
+Before deploying to Azure via GitHub Actions, configure repository secrets:
+
+```powershell
+# Install GitHub CLI and authenticate
+gh auth login
+
+# Run the interactive secrets setup script
+npm run init:secrets:interactive
+
+# Or use a configuration file
+.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+```
+
+📖 **See [GITHUB_SECRETS_SETUP.md](GITHUB_SECRETS_SETUP.md) for detailed instructions**
 
 ## ⚙️ Configuration
 
