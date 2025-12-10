@@ -37,12 +37,13 @@
 
 .EXAMPLE
     npm run init:secrets:interactive
-    Run via NPM script in interactive mode.
+    Run via NPM script wrapper (optional - PowerShell can be used directly).
 
 .NOTES
     Prerequisites:
-    - GitHub CLI (gh) must be installed and authenticated
-    - PowerShell 5.1+ or PowerShell Core 7+
+    - **GitHub CLI (gh)** must be installed and authenticated (REQUIRED)
+    - PowerShell 5.1+ or PowerShell Core 7+ (REQUIRED)
+    - npm (OPTIONAL - only needed if using NPM script wrappers)
     
     References:
     - GITHUB_SECRETS_CONFIGURATION.md - Complete secret reference

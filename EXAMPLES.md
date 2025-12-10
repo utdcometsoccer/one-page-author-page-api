@@ -2,15 +2,17 @@
 
 This document provides practical examples of using the `Initialize-GitHubSecrets.ps1` script.
 
+**Note:** This script uses **GitHub CLI (`gh`)** to set repository secrets. The script can be run directly with PowerShell, or optionally via NPM wrappers.
+
 ## Prerequisites Check
 
-Before running any examples, ensure you have the prerequisites:
+Before running any examples, ensure you have GitHub CLI installed and authenticated:
 
 ```powershell
-# Check if GitHub CLI is installed
+# Check if GitHub CLI is installed (REQUIRED)
 gh --version
 
-# Check if authenticated
+# Check if authenticated (REQUIRED)
 gh auth status
 
 # Authenticate if needed

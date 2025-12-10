@@ -2,34 +2,40 @@
 
 This guide explains how to use the `Initialize-GitHubSecrets.ps1` script to configure GitHub repository secrets for CI/CD deployment of the OnePageAuthor API Platform.
 
+**Primary Tool:** The script uses **GitHub CLI (`gh`)** to set repository secrets. NPM scripts are optional convenience wrappers.
+
 ## Quick Start
 
 ### Prerequisites
 
-1. **Install GitHub CLI (gh)**
+**Required:**
+1. **GitHub CLI (gh)** - Primary tool for setting secrets
    - Windows: `winget install --id GitHub.cli`
    - macOS: `brew install gh`
    - Linux: See [installation guide](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)
 
-2. **Authenticate with GitHub**
+2. **Authenticate with GitHub CLI**
    ```bash
    gh auth login
    ```
 
-3. **Ensure you have PowerShell 7+**
+3. **PowerShell 7+**
    ```bash
    pwsh --version
    ```
+
+**Optional:**
+- **npm** - Only needed if using NPM script wrappers
 
 ### Method 1: Interactive Mode (Recommended for First-Time Setup)
 
 This mode prompts you for each secret value with helpful descriptions and examples.
 
 ```powershell
-# Using PowerShell directly
+# Direct PowerShell execution (recommended)
 .\Initialize-GitHubSecrets.ps1 -Interactive
 
-# Or using NPM
+# Or using NPM wrapper (optional)
 npm run init:secrets:interactive
 ```
 
@@ -63,10 +69,10 @@ vim secrets.json      # Linux/macOS
 
 **Step 3: Run the script**
 ```powershell
-# Using PowerShell directly
+# Direct PowerShell execution (recommended)
 .\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
 
-# Or using NPM
+# Or using NPM wrapper (optional)
 npm run init:secrets -- -ConfigFile secrets.json
 ```
 

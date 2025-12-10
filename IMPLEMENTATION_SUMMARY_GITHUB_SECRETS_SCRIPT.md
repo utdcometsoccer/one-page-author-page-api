@@ -2,30 +2,32 @@
 
 ## Overview
 
-Implemented an NPM CLI-based PowerShell script to automate the initialization of GitHub repository secrets required for CI/CD deployment of the OnePageAuthor API Platform.
+Implemented a PowerShell script that uses **GitHub CLI (`gh`)** to automate the initialization of GitHub repository secrets required for CI/CD deployment of the OnePageAuthor API Platform.
 
 ## Problem Statement
 
-The issue requested: "Refer to the configuration documentation and write a PowerShell based script template that uses NPM CLI Script to Initialize GitHub Secrets"
+The issue requested: "Refer to the configuration documentation and write a PowerShell based script template that uses GitHub CLI to Initialize GitHub Secrets"
 
 ## Solution
 
 Created a comprehensive automation solution that:
-1. Uses NPM scripts as a convenient entry point
-2. Executes a PowerShell script that leverages GitHub CLI (gh)
-3. Supports multiple input modes (interactive, config file, text file)
-4. Covers all secret categories needed for the platform
-5. Includes extensive documentation and examples
+1. Uses **GitHub CLI (`gh secret set`)** as the primary tool for setting secrets
+2. Executes as a PowerShell script with multiple input modes
+3. Optionally provides NPM script wrappers for convenience
+4. Supports interactive prompts, JSON config files, and text files
+5. Covers all secret categories needed for the platform
+6. Includes extensive documentation and examples
 
 ## Files Created/Modified
 
 ### Core Implementation Files
 
 1. **`package.json`** (NEW)
-   - Added NPM scripts for easy execution:
-     - `npm run init:secrets:interactive` - Interactive mode
-     - `npm run init:secrets -- -ConfigFile secrets.json` - Config file mode
-     - `npm run init:secrets:help` - Display help
+   - Added optional NPM script wrappers for convenience:
+     - `npm run init:secrets:interactive` - Interactive mode wrapper
+     - `npm run init:secrets -- -ConfigFile secrets.json` - Config file mode wrapper
+     - `npm run init:secrets:help` - Display help wrapper
+   - **Note:** NPM is optional; PowerShell script can be run directly
 
 2. **`Initialize-GitHubSecrets.ps1`** (NEW)
    - 581 lines of PowerShell code
@@ -160,6 +162,10 @@ This approach:
 
 ### Quick Start (Interactive)
 ```powershell
+# Direct PowerShell execution (recommended)
+.\Initialize-GitHubSecrets.ps1 -Interactive
+
+# Or via NPM wrapper (optional)
 npm run init:secrets:interactive
 ```
 
@@ -171,7 +177,10 @@ Copy-Item secrets-template.json secrets.json
 # 2. Edit with your values
 code secrets.json
 
-# 3. Run script
+# 3. Run script directly with PowerShell (recommended)
+.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+
+# Or via NPM wrapper (optional)
 npm run init:secrets -- -ConfigFile secrets.json
 ```
 

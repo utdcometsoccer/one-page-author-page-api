@@ -8,10 +8,12 @@ This directory contains PowerShell scripts to streamline development workflow fo
 
 Automates the process of setting up GitHub repository secrets required for CI/CD deployment of the OnePageAuthor API Platform.
 
+**Primary Tool:** Uses **GitHub CLI (`gh secret set`)** to configure repository secrets. NPM scripts are optional wrappers.
+
 **Usage:**
 
 ```powershell
-# Interactive mode - prompts for each secret
+# Interactive mode - prompts for each secret (recommended)
 .\Initialize-GitHubSecrets.ps1 -Interactive
 
 # Using a configuration file
@@ -20,20 +22,20 @@ Automates the process of setting up GitHub repository secrets required for CI/CD
 # Using a text file (legacy format)
 .\Initialize-GitHubSecrets.ps1 -SecretsFile secrets.txt
 
-# Via NPM scripts
-npm run init:secrets:interactive
-npm run init:secrets -- -ConfigFile secrets.json
-
 # Display help
 .\Initialize-GitHubSecrets.ps1 -Help
+
+# Optional: Via NPM script wrappers
+npm run init:secrets:interactive
+npm run init:secrets -- -ConfigFile secrets.json
 npm run init:secrets:help
 ```
 
 **What it does:**
 
-1. ✅ **Validates prerequisites** - checks for GitHub CLI (gh) and authentication
+1. ✅ **Validates prerequisites** - checks for GitHub CLI (gh) installation and authentication
 2. ✅ **Prompts for secret values** - interactive mode with clear descriptions and examples
-3. ✅ **Sets GitHub secrets** - uses `gh secret set` command to configure repository secrets
+3. ✅ **Sets GitHub secrets** - uses GitHub CLI (`gh secret set`) to configure repository secrets
 4. ✅ **Handles sensitive values** - masks sensitive input and displays appropriately
 5. ✅ **Organizes by category** - groups secrets by Core Infrastructure, Cosmos DB, Azure AD, Stripe, etc.
 6. ✅ **Validates configuration** - ensures required secrets are provided before setting

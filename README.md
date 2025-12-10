@@ -79,20 +79,25 @@ dotnet test OnePageAuthorAPI.sln -c Debug
 
 ### GitHub Secrets Configuration (for CI/CD)
 
-Before deploying to Azure via GitHub Actions, configure repository secrets:
+Before deploying to Azure via GitHub Actions, configure repository secrets using GitHub CLI:
 
 ```powershell
-# Install GitHub CLI and authenticate
+# Install and authenticate GitHub CLI (required)
 gh auth login
 
-# Run the interactive secrets setup script
-npm run init:secrets:interactive
+# Run the PowerShell script directly
+.\Initialize-GitHubSecrets.ps1 -Interactive
 
 # Or use a configuration file
 .\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+
+# Optional: Use NPM wrappers if preferred
+npm run init:secrets:interactive
 ```
 
 📖 **See [GITHUB_SECRETS_SETUP.md](GITHUB_SECRETS_SETUP.md) for detailed instructions**
+
+**Note:** The script uses **GitHub CLI (`gh secret set`)** to configure secrets. NPM is optional.
 
 ## ⚙️ Configuration
 
