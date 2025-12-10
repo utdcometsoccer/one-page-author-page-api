@@ -29,6 +29,49 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       # =========================================
+      # Generate Version Number
+      # =========================================
+
+      - name: 'Generate Version Number'
+        id: version
+        shell: bash
+        run: |
+          # Version format: MAJOR.MINOR.BUILD
+          # MAJOR: Increments yearly (starts at 0)
+          # MINOR: Increments monthly (1-12), resets to 1 yearly
+          # BUILD: GitHub run number
+          
+          # Calculate major version based on years since project start (2025)
+          BASE_YEAR=2025
+          CURRENT_YEAR=$(date +%Y)
+          MAJOR_VERSION=$((CURRENT_YEAR - BASE_YEAR))
+          
+          # Calculate minor version based on current month (1-12)
+          CURRENT_MONTH=$(date +%-m)
+          MINOR_VERSION=$CURRENT_MONTH
+          
+          BUILD_NUMBER=${{ github.run_number }}
+          
+          VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}"
+          
+          # Get short commit SHA for informational version
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          
+          # Informational version includes build metadata
+          INFORMATIONAL_VERSION="${VERSION}+sha.${SHORT_SHA}"
+          
+          echo "Version: ${VERSION}"
+          echo "Informational Version: ${INFORMATIONAL_VERSION}"
+          echo "Build Number: ${BUILD_NUMBER}"
+          echo "Major Version: ${MAJOR_VERSION} (Year: ${CURRENT_YEAR})"
+          echo "Minor Version: ${MINOR_VERSION} (Month: ${CURRENT_MONTH})"
+          
+          # Export for subsequent steps
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "INFORMATIONAL_VERSION=${INFORMATIONAL_VERSION}" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=${BUILD_NUMBER}" >> $GITHUB_ENV
+
+      # =========================================
       # Build all Function Apps
       # =========================================
 
@@ -36,9 +79,11 @@ jobs:
         shell: bash
         run: |
           echo "Building function-app..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.FUNCTION_APP_PATH }}'
-          dotnet build --configuration Release
-          dotnet publish --configuration Release --output ./output
+          dotnet build --configuration Release /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          dotnet publish --configuration Release --output ./output /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
           popd
 
       - name: 'Zip function-app Output'
@@ -52,9 +97,11 @@ jobs:
         shell: bash
         run: |
           echo "Building ImageAPI..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.IMAGE_API_PATH }}'
-          dotnet build --configuration Release
-          dotnet publish --configuration Release --output ./output
+          dotnet build --configuration Release /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          dotnet publish --configuration Release --output ./output /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
           popd
 
       - name: 'Zip ImageAPI Output'
@@ -68,9 +115,11 @@ jobs:
         shell: bash
         run: |
           echo "Building InkStainedWretchFunctions..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.INK_STAINED_WRETCH_FUNCTIONS_PATH }}'
-          dotnet build --configuration Release
-          dotnet publish --configuration Release --output ./output
+          dotnet build --configuration Release /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          dotnet publish --configuration Release --output ./output /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
           popd
 
       - name: 'Zip InkStainedWretchFunctions Output'
@@ -84,9 +133,11 @@ jobs:
         shell: bash
         run: |
           echo "Building InkStainedWretchStripe..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.INK_STAINED_WRETCH_STRIPE_PATH }}'
-          dotnet build --configuration Release
-          dotnet publish --configuration Release --output ./output
+          dotnet build --configuration Release /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          dotnet publish --configuration Release --output ./output /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
           popd
 
       - name: 'Zip InkStainedWretchStripe Output'
@@ -100,9 +151,11 @@ jobs:
         shell: bash
         run: |
           echo "Building InkStainedWretchesConfig..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.INK_STAINED_WRETCHES_CONFIG_PATH }}'
-          dotnet build --configuration Release
-          dotnet publish --configuration Release --output ./output
+          dotnet build --configuration Release /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          dotnet publish --configuration Release --output ./output /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
           popd
 
       - name: 'Zip InkStainedWretchesConfig Output'
