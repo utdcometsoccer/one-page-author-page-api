@@ -46,19 +46,103 @@ param deployInkStainedWretchStripe bool = true
 @description('Whether to deploy the InkStainedWretchesConfig Function App')
 param deployInkStainedWretchesConfig bool = true
 
+// =========================================
+// Required Secure Parameters
+// =========================================
+
 @description('Cosmos DB connection string (required for Function Apps)')
 @secure()
 param cosmosDbConnectionString string = ''
+
+@description('Cosmos DB Endpoint URI (optional, extracted from connection string if not provided)')
+param cosmosDbEndpointUri string = ''
+
+@description('Cosmos DB Primary Key (optional, extracted from connection string if not provided)')
+@secure()
+param cosmosDbPrimaryKey string = ''
+
+@description('Cosmos DB Database ID')
+param cosmosDbDatabaseId string = 'OnePageAuthorDb'
+
+@description('Azure Storage Connection String (required for ImageAPI)')
+@secure()
+param azureStorageConnectionString string = ''
 
 @description('Stripe API Key (required for InkStainedWretchStripe)')
 @secure()
 param stripeApiKey string = ''
 
-@description('Azure AD Tenant ID')
+@description('Stripe Webhook Secret (required for InkStainedWretchStripe webhooks)')
+@secure()
+param stripeWebhookSecret string = ''
+
+// =========================================
+// Azure AD Authentication (Optional)
+// =========================================
+
+@description('Azure AD Tenant ID (optional)')
 param aadTenantId string = ''
 
-@description('Azure AD Audience (Client ID)')
+@description('Azure AD Audience/Client ID (optional)')
 param aadAudience string = ''
+
+@description('Azure AD Client ID (optional, for apps that need both audience and client ID)')
+param aadClientId string = ''
+
+@description('Azure AD Authority URL (optional)')
+param aadAuthority string = ''
+
+// =========================================
+// Azure Infrastructure (Optional - for Domain Management)
+// =========================================
+
+@description('Azure Subscription ID (optional, for domain management features)')
+param azureSubscriptionId string = ''
+
+@description('Azure DNS Resource Group (optional, for DNS zone creation)')
+param azureDnsResourceGroup string = ''
+
+// =========================================
+// Google Domains Integration (Optional)
+// =========================================
+
+@description('Google Cloud Project ID (optional, for Google Domains registration)')
+param googleCloudProjectId string = ''
+
+@description('Google Domains Location (optional, default: global)')
+param googleDomainsLocation string = 'global'
+
+// =========================================
+// Amazon Product Advertising API (Optional)
+// =========================================
+
+@description('Amazon Product Access Key (optional, for Amazon API integration)')
+@secure()
+param amazonProductAccessKey string = ''
+
+@description('Amazon Product Secret Key (optional, for Amazon API integration)')
+@secure()
+param amazonProductSecretKey string = ''
+
+@description('Amazon Product Partner Tag (optional, for Amazon API integration)')
+param amazonProductPartnerTag string = ''
+
+@description('Amazon Product Region (optional, default: us-east-1)')
+param amazonProductRegion string = 'us-east-1'
+
+@description('Amazon Product Marketplace (optional, default: www.amazon.com)')
+param amazonProductMarketplace string = 'www.amazon.com'
+
+// =========================================
+// Penguin Random House API (Optional)
+// =========================================
+
+@description('Penguin Random House API Key (optional)')
+@secure()
+param penguinRandomHouseApiKey string = ''
+
+@description('Penguin Random House API Domain (optional, default: PRH.US)')
+param penguinRandomHouseApiDomain string = 'PRH.US'
 
 // =========================================
 // Variables
@@ -198,7 +282,7 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
   properties: {
     serverFarmId: appServicePlan.id
     siteConfig: {
-      appSettings: [
+      appSettings: concat([
         {
           name: 'AzureWebJobsStorage'
           value: storageConnectionString
@@ -223,22 +307,67 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
           name: 'WEBSITE_RUN_FROM_PACKAGE'
           value: '1'
         }
+      ],
+      // Application Insights (optional)
+      !empty(deployAppInsights ? appInsights!.properties.ConnectionString : '') ? [
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: deployAppInsights ? appInsights!.properties.ConnectionString : ''
+          value: appInsights!.properties.ConnectionString
         }
+      ] : [],
+      // Cosmos DB Configuration
+      !empty(cosmosDbConnectionString) ? [
         {
           name: 'COSMOSDB_CONNECTION_STRING'
           value: cosmosDbConnectionString
         }
+      ] : [],
+      !empty(cosmosDbEndpointUri) ? [
+        {
+          name: 'COSMOSDB_ENDPOINT_URI'
+          value: cosmosDbEndpointUri
+        }
+      ] : [],
+      !empty(cosmosDbPrimaryKey) ? [
+        {
+          name: 'COSMOSDB_PRIMARY_KEY'
+          value: cosmosDbPrimaryKey
+        }
+      ] : [],
+      !empty(cosmosDbDatabaseId) ? [
+        {
+          name: 'COSMOSDB_DATABASE_ID'
+          value: cosmosDbDatabaseId
+        }
+      ] : [],
+      // Azure Storage for Images
+      !empty(azureStorageConnectionString) ? [
+        {
+          name: 'AZURE_STORAGE_CONNECTION_STRING'
+          value: azureStorageConnectionString
+        }
+      ] : [],
+      // Azure AD Authentication (optional)
+      !empty(aadTenantId) ? [
         {
           name: 'AAD_TENANT_ID'
           value: aadTenantId
         }
+      ] : [],
+      !empty(aadAudience) ? [
         {
           name: 'AAD_AUDIENCE'
           value: aadAudience
         }
+      ] : [],
+      !empty(aadAuthority) ? [
+        {
+          name: 'AAD_AUTHORITY'
+          value: aadAuthority
+        }
+      ] : [],
+      // Key Vault (optional)
+      !empty(keyVaultUri) ? [
         {
           name: 'KEY_VAULT_URL'
           value: keyVaultUri
@@ -247,7 +376,8 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
           name: 'USE_KEY_VAULT'
           value: 'false'
         }
-      ]
+      ] : []
+      )
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
     }
@@ -269,7 +399,7 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
   properties: {
     serverFarmId: appServicePlan.id
     siteConfig: {
-      appSettings: [
+      appSettings: concat([
         {
           name: 'AzureWebJobsStorage'
           value: storageConnectionString
@@ -294,22 +424,124 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
           name: 'WEBSITE_RUN_FROM_PACKAGE'
           value: '1'
         }
+      ],
+      // Application Insights (optional)
+      !empty(deployAppInsights ? appInsights!.properties.ConnectionString : '') ? [
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: deployAppInsights ? appInsights!.properties.ConnectionString : ''
+          value: appInsights!.properties.ConnectionString
         }
+      ] : [],
+      // Cosmos DB Configuration
+      !empty(cosmosDbConnectionString) ? [
         {
-          name: 'COSMOSDB_CONNECTION_STRING'
+          name: 'CosmosDBConnection'
           value: cosmosDbConnectionString
         }
+      ] : [],
+      !empty(cosmosDbEndpointUri) ? [
+        {
+          name: 'COSMOSDB_ENDPOINT_URI'
+          value: cosmosDbEndpointUri
+        }
+      ] : [],
+      !empty(cosmosDbPrimaryKey) ? [
+        {
+          name: 'COSMOSDB_PRIMARY_KEY'
+          value: cosmosDbPrimaryKey
+        }
+      ] : [],
+      !empty(cosmosDbDatabaseId) ? [
+        {
+          name: 'COSMOSDB_DATABASE_ID'
+          value: cosmosDbDatabaseId
+        }
+      ] : [],
+      // Azure AD Authentication (optional)
+      !empty(aadTenantId) ? [
         {
           name: 'AAD_TENANT_ID'
           value: aadTenantId
         }
+      ] : [],
+      !empty(aadAudience) ? [
         {
           name: 'AAD_AUDIENCE'
           value: aadAudience
         }
+      ] : [],
+      // Azure Infrastructure (optional - for domain management)
+      !empty(azureSubscriptionId) ? [
+        {
+          name: 'AZURE_SUBSCRIPTION_ID'
+          value: azureSubscriptionId
+        }
+      ] : [],
+      !empty(azureDnsResourceGroup) ? [
+        {
+          name: 'AZURE_DNS_RESOURCE_GROUP'
+          value: azureDnsResourceGroup
+        }
+      ] : [],
+      // Google Domains Integration (optional)
+      !empty(googleCloudProjectId) ? [
+        {
+          name: 'GOOGLE_CLOUD_PROJECT_ID'
+          value: googleCloudProjectId
+        }
+      ] : [],
+      !empty(googleDomainsLocation) ? [
+        {
+          name: 'GOOGLE_DOMAINS_LOCATION'
+          value: googleDomainsLocation
+        }
+      ] : [],
+      // Amazon Product Advertising API (optional)
+      !empty(amazonProductAccessKey) ? [
+        {
+          name: 'AMAZON_PRODUCT_ACCESS_KEY'
+          value: amazonProductAccessKey
+        }
+      ] : [],
+      !empty(amazonProductSecretKey) ? [
+        {
+          name: 'AMAZON_PRODUCT_SECRET_KEY'
+          value: amazonProductSecretKey
+        }
+      ] : [],
+      !empty(amazonProductPartnerTag) ? [
+        {
+          name: 'AMAZON_PRODUCT_PARTNER_TAG'
+          value: amazonProductPartnerTag
+        }
+      ] : [],
+      !empty(amazonProductRegion) ? [
+        {
+          name: 'AMAZON_PRODUCT_REGION'
+          value: amazonProductRegion
+        }
+      ] : [],
+      !empty(amazonProductMarketplace) ? [
+        {
+          name: 'AMAZON_PRODUCT_MARKETPLACE'
+          value: amazonProductMarketplace
+        }
+      ] : [],
+      // Penguin Random House API (optional)
+      !empty(penguinRandomHouseApiKey) ? [
+        {
+          name: 'PENGUIN_RANDOM_HOUSE_API_KEY'
+          value: penguinRandomHouseApiKey
+        }
+      ] : [],
+      !empty(penguinRandomHouseApiDomain) ? [
+        {
+          name: 'PENGUIN_RANDOM_HOUSE_API_DOMAIN'
+          value: penguinRandomHouseApiDomain
+        }
+      ] : [],
+      // Key Vault (optional)
+      !empty(keyVaultUri) ? [
         {
           name: 'KEY_VAULT_URL'
           value: keyVaultUri
@@ -318,7 +550,8 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
           name: 'USE_KEY_VAULT'
           value: 'false'
         }
-      ]
+      ] : []
+      )
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
     }
@@ -340,7 +573,7 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
   properties: {
     serverFarmId: appServicePlan.id
     siteConfig: {
-      appSettings: [
+      appSettings: concat([
         {
           name: 'AzureWebJobsStorage'
           value: storageConnectionString
@@ -365,26 +598,73 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
           name: 'WEBSITE_RUN_FROM_PACKAGE'
           value: '1'
         }
+      ],
+      // Application Insights (optional)
+      !empty(deployAppInsights ? appInsights!.properties.ConnectionString : '') ? [
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: deployAppInsights ? appInsights!.properties.ConnectionString : ''
+          value: appInsights!.properties.ConnectionString
         }
+      ] : [],
+      // Cosmos DB Configuration
+      !empty(cosmosDbConnectionString) ? [
         {
           name: 'COSMOSDB_CONNECTION_STRING'
           value: cosmosDbConnectionString
         }
+      ] : [],
+      !empty(cosmosDbEndpointUri) ? [
+        {
+          name: 'COSMOSDB_ENDPOINT_URI'
+          value: cosmosDbEndpointUri
+        }
+      ] : [],
+      !empty(cosmosDbPrimaryKey) ? [
+        {
+          name: 'COSMOSDB_PRIMARY_KEY'
+          value: cosmosDbPrimaryKey
+        }
+      ] : [],
+      !empty(cosmosDbDatabaseId) ? [
+        {
+          name: 'COSMOSDB_DATABASE_ID'
+          value: cosmosDbDatabaseId
+        }
+      ] : [],
+      // Stripe Configuration
+      !empty(stripeApiKey) ? [
         {
           name: 'STRIPE_API_KEY'
           value: stripeApiKey
         }
+      ] : [],
+      !empty(stripeWebhookSecret) ? [
+        {
+          name: 'STRIPE_WEBHOOK_SECRET'
+          value: stripeWebhookSecret
+        }
+      ] : [],
+      // Azure AD Authentication (optional)
+      !empty(aadTenantId) ? [
         {
           name: 'AAD_TENANT_ID'
           value: aadTenantId
         }
+      ] : [],
+      !empty(aadAudience) ? [
         {
           name: 'AAD_AUDIENCE'
           value: aadAudience
         }
+      ] : [],
+      !empty(aadClientId) ? [
+        {
+          name: 'AAD_CLIENT_ID'
+          value: aadClientId
+        }
+      ] : [],
+      // Key Vault (optional)
+      !empty(keyVaultUri) ? [
         {
           name: 'KEY_VAULT_URL'
           value: keyVaultUri
@@ -393,7 +673,8 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
           name: 'USE_KEY_VAULT'
           value: 'false'
         }
-      ]
+      ] : []
+      )
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
     }

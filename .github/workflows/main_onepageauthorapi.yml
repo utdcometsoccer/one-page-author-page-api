@@ -371,15 +371,50 @@ jobs:
         continue-on-error: true
         shell: bash
         env:
+          # Required deployment configuration
           ISW_RESOURCE_GROUP: ${{ secrets.ISW_RESOURCE_GROUP }}
           ISW_LOCATION: ${{ secrets.ISW_LOCATION }}
           ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
           ISW_DNS_ZONE_NAME: ${{ secrets.ISW_DNS_ZONE_NAME }}
+          DEPLOY_COMMUNICATION_SERVICES: ${{ secrets.DEPLOY_COMMUNICATION_SERVICES }}
+          
+          # Core secrets (required for basic functionality)
           COSMOSDB_CONNECTION_STRING: ${{ secrets.COSMOSDB_CONNECTION_STRING }}
+          COSMOSDB_ENDPOINT_URI: ${{ secrets.COSMOSDB_ENDPOINT_URI }}
+          COSMOSDB_PRIMARY_KEY: ${{ secrets.COSMOSDB_PRIMARY_KEY }}
+          COSMOSDB_DATABASE_ID: ${{ secrets.COSMOSDB_DATABASE_ID }}
+          
+          # ImageAPI specific
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          
+          # Stripe configuration
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          
+          # Azure AD Authentication (optional)
           AAD_TENANT_ID: ${{ secrets.AAD_TENANT_ID }}
           AAD_AUDIENCE: ${{ secrets.AAD_AUDIENCE }}
-          DEPLOY_COMMUNICATION_SERVICES: ${{ secrets.DEPLOY_COMMUNICATION_SERVICES }}
+          AAD_CLIENT_ID: ${{ secrets.AAD_CLIENT_ID }}
+          AAD_AUTHORITY: ${{ secrets.AAD_AUTHORITY }}
+          
+          # Azure Infrastructure (optional - for domain management)
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_DNS_RESOURCE_GROUP: ${{ secrets.AZURE_DNS_RESOURCE_GROUP }}
+          
+          # Google Domains Integration (optional)
+          GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
+          GOOGLE_DOMAINS_LOCATION: ${{ secrets.GOOGLE_DOMAINS_LOCATION }}
+          
+          # Amazon Product Advertising API (optional)
+          AMAZON_PRODUCT_ACCESS_KEY: ${{ secrets.AMAZON_PRODUCT_ACCESS_KEY }}
+          AMAZON_PRODUCT_SECRET_KEY: ${{ secrets.AMAZON_PRODUCT_SECRET_KEY }}
+          AMAZON_PRODUCT_PARTNER_TAG: ${{ secrets.AMAZON_PRODUCT_PARTNER_TAG }}
+          AMAZON_PRODUCT_REGION: ${{ secrets.AMAZON_PRODUCT_REGION }}
+          AMAZON_PRODUCT_MARKETPLACE: ${{ secrets.AMAZON_PRODUCT_MARKETPLACE }}
+          
+          # Penguin Random House API (optional)
+          PENGUIN_RANDOM_HOUSE_API_KEY: ${{ secrets.PENGUIN_RANDOM_HOUSE_API_KEY }}
+          PENGUIN_RANDOM_HOUSE_API_DOMAIN: ${{ secrets.PENGUIN_RANDOM_HOUSE_API_DOMAIN }}
         run: |
           # Validate required secrets are available
           if [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_LOCATION" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -418,17 +453,57 @@ jobs:
             PARAMS="$PARAMS deployCommunicationServices=false"
             echo "⚠️ Communication Services deployment skipped (DEPLOY_COMMUNICATION_SERVICES not set to 'true')"
           fi
+          
+          # Build conditional secure parameters
+          SECURE_PARAMS=""
+          
+          # Add Cosmos DB parameters conditionally
+          [ -n "$COSMOSDB_CONNECTION_STRING" ] && SECURE_PARAMS="$SECURE_PARAMS cosmosDbConnectionString='$COSMOSDB_CONNECTION_STRING'"
+          [ -n "$COSMOSDB_ENDPOINT_URI" ] && PARAMS="$PARAMS cosmosDbEndpointUri='$COSMOSDB_ENDPOINT_URI'"
+          [ -n "$COSMOSDB_PRIMARY_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS cosmosDbPrimaryKey='$COSMOSDB_PRIMARY_KEY'"
+          [ -n "$COSMOSDB_DATABASE_ID" ] && PARAMS="$PARAMS cosmosDbDatabaseId='$COSMOSDB_DATABASE_ID'"
+          
+          # Add ImageAPI storage parameter conditionally
+          [ -n "$AZURE_STORAGE_CONNECTION_STRING" ] && SECURE_PARAMS="$SECURE_PARAMS azureStorageConnectionString='$AZURE_STORAGE_CONNECTION_STRING'"
+          
+          # Add Stripe parameters conditionally
+          [ -n "$STRIPE_API_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS stripeApiKey='$STRIPE_API_KEY'"
+          [ -n "$STRIPE_WEBHOOK_SECRET" ] && SECURE_PARAMS="$SECURE_PARAMS stripeWebhookSecret='$STRIPE_WEBHOOK_SECRET'"
+          
+          # Add Azure AD parameters conditionally
+          [ -n "$AAD_TENANT_ID" ] && PARAMS="$PARAMS aadTenantId='$AAD_TENANT_ID'"
+          [ -n "$AAD_AUDIENCE" ] && PARAMS="$PARAMS aadAudience='$AAD_AUDIENCE'"
+          [ -n "$AAD_CLIENT_ID" ] && PARAMS="$PARAMS aadClientId='$AAD_CLIENT_ID'"
+          [ -n "$AAD_AUTHORITY" ] && PARAMS="$PARAMS aadAuthority='$AAD_AUTHORITY'"
+          
+          # Add Azure Infrastructure parameters conditionally
+          [ -n "$AZURE_SUBSCRIPTION_ID" ] && PARAMS="$PARAMS azureSubscriptionId='$AZURE_SUBSCRIPTION_ID'"
+          [ -n "$AZURE_DNS_RESOURCE_GROUP" ] && PARAMS="$PARAMS azureDnsResourceGroup='$AZURE_DNS_RESOURCE_GROUP'"
+          
+          # Add Google Domains parameters conditionally
+          [ -n "$GOOGLE_CLOUD_PROJECT_ID" ] && PARAMS="$PARAMS googleCloudProjectId='$GOOGLE_CLOUD_PROJECT_ID'"
+          [ -n "$GOOGLE_DOMAINS_LOCATION" ] && PARAMS="$PARAMS googleDomainsLocation='$GOOGLE_DOMAINS_LOCATION'"
+          
+          # Add Amazon API parameters conditionally
+          [ -n "$AMAZON_PRODUCT_ACCESS_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS amazonProductAccessKey='$AMAZON_PRODUCT_ACCESS_KEY'"
+          [ -n "$AMAZON_PRODUCT_SECRET_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS amazonProductSecretKey='$AMAZON_PRODUCT_SECRET_KEY'"
+          [ -n "$AMAZON_PRODUCT_PARTNER_TAG" ] && PARAMS="$PARAMS amazonProductPartnerTag='$AMAZON_PRODUCT_PARTNER_TAG'"
+          [ -n "$AMAZON_PRODUCT_REGION" ] && PARAMS="$PARAMS amazonProductRegion='$AMAZON_PRODUCT_REGION'"
+          [ -n "$AMAZON_PRODUCT_MARKETPLACE" ] && PARAMS="$PARAMS amazonProductMarketplace='$AMAZON_PRODUCT_MARKETPLACE'"
+          
+          # Add Penguin Random House parameters conditionally
+          [ -n "$PENGUIN_RANDOM_HOUSE_API_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS penguinRandomHouseApiKey='$PENGUIN_RANDOM_HOUSE_API_KEY'"
+          [ -n "$PENGUIN_RANDOM_HOUSE_API_DOMAIN" ] && PARAMS="$PARAMS penguinRandomHouseApiDomain='$PENGUIN_RANDOM_HOUSE_API_DOMAIN'"
 
           # Deploy infrastructure
           echo "🚀 Starting infrastructure deployment..."
+          echo "Parameters: $PARAMS"
+          echo "Secure parameters: [REDACTED]"
+          
           az deployment group create \
             --resource-group "$ISW_RESOURCE_GROUP" \
             --template-file infra/inkstainedwretches.bicep \
-            --parameters $PARAMS \
-                        cosmosDbConnectionString="$COSMOSDB_CONNECTION_STRING" \
-                        stripeApiKey="$STRIPE_API_KEY" \
-                        aadTenantId="$AAD_TENANT_ID" \
-                        aadAudience="$AAD_AUDIENCE" \
+            --parameters $PARAMS $SECURE_PARAMS \
             --output json > deployment-output.json
 
           echo "✓ Infrastructure deployment completed"
