@@ -1,0 +1,19 @@
+{
+  "name": "one-page-author-api",
+  "version": "1.0.0",
+  "description": "Optional NPM wrappers for PowerShell development scripts. Scripts can be run directly with PowerShell without npm.",
+  "private": true,
+  "scripts": {
+    "init:secrets": "pwsh -File ./Initialize-GitHubSecrets.ps1",
+    "init:secrets:interactive": "pwsh -File ./Initialize-GitHubSecrets.ps1 -Interactive",
+    "init:secrets:help": "pwsh -File ./Initialize-GitHubSecrets.ps1 -Help"
+  },
+  "keywords": [
+    "azure-functions",
+    "github-secrets",
+    "github-cli",
+    "development"
+  ],
+  "author": "OnePageAuthor Team",
+  "license": "MIT"
+}

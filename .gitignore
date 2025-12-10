@@ -272,3 +272,8 @@ __azurite_db_*.json
 
 # Bicep compiled templates
 infra/*.json
+
+# GitHub Secrets configuration files (contains sensitive data)
+secrets.json
+secrets-*.json
+!secrets-template.json
