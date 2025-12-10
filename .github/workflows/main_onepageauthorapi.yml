@@ -38,7 +38,7 @@ jobs:
         run: |
           # Version format: MAJOR.MINOR.BUILD
           # MAJOR: Increments yearly (starts at 0)
-          # MINOR: Increments monthly, resets to 0 yearly
+          # MINOR: Increments monthly (1-12), resets to 1 yearly
           # BUILD: GitHub run number
           
           # Calculate major version based on years since project start (2025)
