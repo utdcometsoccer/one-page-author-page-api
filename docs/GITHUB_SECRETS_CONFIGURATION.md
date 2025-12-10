@@ -52,25 +52,25 @@ The deployment workflow (`.github/workflows/main_onepageauthorapi.yml`) reads Gi
 | `ISW_DNS_ZONE_NAME` | (Bicep parameter) | DNS zone to create | Your domain name |
 
 ### Optional Secrets - Google Domains Integration
-| GitHub Secret | Environment Variable | Purpose | Where to Find |
-|---------------|---------------------|---------|---------------|
-| `GOOGLE_CLOUD_PROJECT_ID` | `GOOGLE_CLOUD_PROJECT_ID` | Google Cloud project ID | [Google Cloud Console](https://console.cloud.google.com) → Project ID |
-| `GOOGLE_DOMAINS_LOCATION` | `GOOGLE_DOMAINS_LOCATION` | Location for domain operations | Default: "global" |
+| GitHub Secret | Environment Variable | Purpose | Default Value | Where to Find |
+|---------------|---------------------|---------|---------------|---------------|
+| `GOOGLE_CLOUD_PROJECT_ID` | `GOOGLE_CLOUD_PROJECT_ID` | Google Cloud project ID | N/A | [Google Cloud Console](https://console.cloud.google.com) → Project ID |
+| `GOOGLE_DOMAINS_LOCATION` | `GOOGLE_DOMAINS_LOCATION` | Location for domain operations | "global" (if GOOGLE_CLOUD_PROJECT_ID is set) | Location identifier |
 
 ### Optional Secrets - Amazon Product Advertising API
-| GitHub Secret | Environment Variable | Purpose | Where to Find |
-|---------------|---------------------|---------|---------------|
-| `AMAZON_PRODUCT_ACCESS_KEY` | `AMAZON_PRODUCT_ACCESS_KEY` | AWS access key ID | [AWS Console](https://console.aws.amazon.com) → Security Credentials |
-| `AMAZON_PRODUCT_SECRET_KEY` | `AMAZON_PRODUCT_SECRET_KEY` | AWS secret access key | Created with Access Key (save immediately) |
-| `AMAZON_PRODUCT_PARTNER_TAG` | `AMAZON_PRODUCT_PARTNER_TAG` | Amazon Associates tracking ID | [Amazon Associates](https://affiliate-program.amazon.com) |
-| `AMAZON_PRODUCT_REGION` | `AMAZON_PRODUCT_REGION` | AWS region | Default: "us-east-1" |
-| `AMAZON_PRODUCT_MARKETPLACE` | `AMAZON_PRODUCT_MARKETPLACE` | Target marketplace | Default: "www.amazon.com" |
+| GitHub Secret | Environment Variable | Purpose | Default Value | Where to Find |
+|---------------|---------------------|---------|---------------|---------------|
+| `AMAZON_PRODUCT_ACCESS_KEY` | `AMAZON_PRODUCT_ACCESS_KEY` | AWS access key ID | N/A | [AWS Console](https://console.aws.amazon.com) → Security Credentials |
+| `AMAZON_PRODUCT_SECRET_KEY` | `AMAZON_PRODUCT_SECRET_KEY` | AWS secret access key | N/A | Created with Access Key (save immediately) |
+| `AMAZON_PRODUCT_PARTNER_TAG` | `AMAZON_PRODUCT_PARTNER_TAG` | Amazon Associates tracking ID | N/A | [Amazon Associates](https://affiliate-program.amazon.com) |
+| `AMAZON_PRODUCT_REGION` | `AMAZON_PRODUCT_REGION` | AWS region | "us-east-1" (if ACCESS_KEY is set) | AWS region identifier |
+| `AMAZON_PRODUCT_MARKETPLACE` | `AMAZON_PRODUCT_MARKETPLACE` | Target marketplace | "www.amazon.com" (if ACCESS_KEY is set) | Amazon marketplace URL |
 
 ### Optional Secrets - Penguin Random House API
-| GitHub Secret | Environment Variable | Purpose | Where to Find |
-|---------------|---------------------|---------|---------------|
-| `PENGUIN_RANDOM_HOUSE_API_KEY` | `PENGUIN_RANDOM_HOUSE_API_KEY` | PRH API authentication key | [PRH Developer Portal](https://developer.penguinrandomhouse.com) |
-| `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | PRH API domain | Default: "PRH.US" |
+| GitHub Secret | Environment Variable | Purpose | Default Value | Where to Find |
+|---------------|---------------------|---------|---------------|---------------|
+| `PENGUIN_RANDOM_HOUSE_API_KEY` | `PENGUIN_RANDOM_HOUSE_API_KEY` | PRH API authentication key | N/A | [PRH Developer Portal](https://developer.penguinrandomhouse.com) |
+| `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | PRH API domain | "PRH.US" (if API_KEY is set) | API domain identifier |
 
 ## ImageAPI Secrets
 

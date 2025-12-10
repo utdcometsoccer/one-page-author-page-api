@@ -110,7 +110,7 @@ param azureDnsResourceGroup string = ''
 param googleCloudProjectId string = ''
 
 @description('Google Domains Location (optional, default: global)')
-param googleDomainsLocation string = 'global'
+param googleDomainsLocation string = ''
 
 // =========================================
 // Amazon Product Advertising API (Optional)
@@ -128,10 +128,10 @@ param amazonProductSecretKey string = ''
 param amazonProductPartnerTag string = ''
 
 @description('Amazon Product Region (optional, default: us-east-1)')
-param amazonProductRegion string = 'us-east-1'
+param amazonProductRegion string = ''
 
 @description('Amazon Product Marketplace (optional, default: www.amazon.com)')
-param amazonProductMarketplace string = 'www.amazon.com'
+param amazonProductMarketplace string = ''
 
 // =========================================
 // Penguin Random House API (Optional)
@@ -142,7 +142,7 @@ param amazonProductMarketplace string = 'www.amazon.com'
 param penguinRandomHouseApiKey string = ''
 
 @description('Penguin Random House API Domain (optional, default: PRH.US)')
-param penguinRandomHouseApiDomain string = 'PRH.US'
+param penguinRandomHouseApiDomain string = ''
 
 // =========================================
 // Variables
@@ -495,6 +495,11 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
           name: 'GOOGLE_DOMAINS_LOCATION'
           value: googleDomainsLocation
         }
+      ] : !empty(googleCloudProjectId) ? [
+        {
+          name: 'GOOGLE_DOMAINS_LOCATION'
+          value: 'global'
+        }
       ] : [],
       // Amazon Product Advertising API (optional)
       !empty(amazonProductAccessKey) ? [
@@ -520,11 +525,21 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
           name: 'AMAZON_PRODUCT_REGION'
           value: amazonProductRegion
         }
+      ] : !empty(amazonProductAccessKey) ? [
+        {
+          name: 'AMAZON_PRODUCT_REGION'
+          value: 'us-east-1'
+        }
       ] : [],
       !empty(amazonProductMarketplace) ? [
         {
           name: 'AMAZON_PRODUCT_MARKETPLACE'
           value: amazonProductMarketplace
+        }
+      ] : !empty(amazonProductAccessKey) ? [
+        {
+          name: 'AMAZON_PRODUCT_MARKETPLACE'
+          value: 'www.amazon.com'
         }
       ] : [],
       // Penguin Random House API (optional)
@@ -538,6 +553,11 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
         {
           name: 'PENGUIN_RANDOM_HOUSE_API_DOMAIN'
           value: penguinRandomHouseApiDomain
+        }
+      ] : !empty(penguinRandomHouseApiKey) ? [
+        {
+          name: 'PENGUIN_RANDOM_HOUSE_API_DOMAIN'
+          value: 'PRH.US'
         }
       ] : [],
       // Key Vault (optional)
