@@ -29,6 +29,40 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       # =========================================
+      # Generate Version Number
+      # =========================================
+
+      - name: 'Generate Version Number'
+        id: version
+        shell: bash
+        run: |
+          # Version format: MAJOR.MINOR.BUILD
+          # MAJOR: 0 (initial version)
+          # MINOR: Incremented manually for feature releases
+          # BUILD: GitHub run number
+          
+          MAJOR_VERSION=0
+          MINOR_VERSION=1
+          BUILD_NUMBER=${{ github.run_number }}
+          
+          VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}"
+          
+          # Get short commit SHA for informational version
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          
+          # Informational version includes build metadata
+          INFORMATIONAL_VERSION="${VERSION}+sha.${SHORT_SHA}"
+          
+          echo "Version: ${VERSION}"
+          echo "Informational Version: ${INFORMATIONAL_VERSION}"
+          echo "Build Number: ${BUILD_NUMBER}"
+          
+          # Export for subsequent steps
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "INFORMATIONAL_VERSION=${INFORMATIONAL_VERSION}" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=${BUILD_NUMBER}" >> $GITHUB_ENV
+
+      # =========================================
       # Build all Function Apps
       # =========================================
 
@@ -36,9 +70,11 @@ jobs:
         shell: bash
         run: |
           echo "Building function-app..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.FUNCTION_APP_PATH }}'
-          dotnet build --configuration Release
-          dotnet publish --configuration Release --output ./output
+          dotnet build --configuration Release /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          dotnet publish --configuration Release --output ./output /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
           popd
 
       - name: 'Zip function-app Output'
@@ -52,9 +88,11 @@ jobs:
         shell: bash
         run: |
           echo "Building ImageAPI..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.IMAGE_API_PATH }}'
-          dotnet build --configuration Release
-          dotnet publish --configuration Release --output ./output
+          dotnet build --configuration Release /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          dotnet publish --configuration Release --output ./output /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
           popd
 
       - name: 'Zip ImageAPI Output'
@@ -68,9 +106,11 @@ jobs:
         shell: bash
         run: |
           echo "Building InkStainedWretchFunctions..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.INK_STAINED_WRETCH_FUNCTIONS_PATH }}'
-          dotnet build --configuration Release
-          dotnet publish --configuration Release --output ./output
+          dotnet build --configuration Release /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          dotnet publish --configuration Release --output ./output /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
           popd
 
       - name: 'Zip InkStainedWretchFunctions Output'
@@ -84,9 +124,11 @@ jobs:
         shell: bash
         run: |
           echo "Building InkStainedWretchStripe..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.INK_STAINED_WRETCH_STRIPE_PATH }}'
-          dotnet build --configuration Release
-          dotnet publish --configuration Release --output ./output
+          dotnet build --configuration Release /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          dotnet publish --configuration Release --output ./output /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
           popd
 
       - name: 'Zip InkStainedWretchStripe Output'
@@ -100,9 +142,11 @@ jobs:
         shell: bash
         run: |
           echo "Building InkStainedWretchesConfig..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.INK_STAINED_WRETCHES_CONFIG_PATH }}'
-          dotnet build --configuration Release
-          dotnet publish --configuration Release --output ./output
+          dotnet build --configuration Release /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          dotnet publish --configuration Release --output ./output /p:Version=${{ env.VERSION }} /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
           popd
 
       - name: 'Zip InkStainedWretchesConfig Output'

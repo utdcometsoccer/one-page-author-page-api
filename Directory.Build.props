@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  
+  <!-- 
+    Centralized version management for all projects in the solution.
+    Version format: MAJOR.MINOR.BUILD
+    - MAJOR: 0 (starting version)
+    - MINOR: Incremented for feature releases
+    - BUILD: GitHub Actions run number (GITHUB_RUN_NUMBER)
+    
+    The version can be overridden during build using:
+    dotnet build /p:Version=0.1.123 /p:InformationalVersion=0.1.123+sha.abc123
+  -->
+  
+  <PropertyGroup>
+    <!-- Default version (used for local development builds) -->
+    <VersionPrefix>0.1.0</VersionPrefix>
+    
+    <!-- Assembly version (should be stable for binary compatibility) -->
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    
+    <!-- File version (can change with each build) -->
+    <FileVersion>0.1.0.0</FileVersion>
+    
+    <!-- 
+      Informational version (includes git sha and build metadata)
+      This will be overridden in CI/CD with build number
+    -->
+    <InformationalVersion>0.1.0-local</InformationalVersion>
+    
+    <!-- Enable deterministic builds for reproducibility -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+  
+</Project>
