@@ -41,10 +41,16 @@ Added a dedicated step in `.github/workflows/main_onepageauthorapi.yml`:
   id: version
   shell: bash
   run: |
-    MAJOR_VERSION=0
-    MINOR_VERSION=1
-    BUILD_NUMBER=${{ github.run_number }}
+    # Calculate major version based on years since project start (2025)
+    BASE_YEAR=2025
+    CURRENT_YEAR=$(date +%Y)
+    MAJOR_VERSION=$((CURRENT_YEAR - BASE_YEAR))
     
+    # Calculate minor version based on current month (1-12)
+    CURRENT_MONTH=$(date +%-m)
+    MINOR_VERSION=$CURRENT_MONTH
+    
+    BUILD_NUMBER=${{ github.run_number }}
     VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}"
     SHORT_SHA=$(git rev-parse --short HEAD)
     INFORMATIONAL_VERSION="${VERSION}+sha.${SHORT_SHA}"
@@ -57,12 +63,14 @@ Added a dedicated step in `.github/workflows/main_onepageauthorapi.yml`:
 **Version Format:** `MAJOR.MINOR.BUILD+sha.COMMIT`
 
 **Components:**
-- **MAJOR**: Currently 0 (initial development)
-- **MINOR**: 1 (incremented manually for feature releases)
+- **MAJOR**: Years since 2025 (increments yearly, starts at 0)
+- **MINOR**: Current month number (1-12, resets each January)
 - **BUILD**: GitHub Actions run number (auto-incremented)
 - **COMMIT**: Short git SHA (7 characters)
 
-**Example:** `0.1.42+sha.1bb3c74`
+**Examples:**
+- `0.12.42+sha.1bb3c74` (December 2025, build 42)
+- `1.3.100+sha.abc1234` (March 2026, build 100)
 
 ### 3. Updated Build Commands
 
@@ -218,16 +226,15 @@ dotnet build --configuration Release \
 
 **Build Number**: Automatically incremented with each GitHub Actions run
 
-**Minor Version** (e.g., 0.1.x → 0.2.x):
-1. Edit `.github/workflows/main_onepageauthorapi.yml`
-2. Update `MINOR_VERSION=2` in "Generate Version Number" step
-3. Optional: Update `Directory.Build.props` for consistency
+**Minor Version**: Automatically calculated from current month (1-12)
+- January = 1, February = 2, ..., December = 12
+- Resets to 1 each January automatically
 
-**Major Version** (e.g., 0.x.y → 1.x.y):
-1. Edit `.github/workflows/main_onepageauthorapi.yml`
-2. Update `MAJOR_VERSION=1` in "Generate Version Number" step
-3. Optional: Reset `MINOR_VERSION=0`
-4. Update `Directory.Build.props` accordingly
+**Major Version**: Automatically calculated from years since 2025
+- 2025 = 0, 2026 = 1, 2027 = 2, etc.
+- Increments automatically each January
+
+No manual intervention required for any version component.
 
 ## Files Modified/Created
 

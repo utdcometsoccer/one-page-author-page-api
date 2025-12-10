@@ -37,12 +37,19 @@ jobs:
         shell: bash
         run: |
           # Version format: MAJOR.MINOR.BUILD
-          # MAJOR: 0 (initial version)
-          # MINOR: Incremented manually for feature releases
+          # MAJOR: Increments yearly (starts at 0)
+          # MINOR: Increments monthly, resets to 0 yearly
           # BUILD: GitHub run number
           
-          MAJOR_VERSION=0
-          MINOR_VERSION=1
+          # Calculate major version based on years since project start (2025)
+          BASE_YEAR=2025
+          CURRENT_YEAR=$(date +%Y)
+          MAJOR_VERSION=$((CURRENT_YEAR - BASE_YEAR))
+          
+          # Calculate minor version based on current month (1-12)
+          CURRENT_MONTH=$(date +%-m)
+          MINOR_VERSION=$CURRENT_MONTH
+          
           BUILD_NUMBER=${{ github.run_number }}
           
           VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}"
@@ -56,6 +63,8 @@ jobs:
           echo "Version: ${VERSION}"
           echo "Informational Version: ${INFORMATIONAL_VERSION}"
           echo "Build Number: ${BUILD_NUMBER}"
+          echo "Major Version: ${MAJOR_VERSION} (Year: ${CURRENT_YEAR})"
+          echo "Minor Version: ${MINOR_VERSION} (Month: ${CURRENT_MONTH})"
           
           # Export for subsequent steps
           echo "VERSION=${VERSION}" >> $GITHUB_ENV

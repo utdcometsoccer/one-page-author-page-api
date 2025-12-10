@@ -12,15 +12,16 @@ The version follows semantic versioning with build metadata:
 MAJOR.MINOR.BUILD+sha.COMMIT
 ```
 
-- **MAJOR**: Currently `0` (initial development phase)
-- **MINOR**: Incremented manually for feature releases (currently `1`)
+- **MAJOR**: Increments yearly (years since 2025, starts at `0`)
+- **MINOR**: Current month number (1-12), resets to 1 each January
 - **BUILD**: GitHub Actions run number (automatically incremented)
 - **COMMIT**: Short git commit SHA (7 characters)
 
 ### Examples
 
-- `0.1.123` - Version number
-- `0.1.123+sha.abc1234` - Informational version with commit SHA
+- `0.12.123` - Version number (Year 2025, December, build 123)
+- `0.12.123+sha.abc1234` - Informational version with commit SHA
+- `1.3.456` - Version number (Year 2026, March, build 456)
 
 ## Implementation
 
@@ -48,10 +49,16 @@ The workflow generates version numbers in the "Generate Version Number" step:
   id: version
   shell: bash
   run: |
-    MAJOR_VERSION=0
-    MINOR_VERSION=1
-    BUILD_NUMBER=${{ github.run_number }}
+    # Calculate major version based on years since project start (2025)
+    BASE_YEAR=2025
+    CURRENT_YEAR=$(date +%Y)
+    MAJOR_VERSION=$((CURRENT_YEAR - BASE_YEAR))
     
+    # Calculate minor version based on current month (1-12)
+    CURRENT_MONTH=$(date +%-m)
+    MINOR_VERSION=$CURRENT_MONTH
+    
+    BUILD_NUMBER=${{ github.run_number }}
     VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}"
     SHORT_SHA=$(git rev-parse --short HEAD)
     INFORMATIONAL_VERSION="${VERSION}+sha.${SHORT_SHA}"
@@ -99,29 +106,25 @@ dotnet build --configuration Release \
 
 The build number is automatically incremented with each GitHub Actions workflow run. No manual intervention is required.
 
-### Manual (Minor Version)
+### Automatic (Minor Version - Monthly)
 
-To increment the minor version (e.g., from `0.1.x` to `0.2.x`):
+The minor version is automatically calculated based on the current month (1-12):
+- January = 1
+- February = 2
+- ...
+- December = 12
 
-1. Edit `.github/workflows/main_onepageauthorapi.yml`
-2. Locate the "Generate Version Number" step
-3. Update `MINOR_VERSION` value:
-   ```bash
-   MINOR_VERSION=2  # Change from 1 to 2
-   ```
-4. Optionally update `Directory.Build.props` for consistency:
-   ```xml
-   <VersionPrefix>0.2.0</VersionPrefix>
-   ```
+The minor version automatically resets to 1 each January.
 
-### Manual (Major Version)
+### Automatic (Major Version - Yearly)
 
-To increment the major version (e.g., from `0.x.y` to `1.x.y`):
+The major version is automatically calculated based on years since the project start (2025):
+- 2025 = 0
+- 2026 = 1
+- 2027 = 2
+- and so on...
 
-1. Edit `.github/workflows/main_onepageauthorapi.yml`
-2. Update `MAJOR_VERSION` in the "Generate Version Number" step
-3. Reset `MINOR_VERSION` to 0 if desired
-4. Update `Directory.Build.props` accordingly
+No manual intervention is required. The version automatically updates based on the current date when the workflow runs.
 
 ## Benefits
 
