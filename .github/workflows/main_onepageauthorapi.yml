@@ -500,6 +500,9 @@ jobs:
           echo "Parameters: $PARAMS"
           echo "Secure parameters: [REDACTED]"
           
+          # Note: We intentionally don't quote $PARAMS and $SECURE_PARAMS here
+          # because they contain multiple space-separated parameter assignments
+          # that need to be passed as separate arguments to az deployment
           az deployment group create \
             --resource-group "$ISW_RESOURCE_GROUP" \
             --template-file infra/inkstainedwretches.bicep \
