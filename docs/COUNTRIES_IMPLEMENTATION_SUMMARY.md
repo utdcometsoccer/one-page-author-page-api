@@ -146,8 +146,9 @@ Located in `SeedCountries/data/`:
 
 #### API Documentation
 
+API documentation for the Countries endpoint is included in the main API documentation:
 
-- **File**: `InkStainedWretchFunctions/COUNTRIES_API_DOCUMENTATION.md`
+- **File**: `docs/API-Documentation.md`
 - **Contents**:
 
   - Endpoint specification
@@ -323,7 +324,6 @@ Possible future improvements:
 16. `SeedCountries/data/countries-zh-tw.json`
 17. `OnePageAuthor.Test/Country/CountryServiceTests.cs`
 18. `OnePageAuthor.Test/Country/CountriesContainerManagerTests.cs`
-19. `InkStainedWretchFunctions/COUNTRIES_API_DOCUMENTATION.md`
 
 ### Modified Files (3 total)
 
