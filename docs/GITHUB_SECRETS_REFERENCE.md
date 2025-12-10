@@ -1,6 +1,6 @@
-# GitHub Secrets Quick Reference
+# GitHub Secrets Configuration Guide
 
-This document provides a quick reference for all GitHub Secrets required by the deployment workflow.
+This comprehensive guide provides a complete reference for all GitHub Secrets required by the deployment workflow, including detailed descriptions, examples, and troubleshooting guidance.
 
 ## 📋 Secrets Checklist
 
@@ -132,6 +132,43 @@ az cosmosdb keys list \
 2. Go to "Keys" blade
 3. Copy "PRIMARY CONNECTION STRING"
 
+### COSMOSDB_RESOURCE_GROUP
+
+**Format**: String
+**Required**: For Cosmos DB deployment
+**Example**: `rg-cosmosdb-prod`
+**Description**: Resource group for Cosmos DB deployment.
+
+### COSMOSDB_ACCOUNT_NAME
+
+**Format**: String
+**Required**: For Cosmos DB deployment
+**Example**: `cosmos-onepageauthor-prod`
+**Description**: Cosmos DB account name for deployment.
+
+### COSMOSDB_LOCATION
+
+**Format**: String (Azure region name)
+**Required**: For Cosmos DB deployment
+**Example**: `East US`
+**Description**: Azure region for Cosmos DB deployment.
+
+### COSMOSDB_ENABLE_FREE_TIER
+
+**Format**: String (`"true"` or `"false"`)
+**Required**: No
+**Example**: `true`
+**Description**: Enable Cosmos DB free tier (one per subscription).
+**Default**: `false`
+
+### COSMOSDB_ENABLE_ZONE_REDUNDANCY
+
+**Format**: String (`"true"` or `"false"`)
+**Required**: No
+**Example**: `true`
+**Description**: Enable zone redundancy for Cosmos DB.
+**Default**: `false`
+
 ### STRIPE_API_KEY
 
 **Format**: String (starts with `sk_test_` or `sk_live_`)
@@ -254,6 +291,25 @@ az account show --query tenantId -o tsv
 - Provides configuration management and Key Vault integration endpoints
 - Infrastructure must be deployed first
 
+### DEPLOY_COMMUNICATION_SERVICES
+
+**Format**: String (`"true"` or `"false"`)
+**Required**: No (optional)
+**Example**: `true`
+**Description**: Enable/disable Azure Communication Services deployment for email notifications.
+**Notes**:
+- Set to `"true"` to deploy
+- Leave empty or set to `"false"` to skip
+- When enabled, automatically registers the `Microsoft.Communication` resource provider
+- Used for author invitation emails and notifications
+
+### APPINSIGHTS_NAME
+
+**Format**: String
+**Required**: For Application Insights deployment
+**Example**: `appi-onepageauthor-prod`
+**Description**: Application Insights instance name for monitoring and logging.
+
 ## 🚀 Deployment Scenarios
 
 ### Scenario 1: Full Deployment (All Resources)
@@ -333,17 +389,76 @@ A: Yes, update the secrets in GitHub repository settings. The next workflow run 
 **Q: What happens if deployment fails?**
 A: The workflow uses `continue-on-error: true`, so a failure in one component won't stop the entire workflow. Check the logs for the specific error.
 
+## 🗺️ Environment Variable Mapping
+
+### Overview
+
+The deployment workflow (`.github/workflows/main_onepageauthorapi.yml`) reads GitHub Secrets and conditionally passes them to the Bicep template (`infra/inkstainedwretches.bicep`). Only non-empty secrets are added as environment variables to the Function Apps, allowing for flexible deployment configurations.
+
+### InkStainedWretchFunctions Environment Variables
+
+| GitHub Secret | Environment Variable | Purpose |
+|---------------|---------------------|---------|
+| `COSMOSDB_CONNECTION_STRING` | `CosmosDBConnection` | Cosmos DB connection for triggers |
+| `COSMOSDB_ENDPOINT_URI` | `COSMOSDB_ENDPOINT_URI` | Cosmos DB endpoint URL |
+| `COSMOSDB_PRIMARY_KEY` | `COSMOSDB_PRIMARY_KEY` | Cosmos DB access key |
+| `COSMOSDB_DATABASE_ID` | `COSMOSDB_DATABASE_ID` | Database name |
+| `AAD_TENANT_ID` | `AAD_TENANT_ID` | Azure AD tenant ID |
+| `AAD_AUDIENCE` | `AAD_AUDIENCE` | Azure AD client ID |
+| `AZURE_SUBSCRIPTION_ID` | `AZURE_SUBSCRIPTION_ID` | Azure subscription for DNS/Front Door |
+| `AZURE_DNS_RESOURCE_GROUP` | `AZURE_DNS_RESOURCE_GROUP` | Resource group for DNS zones |
+| `GOOGLE_CLOUD_PROJECT_ID` | `GOOGLE_CLOUD_PROJECT_ID` | Google Cloud project ID |
+| `GOOGLE_DOMAINS_LOCATION` | `GOOGLE_DOMAINS_LOCATION` | Location for domain operations |
+| `AMAZON_PRODUCT_ACCESS_KEY` | `AMAZON_PRODUCT_ACCESS_KEY` | AWS access key ID |
+| `AMAZON_PRODUCT_SECRET_KEY` | `AMAZON_PRODUCT_SECRET_KEY` | AWS secret access key |
+| `AMAZON_PRODUCT_PARTNER_TAG` | `AMAZON_PRODUCT_PARTNER_TAG` | Amazon Associates tracking ID |
+| `AMAZON_PRODUCT_REGION` | `AMAZON_PRODUCT_REGION` | AWS region (default: "us-east-1") |
+| `AMAZON_PRODUCT_MARKETPLACE` | `AMAZON_PRODUCT_MARKETPLACE` | Target marketplace (default: "www.amazon.com") |
+| `PENGUIN_RANDOM_HOUSE_API_KEY` | `PENGUIN_RANDOM_HOUSE_API_KEY` | PRH API authentication key |
+| `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | PRH API domain (default: "PRH.US") |
+
+### ImageAPI Environment Variables
+
+| GitHub Secret | Environment Variable | Purpose |
+|---------------|---------------------|---------|
+| `COSMOSDB_ENDPOINT_URI` | `COSMOSDB_ENDPOINT_URI` | Cosmos DB endpoint URL |
+| `COSMOSDB_PRIMARY_KEY` | `COSMOSDB_PRIMARY_KEY` | Cosmos DB access key |
+| `COSMOSDB_DATABASE_ID` | `COSMOSDB_DATABASE_ID` | Database name |
+| `COSMOSDB_CONNECTION_STRING` | `COSMOSDB_CONNECTION_STRING` | Full connection string |
+| `AZURE_STORAGE_CONNECTION_STRING` | `AZURE_STORAGE_CONNECTION_STRING` | Blob storage connection |
+| `AAD_TENANT_ID` | `AAD_TENANT_ID` | Azure AD tenant ID |
+| `AAD_AUDIENCE` | `AAD_AUDIENCE` | Azure AD client ID |
+| `AAD_AUTHORITY` | `AAD_AUTHORITY` | Azure AD authority URL |
+
+### InkStainedWretchStripe Environment Variables
+
+| GitHub Secret | Environment Variable | Purpose |
+|---------------|---------------------|---------|
+| `STRIPE_API_KEY` | `STRIPE_API_KEY` | Stripe secret key |
+| `STRIPE_WEBHOOK_SECRET` | `STRIPE_WEBHOOK_SECRET` | Webhook signing secret |
+| `COSMOSDB_ENDPOINT_URI` | `COSMOSDB_ENDPOINT_URI` | Cosmos DB endpoint URL |
+| `COSMOSDB_PRIMARY_KEY` | `COSMOSDB_PRIMARY_KEY` | Cosmos DB access key |
+| `COSMOSDB_DATABASE_ID` | `COSMOSDB_DATABASE_ID` | Database name |
+| `COSMOSDB_CONNECTION_STRING` | `COSMOSDB_CONNECTION_STRING` | Full connection string |
+| `AAD_TENANT_ID` | `AAD_TENANT_ID` | Azure AD tenant ID |
+| `AAD_AUDIENCE` | `AAD_AUDIENCE` | Azure AD audience/client ID |
+| `AAD_CLIENT_ID` | `AAD_CLIENT_ID` | Azure AD client ID |
+
 ## 📞 Support
 
 If you need help setting up secrets:
 1. Review this document and the [Deployment Guide](DEPLOYMENT_GUIDE.md)
 2. Check the GitHub Actions logs for specific error messages
 3. Verify secret names match exactly (case-sensitive)
-4. Open an issue in the repository if problems persist
+4. Consult the [GitHub Actions workflow](.github/workflows/main_onepageauthorapi.yml) for implementation details
+5. Check Bicep templates in `infra/` directory for parameter mappings
+6. Open an issue in the repository if problems persist
 
 ---
 
 **Last Updated**: 2024
 **Related Documentation**: 
 - [Deployment Guide](DEPLOYMENT_GUIDE.md)
+- [Deployment Architecture](DEPLOYMENT_ARCHITECTURE.md)
 - [README.md](../README.md)
+- [GitHub Actions Secrets Documentation](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
