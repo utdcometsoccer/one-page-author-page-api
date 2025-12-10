@@ -4313,7 +4313,14 @@ The scripts can be modified to suit your development preferences:
 
 ## 📖 Documentation
 
-All detailed documentation has been organized in the [`docs/`](docs/) folder:
+All detailed documentation has been organized in the [`docs/`](docs/) folder. For a complete navigation guide, see the **[Documentation Index](docs/INDEX.md)**.
+
+### Quick Links
+- [**Documentation Index**](docs/INDEX.md) - Complete navigation guide to all documentation
+- [**API Reference**](docs/API-Documentation.md) - Comprehensive API documentation
+- [**Deployment Guide**](docs/DEPLOYMENT_GUIDE.md) - Complete deployment workflow
+- [**GitHub Secrets Reference**](docs/GITHUB_SECRETS_REFERENCE.md) - Secrets configuration guide
+- [**Development Scripts**](docs/DEVELOPMENT_SCRIPTS.md) - Development automation
 
 ### Core Documentation
 | Document | Description |
