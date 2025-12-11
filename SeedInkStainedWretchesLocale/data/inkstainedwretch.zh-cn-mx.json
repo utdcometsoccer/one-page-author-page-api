@@ -186,29 +186,36 @@
         "navItems": {
             "chooseCulture": {
                 "label": "Culture",
-                "description": "Choose Language & Region"
+                "description": "Choose Language & Region",
+                "ariaLabel": "选择您的语言和地区设置"
             },
             "login": {
                 "label": "Login",
-                "description": "Sign In / Sign Up"
+                "description": "Sign In / Sign Up",
+                "ariaLabel": "登录或创建帐户"
             },
             "domainRegistration": {
                 "label": "Domain",
-                "description": "Register Domain"
+                "description": "Register Domain",
+                "ariaLabel": "为您的作者页面注册自定义域名"
             },
             "authorPage": {
                 "label": "Author",
-                "description": "Author Page"
+                "description": "Author Page",
+                "ariaLabel": "管理您的作者资料和内容"
             },
             "subscribe": {
                 "label": "Subscribe",
-                "description": "Choose a Subscription Plan and Checkout"
+                "description": "Choose a Subscription Plan and Checkout",
+                "ariaLabel": "查看并选择订阅计划"
             },
             "thankYou": {
                 "label": "Success",
-                "description": "Thank You"
+                "description": "Thank You",
+                "ariaLabel": "查看购买确认"
             }
-        }
+        },
+        "brandAriaLabel": "导航到主页"
     },
     "OpenLibraryAuthorForm": {
         "legend": "Edit Author",

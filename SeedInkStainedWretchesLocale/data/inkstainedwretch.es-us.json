@@ -186,29 +186,36 @@
         "navItems": {
             "chooseCulture": {
                 "label": "Cultura",
-                "description": "Elegir Idioma y Región"
+                "description": "Elegir Idioma y Región",
+                "ariaLabel": "Elija su idioma y configuración de región"
             },
             "login": {
                 "label": "Iniciar Sesión",
-                "description": "Registrarse / Iniciar Sesión"
+                "description": "Registrarse / Iniciar Sesión",
+                "ariaLabel": "Iniciar sesión o crear una cuenta"
             },
             "domainRegistration": {
                 "label": "Dominio",
-                "description": "Registrar Dominio"
+                "description": "Registrar Dominio",
+                "ariaLabel": "Registrar un dominio personalizado para su página de autor"
             },
             "authorPage": {
                 "label": "Autor",
-                "description": "Página de Autor"
+                "description": "Página de Autor",
+                "ariaLabel": "Administrar su perfil de autor y contenido"
             },
             "subscribe": {
                 "label": "Suscribirse",
-                "description": "Elegir un Plan de Suscripción y Pagar"
+                "description": "Elegir un Plan de Suscripción y Pagar",
+                "ariaLabel": "Ver y seleccionar planes de suscripción"
             },
             "thankYou": {
                 "label": "Éxito",
-                "description": "Gracias"
+                "description": "Gracias",
+                "ariaLabel": "Ver confirmación de compra"
             }
-        }
+        },
+        "brandAriaLabel": "Navegar a la página de inicio"
     },
     "OpenLibraryAuthorForm": {
         "legend": "Editar Autor",

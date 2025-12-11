@@ -29,8 +29,7 @@ Each top-level section is stored in its own Cosmos DB container. The partition k
 | AuthorRegistration | `AuthorRegistration` | `/Culture` |
 | LoginRegister | `LoginRegister` | `/Culture` |
 | ThankYou | `ThankYou` | `/Culture` |
-| Navbar |
-avbar` | `/Culture` |
+| Navbar | `Navbar` | `/Culture` |
 | DomainRegistration | `DomainRegistration` | `/Culture` |
 | ErrorPage | `ErrorPage` | `/Culture` |
 | ImageManager | `ImageManager` | `/Culture` |
@@ -49,9 +48,30 @@ avbar` | `/Culture` |
 
    - Extract culture (e.g. `en-us` becomes `en-US` canonical form when needed).
    - Ensure each container exists (if missing create with `/Culture`).
+   - Process JSON fields, including nested structures (e.g., `navItems.login.ariaLabel` → `navItems_login_ariaLabel`).
    - Insert or upsert each object with its `Culture` property populated.
 
 3. Result: All containers now contain exactly one document per culture (or more if versioning is introduced later).
+
+### Nested JSON Handling
+
+The seeder automatically flattens nested JSON structures to match C# entity properties. For example:
+
+```json
+{
+  "Navbar": {
+    "brand": "Ink Stained Wretches",
+    "navItems": {
+      "login": {
+        "label": "Login",
+        "ariaLabel": "Sign in or create an account"
+      }
+    }
+  }
+}
+```
+
+Maps to entity properties: `brand`, `navItems_login_label`, `navItems_login_ariaLabel`.
 
 ## Aggregation Model
 
@@ -138,6 +158,18 @@ This registers:
 2. Create corresponding POCO inheriting `AuthorManagementBase`.
 3. Register new container manager + DI mapping.
 4. Add property to `LocalizationText` and retrieval line in `LocalizationTextProvider`.
+
+## Accessibility (ARIA Labels)
+
+All navigation and interactive elements include optional ARIA labels for screen reader accessibility:
+
+- **`Navbar.brandAriaLabel`**: Describes the brand/logo link (e.g., "Navigate to home page")
+- **`navItems.*.ariaLabel`**: Descriptive labels for each navigation item (e.g., "Sign in or create an account")
+
+These labels are:
+- Properly translated across all 20 supported locales
+- Optional (nullable) properties in C# entities
+- Automatically handled by the nested JSON processing in the seeder
 
 ## Error Handling
 

@@ -136,14 +136,8 @@ class Program
                             continue;
                         }
 
-                        foreach (var field in obj.EnumerateObject())
-                        {
-                            var prop = pocoType.GetProperty(field.Name);
-                            if (prop is not null && prop.CanWrite)
-                            {
-                                prop.SetValue(pocoInstance, field.Value.GetString() ?? string.Empty);
-                            }
-                        }
+                        // Process JSON fields, handling both flat and nested structures
+                        ProcessJsonFields(obj, pocoInstance, pocoType, string.Empty);
                         try
                         {
                             await repository.AddAsync(pocoInstance);
@@ -170,14 +164,7 @@ class Program
                                 cultureProp.SetValue(pocoInstance, culture);
 
                             // Set properties from JSON first so we can check for existing items
-                            foreach (var field in item.EnumerateObject())
-                            {
-                                var prop = pocoType.GetProperty(field.Name);
-                                if (prop is not null && prop.CanWrite)
-                                {
-                                    prop.SetValue(pocoInstance, field.Value.GetString() ?? string.Empty);
-                                }
-                            }
+                            ProcessJsonFields(item, pocoInstance, pocoType, string.Empty);
 
                             // Check if this specific array item already exists
                             bool itemExists = await CheckIfIndividualItemExistsAsync(repository, pocoInstance, containerName);
@@ -352,6 +339,55 @@ class Program
         {
             Console.WriteLine($"Error executing count query for {containerName}: {ex.Message}");
             return false;
+        }
+    }
+
+    /// <summary>
+    /// Recursively process JSON fields and map them to POCO properties.
+    /// Handles nested objects by flattening them with underscore-separated property names.
+    /// </summary>
+    /// <param name="jsonElement">The JSON element to process</param>
+    /// <param name="pocoInstance">The POCO instance to populate</param>
+    /// <param name="pocoType">The type of the POCO</param>
+    /// <param name="prefix">The prefix for nested properties (e.g., "navItems_chooseCulture")</param>
+    private static void ProcessJsonFields(JsonElement jsonElement, dynamic pocoInstance, Type pocoType, string prefix)
+    {
+        foreach (var field in jsonElement.EnumerateObject())
+        {
+            string propertyName = string.IsNullOrEmpty(prefix) ? field.Name : $"{prefix}_{field.Name}";
+
+            if (field.Value.ValueKind == JsonValueKind.Object)
+            {
+                // Recursively process nested objects
+                ProcessJsonFields(field.Value, pocoInstance, pocoType, propertyName);
+            }
+            else if (field.Value.ValueKind == JsonValueKind.String)
+            {
+                // Try to find and set the property on the POCO
+                var prop = pocoType.GetProperty(propertyName);
+                if (prop is not null && prop.CanWrite)
+                {
+                    prop.SetValue(pocoInstance, field.Value.GetString() ?? string.Empty);
+                }
+                else
+                {
+                    // Property not found - this is expected for optional properties
+                    // Only log if it's not an ariaLabel (which are optional)
+                    if (!propertyName.EndsWith("ariaLabel", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Console.WriteLine($"  Note: Property '{propertyName}' not found in {pocoType.Name}");
+                    }
+                }
+            }
+            else if (field.Value.ValueKind == JsonValueKind.Null)
+            {
+                // Handle null values - just skip them for optional properties
+                var prop = pocoType.GetProperty(propertyName);
+                if (prop is not null && prop.CanWrite && Nullable.GetUnderlyingType(prop.PropertyType) != null)
+                {
+                    prop.SetValue(pocoInstance, null);
+                }
+            }
         }
     }
 }

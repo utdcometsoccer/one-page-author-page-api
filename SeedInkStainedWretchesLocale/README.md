@@ -84,6 +84,28 @@ Place JSON files in `data/` with this pattern:
 
 Each top-level property name should match a POCO/container name (e.g., `Navbar`, `ThankYou`, `ArticleList`). Values can be an object or array.
 
+### Nested JSON Support
+
+The seeder supports nested JSON structures that are automatically flattened to match entity properties:
+
+```json
+{
+  "Navbar": {
+    "brand": "Ink Stained Wretches",
+    "brandAriaLabel": "Navigate to home page",
+    "navItems": {
+      "login": {
+        "label": "Login",
+        "description": "Sign In / Sign Up",
+        "ariaLabel": "Sign in or create an account"
+      }
+    }
+  }
+}
+```
+
+This nested structure is flattened to match entity properties like `navItems_login_label`, `navItems_login_description`, and `navItems_login_ariaLabel`.
+
 ### North America Locales Included
 
 The seeder includes comprehensive localization for all North American countries:
@@ -92,8 +114,21 @@ The seeder includes comprehensive localization for all North American countries:
 - **Canada (CA)**: en-ca, fr-ca, es-ca, ar-ca, zh-cn-ca, zh-tw-ca
 - **Mexico (MX)**: es-mx, en-mx, fr-mx, ar-mx, zh-cn-mx, zh-tw-mx
 
+## Recent Updates
+
+### Accessibility Enhancements (December 2024)
+
+All locale files now include comprehensive ARIA labels for improved accessibility:
+
+- **Navbar.brandAriaLabel**: Screen reader label for the brand/logo link
+- **navItems.*.ariaLabel**: Descriptive labels for each navigation item
+
+These accessibility labels are properly translated across all 20 supported locales (EN, ES, FR, AR, ZH-CN, ZH-TW for US, CA, MX, and EG).
+
 ## Notes
 
 
 - Container managers and repository are provided by `OnePageAuthorLib` via `.AddInkStainedWretchServices()`.
 - Partition key convention is usually `/Culture` for localization containers.
+- The seeder uses reflection and dynamic typing to handle various POCO types and supports both flat and nested JSON structures.
+- Nested JSON objects are automatically flattened using underscore-separated property names (e.g., `navItems_login_ariaLabel`).
