@@ -399,7 +399,6 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         public void UpdateDomainRegistration_WithNullPayload_ReturnsBadRequest()
         {
             // Arrange
-            var registrationId = "test-registration-123";
 
             // Note: This test would verify that null payload validation works
             // In practice, this requires proper JWT authentication mocking
@@ -411,7 +410,6 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         public void UpdateDomainRegistration_WithAllFieldsNull_ReturnsBadRequest()
         {
             // Arrange
-            var registrationId = "test-registration-123";
             var payload = new UpdateDomainRegistrationRequest(); // All fields null
 
             // Note: This test would verify that at least one field is required for update

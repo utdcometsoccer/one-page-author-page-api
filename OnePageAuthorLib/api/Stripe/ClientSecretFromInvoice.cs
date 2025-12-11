@@ -42,7 +42,10 @@ namespace OnePageAuthorLib.Api.Stripe
                         List<InvoicePayment> data => await _invoicePaymentIntentExtractor.ExtractPaymentIntentAsync(invoice) switch
                         {
                             null => HandleNullInvoice(),
-                            PaymentIntent paymentIntent => _paymentIntentExtractor.Extract(paymentIntent)
+                            PaymentIntent paymentIntent =>
+                                string.IsNullOrWhiteSpace(_paymentIntentExtractor.Extract(paymentIntent))
+                                    ? throw new InvalidOperationException("PaymentIntent found but missing client_secret. Ensure the intent is in a state that exposes client_secret or retrieve via supported methods.")
+                                    : _paymentIntentExtractor.Extract(paymentIntent)
                         }
                     }
                 }
