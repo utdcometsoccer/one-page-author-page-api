@@ -78,6 +78,17 @@ Console.WriteLine($"Cosmos DB Endpoint configured: {InkStainedWretch.OnePageAuth
 Console.WriteLine($"Cosmos DB Primary Key configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(primaryKey)}");
 Console.WriteLine($"Cosmos DB Database ID configured: {databaseId}");
 
+// Sanitization status: show if trimming removed quotes/whitespace
+string Sanitize(string? v) => v?.Trim().Trim('\'').Trim('"') ?? v ?? string.Empty;
+var sanitizedEndpoint = Sanitize(endpointUri);
+var sanitizedPrimaryKey = Sanitize(primaryKey);
+var sanitizedDatabaseId = Sanitize(databaseId);
+var sanitizationApplied =
+    (!string.Equals(endpointUri, sanitizedEndpoint, StringComparison.Ordinal)) ||
+    (!string.Equals(primaryKey, sanitizedPrimaryKey, StringComparison.Ordinal)) ||
+    (!string.Equals(databaseId, sanitizedDatabaseId, StringComparison.Ordinal));
+Console.WriteLine($"Config sanitization applied: {(sanitizationApplied ? "yes" : "no")}");
+
 builder.Services
     .AddCosmosClient(endpointUri, primaryKey)
     .AddCosmosDatabase(databaseId)

@@ -284,6 +284,30 @@ dotnet run
 
 ```
 
+### Startup Configuration Diagnostics
+
+- All Functions apps now emit masked configuration summaries at startup and a concise line indicating whether sanitization was applied to Cosmos settings (`COSMOSDB_ENDPOINT_URI`, `COSMOSDB_PRIMARY_KEY`, `COSMOSDB_DATABASE_ID`).
+- Sanitization trims surrounding quotes and whitespace so validation and clients receive clean values. Example log:
+
+```
+Cosmos DB Endpoint configured: https:****com/
+Cosmos DB Primary Key configured: C2y6****Jw==
+Cosmos DB Database ID configured: OnePageAuthorDB
+Config sanitization applied: yes
+```
+
+### Stripe Orchestrator Tests
+
+- Added unit tests for the Stripe client secret extraction orchestrator covering hydrated PaymentIntent success and missing secret error paths.
+- Tests live in `OnePageAuthor.Test/StripeExtractorTests.cs`.
+- When a `PaymentIntent` is present but the `client_secret` is missing, the orchestrator now throws a clear exception:
+
+```
+PaymentIntent found but missing client_secret. Ensure the intent is in a state that exposes client_secret or retrieve via supported methods.
+```
+
+This behavior helps surface misconfiguration or unsupported retrieval states early during subscription checkout flows.
+
 ### Testing
 
 

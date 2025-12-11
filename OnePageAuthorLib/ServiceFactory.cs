@@ -26,10 +26,16 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// <returns>The IServiceCollection for chaining.</returns>
         public static IServiceCollection AddCosmosClient(this IServiceCollection services, string endpointUri, string primaryKey)
         {
+            endpointUri = SanitizeConfigValue(endpointUri);
+            primaryKey = SanitizeConfigValue(primaryKey);
+
             if (string.IsNullOrWhiteSpace(endpointUri))
                 throw new ArgumentException("endpointUri cannot be null or empty.", nameof(endpointUri));
             if (string.IsNullOrWhiteSpace(primaryKey))
                 throw new ArgumentException("primaryKey cannot be null or empty.", nameof(primaryKey));
+
+            // Validate Cosmos DB primary key format (Base64 safety checks)
+            Base64Validation.ThrowIfInvalidBase64(primaryKey, nameof(primaryKey));
 
             services.AddSingleton(sp => new Microsoft.Azure.Cosmos.CosmosClient(endpointUri, primaryKey));
             return services;
@@ -62,6 +68,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         {
             var services = new ServiceCollection();
             // Register CosmosClient as a singleton (only one instance injected)
+            Base64Validation.ThrowIfInvalidBase64(primaryKey, nameof(primaryKey));
             var cosmosClient = new Microsoft.Azure.Cosmos.CosmosClient(endpointUri, primaryKey);
             services.AddSingleton(cosmosClient);
             // Register Database as a singleton (only one instance injected)
@@ -93,6 +100,10 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// <returns>A configured ServiceProvider instance.</returns>
         public static ServiceProvider CreateProvider(string endpointUri, string primaryKey, string databaseId)
         {
+            endpointUri = SanitizeConfigValue(endpointUri);
+            primaryKey = SanitizeConfigValue(primaryKey);
+            databaseId = SanitizeConfigValue(databaseId);
+
             if (string.IsNullOrWhiteSpace(endpointUri))
                 throw new ArgumentException("endpointUri cannot be null, empty, or whitespace.", nameof(endpointUri));
             if (string.IsNullOrWhiteSpace(primaryKey))
@@ -100,11 +111,112 @@ namespace InkStainedWretch.OnePageAuthorAPI
             if (string.IsNullOrWhiteSpace(databaseId))
                 throw new ArgumentException("databaseId cannot be null, empty, or whitespace.", nameof(databaseId));
 
+            // Validate Cosmos DB primary key format (Base64 safety checks)
+            Base64Validation.ThrowIfInvalidBase64(primaryKey, nameof(primaryKey));
+
             if (_serviceProvider == null)
             {
                 _serviceProvider = InitializeProvider(endpointUri, primaryKey, databaseId);
             }
             return _serviceProvider;
+        }
+
+        // Helper: trims surrounding single/double quotes and whitespace from configuration values
+        private static string SanitizeConfigValue(string value)
+        {
+            if (value == null) return value!;
+            var trimmed = value.Trim();
+            if (trimmed.Length >= 2)
+            {
+                if ((trimmed.StartsWith("\"") && trimmed.EndsWith("\"")) ||
+                    (trimmed.StartsWith("'") && trimmed.EndsWith("'")))
+                {
+                    var inner = trimmed.Substring(1, trimmed.Length - 2).Trim();
+                    // Emit a diagnostic trace when we sanitize quoted config values (masked)
+                    try
+                    {
+                        var masked = MaskSensitiveValue(inner);
+                        System.Diagnostics.Trace.WriteLine($"Sanitized quoted config value: {masked}");
+                    }
+                    catch { /* no-op */ }
+                    return inner;
+                }
+            }
+            return trimmed;
+        }
+
+        // Helper to mask sensitive values for diagnostics
+        private static string MaskSensitiveValue(string? value, string notSetText = "(set)")
+        {
+            if (string.IsNullOrWhiteSpace(value)) return notSetText;
+            if (value.Length < 8) return "(set)";
+            return $"{value[..4]}****{value[^4..]}";
+        }
+
+        /// <summary>
+        /// Utility for strict Base64 validation with detailed checks for illegal characters, padding rules, and length.
+        /// </summary>
+        private static class Base64Validation
+        {
+            // Allowed base64 characters set
+            private const string AllowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+            public static void ThrowIfInvalidBase64(string value, string paramName)
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Value cannot be null or empty.", paramName);
+
+                // No whitespace allowed
+                for (int i = 0; i < value.Length; i++)
+                {
+                    char c = value[i];
+                    if (char.IsWhiteSpace(c))
+                        throw new ArgumentException("Base64 value contains whitespace.", paramName);
+                    if (AllowedChars.IndexOf(c) < 0)
+                        throw new ArgumentException($"Base64 value contains non-base64 character: '{c}'.", paramName);
+                }
+
+                // Length must be multiple of 4
+                if (value.Length % 4 != 0)
+                    throw new ArgumentException("Base64 value length must be a multiple of 4.", paramName);
+
+                // Padding rules: '=' may only appear at the end, and there can be at most two.
+                int firstPad = value.IndexOf('=');
+                if (firstPad >= 0)
+                {
+                    // No non-padding characters after first '='
+                    for (int i = firstPad; i < value.Length; i++)
+                    {
+                        if (value[i] != '=')
+                            throw new ArgumentException("Illegal character among padding characters.", paramName);
+                    }
+
+                    // At most two '='
+                    int padCount = value.Length - firstPad;
+                    if (padCount > 2)
+                        throw new ArgumentException("Base64 value has more than two padding characters.", paramName);
+
+                    // If one '=' present, the last quartet must encode 2 bytes; if two '=', it encodes 1 byte.
+                    // Enforce canonical padding by checking the position relative to quartet boundaries.
+                    int mod = firstPad % 4;
+                    if (mod == 1)
+                        throw new ArgumentException("Invalid padding position in Base64 value.", paramName);
+                    if (padCount == 1 && mod != 3)
+                        throw new ArgumentException("Single padding '=' must be at the 4th position of a quartet.", paramName);
+                    if (padCount == 2 && mod != 2)
+                        throw new ArgumentException("Double padding '==' must start at the 3rd position of a quartet.", paramName);
+                }
+
+                // Optional: try decode to catch subtle issues
+                try
+                {
+                    Convert.FromBase64String(value);
+                }
+                catch (FormatException ex)
+                {
+                    throw new ArgumentException("Value is not valid Base64.", paramName, ex);
+                }
+            }
         }
 
         /// <summary>
