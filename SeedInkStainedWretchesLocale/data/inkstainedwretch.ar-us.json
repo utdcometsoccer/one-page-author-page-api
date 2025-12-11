@@ -186,29 +186,36 @@
         "navItems": {
             "chooseCulture": {
                 "label": "Culture",
-                "description": "Choose Language & Region"
+                "description": "Choose Language & Region",
+                "ariaLabel": "اختر إعدادات اللغة والمنطقة"
             },
             "login": {
                 "label": "Login",
-                "description": "Sign In / Sign Up"
+                "description": "Sign In / Sign Up",
+                "ariaLabel": "تسجيل الدخول أو إنشاء حساب"
             },
             "domainRegistration": {
                 "label": "Domain",
-                "description": "Register Domain"
+                "description": "Register Domain",
+                "ariaLabel": "تسجيل نطاق مخصص لصفحة المؤلف الخاصة بك"
             },
             "authorPage": {
                 "label": "Author",
-                "description": "Author Page"
+                "description": "Author Page",
+                "ariaLabel": "إدارة ملف المؤلف والمحتوى الخاص بك"
             },
             "subscribe": {
                 "label": "Subscribe",
-                "description": "Choose a Subscription Plan and Checkout"
+                "description": "Choose a Subscription Plan and Checkout",
+                "ariaLabel": "عرض واختيار خطط الاشتراك"
             },
             "thankYou": {
                 "label": "Success",
-                "description": "Thank You"
+                "description": "Thank You",
+                "ariaLabel": "عرض تأكيد الشراء"
             }
-        }
+        },
+        "brandAriaLabel": "انتقل إلى الصفحة الرئيسية"
     },
     "OpenLibraryAuthorForm": {
         "legend": "Edit Author",

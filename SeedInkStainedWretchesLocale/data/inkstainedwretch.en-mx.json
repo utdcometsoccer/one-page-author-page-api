@@ -186,29 +186,36 @@
         "navItems": {
             "chooseCulture": {
                 "label": "Culture",
-                "description": "Choose Language & Region"
+                "description": "Choose Language & Region",
+                "ariaLabel": "Choose your language and region settings"
             },
             "login": {
                 "label": "Login",
-                "description": "Sign In / Sign Up"
+                "description": "Sign In / Sign Up",
+                "ariaLabel": "Sign in or create an account"
             },
             "domainRegistration": {
                 "label": "Domain",
-                "description": "Register Domain"
+                "description": "Register Domain",
+                "ariaLabel": "Register a custom domain for your author page"
             },
             "authorPage": {
                 "label": "Author",
-                "description": "Author Page"
+                "description": "Author Page",
+                "ariaLabel": "Manage your author profile and content"
             },
             "subscribe": {
                 "label": "Subscribe",
-                "description": "Choose a Subscription Plan and Checkout"
+                "description": "Choose a Subscription Plan and Checkout",
+                "ariaLabel": "View and select subscription plans"
             },
             "thankYou": {
                 "label": "Success",
-                "description": "Thank You"
+                "description": "Thank You",
+                "ariaLabel": "View purchase confirmation"
             }
-        }
+        },
+        "brandAriaLabel": "Navigate to home page"
     },
     "OpenLibraryAuthorForm": {
         "legend": "Edit Author",
