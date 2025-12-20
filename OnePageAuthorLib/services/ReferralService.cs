@@ -53,15 +53,25 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 throw new InvalidOperationException("This email has already been referred by you.");
             }
 
-            // Generate unique referral code
+            // Generate unique referral code with retry limit
             var referralCode = GenerateReferralCode();
 
-            // Ensure the code is unique
+            // Ensure the code is unique (max 5 retries to avoid excessive database calls)
+            var retries = 0;
+            const int maxRetries = 5;
             var codeExists = await _referralRepository.GetByReferralCodeAsync(referralCode);
-            while (codeExists != null)
+            
+            while (codeExists != null && retries < maxRetries)
             {
                 referralCode = GenerateReferralCode();
                 codeExists = await _referralRepository.GetByReferralCodeAsync(referralCode);
+                retries++;
+            }
+
+            if (codeExists != null)
+            {
+                _logger.LogError("Failed to generate unique referral code after {MaxRetries} attempts", maxRetries);
+                throw new InvalidOperationException("Unable to generate a unique referral code. Please try again.");
             }
 
             // Create the referral entity
@@ -110,12 +120,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
         public string GenerateReferralCode()
         {
-            // Generate a unique 8-character alphanumeric code
+            // Generate a unique 8-character alphanumeric code using cryptographically secure random
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-            var code = new string(Enumerable.Repeat(chars, 8)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            var bytes = new byte[8];
+            rng.GetBytes(bytes);
+            
+            var code = new string(bytes.Select(b => chars[b % chars.Length]).ToArray());
             return code;
         }
 
