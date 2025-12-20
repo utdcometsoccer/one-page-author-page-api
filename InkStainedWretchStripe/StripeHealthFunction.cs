@@ -13,6 +13,11 @@ namespace InkStainedWretchStripe;
 public class StripeHealthResponse
 {
     /// <summary>
+    /// Current API version for the health endpoint.
+    /// </summary>
+    public const string ApiVersion = "1.0.0";
+
+    /// <summary>
     /// Indicates whether the backend is configured for "test" or "live" Stripe mode.
     /// </summary>
     [JsonPropertyName("stripeMode")]
@@ -28,7 +33,7 @@ public class StripeHealthResponse
     /// API version number for tracking.
     /// </summary>
     [JsonPropertyName("version")]
-    public string Version { get; set; } = "1.0.0";
+    public string Version { get; set; } = ApiVersion;
 }
 
 /// <summary>
@@ -95,7 +100,7 @@ public class StripeHealthFunction
             {
                 StripeMode = stripeMode,
                 StripeConnected = stripeConnected,
-                Version = "1.0.0"
+                Version = StripeHealthResponse.ApiVersion
             };
 
             _logger.LogInformation("Stripe health check completed: mode={StripeMode}, connected={StripeConnected}", stripeMode, stripeConnected);

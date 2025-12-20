@@ -14,6 +14,7 @@ namespace OnePageAuthor.Test.Stripe
     /// </summary>
     public class StripeHealthFunctionTests
     {
+        private const int FakeStripeKeyLength = 40;
         private readonly Mock<ILogger<StripeHealthFunction>> _mockLogger;
         private readonly Mock<HttpRequest> _mockHttpRequest;
 
@@ -59,7 +60,7 @@ namespace OnePageAuthor.Test.Stripe
         public void Run_WithTestKey_ReturnsTestMode()
         {
             // Arrange
-            var config = CreateConfiguration("sk_test_" + new string('x', 40));
+            var config = CreateConfiguration("sk_test_" + new string('x', FakeStripeKeyLength));
             var function = new StripeHealthFunction(_mockLogger.Object, config);
 
             // Act
@@ -77,7 +78,7 @@ namespace OnePageAuthor.Test.Stripe
         public void Run_WithLiveKey_ReturnsLiveMode()
         {
             // Arrange
-            var config = CreateConfiguration("sk_live_" + new string('y', 40));
+            var config = CreateConfiguration("sk_live_" + new string('y', FakeStripeKeyLength));
             var function = new StripeHealthFunction(_mockLogger.Object, config);
 
             // Act
@@ -149,7 +150,7 @@ namespace OnePageAuthor.Test.Stripe
         public void Run_WithRestrictedApiKey_ReturnsConnectedButUnknownMode()
         {
             // Arrange - Restricted keys start with "rk_test_" or "rk_live_"
-            var config = CreateConfiguration("rk_test_" + new string('z', 40));
+            var config = CreateConfiguration("rk_test_" + new string('z', FakeStripeKeyLength));
             var function = new StripeHealthFunction(_mockLogger.Object, config);
 
             // Act
