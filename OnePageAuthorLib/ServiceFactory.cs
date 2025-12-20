@@ -999,5 +999,23 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddSingleton<Interfaces.IKeyVaultConfigService, Services.KeyVaultConfigService>();
             return services;
         }
+
+        /// <summary>
+        /// Registers Testimonial repository in DI by ensuring the Testimonials container exists (partition key /Locale).
+        /// Requires Microsoft.Azure.Cosmos.Database in DI.
+        /// </summary>
+        public static IServiceCollection AddTestimonialRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Testimonial>>(sp =>
+                new TestimonialsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<Interfaces.ITestimonialRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.Testimonial>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.TestimonialRepository(container);
+            });
+            return services;
+        }
     }
 }

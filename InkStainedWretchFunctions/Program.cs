@@ -74,6 +74,7 @@ var services = builder.Services
     .AddFrontDoorServices() // Add Azure Front Door services for domain management
     .AddGoogleDomainsService() // Add Google Domains service for domain registration
     .AddTestingServices() // Add testing services for mock implementations and test harnesses
+    .AddTestimonialRepository() // Add Testimonial repository for testimonials management
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
