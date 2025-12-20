@@ -9,6 +9,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 {
     /// <summary>
     /// Service for managing platform statistics with caching support.
+    /// Note: Uses static in-memory cache shared across all service instances to minimize database calls.
     /// </summary>
     public class PlatformStatsService : IPlatformStatsService
     {
@@ -18,7 +19,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
         private readonly ICountryRepository _countryRepository;
         private readonly ILogger<PlatformStatsService> _logger;
         
-        // In-memory cache
+        // Static in-memory cache shared across all service instances (intentional design for simplicity)
         private static PlatformStats? _cachedStats;
         private static DateTime _cacheTimestamp = DateTime.MinValue;
         private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(1);
@@ -105,12 +106,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
             try
             {
-                // Count active authors by querying all authors
-                var activeAuthors = await CountActiveAuthorsAsync();
+                // Count active authors
+                var activeAuthors = await CountItemsAsync(_authorRepository, "Authors");
                 _logger.LogInformation("Active authors: {Count}", activeAuthors);
 
                 // Count books published
-                var booksPublished = await CountBooksAsync();
+                var booksPublished = await CountItemsAsync(_bookRepository, "Books");
                 _logger.LogInformation("Books published: {Count}", booksPublished);
 
                 // Count countries served
@@ -149,28 +150,49 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             }
         }
 
-        private async Task<int> CountActiveAuthorsAsync()
+        /// <summary>
+        /// Helper method to count items using reflection to access container.
+        /// This is a workaround to avoid changing repository interfaces.
+        /// </summary>
+        private async Task<int> CountItemsAsync<T>(T repository, string containerName)
         {
             try
             {
-                // Access the container from the repository
-                var repository = _authorRepository as GenericRepository<Author>;
-                if (repository == null)
+                // Try to get _container field via reflection
+                var containerField = repository?.GetType()
+                    .GetField("_container", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+                if (containerField == null)
                 {
-                    _logger.LogWarning("Cannot cast author repository to GenericRepository, returning 0");
+                    _logger.LogWarning("Cannot access _container field from {RepositoryType}, returning 0", 
+                        repository?.GetType().Name ?? "null");
                     return 0;
                 }
 
-                var container = repository.GetType()
-                    .GetField("_container", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.GetValue(repository) as IDataContainer;
+                var containerValue = containerField.GetValue(repository);
+                
+                // Handle both IDataContainer and Container types
+                Container? container = null;
+                if (containerValue is IDataContainer dataContainer)
+                {
+                    // Extract Container from IDataContainer wrapper
+                    var wrapperContainerField = dataContainer.GetType()
+                        .GetField("_container", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    container = wrapperContainerField?.GetValue(dataContainer) as Container;
+                }
+                else if (containerValue is Container directContainer)
+                {
+                    container = directContainer;
+                }
 
                 if (container == null)
                 {
-                    _logger.LogWarning("Cannot access container from repository, returning 0");
+                    _logger.LogWarning("Cannot extract Container from {RepositoryType}, returning 0", 
+                        repository?.GetType().Name ?? "null");
                     return 0;
                 }
 
+                // Use COUNT query for efficiency
                 var queryDefinition = new QueryDefinition("SELECT VALUE COUNT(1) FROM c");
                 using var iterator = container.GetItemQueryIterator<int>(queryDefinition);
                 if (iterator.HasMoreResults)
@@ -183,46 +205,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error counting authors");
-                return 0;
-            }
-        }
-
-        private async Task<int> CountBooksAsync()
-        {
-            try
-            {
-                // Access the container from the repository
-                var repository = _bookRepository as GenericRepository<Entities.Book>;
-                if (repository == null)
-                {
-                    _logger.LogWarning("Cannot cast book repository to GenericRepository, returning 0");
-                    return 0;
-                }
-
-                var container = repository.GetType()
-                    .GetField("_container", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.GetValue(repository) as IDataContainer;
-
-                if (container == null)
-                {
-                    _logger.LogWarning("Cannot access container from repository, returning 0");
-                    return 0;
-                }
-
-                var queryDefinition = new QueryDefinition("SELECT VALUE COUNT(1) FROM c");
-                using var iterator = container.GetItemQueryIterator<int>(queryDefinition);
-                if (iterator.HasMoreResults)
-                {
-                    var response = await iterator.ReadNextAsync();
-                    return response.FirstOrDefault();
-                }
-                
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error counting books");
+                _logger.LogError(ex, "Error counting items in {ContainerName}", containerName);
                 return 0;
             }
         }
@@ -231,21 +214,20 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
         {
             try
             {
-                // Access the container from the repository
-                var repository = _countryRepository as StringGenericRepository<Country>;
-                if (repository == null)
+                // CountryRepository has direct Container access
+                var containerField = _countryRepository.GetType()
+                    .GetField("_container", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+                if (containerField == null)
                 {
-                    _logger.LogWarning("Cannot cast country repository to StringGenericRepository, returning 0");
+                    _logger.LogWarning("Cannot access _container field from CountryRepository, returning 0");
                     return 0;
                 }
 
-                var container = repository.GetType()
-                    .GetField("_container", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.GetValue(repository) as IDataContainer;
-
+                var container = containerField.GetValue(_countryRepository) as Container;
                 if (container == null)
                 {
-                    _logger.LogWarning("Cannot access container from repository, returning 0");
+                    _logger.LogWarning("Container from CountryRepository is null, returning 0");
                     return 0;
                 }
 
