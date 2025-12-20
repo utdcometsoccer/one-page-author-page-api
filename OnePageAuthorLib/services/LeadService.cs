@@ -12,14 +12,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
     /// </summary>
     public class LeadService : ILeadService
     {
-        private readonly LeadRepository _leadRepository;
+        private readonly ILeadRepository _leadRepository;
         private readonly ILogger<LeadService> _logger;
         private static readonly Regex EmailRegex = new Regex(
             @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase
         );
 
-        public LeadService(LeadRepository leadRepository, ILogger<LeadService> logger)
+        public LeadService(ILeadRepository leadRepository, ILogger<LeadService> logger)
         {
             _leadRepository = leadRepository ?? throw new ArgumentNullException(nameof(leadRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

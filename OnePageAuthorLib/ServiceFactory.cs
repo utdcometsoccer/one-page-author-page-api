@@ -1009,7 +1009,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddTransient<IContainerManager<Entities.Lead>>(sp =>
                 new NoSQL.LeadsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
 
-            services.AddSingleton<NoSQL.LeadRepository>(sp =>
+            services.AddSingleton<Interfaces.ILeadRepository>(sp =>
             {
                 var container = sp.GetRequiredService<IContainerManager<Entities.Lead>>()
                     .EnsureContainerAsync().GetAwaiter().GetResult();

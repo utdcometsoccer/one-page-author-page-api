@@ -1,5 +1,6 @@
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
+using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 using Microsoft.Azure.Cosmos;
 
 namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
@@ -7,7 +8,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
     /// <summary>
     /// Repository for Lead entities with duplicate detection based on email.
     /// </summary>
-    public class LeadRepository
+    public class LeadRepository : ILeadRepository
     {
         protected readonly IDataContainer _container;
 
