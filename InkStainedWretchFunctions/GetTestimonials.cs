@@ -77,7 +77,7 @@ public class GetTestimonials
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving testimonials");
-            var response = req.CreateResponse(HttpStatusCode.BadRequest);
+            var response = req.CreateResponse(HttpStatusCode.InternalServerError);
             await response.WriteStringAsync($"Error: {ex.Message}");
             return response;
         }
