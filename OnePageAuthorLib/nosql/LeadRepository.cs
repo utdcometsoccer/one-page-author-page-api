@@ -123,19 +123,28 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         /// <returns>List of leads</returns>
         public async Task<IList<Lead>> GetBySourceAsync(string source, DateTime? startDate = null, DateTime? endDate = null)
         {
-            var queryBuilder = "SELECT * FROM c WHERE c.source = @source";
-            var query = new QueryDefinition(queryBuilder)
+            var queryText = "SELECT * FROM c WHERE c.source = @source";
+            
+            if (startDate.HasValue)
+            {
+                queryText += " AND c.createdAt >= @startDate";
+            }
+
+            if (endDate.HasValue)
+            {
+                queryText += " AND c.createdAt <= @endDate";
+            }
+
+            var query = new QueryDefinition(queryText)
                 .WithParameter("@source", source);
 
             if (startDate.HasValue)
             {
-                queryBuilder += " AND c.createdAt >= @startDate";
                 query = query.WithParameter("@startDate", startDate.Value);
             }
 
             if (endDate.HasValue)
             {
-                queryBuilder += " AND c.createdAt <= @endDate";
                 query = query.WithParameter("@endDate", endDate.Value);
             }
 

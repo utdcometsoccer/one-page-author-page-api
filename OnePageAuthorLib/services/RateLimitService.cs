@@ -38,9 +38,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
             // Clean up old requests outside the window
             var cutoffTime = DateTime.UtcNow.Subtract(_windowDuration);
-            tracker.Requests.RemoveAll(t => t < cutoffTime);
+            var currentCount = tracker.CleanupAndGetCount(cutoffTime);
 
-            var currentCount = tracker.Requests.Count;
             var isAllowed = currentCount < _maxRequestsPerMinute;
 
             if (!isAllowed)
@@ -56,19 +55,19 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
         /// <summary>
         /// Records a request from the given IP address.
         /// </summary>
-        public async Task RecordRequestAsync(string ipAddress, string endpoint)
+        public Task RecordRequestAsync(string ipAddress, string endpoint)
         {
             if (string.IsNullOrWhiteSpace(ipAddress))
-                return;
+                return Task.CompletedTask;
 
             var key = GetKey(ipAddress, endpoint);
             var tracker = _requestTrackers.GetOrAdd(key, _ => new RequestTracker());
             
-            tracker.Requests.Add(DateTime.UtcNow);
+            tracker.AddRequest(DateTime.UtcNow);
             
             _logger.LogDebug("Recorded request for IP: {IpAddress}, Endpoint: {Endpoint}", ipAddress, endpoint);
             
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -86,9 +85,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
             // Clean up old requests
             var cutoffTime = DateTime.UtcNow.Subtract(_windowDuration);
-            tracker.Requests.RemoveAll(t => t < cutoffTime);
+            var currentCount = tracker.CleanupAndGetCount(cutoffTime);
 
-            var currentCount = tracker.Requests.Count;
             var remaining = Math.Max(0, _maxRequestsPerMinute - currentCount);
 
             return await Task.FromResult(remaining);
@@ -101,10 +99,35 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
         /// <summary>
         /// Internal class to track requests per IP/endpoint combination.
+        /// Uses ConcurrentBag for thread-safe operations.
         /// </summary>
         private class RequestTracker
         {
-            public List<DateTime> Requests { get; } = new();
+            private readonly ConcurrentBag<DateTime> _requests = new();
+            private readonly object _cleanupLock = new();
+
+            public void AddRequest(DateTime timestamp)
+            {
+                _requests.Add(timestamp);
+            }
+
+            public int CleanupAndGetCount(DateTime cutoffTime)
+            {
+                lock (_cleanupLock)
+                {
+                    // Get current requests and filter out old ones
+                    var validRequests = _requests.Where(t => t >= cutoffTime).ToList();
+                    
+                    // Clear and rebuild the bag with only valid requests
+                    while (_requests.TryTake(out _)) { }
+                    foreach (var request in validRequests)
+                    {
+                        _requests.Add(request);
+                    }
+
+                    return validRequests.Count;
+                }
+            }
         }
     }
 }
