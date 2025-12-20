@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System.Text.Json.Serialization;
 
 namespace InkStainedWretchStripe;
 
@@ -14,16 +15,19 @@ public class StripeHealthResponse
     /// <summary>
     /// Indicates whether the backend is configured for "test" or "live" Stripe mode.
     /// </summary>
+    [JsonPropertyName("stripeMode")]
     public string StripeMode { get; set; } = "unknown";
 
     /// <summary>
     /// Indicates whether the Stripe secret key is properly configured.
     /// </summary>
+    [JsonPropertyName("stripeConnected")]
     public bool StripeConnected { get; set; }
 
     /// <summary>
     /// API version number for tracking.
     /// </summary>
+    [JsonPropertyName("version")]
     public string Version { get; set; } = "1.0.0";
 }
 
