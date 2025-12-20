@@ -999,5 +999,34 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddSingleton<Interfaces.IKeyVaultConfigService, Services.KeyVaultConfigService>();
             return services;
         }
+
+        /// <summary>
+        /// Registers PlatformStats repository for managing platform statistics.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddPlatformStatsRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.PlatformStats>>(sp =>
+                new NoSQL.PlatformStatsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<Interfaces.IPlatformStatsRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.PlatformStats>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.PlatformStatsRepository(container);
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers PlatformStats service for managing and caching platform statistics.
+        /// Call this after registering repositories in DI.
+        /// </summary>
+        public static IServiceCollection AddPlatformStatsService(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IPlatformStatsService, Services.PlatformStatsService>();
+            return services;
+        }
     }
 }
