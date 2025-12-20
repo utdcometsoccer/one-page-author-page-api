@@ -999,5 +999,38 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddSingleton<Interfaces.IKeyVaultConfigService, Services.KeyVaultConfigService>();
             return services;
         }
+
+        /// <summary>
+        /// Registers Lead repository with Cosmos DB container.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddLeadRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Lead>>(sp =>
+                new NoSQL.LeadsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<Interfaces.ILeadRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.Lead>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.LeadRepository(container);
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Lead services for lead capture and management.
+        /// </summary>
+        public static IServiceCollection AddLeadServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.ILeadService, Services.LeadService>();
+            services.AddSingleton<Interfaces.IRateLimitService>(sp =>
+            {
+                var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Services.RateLimitService>>();
+                return new Services.RateLimitService(logger, maxRequestsPerMinute: 10);
+            });
+            return services;
+        }
     }
 }
