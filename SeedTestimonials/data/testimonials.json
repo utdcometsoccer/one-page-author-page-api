@@ -1,0 +1,65 @@
+[
+  {
+    "AuthorName": "Sarah Mitchell",
+    "AuthorTitle": "Mystery Novelist",
+    "Quote": "This platform transformed how I connect with my readers. The streamlined profile and subscription features are exactly what I needed.",
+    "Rating": 5,
+    "PhotoUrl": null,
+    "Featured": true,
+    "Locale": "en-US"
+  },
+  {
+    "AuthorName": "James Chen",
+    "AuthorTitle": "Science Fiction Author",
+    "Quote": "The multi-language support helped me reach a global audience. My readership has doubled since switching to this platform.",
+    "Rating": 5,
+    "PhotoUrl": null,
+    "Featured": true,
+    "Locale": "en-US"
+  },
+  {
+    "AuthorName": "Maria Rodriguez",
+    "AuthorTitle": "Romance Writer",
+    "Quote": "Managing my books and articles has never been easier. The interface is intuitive and the features are comprehensive.",
+    "Rating": 5,
+    "PhotoUrl": null,
+    "Featured": true,
+    "Locale": "en-US"
+  },
+  {
+    "AuthorName": "David Thompson",
+    "AuthorTitle": "Historical Fiction Author",
+    "Quote": "The subscription management integration is seamless. My premium content strategy is now running smoothly.",
+    "Rating": 4,
+    "PhotoUrl": null,
+    "Featured": false,
+    "Locale": "en-US"
+  },
+  {
+    "AuthorName": "Emma Williams",
+    "AuthorTitle": "Children's Book Author",
+    "Quote": "I love how easy it is to showcase my portfolio. The image management is fantastic!",
+    "Rating": 5,
+    "PhotoUrl": null,
+    "Featured": false,
+    "Locale": "en-US"
+  },
+  {
+    "AuthorName": "Carlos García",
+    "AuthorTitle": "Escritor de Ficción",
+    "Quote": "Una plataforma increíble para autores. La funcionalidad multilingüe es perfecta para mi audiencia internacional.",
+    "Rating": 5,
+    "PhotoUrl": null,
+    "Featured": true,
+    "Locale": "es-ES"
+  },
+  {
+    "AuthorName": "Sophie Dubois",
+    "AuthorTitle": "Auteure de Romans",
+    "Quote": "Cette plateforme m'a permis de développer ma présence en ligne de manière professionnelle. Je la recommande vivement!",
+    "Rating": 5,
+    "PhotoUrl": null,
+    "Featured": true,
+    "Locale": "fr-FR"
+  }
+]
