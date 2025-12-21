@@ -102,5 +102,33 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 return false;
             }
         }
+
+        public async Task<DomainRegistration?> GetByDomainAsync(string topLevelDomain, string secondLevelDomain)
+        {
+            if (string.IsNullOrWhiteSpace(topLevelDomain) || string.IsNullOrWhiteSpace(secondLevelDomain))
+                return null;
+
+            var query = new QueryDefinition(
+                "SELECT * FROM c WHERE c.domain.topLevelDomain = @tld AND c.domain.secondLevelDomain = @sld")
+                .WithParameter("@tld", topLevelDomain)
+                .WithParameter("@sld", secondLevelDomain);
+
+            try
+            {
+                using var iterator = _container.GetItemQueryIterator<DomainRegistration>(query);
+                
+                if (iterator.HasMoreResults)
+                {
+                    var page = await iterator.ReadNextAsync();
+                    return page.Resource.FirstOrDefault();
+                }
+                
+                return null;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+        }
     }
 }

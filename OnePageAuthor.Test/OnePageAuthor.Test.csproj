@@ -35,6 +35,7 @@
     <ProjectReference Include="..\ImageAPI\ImageAPI.csproj" />
     <ProjectReference Include="..\InkStainedWretchFunctions\InkStainedWretchFunctions.csproj" />
     <ProjectReference Include="..\InkStainedWretchStripe\InkStainedWretchStripe.csproj" />
+    <ProjectReference Include="..\function-app\function-app.csproj" />
   </ItemGroup>
 
 </Project>
