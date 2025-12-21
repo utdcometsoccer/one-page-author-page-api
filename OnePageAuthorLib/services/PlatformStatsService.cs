@@ -23,7 +23,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
         private static PlatformStats? _cachedStats;
         private static DateTime _cacheTimestamp = DateTime.MinValue;
         private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(1);
-        private static readonly object _cacheLock = new object();
+        private static readonly SemaphoreSlim _cacheSemaphore = new SemaphoreSlim(1, 1);
 
         public PlatformStatsService(
             IPlatformStatsRepository statsRepository,
@@ -45,55 +45,80 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
         /// </summary>
         public async Task<PlatformStats> GetPlatformStatsAsync()
         {
-            lock (_cacheLock)
+            // Check cache without lock first for performance
+            if (_cachedStats != null && DateTime.UtcNow - _cacheTimestamp < CacheDuration)
             {
-                // Check if cache is still valid
+                _logger.LogInformation("Returning cached platform stats (age: {Age} minutes)", 
+                    (DateTime.UtcNow - _cacheTimestamp).TotalMinutes);
+                return _cachedStats;
+            }
+
+            // Use semaphore for async-compatible locking to prevent concurrent DB calls
+            await _cacheSemaphore.WaitAsync();
+            try
+            {
+                // Double-check cache after acquiring lock
                 if (_cachedStats != null && DateTime.UtcNow - _cacheTimestamp < CacheDuration)
                 {
-                    _logger.LogInformation("Returning cached platform stats (age: {Age} minutes)", 
+                    _logger.LogInformation("Returning cached platform stats after lock (age: {Age} minutes)", 
                         (DateTime.UtcNow - _cacheTimestamp).TotalMinutes);
                     return _cachedStats;
                 }
-            }
 
-            _logger.LogInformation("Cache miss or expired, fetching platform stats from database");
+                _logger.LogInformation("Cache miss or expired, fetching platform stats from database");
 
-            try
-            {
-                var stats = await _statsRepository.GetCurrentStatsAsync();
-                
-                if (stats == null)
+                try
                 {
-                    _logger.LogWarning("No platform stats found in database, returning default values");
-                    stats = new PlatformStats();
+                    var stats = await _statsRepository.GetCurrentStatsAsync();
+                    
+                    if (stats == null)
+                    {
+                        _logger.LogWarning("No platform stats found in database, returning default values");
+                        stats = new PlatformStats();
+                    }
+
+                    // Update cache
+                    UpdateCache(stats);
+
+                    return stats;
                 }
-
-                // Update cache
-                lock (_cacheLock)
+                catch (Exception ex)
                 {
-                    _cachedStats = stats;
-                    _cacheTimestamp = DateTime.UtcNow;
-                }
-
-                return stats;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching platform stats from database");
-                
-                // Return cached stats if available, even if expired
-                lock (_cacheLock)
-                {
+                    _logger.LogError(ex, "Error fetching platform stats from database");
+                    
+                    // Return cached stats if available, even if expired
                     if (_cachedStats != null)
                     {
                         _logger.LogInformation("Returning stale cached stats due to error");
                         return _cachedStats;
                     }
-                }
 
-                // Return default if no cache available
-                return new PlatformStats();
+                    // Return default if no cache available
+                    return new PlatformStats();
+                }
             }
+            finally
+            {
+                _cacheSemaphore.Release();
+            }
+        }
+
+        /// <summary>
+        /// Updates the static cache in a centralized location.
+        /// </summary>
+        private static void UpdateCache(PlatformStats stats)
+        {
+            _cachedStats = stats;
+            _cacheTimestamp = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Clears the static cache. Intended for testing purposes only.
+        /// </summary>
+        internal static void ClearCache()
+        {
+            _cachedStats = null;
+            _cacheTimestamp = DateTime.MinValue;
         }
 
         /// <summary>
@@ -119,13 +144,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 _logger.LogInformation("Countries served: {Count}", countriesServed);
 
                 // Create updated stats
+                // Note: TotalRevenue and AverageRating are not yet computed from real data
                 var stats = new PlatformStats
                 {
                     id = "current",
                     ActiveAuthors = activeAuthors,
                     BooksPublished = booksPublished,
-                    TotalRevenue = 0, // TODO: Calculate from Stripe data
-                    AverageRating = 4.8, // TODO: Calculate from user ratings
+                    TotalRevenue = 0, // TODO: Calculate from Stripe subscription data
+                    AverageRating = 0, // TODO: Calculate from user ratings system
                     CountriesServed = countriesServed,
                     LastUpdated = DateTime.UtcNow.ToString("O")
                 };
@@ -135,11 +161,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 _logger.LogInformation("Platform statistics updated successfully");
 
                 // Update cache
-                lock (_cacheLock)
-                {
-                    _cachedStats = savedStats;
-                    _cacheTimestamp = DateTime.UtcNow;
-                }
+                UpdateCache(savedStats);
 
                 return savedStats;
             }
@@ -238,12 +260,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 while (iterator.HasMoreResults)
                 {
                     var response = await iterator.ReadNextAsync();
-                    foreach (var code in response)
+                    foreach (var code in response.Where(c => !string.IsNullOrWhiteSpace(c)))
                     {
-                        if (!string.IsNullOrWhiteSpace(code))
-                        {
-                            countries.Add(code);
-                        }
+                        countries.Add(code);
                     }
                 }
                 

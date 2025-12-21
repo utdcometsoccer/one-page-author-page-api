@@ -51,20 +51,28 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             if (stats == null)
                 throw new ArgumentNullException(nameof(stats));
 
-            // Ensure the id is set to "current" for consistency
-            stats.id = StatsId;
-            stats.LastUpdated = DateTime.UtcNow.ToString("O");
+            // Create a new instance to avoid mutating the input parameter
+            var statsToSave = new PlatformStats
+            {
+                id = StatsId,
+                ActiveAuthors = stats.ActiveAuthors,
+                BooksPublished = stats.BooksPublished,
+                TotalRevenue = stats.TotalRevenue,
+                AverageRating = stats.AverageRating,
+                CountriesServed = stats.CountriesServed,
+                LastUpdated = DateTime.UtcNow.ToString("O")
+            };
 
             try
             {
                 // Try to replace if exists
-                var response = await _container.ReplaceItemAsync(stats, StatsId, new PartitionKey(StatsId));
+                var response = await _container.ReplaceItemAsync(statsToSave, StatsId, new PartitionKey(StatsId));
                 return response.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 // If not found, create it
-                var response = await _container.CreateItemAsync(stats, new PartitionKey(StatsId));
+                var response = await _container.CreateItemAsync(statsToSave, new PartitionKey(StatsId));
                 return response.Resource;
             }
         }

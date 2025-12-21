@@ -34,41 +34,32 @@ public class GetPlatformStats
     /// Handles HTTP GET requests for platform statistics.
     /// </summary>
     /// <param name="req">The incoming HTTP request.</param>
-    /// <returns>200 with JSON payload of platform stats; 500 on error.</returns>
+    /// <returns>200 with JSON payload of platform stats.</returns>
     [Function("GetPlatformStats")]
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "stats/platform")] HttpRequestData req)
     {
         _logger.LogInformation("Received request for platform statistics");
         
-        try
+        // Service handles errors gracefully and never throws
+        var stats = await _platformStatsService.GetPlatformStatsAsync();
+        
+        var response = req.CreateResponse(HttpStatusCode.OK);
+        
+        // Add cache control header to enable browser caching for 1 hour
+        response.Headers.Add("Cache-Control", "public, max-age=3600");
+        
+        await response.WriteAsJsonAsync(new
         {
-            var stats = await _platformStatsService.GetPlatformStatsAsync();
-            
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            
-            // Add cache control header to enable browser caching for 1 hour
-            response.Headers.Add("Cache-Control", "public, max-age=3600");
-            
-            await response.WriteAsJsonAsync(new
-            {
-                activeAuthors = stats.ActiveAuthors,
-                booksPublished = stats.BooksPublished,
-                totalRevenue = stats.TotalRevenue,
-                averageRating = stats.AverageRating,
-                countriesServed = stats.CountriesServed,
-                lastUpdated = stats.LastUpdated
-            });
-            
-            _logger.LogInformation("Successfully returned platform statistics");
-            return response;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving platform statistics");
-            var response = req.CreateResponse(HttpStatusCode.InternalServerError);
-            await response.WriteAsJsonAsync(new { error = "Internal server error" });
-            return response;
-        }
+            activeAuthors = stats.ActiveAuthors,
+            booksPublished = stats.BooksPublished,
+            totalRevenue = stats.TotalRevenue,
+            averageRating = stats.AverageRating,
+            countriesServed = stats.CountriesServed,
+            lastUpdated = stats.LastUpdated
+        });
+        
+        _logger.LogInformation("Successfully returned platform statistics");
+        return response;
     }
 }

@@ -107,6 +107,8 @@ namespace OnePageAuthor.Test
         public async Task GetPlatformStatsAsync_ReturnsCachedStats_WhenCacheValid()
         {
             // Arrange
+            PlatformStatsService.ClearCache(); // Clear static cache for test isolation
+            
             var statsRepoMock = new Mock<IPlatformStatsRepository>();
             var authorRepoMock = new Mock<IAuthorRepository>();
             var bookRepoMock = new Mock<IGenericRepository<BookEntity>>();
@@ -134,21 +136,23 @@ namespace OnePageAuthor.Test
                 loggerMock.Object);
 
             // Act
-            var result1 = await service.GetPlatformStatsAsync(); // First call
-            var result2 = await service.GetPlatformStatsAsync(); // Second call
+            var result1 = await service.GetPlatformStatsAsync(); // First call - cache miss
+            var result2 = await service.GetPlatformStatsAsync(); // Second call - cache hit
 
             // Assert
             Assert.NotNull(result1);
             Assert.NotNull(result2);
             Assert.Equal(result1.ActiveAuthors, result2.ActiveAuthors);
-            // Note: Due to static cache, repository may be called 0 or 1 time depending on test execution order
-            // This demonstrates that caching is working across service instances
+            // Repository should only be called once due to caching
+            statsRepoMock.Verify(r => r.GetCurrentStatsAsync(), Times.Once);
         }
 
         [Fact]
         public async Task GetPlatformStatsAsync_ReturnsDefaultOnError()
         {
             // Arrange
+            PlatformStatsService.ClearCache(); // Clear static cache for test isolation
+            
             var statsRepoMock = new Mock<IPlatformStatsRepository>();
             var authorRepoMock = new Mock<IAuthorRepository>();
             var bookRepoMock = new Mock<IGenericRepository<BookEntity>>();
@@ -169,9 +173,18 @@ namespace OnePageAuthor.Test
 
             // Assert
             Assert.NotNull(result);
-            // Note: Due to static cache, result may be cached value from previous test or default
-            // This demonstrates the service gracefully handles errors by returning available data
-            Assert.True(result.ActiveAuthors >= 0);
+            // Verify the repository was called
+            statsRepoMock.Verify(r => r.GetCurrentStatsAsync(), Times.Once);
+            
+            // Verify error was logged
+            loggerMock.Verify(
+                l => l.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error fetching platform stats")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
         }
 
         [Fact]

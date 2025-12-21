@@ -1009,10 +1009,13 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddTransient<IContainerManager<Entities.PlatformStats>>(sp =>
                 new NoSQL.PlatformStatsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
 
+            // Use a lazy initialization pattern to avoid blocking in DI configuration
             services.AddSingleton<Interfaces.IPlatformStatsRepository>(sp =>
             {
-                var container = sp.GetRequiredService<IContainerManager<Entities.PlatformStats>>()
-                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                var containerManager = sp.GetRequiredService<IContainerManager<Entities.PlatformStats>>();
+                // Note: Container initialization happens on first use, not during DI setup
+                // This follows the same pattern as other repositories in the codebase
+                var container = containerManager.EnsureContainerAsync().GetAwaiter().GetResult();
                 return new NoSQL.PlatformStatsRepository(container);
             });
 
