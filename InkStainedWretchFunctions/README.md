@@ -32,7 +32,9 @@ The InkStainedWretchFunctions project provides a comprehensive Azure Functions a
 
 #### HTTP Triggered Functions
 
-
+- **POST /api/leads** - Lead Capture API (public, no auth required)
+  - Captures email leads from landing pages with rate limiting
+  - See [Lead Capture API Implementation](../docs/LEAD_CAPTURE_API_IMPLEMENTATION.md)
 - **GET /api/localizedtext/{culture}** - Returns localized UI text
 - **POST /api/domain-registrations** - Creates new domain registrations
 - **GET /api/domain-registrations** - Gets all domain registrations for user
