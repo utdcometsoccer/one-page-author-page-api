@@ -70,9 +70,13 @@ var services = builder.Services
     .AddCountryServices() // Add Country services
     .AddLanguageRepository() // Add Language repository
     .AddLanguageServices() // Add Language services
+    .AddPlatformStatsRepository() // Add PlatformStats repository
+    .AddPlatformStatsService() // Add PlatformStats service for landing page social proof
     .AddDnsZoneService() // Add DNS zone service for domain registration triggers
     .AddFrontDoorServices() // Add Azure Front Door services for domain management
     .AddGoogleDomainsService() // Add Google Domains service for domain registration
+    .AddLeadRepository() // Add Lead repository for lead capture
+    .AddLeadServices() // Add Lead services for lead capture and management
     .AddTestingServices() // Add testing services for mock implementations and test harnesses
     .AddTestimonialRepository() // Add Testimonial repository for testimonials management
     .AddApplicationInsightsTelemetryWorkerService()
