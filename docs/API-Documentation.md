@@ -554,6 +554,111 @@ System.Xml.XmlElement
 ---
 
 
+## Stripe API
+
+The Stripe API provides payment processing, subscription management, and billing functionality.
+
+### GET /api/stripe/health
+
+**Public endpoint** - Returns Stripe configuration status (no authentication required).
+
+**Purpose**: Enables frontend applications to validate Stripe configuration before users attempt payments. Helps detect test/live mode mismatches.
+
+**Response:**
+```json
+{
+  "stripeMode": "test" | "live" | "unknown",
+  "stripeConnected": true | false,
+  "version": "1.0.0"
+}
+```
+
+**Field Descriptions:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `stripeMode` | string | Indicates whether backend is configured for "test" or "live" Stripe mode. Returns "unknown" if key is missing or invalid format. |
+| `stripeConnected` | boolean | Indicates whether the Stripe API key is properly configured |
+| `version` | string | API version number for tracking compatibility |
+
+**Security Notes:**
+- No authentication required (anonymous access)
+- Returns only non-sensitive configuration information
+- Never exposes the actual API key value
+- Safe to call from frontend applications
+
+**Example Responses:**
+
+*Test Mode Connected:*
+```json
+{
+  "stripeMode": "test",
+  "stripeConnected": true,
+  "version": "1.0.0"
+}
+```
+
+*Live Mode Connected:*
+```json
+{
+  "stripeMode": "live",
+  "stripeConnected": true,
+  "version": "1.0.0"
+}
+```
+
+*Not Connected:*
+```json
+{
+  "stripeMode": "unknown",
+  "stripeConnected": false,
+  "version": "1.0.0"
+}
+```
+
+**TypeScript Example:**
+```typescript
+// Check Stripe configuration on app startup
+async function validateStripeConfig() {
+  try {
+    const response = await fetch('/api/stripe/health');
+    const health = await response.json();
+    
+    if (!health.stripeConnected) {
+      console.error('Stripe is not configured');
+      return false;
+    }
+    
+    // Check for mode mismatch
+    const frontendMode = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_test_') ? 'test' : 'live';
+    if (health.stripeMode !== frontendMode) {
+      console.error(`Stripe mode mismatch: frontend=${frontendMode}, backend=${health.stripeMode}`);
+      return false;
+    }
+    
+    console.log(`Stripe configured correctly in ${health.stripeMode} mode`);
+    return true;
+  } catch (error) {
+    console.error('Failed to check Stripe health:', error);
+    return false;
+  }
+}
+
+// Interface definitions
+interface StripeHealthResponse {
+  stripeMode: 'test' | 'live' | 'unknown';
+  stripeConnected: boolean;
+  version: string;
+}
+```
+
+**Use Cases:**
+- Frontend validation on application startup
+- Detecting test/live mode mismatches between frontend and backend
+- Health monitoring and diagnostics
+- Pre-flight checks before initiating payment flows
+
+---
 
 ## Testing & Validation
 

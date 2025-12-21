@@ -13,6 +13,7 @@ This project provides HTTP-triggered Azure Functions to integrate with Stripe us
 
 Key functions and routes:
 
+- GET  /api/stripe/health — health check endpoint (returns Stripe mode and connection status)
 - POST /api/CreateStripeCheckoutSession — create a checkout session
 - GET  /api/GetStripeCheckoutSession/{sessionId} — retrieve a checkout session
 - POST /api/CreateStripeCustomer — create a Stripe customer
@@ -312,7 +313,28 @@ For production webhook handling:
 
 Assuming the Functions host is running locally at <https://localhost:7292.>
 
-Create customer
+### Health Check
+
+Check Stripe configuration and connection status (no authentication required):
+
+```pwsh
+Invoke-RestMethod -Method Get -Uri "https://localhost:7292/api/stripe/health"
+
+# Response example (test mode):
+# {
+#   "stripeMode": "test",
+#   "stripeConnected": true,
+#   "version": "1.0.0"
+# }
+```
+
+This endpoint is useful for:
+- Verifying Stripe configuration before making API calls
+- Frontend validation to detect test/live mode mismatches
+- Health monitoring and diagnostics
+- No authentication required (anonymous access)
+
+### Create customer
 
 ```pwsh
 $body = @{ Email = "user@example.com"; Name = "Jane Doe" } | ConvertTo-Json
