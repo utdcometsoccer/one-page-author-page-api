@@ -1001,6 +1001,38 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
+        /// Registers PlatformStats repository for managing platform statistics.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddPlatformStatsRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.PlatformStats>>(sp =>
+                new NoSQL.PlatformStatsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            // Use a lazy initialization pattern to avoid blocking in DI configuration
+            services.AddSingleton<Interfaces.IPlatformStatsRepository>(sp =>
+            {
+                var containerManager = sp.GetRequiredService<IContainerManager<Entities.PlatformStats>>();
+                // Note: Container initialization happens on first use, not during DI setup
+                // This follows the same pattern as other repositories in the codebase
+                var container = containerManager.EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.PlatformStatsRepository(container);
+            });
+
+            return services;
+        }        
+
+        /// <summary>
+        /// Registers PlatformStats service for managing and caching platform statistics.
+        /// Call this after registering repositories in DI.
+        /// </summary>
+        public static IServiceCollection AddPlatformStatsService(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IPlatformStatsService, Services.PlatformStatsService>();
+            return services;
+        }
+
+        /// <summary>
         /// Registers Lead repository with Cosmos DB container.
         /// Call this after registering a singleton Database in DI.
         /// </summary>
@@ -1019,7 +1051,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
             return services;
         }
 
-        /// <summary>
+         /// <summary>
         /// Registers Lead services for lead capture and management.
         /// </summary>
         public static IServiceCollection AddLeadServices(this IServiceCollection services)
