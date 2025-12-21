@@ -34,6 +34,7 @@
     <ProjectReference Include="..\OnePageAuthorLib\OnePageAuthorLib.csproj" />
     <ProjectReference Include="..\ImageAPI\ImageAPI.csproj" />
     <ProjectReference Include="..\InkStainedWretchFunctions\InkStainedWretchFunctions.csproj" />
+    <ProjectReference Include="..\InkStainedWretchStripe\InkStainedWretchStripe.csproj" />
   </ItemGroup>
 
 </Project>

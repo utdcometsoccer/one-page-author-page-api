@@ -10,6 +10,7 @@ This comprehensive API documentation covers all Azure Functions and endpoints av
 - [Image API](#image-api)
 - [Domain Registration API](#domain-registration-api)
 - [External Integration API](#external-integration-api)
+- [Testimonials API](#testimonials-api)
 - [Error Handling](#error-handling)
 - [TypeScript Examples](#typescript-examples)
 
@@ -644,6 +645,176 @@ X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 99
 X-RateLimit-Reset: 1640995200
 `
+
+---
+
+## Testimonials API
+
+The Testimonials API provides endpoints for managing and retrieving testimonials for the landing page.
+
+### GET /api/testimonials
+
+**Public endpoint** - Retrieves testimonials with optional filtering and caching.
+
+**Query Parameters:**
+- `limit` (optional, number): Maximum number of testimonials to return. Default: 5, Max: 20
+- `featured` (optional, boolean): Filter to only featured testimonials
+- `locale` (optional, string): Filter by locale (e.g., "en-US", "es-ES", "fr-FR")
+
+**Response:**
+```json
+{
+  "testimonials": [
+    {
+      "id": "string",
+      "authorName": "string",
+      "authorTitle": "string",
+      "quote": "string",
+      "rating": 5,
+      "photoUrl": "string | null",
+      "featured": true,
+      "createdAt": "2025-01-15T10:30:00Z",
+      "locale": "en-US"
+    }
+  ],
+  "total": 10
+}
+```
+
+**Cache Control:** 15 minutes (public, max-age=900)
+
+**TypeScript Example:**
+```typescript
+// Get featured testimonials in English
+const response = await fetch('/api/testimonials?featured=true&locale=en-US&limit=3');
+const data = await response.json();
+
+// Interface
+interface GetTestimonialsResponse {
+  testimonials: Testimonial[];
+  total: number;
+}
+
+interface Testimonial {
+  id: string;
+  authorName: string;
+  authorTitle: string;
+  quote: string;
+  rating: number;
+  photoUrl?: string;
+  featured: boolean;
+  createdAt: string;
+  locale: string;
+}
+```
+
+### POST /api/admin/testimonials
+
+**Protected endpoint** - Creates a new testimonial. Requires authentication.
+
+**Request Body:**
+```json
+{
+  "authorName": "Sarah Mitchell",
+  "authorTitle": "Mystery Novelist",
+  "quote": "This platform transformed how I connect with my readers.",
+  "rating": 5,
+  "photoUrl": null,
+  "featured": true,
+  "locale": "en-US"
+}
+```
+
+**Response:** 201 Created
+```json
+{
+  "id": "generated-id",
+  "authorName": "Sarah Mitchell",
+  "authorTitle": "Mystery Novelist",
+  "quote": "This platform transformed how I connect with my readers.",
+  "rating": 5,
+  "photoUrl": null,
+  "featured": true,
+  "createdAt": "2025-01-15T10:30:00Z",
+  "locale": "en-US"
+}
+```
+
+**Validation Rules:**
+- `authorName` is required
+- `quote` is required
+- `rating` must be between 1-5
+
+**TypeScript Example:**
+```typescript
+const apiClient = new ApiClient(baseUrl, token);
+const newTestimonial = {
+  authorName: "Sarah Mitchell",
+  authorTitle: "Mystery Novelist",
+  quote: "This platform transformed how I connect with my readers.",
+  rating: 5,
+  featured: true,
+  locale: "en-US"
+};
+
+const created = await apiClient.post<Testimonial>('/api/admin/testimonials', newTestimonial);
+console.log('Created testimonial:', created.id);
+```
+
+### PUT /api/admin/testimonials/{id}
+
+**Protected endpoint** - Updates an existing testimonial. Requires authentication.
+
+**Request Body:**
+```json
+{
+  "authorName": "Sarah Mitchell",
+  "authorTitle": "Mystery Novelist - Updated",
+  "quote": "Updated testimonial text.",
+  "rating": 5,
+  "photoUrl": "https://example.com/photo.jpg",
+  "featured": false,
+  "locale": "en-US"
+}
+```
+
+**Response:** 200 OK (returns updated testimonial)
+
+**Error Responses:**
+- 404 Not Found - Testimonial with specified ID does not exist
+- 400 Bad Request - Invalid testimonial data or validation failure
+
+**TypeScript Example:**
+```typescript
+const apiClient = new ApiClient(baseUrl, token);
+const updates = {
+  authorName: "Sarah Mitchell",
+  authorTitle: "Mystery Novelist - Updated",
+  quote: "Updated testimonial text.",
+  rating: 5,
+  photoUrl: "https://example.com/photo.jpg",
+  featured: false,
+  locale: "en-US"
+};
+
+const updated = await apiClient.put<Testimonial>('/api/admin/testimonials/sarah-mitchell-en-us', updates);
+```
+
+### DELETE /api/admin/testimonials/{id}
+
+**Protected endpoint** - Deletes a testimonial. Requires authentication.
+
+**Response:** 204 No Content
+
+**Error Responses:**
+- 404 Not Found - Testimonial with specified ID does not exist
+
+**TypeScript Example:**
+```typescript
+const apiClient = new ApiClient(baseUrl, token);
+await apiClient.delete('/api/admin/testimonials/sarah-mitchell-en-us');
+console.log('Testimonial deleted successfully');
+```
 
 ---
 

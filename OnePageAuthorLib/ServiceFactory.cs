@@ -1001,6 +1001,122 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
+        /// Registers Testimonial repository in DI by ensuring the Testimonials container exists (partition key /Locale).
+        /// Requires Microsoft.Azure.Cosmos.Database in DI.
+        /// </summary>
+        public static IServiceCollection AddTestimonialRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Testimonial>>(sp =>
+                new TestimonialsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<Interfaces.ITestimonialRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.Testimonial>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.TestimonialRepository(container);
+            });
+            return services;
+        }
+
+         /// <summary>
+        /// Registers PlatformStats repository for managing platform statistics.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddPlatformStatsRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.PlatformStats>>(sp =>
+                new NoSQL.PlatformStatsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            // Use a lazy initialization pattern to avoid blocking in DI configuration
+            services.AddSingleton<Interfaces.IPlatformStatsRepository>(sp =>
+            {
+                var containerManager = sp.GetRequiredService<IContainerManager<Entities.PlatformStats>>();
+                // Note: Container initialization happens on first use, not during DI setup
+                // This follows the same pattern as other repositories in the codebase
+                var container = containerManager.EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.PlatformStatsRepository(container);
+            });
+
+            return services;
+        }        
+
+        /// <summary>
+        /// Registers PlatformStats service for managing and caching platform statistics.
+        /// Call this after registering repositories in DI.
+        /// </summary>
+        public static IServiceCollection AddPlatformStatsService(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IPlatformStatsService, Services.PlatformStatsService>();
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Lead repository with Cosmos DB container.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddLeadRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Lead>>(sp =>
+                new NoSQL.LeadsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<Interfaces.ILeadRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.Lead>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.LeadRepository(container);
+            });
+
+            return services;
+        }
+
+         /// <summary>
+        /// Registers Lead services for lead capture and management.
+        /// </summary>
+        public static IServiceCollection AddLeadServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.ILeadService, Services.LeadService>();
+            services.AddSingleton<Interfaces.IRateLimitService>(sp =>
+            {
+                var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Services.RateLimitService>>();
+                return new Services.RateLimitService(logger, maxRequestsPerMinute: 10);
+            });
+            return services;
+        }
+
+        /// <summary>
+        /// Registers the Experiment repository for A/B testing.
+        /// Requires that a singleton Microsoft.Azure.Cosmos.Database is already registered.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <returns>The IServiceCollection for chaining.</returns>
+        public static IServiceCollection AddExperimentRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Experiment>, NoSQL.ExperimentsContainerManager>();
+            services.AddTransient<Interfaces.IExperimentRepository>(sp =>
+            {
+                var database = sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                var containerManager = sp.GetRequiredService<IContainerManager<Entities.Experiment>>();
+                var container = containerManager.EnsureContainerAsync().GetAwaiter().GetResult();
+                var logger = sp.GetService<Microsoft.Extensions.Logging.ILogger<NoSQL.ExperimentRepository>>();
+                return new NoSQL.ExperimentRepository(container, logger);
+            });
+            return services;
+        }
+
+        /// <summary>
+        /// Registers the Experiment service for A/B testing variant assignment.
+        /// Requires that AddExperimentRepository has been called.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <returns>The IServiceCollection for chaining.</returns>
+        public static IServiceCollection AddExperimentServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IExperimentService, Services.ExperimentService>();
+            return services;
+        }
+
+        
+        /// <summary>
         /// Registers Referral repository services for managing referral program data.
         /// Call this after registering a singleton Database in DI.
         /// </summary>
