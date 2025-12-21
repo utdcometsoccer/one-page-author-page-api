@@ -75,6 +75,8 @@ var services = builder.Services
     .AddDnsZoneService() // Add DNS zone service for domain registration triggers
     .AddFrontDoorServices() // Add Azure Front Door services for domain management
     .AddGoogleDomainsService() // Add Google Domains service for domain registration
+    .AddReferralRepository() // Add Referral repository for referral program
+    .AddReferralServices() // Add Referral services for referral program
     .AddLeadRepository() // Add Lead repository for lead capture
     .AddLeadServices() // Add Lead services for lead capture and management
     .AddTestingServices() // Add testing services for mock implementations and test harnesses

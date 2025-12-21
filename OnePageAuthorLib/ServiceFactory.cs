@@ -1114,5 +1114,35 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<Interfaces.IExperimentService, Services.ExperimentService>();
             return services;
         }
+
+        
+        /// <summary>
+        /// Registers Referral repository services for managing referral program data.
+        /// Call this after registering a singleton Database in DI.
+        /// </summary>
+        public static IServiceCollection AddReferralRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Referral>>(sp =>
+                new NoSQL.ReferralsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
+
+            services.AddSingleton<API.IReferralRepository>(sp =>
+            {
+                var container = sp.GetRequiredService<IContainerManager<Entities.Referral>>()
+                    .EnsureContainerAsync().GetAwaiter().GetResult();
+                return new NoSQL.ReferralRepository(container);
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers Referral service for referral program business logic.
+        /// Call this after registering ReferralRepository in DI.
+        /// </summary>
+        public static IServiceCollection AddReferralServices(this IServiceCollection services)
+        {
+            services.AddScoped<API.IReferralService, Services.ReferralService>();
+            return services;
+        }
     }
 }
