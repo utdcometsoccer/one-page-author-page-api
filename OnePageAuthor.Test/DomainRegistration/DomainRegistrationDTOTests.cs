@@ -87,6 +87,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                     TelephoneNumber = "+1-217-555-9876"
                 },
                 CreatedAt = new DateTime(2025, 9, 29, 12, 0, 0, DateTimeKind.Utc),
+                LastUpdatedAt = new DateTime(2025, 9, 29, 13, 0, 0, DateTimeKind.Utc),
                 Status = DomainRegistrationStatus.InProgress
             };
 
@@ -109,6 +110,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             Assert.Equal("jane@example.org", response.ContactInformation.EmailAddress);
             Assert.Equal("+1-217-555-9876", response.ContactInformation.TelephoneNumber);
             Assert.Equal(new DateTime(2025, 9, 29, 12, 0, 0, DateTimeKind.Utc), response.CreatedAt);
+            Assert.Equal(new DateTime(2025, 9, 29, 13, 0, 0, DateTimeKind.Utc), response.LastUpdatedAt);
             Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
         }
 

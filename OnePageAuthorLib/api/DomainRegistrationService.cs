@@ -70,7 +70,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             _logger.LogInformation("Creating domain registration for user {Upn}, domain {Domain}", 
                 upn, domain.FullDomainName);
 
-            var domainRegistration = new DomainRegistration(upn, domain, contactInformation);
+            var domainRegistration = new DomainRegistration(upn, domain, contactInformation)
+            {
+                LastUpdatedAt = DateTime.UtcNow
+            };
             
             return await _repository.CreateAsync(domainRegistration);
         }
@@ -113,6 +116,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             existingRegistration.Status = status;
+            existingRegistration.LastUpdatedAt = DateTime.UtcNow;
             
             return await _repository.UpdateAsync(existingRegistration);
         }
@@ -182,6 +186,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             {
                 existingRegistration.Status = status.Value;
             }
+
+            // Always update the LastUpdatedAt timestamp
+            existingRegistration.LastUpdatedAt = DateTime.UtcNow;
 
             return await _repository.UpdateAsync(existingRegistration);
         }
