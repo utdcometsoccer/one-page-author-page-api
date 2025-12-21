@@ -78,6 +78,7 @@ var services = builder.Services
     .AddLeadRepository() // Add Lead repository for lead capture
     .AddLeadServices() // Add Lead services for lead capture and management
     .AddTestingServices() // Add testing services for mock implementations and test harnesses
+    .AddTestimonialRepository() // Add Testimonial repository for testimonials management
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
