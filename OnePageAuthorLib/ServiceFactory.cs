@@ -1082,5 +1082,37 @@ namespace InkStainedWretch.OnePageAuthorAPI
             });
             return services;
         }
+
+        /// <summary>
+        /// Registers the Experiment repository for A/B testing.
+        /// Requires that a singleton Microsoft.Azure.Cosmos.Database is already registered.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <returns>The IServiceCollection for chaining.</returns>
+        public static IServiceCollection AddExperimentRepository(this IServiceCollection services)
+        {
+            services.AddTransient<IContainerManager<Entities.Experiment>, NoSQL.ExperimentsContainerManager>();
+            services.AddTransient<Interfaces.IExperimentRepository>(sp =>
+            {
+                var database = sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
+                var containerManager = sp.GetRequiredService<IContainerManager<Entities.Experiment>>();
+                var container = containerManager.EnsureContainerAsync().GetAwaiter().GetResult();
+                var logger = sp.GetService<Microsoft.Extensions.Logging.ILogger<NoSQL.ExperimentRepository>>();
+                return new NoSQL.ExperimentRepository(container, logger);
+            });
+            return services;
+        }
+
+        /// <summary>
+        /// Registers the Experiment service for A/B testing variant assignment.
+        /// Requires that AddExperimentRepository has been called.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <returns>The IServiceCollection for chaining.</returns>
+        public static IServiceCollection AddExperimentServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IExperimentService, Services.ExperimentService>();
+            return services;
+        }
     }
 }
