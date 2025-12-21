@@ -523,5 +523,109 @@ namespace OnePageAuthor.Test.DomainRegistration
         }
 
         #endregion
+
+        #region LastUpdatedAt Tests
+
+        [Fact]
+        public async Task CreateDomainRegistrationAsync_SetsLastUpdatedAt()
+        {
+            // Arrange
+            var user = CreateTestUser();
+            var domain = CreateTestDomain();
+            var contactInfo = CreateTestContactInfo();
+            InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration? capturedRegistration = null;
+
+            _repositoryMock.Setup(r => r.CreateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()))
+                          .Callback<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(dr => capturedRegistration = dr)
+                          .ReturnsAsync((InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration dr) => dr);
+
+            // Act
+            var result = await _service.CreateDomainRegistrationAsync(user, domain, contactInfo);
+
+            // Assert
+            Assert.NotNull(capturedRegistration);
+            Assert.True((DateTime.UtcNow - capturedRegistration.LastUpdatedAt).TotalSeconds < 5, 
+                "LastUpdatedAt should be set to current UTC time");
+        }
+
+        [Fact]
+        public async Task UpdateDomainRegistrationAsync_UpdatesLastUpdatedAt()
+        {
+            // Arrange
+            var user = CreateTestUser();
+            var registrationId = "test-id-123";
+            var domain = CreateTestDomain();
+            var contactInfo = CreateTestContactInfo();
+            
+            var existingRegistration = new InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration
+            {
+                id = registrationId,
+                Upn = "test@example.com",
+                Domain = domain,
+                ContactInformation = contactInfo,
+                CreatedAt = DateTime.UtcNow.AddDays(-1),
+                LastUpdatedAt = DateTime.UtcNow.AddDays(-1),
+                Status = DomainRegistrationStatus.Pending
+            };
+
+            InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration? capturedRegistration = null;
+
+            _repositoryMock.Setup(r => r.GetByIdAsync(registrationId, "test@example.com"))
+                          .ReturnsAsync(existingRegistration);
+            
+            _repositoryMock.Setup(r => r.UpdateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()))
+                          .Callback<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(dr => capturedRegistration = dr)
+                          .ReturnsAsync((InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration dr) => dr);
+
+            // Act
+            var result = await _service.UpdateDomainRegistrationAsync(user, registrationId, domain, contactInfo);
+
+            // Assert
+            Assert.NotNull(capturedRegistration);
+            Assert.True((DateTime.UtcNow - capturedRegistration.LastUpdatedAt).TotalSeconds < 5, 
+                "LastUpdatedAt should be updated to current UTC time");
+            Assert.True(capturedRegistration.LastUpdatedAt > existingRegistration.CreatedAt,
+                "LastUpdatedAt should be more recent than CreatedAt");
+        }
+
+        [Fact]
+        public async Task UpdateDomainRegistrationStatusAsync_UpdatesLastUpdatedAt()
+        {
+            // Arrange
+            var user = CreateTestUser();
+            var registrationId = "test-id-123";
+            var newStatus = DomainRegistrationStatus.Completed;
+            
+            var existingRegistration = new InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration
+            {
+                id = registrationId,
+                Upn = "test@example.com",
+                Domain = CreateTestDomain(),
+                ContactInformation = CreateTestContactInfo(),
+                CreatedAt = DateTime.UtcNow.AddDays(-1),
+                LastUpdatedAt = DateTime.UtcNow.AddDays(-1),
+                Status = DomainRegistrationStatus.Pending
+            };
+
+            InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration? capturedRegistration = null;
+
+            _repositoryMock.Setup(r => r.GetByIdAsync(registrationId, "test@example.com"))
+                          .ReturnsAsync(existingRegistration);
+            
+            _repositoryMock.Setup(r => r.UpdateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()))
+                          .Callback<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(dr => capturedRegistration = dr)
+                          .ReturnsAsync((InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration dr) => dr);
+
+            // Act
+            var result = await _service.UpdateDomainRegistrationStatusAsync(user, registrationId, newStatus);
+
+            // Assert
+            Assert.NotNull(capturedRegistration);
+            Assert.Equal(DomainRegistrationStatus.Completed, capturedRegistration.Status);
+            Assert.True((DateTime.UtcNow - capturedRegistration.LastUpdatedAt).TotalSeconds < 5, 
+                "LastUpdatedAt should be updated to current UTC time");
+        }
+
+        #endregion
     }
 }

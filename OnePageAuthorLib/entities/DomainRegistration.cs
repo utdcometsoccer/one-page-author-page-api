@@ -38,6 +38,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
+        /// Timestamp when the author site was last updated.
+        /// </summary>
+        [JsonProperty("lastUpdatedAt")]
+        public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
         /// Status of the domain registration request.
         /// </summary>
         [JsonProperty("status")]

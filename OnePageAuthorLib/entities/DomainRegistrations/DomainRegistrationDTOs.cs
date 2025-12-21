@@ -195,6 +195,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistrations
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
+        /// Timestamp when the author site was last updated.
+        /// </summary>
+        public DateTime LastUpdatedAt { get; set; }
+
+        /// <summary>
         /// Status of the domain registration.
         /// </summary>
         public DomainRegistrationStatus Status { get; set; }
@@ -226,6 +231,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistrations
                     TelephoneNumber = entity.ContactInformation.TelephoneNumber
                 },
                 CreatedAt = entity.CreatedAt,
+                LastUpdatedAt = entity.LastUpdatedAt,
                 Status = entity.Status
             };
         }
