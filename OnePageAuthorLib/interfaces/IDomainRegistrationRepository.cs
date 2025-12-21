@@ -43,5 +43,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="upn">The user's UPN (partition key)</param>
         /// <returns>True if deleted successfully, false if not found</returns>
         Task<bool> DeleteAsync(string id, string upn);
+
+        /// <summary>
+        /// Gets a domain registration by top-level domain and second-level domain.
+        /// </summary>
+        /// <param name="topLevelDomain">The top-level domain (e.g., "com")</param>
+        /// <param name="secondLevelDomain">The second-level domain (e.g., "example")</param>
+        /// <returns>The domain registration if found, null otherwise</returns>
+        Task<DomainRegistration?> GetByDomainAsync(string topLevelDomain, string secondLevelDomain);
     }
 }
