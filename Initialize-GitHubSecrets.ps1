@@ -547,14 +547,17 @@ function Set-GitHubSecret {
         
         # Remove leading/trailing double quotes (unless it's valid JSON object/array)
         if ($CleanValue.StartsWith('"') -and $CleanValue.EndsWith('"')) {
-            # Try to detect if this is a valid JSON object or array (not just a JSON string)
-            # JSON objects start with { and arrays start with [
-            # A simple quoted string like "value" is technically valid JSON but we want to remove those quotes
+            # Detect if this is a valid JSON object or array by parsing and checking the type
+            # We want to preserve JSON objects and arrays (e.g., Azure credentials, config arrays)
+            # but remove quotes from simple strings (e.g., "myvalue", "https://example.com")
             $isJsonObjectOrArray = $false
             try {
                 $parsed = ConvertFrom-Json $CleanValue -ErrorAction Stop
-                # Check if the parsed result is an object or array, not a simple string
-                if ($parsed -is [System.Management.Automation.PSCustomObject] -or $parsed -is [System.Array]) {
+                # Check if the parsed result is a PSCustomObject (JSON object) or Array (JSON array)
+                # Exclude simple strings, numbers, and booleans
+                if (($parsed -is [System.Management.Automation.PSCustomObject] -or 
+                     $parsed -is [System.Array]) -and 
+                     $parsed -isnot [string]) {
                     $isJsonObjectOrArray = $true
                 }
             } catch {
