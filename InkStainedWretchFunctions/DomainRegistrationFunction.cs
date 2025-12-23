@@ -144,7 +144,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// </example>
         [Function("CreateDomainRegistration")]
         public async Task<IActionResult> CreateDomainRegistration(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "domain-registrations")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "domain-registrations")] HttpRequest req,
             [FromBody] CreateDomainRegistrationRequest payload)
         {
             _logger.LogInformation("CreateDomainRegistration function processed a request.");
@@ -313,7 +313,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// </example>
         [Function("GetDomainRegistrations")]
         public async Task<IActionResult> GetDomainRegistrations(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "domain-registrations")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "domain-registrations")] HttpRequest req)
         {
             _logger.LogInformation("GetDomainRegistrations function processed a request.");
 
@@ -361,7 +361,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// <returns>Domain registration or error response</returns>
         [Function("GetDomainRegistrationById")]
         public async Task<IActionResult> GetDomainRegistrationById(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "domain-registrations/{registrationId}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "domain-registrations/{registrationId}")] HttpRequest req,
             string registrationId)
         {
             _logger.LogInformation("GetDomainRegistrationById function processed a request for ID: {RegistrationId}", registrationId);
@@ -531,7 +531,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// </example>
         [Function("UpdateDomainRegistration")]
         public async Task<IActionResult> UpdateDomainRegistration(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "domain-registrations/{registrationId}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "domain-registrations/{registrationId}")] HttpRequest req,
             string registrationId,
             [FromBody] UpdateDomainRegistrationRequest payload)
         {

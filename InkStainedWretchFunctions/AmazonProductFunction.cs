@@ -150,7 +150,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// </example>
         [Function("SearchAmazonBooksByAuthor")]
         public async Task<IActionResult> SearchBooksByAuthor(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "amazon/books/author/{authorName}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "amazon/books/author/{authorName}")] HttpRequest req,
             string authorName)
         {
             _logger.LogInformation("SearchAmazonBooksByAuthor function processed a request.");
