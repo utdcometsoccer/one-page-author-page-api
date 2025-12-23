@@ -537,16 +537,37 @@ function Set-GitHubSecret {
     # Remove surrounding quotes if present (guard against erroneous quote insertion)
     $CleanValue = $Value.Trim()
     
-    # Remove leading/trailing single quotes
-    if ($CleanValue.StartsWith("'") -and $CleanValue.EndsWith("'")) {
-        $CleanValue = $CleanValue.Substring(1, $CleanValue.Length - 2)
-        Write-Warning "Removed surrounding single quotes from $Name"
-    }
-    
-    # Remove leading/trailing double quotes (unless it's JSON which legitimately uses quotes)
-    if ($CleanValue.StartsWith('"') -and $CleanValue.EndsWith('"') -and -not $CleanValue.StartsWith('{"')) {
-        $CleanValue = $CleanValue.Substring(1, $CleanValue.Length - 2)
-        Write-Warning "Removed surrounding double quotes from $Name"
+    # Only process quote removal if value has at least 2 characters
+    if ($CleanValue.Length -ge 2) {
+        # Remove leading/trailing single quotes
+        if ($CleanValue.StartsWith("'") -and $CleanValue.EndsWith("'")) {
+            $CleanValue = $CleanValue.Substring(1, $CleanValue.Length - 2)
+            Write-Warning "Removed surrounding single quotes from $Name"
+        }
+        
+        # Remove leading/trailing double quotes (unless it's valid JSON object/array)
+        if ($CleanValue.StartsWith('"') -and $CleanValue.EndsWith('"')) {
+            # Try to detect if this is a valid JSON object or array (not just a JSON string)
+            # JSON objects start with { and arrays start with [
+            # A simple quoted string like "value" is technically valid JSON but we want to remove those quotes
+            $isJsonObjectOrArray = $false
+            try {
+                $parsed = ConvertFrom-Json $CleanValue -ErrorAction Stop
+                # Check if the parsed result is an object or array, not a simple string
+                if ($parsed -is [System.Management.Automation.PSCustomObject] -or $parsed -is [System.Array]) {
+                    $isJsonObjectOrArray = $true
+                }
+            } catch {
+                # Not valid JSON at all
+                $isJsonObjectOrArray = $false
+            }
+            
+            # Only remove quotes if not a JSON object or array
+            if (-not $isJsonObjectOrArray) {
+                $CleanValue = $CleanValue.Substring(1, $CleanValue.Length - 2)
+                Write-Warning "Removed surrounding double quotes from $Name"
+            }
+        }
     }
     
     try {
