@@ -549,10 +549,14 @@ function Set-GitHubSecret {
         if ($CleanValue.StartsWith('"') -and $CleanValue.EndsWith('"')) {
             # Detect if this is a valid JSON object or array by parsing and checking the type
             # We want to preserve JSON objects and arrays (e.g., Azure credentials, config arrays)
-            # but remove quotes from simple strings (e.g., "myvalue", "https://example.com")
+            # but remove quotes from simple strings, numbers, booleans (e.g., "myvalue", "https://example.com", "true", "123")
+            # 
+            # Design decision: JSON primitives (strings, numbers, booleans, null) should have quotes removed
+            # because in the context of GitHub secrets, these are likely erroneously quoted simple values.
+            # Only complex JSON structures (objects, arrays) need to preserve their quotes.
             $isJsonObjectOrArray = $false
             
-            # Performance optimization: Quick check if content looks like JSON before parsing
+            # Performance optimization: Quick check if content looks like JSON object/array before parsing
             # Peek at the first character inside the quotes
             if ($CleanValue.Length -gt 2) {
                 $firstCharInsideQuotes = $CleanValue[1]
