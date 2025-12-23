@@ -552,19 +552,23 @@ function Set-GitHubSecret {
             # but remove quotes from simple strings (e.g., "myvalue", "https://example.com")
             $isJsonObjectOrArray = $false
             
-            # Performance optimization: Quick check if it looks like JSON before parsing
-            # JSON objects start with { and arrays start with [
-            $trimmedContent = $CleanValue.Trim('"')
-            if ($trimmedContent.StartsWith('{') -or $trimmedContent.StartsWith('[')) {
-                try {
-                    $parsed = ConvertFrom-Json $CleanValue -ErrorAction Stop
-                    # Check if the parsed result is a PSCustomObject (JSON object) or Array (JSON array)
-                    if ($parsed -is [System.Management.Automation.PSCustomObject] -or $parsed -is [System.Array]) {
-                        $isJsonObjectOrArray = $true
+            # Performance optimization: Quick check if content looks like JSON before parsing
+            # Peek at the first character inside the quotes
+            if ($CleanValue.Length -gt 2) {
+                $firstCharInsideQuotes = $CleanValue[1]
+                
+                # Only attempt JSON parsing if it starts with { or [ (JSON object or array)
+                if ($firstCharInsideQuotes -eq '{' -or $firstCharInsideQuotes -eq '[') {
+                    try {
+                        $parsed = ConvertFrom-Json $CleanValue -ErrorAction Stop
+                        # Check if the parsed result is a PSCustomObject (JSON object) or Array (JSON array)
+                        if ($parsed -is [System.Management.Automation.PSCustomObject] -or $parsed -is [System.Array]) {
+                            $isJsonObjectOrArray = $true
+                        }
+                    } catch {
+                        # Not valid JSON at all
+                        $isJsonObjectOrArray = $false
                     }
-                } catch {
-                    # Not valid JSON at all
-                    $isJsonObjectOrArray = $false
                 }
             }
             
