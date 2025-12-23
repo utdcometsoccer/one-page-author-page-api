@@ -114,6 +114,7 @@ STRIPE_API_KEY=sk_test_your_key_here
 - `AAD_TENANT_ID` - Azure AD tenant ID
 - `AAD_AUDIENCE` - Azure AD client ID / audience
 - `AAD_CLIENT_ID` - Azure AD client ID
+- `OPEN_ID_CONNECT_METADATA_URL` - OpenID Connect metadata URL for JWT validation
 
 ### Optional - ImageAPI (if using image features)
 - `AZURE_STORAGE_CONNECTION_STRING` - Azure Blob Storage connection
@@ -125,6 +126,8 @@ STRIPE_API_KEY=sk_test_your_key_here
 ### Optional - Domain Management
 - `AZURE_SUBSCRIPTION_ID` - Azure subscription ID
 - `AZURE_DNS_RESOURCE_GROUP` - Resource group for DNS zones
+- `AZURE_RESOURCE_GROUP_NAME` - Resource group name for Azure Front Door
+- `AZURE_FRONTDOOR_PROFILE_NAME` - Azure Front Door profile name
 - `ISW_DNS_ZONE_NAME` - DNS zone name
 - `GOOGLE_CLOUD_PROJECT_ID` - Google Cloud project ID
 - `GOOGLE_DOMAINS_LOCATION` - Location for domain operations
@@ -137,6 +140,26 @@ STRIPE_API_KEY=sk_test_your_key_here
 - `AMAZON_PRODUCT_MARKETPLACE` - Target marketplace
 - `PENGUIN_RANDOM_HOUSE_API_KEY` - PRH API key
 - `PENGUIN_RANDOM_HOUSE_API_DOMAIN` - PRH API domain
+
+### Optional - Azure Key Vault (for secure secret management)
+- `KEY_VAULT_URL` - Azure Key Vault URL
+- `USE_KEY_VAULT` - Feature flag to enable Key Vault (true/false)
+
+### Optional - Referral Program
+- `REFERRAL_BASE_URL` - Base URL for generating referral links
+
+### Optional - Testing Configuration
+- `TESTING_MODE` - Enable testing mode (true/false)
+- `MOCK_AZURE_INFRASTRUCTURE` - Mock Azure infrastructure operations (true/false)
+- `MOCK_GOOGLE_DOMAINS` - Mock Google Domains API calls (true/false)
+- `MOCK_STRIPE_PAYMENTS` - Mock Stripe payment operations (true/false)
+- `STRIPE_TEST_MODE` - Use Stripe test mode (true/false)
+- `MOCK_EXTERNAL_APIS` - Mock external API calls (true/false)
+- `ENABLE_TEST_LOGGING` - Enable detailed test logging (true/false)
+- `TEST_SCENARIO` - Test scenario identifier
+- `MAX_TEST_COST_LIMIT` - Maximum cost limit for testing operations (USD)
+- `TEST_DOMAIN_SUFFIX` - Test domain suffix for testing
+- `SKIP_DOMAIN_PURCHASE` - Skip actual domain purchases during testing (true/false)
 
 ## Verification
 
