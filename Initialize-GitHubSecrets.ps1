@@ -235,6 +235,13 @@ $secretDefinitions = @{
             Required = $false
             Example = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
             Category = "Authentication"
+        },
+        @{
+            Name = "OPEN_ID_CONNECT_METADATA_URL"
+            Description = "OpenID Connect metadata URL for JWT validation"
+            Required = $false
+            Example = "https://login.microsoftonline.com/{tenant-id}/v2.0/.well-known/openid-configuration"
+            Category = "Authentication"
         }
     )
     
@@ -281,6 +288,20 @@ $secretDefinitions = @{
             Description = "Resource group for DNS zones"
             Required = $false
             Example = "rg-dns-prod"
+            Category = "Domain"
+        },
+        @{
+            Name = "AZURE_RESOURCE_GROUP_NAME"
+            Description = "Resource group name for Azure Front Door"
+            Required = $false
+            Example = "rg-onepageauthor-prod"
+            Category = "Domain"
+        },
+        @{
+            Name = "AZURE_FRONTDOOR_PROFILE_NAME"
+            Description = "Azure Front Door profile name"
+            Required = $false
+            Example = "afd-onepageauthor"
             Category = "Domain"
         },
         @{
@@ -366,6 +387,113 @@ $secretDefinitions = @{
             Category = "ExternalAPI"
         }
     )
+    
+    "Azure Key Vault (Optional)" = @(
+        @{
+            Name = "KEY_VAULT_URL"
+            Description = "Azure Key Vault URL for secure secret management"
+            Required = $false
+            Example = "https://your-keyvault.vault.azure.net/"
+            Category = "Security"
+        },
+        @{
+            Name = "USE_KEY_VAULT"
+            Description = "Feature flag to enable Key Vault (true/false)"
+            Required = $false
+            Example = "false"
+            Category = "Security"
+        }
+    )
+    
+    "Referral Program (Optional)" = @(
+        @{
+            Name = "REFERRAL_BASE_URL"
+            Description = "Base URL for generating referral links"
+            Required = $false
+            Example = "https://inkstainedwretches.com"
+            Category = "Features"
+        }
+    )
+    
+    "Testing Configuration (Optional)" = @(
+        @{
+            Name = "TESTING_MODE"
+            Description = "Enable testing mode (true/false)"
+            Required = $false
+            Example = "false"
+            Category = "Testing"
+        },
+        @{
+            Name = "MOCK_AZURE_INFRASTRUCTURE"
+            Description = "Mock Azure infrastructure operations (true/false)"
+            Required = $false
+            Example = "false"
+            Category = "Testing"
+        },
+        @{
+            Name = "MOCK_GOOGLE_DOMAINS"
+            Description = "Mock Google Domains API calls (true/false)"
+            Required = $false
+            Example = "false"
+            Category = "Testing"
+        },
+        @{
+            Name = "MOCK_STRIPE_PAYMENTS"
+            Description = "Mock Stripe payment operations (true/false)"
+            Required = $false
+            Example = "false"
+            Category = "Testing"
+        },
+        @{
+            Name = "STRIPE_TEST_MODE"
+            Description = "Use Stripe test mode (true/false)"
+            Required = $false
+            Example = "true"
+            Category = "Testing"
+        },
+        @{
+            Name = "MOCK_EXTERNAL_APIS"
+            Description = "Mock external API calls (true/false)"
+            Required = $false
+            Example = "false"
+            Category = "Testing"
+        },
+        @{
+            Name = "ENABLE_TEST_LOGGING"
+            Description = "Enable detailed test logging (true/false)"
+            Required = $false
+            Example = "false"
+            Category = "Testing"
+        },
+        @{
+            Name = "TEST_SCENARIO"
+            Description = "Test scenario identifier"
+            Required = $false
+            Example = "default"
+            Category = "Testing"
+        },
+        @{
+            Name = "MAX_TEST_COST_LIMIT"
+            Description = "Maximum cost limit for testing operations (USD)"
+            Required = $false
+            Example = "50.00"
+            Category = "Testing"
+        },
+        @{
+            Name = "TEST_DOMAIN_SUFFIX"
+            Description = "Test domain suffix for testing"
+            Required = $false
+            Example = "test-domain.local"
+            Category = "Testing"
+        },
+        @{
+            Name = "SKIP_DOMAIN_PURCHASE"
+            Description = "Skip actual domain purchases during testing (true/false)"
+            Required = $false
+            Example = "true"
+            Category = "Testing"
+        }
+    )
 }
 
 # Function to read secret from user
@@ -406,15 +534,30 @@ function Set-GitHubSecret {
         return $false
     }
     
+    # Remove surrounding quotes if present (guard against erroneous quote insertion)
+    $CleanValue = $Value.Trim()
+    
+    # Remove leading/trailing single quotes
+    if ($CleanValue.StartsWith("'") -and $CleanValue.EndsWith("'")) {
+        $CleanValue = $CleanValue.Substring(1, $CleanValue.Length - 2)
+        Write-Warning "Removed surrounding single quotes from $Name"
+    }
+    
+    # Remove leading/trailing double quotes (unless it's JSON which legitimately uses quotes)
+    if ($CleanValue.StartsWith('"') -and $CleanValue.EndsWith('"') -and -not $CleanValue.StartsWith('{"')) {
+        $CleanValue = $CleanValue.Substring(1, $CleanValue.Length - 2)
+        Write-Warning "Removed surrounding double quotes from $Name"
+    }
+    
     try {
         # Use gh secret set command
-        $Value | gh secret set $Name 2>&1 | Out-Null
+        $CleanValue | gh secret set $Name 2>&1 | Out-Null
         
         if ($LASTEXITCODE -eq 0) {
             if ($IsSensitive) {
                 Write-Success "Set $Name (value hidden)"
             } else {
-                $displayValue = if ($Value.Length -gt 30) { "$($Value.Substring(0, 30))..." } else { $Value }
+                $displayValue = if ($CleanValue.Length -gt 30) { "$($CleanValue.Substring(0, 30))..." } else { $CleanValue }
                 Write-Success "Set $Name = $displayValue"
             }
             return $true
