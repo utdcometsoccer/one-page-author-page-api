@@ -147,7 +147,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// </example>
         [Function("SearchPenguinAuthors")]
         public async Task<IActionResult> SearchAuthors(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "penguin/authors/{authorName}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "penguin/authors/{authorName}")] HttpRequest req,
             string authorName)
         {
             _logger.LogInformation("SearchPenguinAuthors function processed a request.");
@@ -335,7 +335,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// </example>
         [Function("GetPenguinTitlesByAuthor")]
         public async Task<IActionResult> GetTitlesByAuthor(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "penguin/authors/{authorKey}/titles")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "penguin/authors/{authorKey}/titles")] HttpRequest req,
             string authorKey)
         {
             _logger.LogInformation("GetPenguinTitlesByAuthor function processed a request.");
