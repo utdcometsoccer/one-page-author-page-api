@@ -247,6 +247,8 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 | `AAD_TENANT_ID` | Your Azure AD tenant identifier | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
 | `AAD_AUDIENCE` | API application client ID | Azure Portal → Microsoft Entra ID → App registrations → Your App → Application (client) ID |
 
+**Important:** Most endpoints use JWT Bearer token authentication only (no Azure Functions host keys required). Endpoints validate JWT tokens using `JwtAuthenticationHelper.ValidateJwtTokenAsync()`. See [AUTHORIZATION_FIX_DOCUMENTATION.md](../AUTHORIZATION_FIX_DOCUMENTATION.md) for details.
+
 </details>
 
 ### ⚠️ Migration from local.settings.json
