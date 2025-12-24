@@ -11,9 +11,10 @@ All documentation is organized in the [`docs/`](.) directory with the following 
 Start here if you're new to the project:
 
 1. [**Main README**](../README.md) - Project overview, quick start, and architecture
-2. [**CONTRIBUTING**](CONTRIBUTING.md) - How to contribute to the project
-3. [**CODE_OF_CONDUCT**](CODE_OF_CONDUCT.md) - Community guidelines
-4. [**SECURITY**](SECURITY.md) - Security policies and vulnerability reporting
+2. [**PRODUCT_ROADMAP**](../PRODUCT_ROADMAP.md) - **Strategic roadmap** - Features, technical debt, and release planning
+3. [**CONTRIBUTING**](CONTRIBUTING.md) - How to contribute to the project
+4. [**CODE_OF_CONDUCT**](CODE_OF_CONDUCT.md) - Community guidelines
+5. [**SECURITY**](SECURITY.md) - Security policies and vulnerability reporting
 
 ### 🔧 Development & Setup
 
