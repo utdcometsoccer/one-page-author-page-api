@@ -7,6 +7,10 @@
 
 A comprehensive .NET 10 platform providing APIs and utilities for author management, content publishing, and subscription services. Built with Azure Functions (isolated worker), Azure Cosmos DB for persistence, Stripe for billing, and Microsoft Entra ID for authentication.
 
+## 📋 Product Roadmap
+
+For strategic planning, feature roadmap, technical debt tracking, and release planning, see the **[Product Roadmap](PRODUCT_ROADMAP.md)**.
+
 ## 🚀 Platform Overview
 
 ### Key Features
