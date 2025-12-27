@@ -1,0 +1,20 @@
+// KQL Query: Authenticated Function Errors Analysis
+// Shows errors in authenticated functions with full context
+// Recommended visualization: Table and time chart
+// Use this to identify and troubleshoot authentication or authorization issues
+
+customEvents
+| where name == 'AuthenticatedFunctionError'
+| extend FunctionName = tostring(customDimensions["FunctionName"])
+| extend UserId = tostring(customDimensions["UserId"])
+| extend UserEmailDomain = tostring(customDimensions["UserEmailDomain"])
+| extend ErrorMessage = tostring(customDimensions["ErrorMessage"])
+| extend ErrorType = tostring(customDimensions["ErrorType"])
+| extend Timestamp = todatetime(customDimensions["Timestamp"])
+| summarize 
+    ErrorCount = count(),
+    AffectedUsers = dcount(UserId),
+    SampleErrorMessage = any(ErrorMessage)
+    by bin(timestamp, 1h), FunctionName, ErrorType
+| order by timestamp desc, ErrorCount desc
+| render timechart

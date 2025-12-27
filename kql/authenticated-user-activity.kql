@@ -1,0 +1,30 @@
+// KQL Query: Authenticated User Activity Analysis
+// Shows user activity patterns across all authenticated functions
+// Recommended visualization: Table or bar chart
+// Use this to understand user engagement and identify power users
+
+let functionCalls = customEvents
+| where name == 'AuthenticatedFunctionCall'
+| extend FunctionName = tostring(customDimensions["FunctionName"])
+| extend UserId = tostring(customDimensions["UserId"])
+| extend UserEmailDomain = tostring(customDimensions["UserEmailDomain"])
+| extend Timestamp = todatetime(customDimensions["Timestamp"]);
+
+functionCalls
+| summarize 
+    TotalCalls = count(),
+    UniqueFunctions = dcount(FunctionName),
+    FirstActivity = min(Timestamp),
+    LastActivity = max(Timestamp),
+    Functions = make_set(FunctionName)
+    by UserId, UserEmailDomain
+| extend DaysSinceFirstActivity = datetime_diff('day', now(), FirstActivity)
+| order by TotalCalls desc
+| project 
+    UserId, 
+    UserEmailDomain, 
+    TotalCalls, 
+    UniqueFunctions,
+    DaysSinceFirstActivity,
+    LastActivity,
+    Functions
