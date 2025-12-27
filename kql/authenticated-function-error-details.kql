@@ -1,0 +1,31 @@
+// KQL Query: Detailed Authenticated Function Error Analysis
+// Shows detailed error information for troubleshooting
+// Recommended visualization: Table
+// Use this to drill down into specific errors and their context
+
+customEvents
+| where name == 'AuthenticatedFunctionError'
+| extend FunctionName = tostring(customDimensions["FunctionName"])
+| extend UserId = tostring(customDimensions["UserId"])
+| extend UserEmailDomain = tostring(customDimensions["UserEmailDomain"])
+| extend ErrorMessage = tostring(customDimensions["ErrorMessage"])
+| extend ErrorType = tostring(customDimensions["ErrorType"])
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| extend SubscriptionId = tostring(customDimensions["SubscriptionId"])
+| extend TestimonialId = tostring(customDimensions["TestimonialId"])
+| extend Domain = tostring(customDimensions["Domain"])
+| extend TargetEmail = tostring(customDimensions["TargetEmail"])
+| extend Timestamp = todatetime(customDimensions["Timestamp"])
+| project 
+    Timestamp = timestamp,
+    FunctionName,
+    ErrorType,
+    ErrorMessage,
+    UserId,
+    UserEmailDomain,
+    CustomerId,
+    SubscriptionId,
+    TestimonialId,
+    Domain,
+    TargetEmail
+| order by Timestamp desc

@@ -1,0 +1,30 @@
+// KQL Query: Testimonial Operations Analysis
+// Shows all testimonial CRUD operations with user context
+// Recommended visualization: Time chart and table
+// Use this to monitor testimonial management activity
+
+let testimonialCalls = customEvents
+| where name in ('AuthenticatedFunctionCall', 'AuthenticatedFunctionSuccess', 'AuthenticatedFunctionError')
+| extend FunctionName = tostring(customDimensions["FunctionName"])
+| where FunctionName in ('CreateTestimonial', 'UpdateTestimonial', 'DeleteTestimonial')
+| extend UserId = tostring(customDimensions["UserId"])
+| extend UserEmailDomain = tostring(customDimensions["UserEmailDomain"])
+| extend TestimonialId = tostring(customDimensions["TestimonialId"])
+| extend EventType = case(
+    name == 'AuthenticatedFunctionSuccess', 'Success',
+    name == 'AuthenticatedFunctionError', 'Error',
+    'Call'
+)
+| extend Timestamp = todatetime(customDimensions["Timestamp"]);
+
+testimonialCalls
+| summarize 
+    TotalOperations = count(),
+    SuccessCount = countif(EventType == 'Success'),
+    ErrorCount = countif(EventType == 'Error'),
+    UniqueUsers = dcount(UserId),
+    UniqueTestimonials = dcount(TestimonialId)
+    by bin(timestamp, 1h), FunctionName
+| extend SuccessRate = round(100.0 * SuccessCount / TotalOperations, 2)
+| order by timestamp desc
+| render timechart

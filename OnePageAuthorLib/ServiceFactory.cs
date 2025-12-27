@@ -4,6 +4,7 @@ using InkStainedWretch.OnePageAuthorAPI.NoSQL;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.API.Penguin;
 using InkStainedWretch.OnePageAuthorLib.API.Amazon;
+using InkStainedWretch.OnePageAuthorLib.API;
 using InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces.Authormanagement;
 using OnePageAuthorLib.Api.Stripe;
@@ -374,6 +375,8 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<IClientSecretFromInvoice, ClientSecretFromInvoice>();
             // Register telemetry service for Application Insights Stripe event tracking
             services.AddScoped<IStripeTelemetryService, StripeTelemetryService>();
+            // Register telemetry service for authenticated function tracking
+            services.AddScoped<IAuthenticatedFunctionTelemetryService, AuthenticatedFunctionTelemetryService>();
             return services;
         }
 

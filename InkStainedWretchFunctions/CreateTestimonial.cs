@@ -1,5 +1,6 @@
 using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
+using InkStainedWretch.OnePageAuthorLib.API;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
@@ -18,11 +19,16 @@ public class CreateTestimonial
 {
     private readonly ILogger<CreateTestimonial> _logger;
     private readonly ITestimonialRepository _repository;
+    private readonly IAuthenticatedFunctionTelemetryService _telemetry;
 
-    public CreateTestimonial(ILogger<CreateTestimonial> logger, ITestimonialRepository repository)
+    public CreateTestimonial(
+        ILogger<CreateTestimonial> logger, 
+        ITestimonialRepository repository,
+        IAuthenticatedFunctionTelemetryService telemetry)
     {
         _logger = logger;
         _repository = repository;
+        _telemetry = telemetry;
     }
 
     /// <summary>
@@ -33,7 +39,17 @@ public class CreateTestimonial
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "admin/testimonials")] HttpRequestData req)
     {
-        _logger.LogInformation("Creating new testimonial");
+        var user = req.FunctionContext.Features.Get<IHttpContextAccessor>()?.HttpContext?.User;
+        var userId = AuthenticatedFunctionTelemetryService.ExtractUserId(user);
+        var userEmail = AuthenticatedFunctionTelemetryService.ExtractUserEmail(user);
+
+        _logger.LogInformation("Creating new testimonial by user {UserId}", userId ?? "Anonymous");
+
+        // Track the authenticated function call
+        _telemetry.TrackAuthenticatedFunctionCall(
+            "CreateTestimonial",
+            userId,
+            userEmail);
 
         try
         {
@@ -46,6 +62,12 @@ public class CreateTestimonial
 
             if (testimonial == null)
             {
+                _telemetry.TrackAuthenticatedFunctionError(
+                    "CreateTestimonial",
+                    userId,
+                    userEmail,
+                    "Invalid testimonial data",
+                    "ValidationError");
                 var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await badResponse.WriteStringAsync("Invalid testimonial data");
                 return badResponse;
@@ -54,6 +76,12 @@ public class CreateTestimonial
             // Validate required fields
             if (string.IsNullOrWhiteSpace(testimonial.AuthorName))
             {
+                _telemetry.TrackAuthenticatedFunctionError(
+                    "CreateTestimonial",
+                    userId,
+                    userEmail,
+                    "AuthorName is required",
+                    "ValidationError");
                 var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await badResponse.WriteStringAsync("AuthorName is required");
                 return badResponse;
@@ -61,6 +89,12 @@ public class CreateTestimonial
 
             if (string.IsNullOrWhiteSpace(testimonial.Quote))
             {
+                _telemetry.TrackAuthenticatedFunctionError(
+                    "CreateTestimonial",
+                    userId,
+                    userEmail,
+                    "Quote is required",
+                    "ValidationError");
                 var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await badResponse.WriteStringAsync("Quote is required");
                 return badResponse;
@@ -69,6 +103,12 @@ public class CreateTestimonial
             // Validate rating
             if (testimonial.Rating < 1 || testimonial.Rating > 5)
             {
+                _telemetry.TrackAuthenticatedFunctionError(
+                    "CreateTestimonial",
+                    userId,
+                    userEmail,
+                    "Rating must be between 1 and 5",
+                    "ValidationError");
                 var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await badResponse.WriteStringAsync("Rating must be between 1 and 5");
                 return badResponse;
@@ -77,13 +117,38 @@ public class CreateTestimonial
             // Create testimonial
             var created = await _repository.CreateAsync(testimonial);
 
+            // Track success with additional context
+            var successProperties = new Dictionary<string, string>
+            {
+                { "TestimonialId", created.id ?? "unknown" },
+                { "AuthorName", created.AuthorName },
+                { "Rating", created.Rating.ToString() }
+            };
+
+            _telemetry.TrackAuthenticatedFunctionSuccess(
+                "CreateTestimonial",
+                userId,
+                userEmail,
+                successProperties);
+
+            _logger.LogInformation(
+                "Successfully created testimonial {TestimonialId} by user {UserId}",
+                created.id,
+                userId ?? "Anonymous");
+
             var response = req.CreateResponse(HttpStatusCode.Created);
             await response.WriteAsJsonAsync(created);
             return response;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating testimonial");
+            _logger.LogError(ex, "Error creating testimonial by user {UserId}", userId ?? "Anonymous");
+            _telemetry.TrackAuthenticatedFunctionError(
+                "CreateTestimonial",
+                userId,
+                userEmail,
+                ex.Message,
+                ex.GetType().Name);
             var response = req.CreateResponse(HttpStatusCode.InternalServerError);
             await response.WriteStringAsync($"Error: {ex.Message}");
             return response;

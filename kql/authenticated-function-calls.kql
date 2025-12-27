@@ -1,0 +1,18 @@
+// KQL Query: Authenticated Function Calls Summary
+// Shows distribution and activity patterns of authenticated function calls
+// Recommended visualization: Bar chart or time chart
+// Use this to understand which authenticated endpoints are being used and by whom
+
+customEvents
+| where name == 'AuthenticatedFunctionCall'
+| extend FunctionName = tostring(customDimensions["FunctionName"])
+| extend UserId = tostring(customDimensions["UserId"])
+| extend UserEmailDomain = tostring(customDimensions["UserEmailDomain"])
+| extend Timestamp = todatetime(customDimensions["Timestamp"])
+| summarize 
+    CallCount = count(),
+    UniqueUsers = dcount(UserId),
+    UniqueEmailDomains = dcount(UserEmailDomain)
+    by bin(timestamp, 1h), FunctionName
+| order by timestamp desc, CallCount desc
+| render timechart

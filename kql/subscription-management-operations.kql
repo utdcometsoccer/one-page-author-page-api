@@ -1,0 +1,31 @@
+// KQL Query: Subscription Management Operations
+// Shows all subscription-related authenticated operations
+// Recommended visualization: Time chart and table
+// Use this to monitor subscription management activity by users
+
+let subscriptionCalls = customEvents
+| where name in ('AuthenticatedFunctionCall', 'AuthenticatedFunctionSuccess', 'AuthenticatedFunctionError')
+| extend FunctionName = tostring(customDimensions["FunctionName"])
+| where FunctionName in ('FindSubscription', 'ListSubscription', 'UpdateSubscription', 'InvoicePreview')
+| extend UserId = tostring(customDimensions["UserId"])
+| extend UserEmailDomain = tostring(customDimensions["UserEmailDomain"])
+| extend CustomerId = tostring(customDimensions["CustomerId"])
+| extend SubscriptionId = tostring(customDimensions["SubscriptionId"])
+| extend EventType = case(
+    name == 'AuthenticatedFunctionSuccess', 'Success',
+    name == 'AuthenticatedFunctionError', 'Error',
+    'Call'
+)
+| extend Timestamp = todatetime(customDimensions["Timestamp"]);
+
+subscriptionCalls
+| summarize 
+    TotalOperations = count(),
+    SuccessCount = countif(EventType == 'Success'),
+    ErrorCount = countif(EventType == 'Error'),
+    UniqueUsers = dcount(UserId),
+    UniqueCustomers = dcount(CustomerId)
+    by bin(timestamp, 1h), FunctionName
+| extend SuccessRate = round(100.0 * SuccessCount / TotalOperations, 2)
+| order by timestamp desc
+| render timechart

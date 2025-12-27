@@ -1,0 +1,17 @@
+// KQL Query: Authenticated Function Success Metrics
+// Shows successful operations across authenticated functions
+// Recommended visualization: Time chart or table
+// Use this to monitor successful API operations and track usage patterns
+
+customEvents
+| where name == 'AuthenticatedFunctionSuccess'
+| extend FunctionName = tostring(customDimensions["FunctionName"])
+| extend UserId = tostring(customDimensions["UserId"])
+| extend UserEmailDomain = tostring(customDimensions["UserEmailDomain"])
+| extend Timestamp = todatetime(customDimensions["Timestamp"])
+| summarize 
+    SuccessCount = count(),
+    UniqueUsers = dcount(UserId)
+    by bin(timestamp, 1h), FunctionName
+| order by timestamp desc, SuccessCount desc
+| render timechart
