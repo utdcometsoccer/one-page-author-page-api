@@ -35,7 +35,7 @@ public class CancelSubscription
     /// </remarks>
     [Function("CancelSubscription")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "CancelSubscription/{subscriptionId}")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "CancelSubscription/{subscriptionId}")] HttpRequest req,
         string subscriptionId,
         [FromBody] CancelSubscriptionRequest? payload)
     {

@@ -122,7 +122,7 @@ public class Delete
     /// </example>
     [Function("Delete")]
     [Authorize(Policy = "RequireScope.Read")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "delete")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "delete")] HttpRequest req)
     {
         // Extract image ID from query parameters or route
         var id = req.Query["id"].FirstOrDefault();

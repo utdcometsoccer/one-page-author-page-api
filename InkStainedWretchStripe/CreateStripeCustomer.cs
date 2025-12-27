@@ -37,7 +37,7 @@ public class CreateStripeCustomer
 
     [Function("CreateStripeCustomer")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
         [FromBody] CreateCustomerRequest payload)
     {
         _logger.LogInformation("CreateStripeCustomer invoked.");

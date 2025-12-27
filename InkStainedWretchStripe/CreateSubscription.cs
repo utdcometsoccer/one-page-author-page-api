@@ -81,7 +81,7 @@ public class CreateSubscription
     /// <returns>200 with SubscriptionCreateResponse; 400 on invalid input.</returns>
     [Function("CreateSubscription")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
         [FromBody] CreateSubscriptionRequest payload)
     {
         _logger.LogInformation("CreateSubscription invoked.");

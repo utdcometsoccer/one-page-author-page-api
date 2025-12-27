@@ -157,7 +157,7 @@ public class User
     /// </example>
     [Function("User")]
     [Authorize(Policy = "RequireScope.Read")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
         _logger.LogInformation("User images list function invoked.");
 
