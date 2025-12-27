@@ -26,7 +26,7 @@ public class CreateStripeCheckoutSession
 
     [Function("CreateStripeCheckoutSession")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
         [FromBody] CreateCheckoutSessionRequest payload)
     {
         _logger.LogInformation("Processing request to create Stripe checkout session");

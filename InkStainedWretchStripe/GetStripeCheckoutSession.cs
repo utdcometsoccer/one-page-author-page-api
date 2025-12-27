@@ -25,7 +25,7 @@ public class GetStripeCheckoutSession
 
     [Function("GetStripeCheckoutSession")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "GetStripeCheckoutSession/{sessionId}")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetStripeCheckoutSession/{sessionId}")] HttpRequest req,
         string sessionId)
     {
         _logger.LogInformation("Processing request to retrieve Stripe checkout session");

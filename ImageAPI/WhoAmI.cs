@@ -152,7 +152,7 @@ public class WhoAmI
     /// </example>
     [Function("WhoAmI")]
     [Authorize(Policy = "RequireScope.Read")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
         // Validate JWT token and get authenticated user
         var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);

@@ -26,7 +26,7 @@ public class GetStripePriceInformation
 
     [Function("GetStripePriceInformation")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
         [FromBody] PriceListRequest request)
     {
         _logger.LogInformation("Processing POST request to get Stripe price information");
