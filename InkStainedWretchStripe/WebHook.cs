@@ -26,7 +26,7 @@ public class WebHook
 
         // Read raw body as string for Stripe signature verification
         string payload;
-        using (var reader = new StreamReader(req.Body))
+        using (var reader = new StreamReader(req.Body, System.Text.Encoding.UTF8))
         {
             payload = await reader.ReadToEndAsync();
         }
