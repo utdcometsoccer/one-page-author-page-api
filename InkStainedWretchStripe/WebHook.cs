@@ -19,11 +19,17 @@ public class WebHook
 
     [Function("WebHook")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WebHook")] HttpRequest req,
-        [FromBody] string payload)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "WebHook")] HttpRequest req)
     {
         var signature = req.Headers["Stripe-Signature"].FirstOrDefault();
         _logger.LogInformation("Webhook invoked. Signature header present: {HasSig}", !string.IsNullOrEmpty(signature));
+
+        // Read raw body as string for Stripe signature verification
+        string payload;
+        using (var reader = new StreamReader(req.Body))
+        {
+            payload = await reader.ReadToEndAsync();
+        }
 
         var result = await _handler.HandleAsync(payload, signature);
         if (!result.Success)
