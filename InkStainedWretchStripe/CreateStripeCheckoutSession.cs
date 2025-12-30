@@ -6,6 +6,7 @@ using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorLib.Extensions;
 
 namespace InkStainedWretchStripe;
 
@@ -46,14 +47,18 @@ public class CreateStripeCheckoutSession
         catch (InvalidOperationException ex)
         {
             _logger.LogWarning(ex, "User profile validation failed for CreateStripeCheckoutSession");
-            return new UnauthorizedObjectResult(new { error = "User profile validation failed" });
+            return ErrorResponseExtensions.CreateErrorResult(
+                StatusCodes.Status401Unauthorized,
+                "User profile validation failed");
         }
 
         try
         {
             if (payload is null)
             {
-                return new BadRequestObjectResult(new { error = "Request body is required or invalid" });
+                return ErrorResponseExtensions.CreateErrorResult(
+                    StatusCodes.Status400BadRequest,
+                    "Request body is required or invalid");
             }
 
             var response = await _checkoutService.CreateAsync(payload);
@@ -61,11 +66,7 @@ public class CreateStripeCheckoutSession
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating Stripe checkout session");
-            return new ObjectResult(new { error = "An error occurred processing your request" })
-            {
-                StatusCode = StatusCodes.Status500InternalServerError
-            };
+            return ErrorResponseExtensions.HandleException(ex, _logger);
         }
     }
 }

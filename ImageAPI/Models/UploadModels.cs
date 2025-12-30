@@ -7,9 +7,4 @@ namespace ImageAPI.Models
         public string Name { get; set; } = string.Empty;
         public long Size { get; set; }
     }
-
-    public class ErrorResponse
-    {
-        public string Error { get; set; } = string.Empty;
-    }
 }

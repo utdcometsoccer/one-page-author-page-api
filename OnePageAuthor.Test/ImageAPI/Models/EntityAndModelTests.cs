@@ -1,5 +1,6 @@
 using InkStainedWretch.OnePageAuthorAPI.Entities.ImageAPI;
 using ImageAPI.Models;
+using InkStainedWretch.OnePageAuthorLib.Models;
 
 namespace OnePageAuthor.Test.ImageAPI.Models
 {

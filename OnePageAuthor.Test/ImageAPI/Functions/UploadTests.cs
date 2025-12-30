@@ -10,6 +10,7 @@ using InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
+using InkStainedWretch.OnePageAuthorLib.Models;
 
 namespace OnePageAuthor.Test.ImageAPI.Functions
 {
@@ -86,7 +87,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Act
             var result = await _uploadFunction.Run(request.Object);
 
-            // Assert
+            // Assert - JWT authentication helper returns UnauthorizedObjectResult
             Assert.IsType<UnauthorizedObjectResult>(result);
         }
 
@@ -120,7 +121,8 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var result = await _uploadFunction.Run(request.Object);
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            var unauthorizedResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(401, unauthorizedResult.StatusCode);
         }
 
         [Fact]
@@ -139,7 +141,8 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var result = await _uploadFunction.Run(request.Object);
 
             // Assert
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var badRequestResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(400, badRequestResult.StatusCode);
             var errorResponse = Assert.IsType<ErrorResponse>(badRequestResult.Value);
             Assert.Equal("No file provided in the request.", errorResponse.Error);
         }

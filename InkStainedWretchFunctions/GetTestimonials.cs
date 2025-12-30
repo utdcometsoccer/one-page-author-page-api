@@ -1,4 +1,5 @@
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
+using InkStainedWretchFunctions.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -31,7 +32,7 @@ public class GetTestimonials
     /// Handles HTTP GET requests for testimonials.
     /// </summary>
     /// <param name="req">The incoming HTTP request.</param>
-    /// <returns>200 with JSON payload of testimonials; 400 on error.</returns>
+    /// <returns>200 with JSON payload of testimonials; standardized error response on failure.</returns>
     [Function("GetTestimonials")]
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "testimonials")] HttpRequestData req)
@@ -76,10 +77,7 @@ public class GetTestimonials
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving testimonials");
-            var response = req.CreateResponse(HttpStatusCode.InternalServerError);
-            await response.WriteStringAsync($"Error: {ex.Message}");
-            return response;
+            return await req.HandleExceptionAsync(ex, _logger);
         }
     }
 }

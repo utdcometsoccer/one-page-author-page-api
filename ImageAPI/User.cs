@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
+using InkStainedWretch.OnePageAuthorLib.Extensions;
 using ImageAPI.Models;
 using System.Security.Claims;
 
@@ -176,7 +177,9 @@ public class User
         catch (InvalidOperationException ex)
         {
             _logger.LogWarning(ex, "User profile validation failed for User");
-            return new UnauthorizedObjectResult(new ErrorResponse { Error = "User profile validation failed" });
+            return ErrorResponseExtensions.CreateErrorResult(
+                StatusCodes.Status401Unauthorized,
+                "User profile validation failed");
         }
 
         try
@@ -186,7 +189,9 @@ public class User
             if (string.IsNullOrWhiteSpace(userProfileId))
             {
                 _logger.LogWarning("User profile ID not found in claims.");
-                return new UnauthorizedResult();
+                return ErrorResponseExtensions.CreateErrorResult(
+                    StatusCodes.Status401Unauthorized,
+                    "User profile ID not found in claims");
             }
 
             // Use the user image service
@@ -199,19 +204,14 @@ public class User
             }
             else
             {
-                return new ObjectResult(new ErrorResponse { Error = result.ErrorMessage ?? "Unknown error occurred." })
-                {
-                    StatusCode = result.StatusCode
-                };
+                return ErrorResponseExtensions.CreateErrorResult(
+                    result.StatusCode,
+                    result.ErrorMessage ?? "Unknown error occurred.");
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to retrieve user images.");
-            return new ObjectResult(new ErrorResponse { Error = "Internal server error occurred while retrieving images." })
-            {
-                StatusCode = StatusCodes.Status500InternalServerError
-            };
+            return ErrorResponseExtensions.HandleException(ex, _logger);
         }
     }
 }

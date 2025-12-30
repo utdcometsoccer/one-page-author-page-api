@@ -1,10 +1,12 @@
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
+using InkStainedWretchFunctions.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using System.Net;
 using System.Text.Json;
 
 namespace InkStainedWretchFunctions;
@@ -63,40 +65,22 @@ public class ReferralFunction
 
             if (request == null)
             {
-                _logger.LogWarning("Invalid request body");
-                var badResponse = req.CreateResponse(System.Net.HttpStatusCode.BadRequest);
-                await badResponse.WriteStringAsync("Invalid request body");
-                return badResponse;
+                return await req.CreateErrorResponseAsync(
+                    HttpStatusCode.BadRequest,
+                    "Invalid request body");
             }
 
             // Create the referral
             var result = await _referralService.CreateReferralAsync(request);
 
             // Return success response
-            var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
+            var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(result);
-            return response;
-        }
-        catch (ArgumentException ex)
-        {
-            _logger.LogWarning(ex, "Validation error in CreateReferral");
-            var response = req.CreateResponse(System.Net.HttpStatusCode.BadRequest);
-            await response.WriteStringAsync(ex.Message);
-            return response;
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogWarning(ex, "Business logic error in CreateReferral");
-            var response = req.CreateResponse(System.Net.HttpStatusCode.Conflict);
-            await response.WriteStringAsync(ex.Message);
             return response;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating referral");
-            var response = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);
-            await response.WriteStringAsync("An error occurred while creating the referral");
-            return response;
+            return await req.HandleExceptionAsync(ex, _logger);
         }
     }
 
@@ -128,23 +112,13 @@ public class ReferralFunction
             var stats = await _referralService.GetReferralStatsAsync(userId);
 
             // Return success response
-            var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
+            var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(stats);
-            return response;
-        }
-        catch (ArgumentException ex)
-        {
-            _logger.LogWarning(ex, "Validation error in GetReferralStats");
-            var response = req.CreateResponse(System.Net.HttpStatusCode.BadRequest);
-            await response.WriteStringAsync(ex.Message);
             return response;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting referral stats for userId: {UserId}", userId);
-            var response = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);
-            await response.WriteStringAsync("An error occurred while retrieving referral statistics");
-            return response;
+            return await req.HandleExceptionAsync(ex, _logger);
         }
     }
 }

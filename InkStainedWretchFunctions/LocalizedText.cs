@@ -1,4 +1,5 @@
 using InkStainedWretch.OnePageAuthorAPI.Interfaces.Authormanagement;
+using InkStainedWretchFunctions.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -32,7 +33,7 @@ public class LocalizedText
     /// </summary>
     /// <param name="req">The incoming HTTP request.</param>
     /// <param name="culture">Route parameter representing the culture (e.g. en-US).</param>
-    /// <returns>200 with JSON payload of localized text; 400 if culture is invalid or retrieval fails.</returns>
+    /// <returns>200 with JSON payload of localized text; standardized error response on failure.</returns>
     [Function("LocalizedText")]
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "localizedtext/{culture}")] HttpRequestData req,
@@ -48,10 +49,7 @@ public class LocalizedText
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, $"Error retrieving localization text for culture: {culture}");
-            var response = req.CreateResponse(System.Net.HttpStatusCode.BadRequest);
-            await response.WriteStringAsync($"Error: {ex.Message}");
-            return response;
+            return await req.HandleExceptionAsync(ex, _logger);
         }
     }
 }

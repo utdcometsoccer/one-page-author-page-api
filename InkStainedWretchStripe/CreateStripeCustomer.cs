@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
 using InkStainedWretch.OnePageAuthorLib.Entities.Stripe;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
+using InkStainedWretch.OnePageAuthorLib.Extensions;
 
 namespace InkStainedWretchStripe;
 
@@ -51,11 +52,15 @@ public class CreateStripeCustomer
 
         if (payload is null)
         {
-            return new BadRequestObjectResult(new { error = "Request body is required." });
+            return ErrorResponseExtensions.CreateErrorResult(
+                StatusCodes.Status400BadRequest,
+                "Request body is required.");
         }
         if (string.IsNullOrWhiteSpace(payload.Email))
         {
-            return new BadRequestObjectResult(new { error = "Email is required." });
+            return ErrorResponseExtensions.CreateErrorResult(
+                StatusCodes.Status400BadRequest,
+                "Email is required.");
         }
 
         try
@@ -66,8 +71,7 @@ public class CreateStripeCustomer
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to ensure Stripe customer for current user.");
-            return new ObjectResult(new { error = ex.Message }) { StatusCode = StatusCodes.Status500InternalServerError };
+            return ErrorResponseExtensions.HandleException(ex, _logger);
         }
     }
 }
