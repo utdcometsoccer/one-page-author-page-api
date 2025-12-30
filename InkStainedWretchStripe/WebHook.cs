@@ -26,9 +26,23 @@ public class WebHook
 
         // Read raw body as string for Stripe signature verification
         string payload;
-        using (var reader = new StreamReader(req.Body, System.Text.Encoding.UTF8))
+        try
         {
-            payload = await reader.ReadToEndAsync();
+            using (var reader = new StreamReader(req.Body, System.Text.Encoding.UTF8))
+            {
+                payload = await reader.ReadToEndAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to read request body");
+            return new BadRequestObjectResult(new { error = "Failed to read request body" });
+        }
+
+        if (string.IsNullOrWhiteSpace(payload))
+        {
+            _logger.LogWarning("Stripe webhook invoked with empty request body.");
+            return new BadRequestObjectResult(new { error = "Request body must not be empty." });
         }
 
         var result = await _handler.HandleAsync(payload, signature);
