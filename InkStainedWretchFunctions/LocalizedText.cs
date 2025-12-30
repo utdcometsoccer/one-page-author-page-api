@@ -1,5 +1,5 @@
 using InkStainedWretch.OnePageAuthorAPI.Interfaces.Authormanagement;
-using InkStainedWretch.OnePageAuthorLib.Extensions;
+using InkStainedWretchFunctions.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;

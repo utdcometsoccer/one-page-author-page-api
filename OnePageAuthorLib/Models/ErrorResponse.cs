@@ -36,5 +36,13 @@ public class ErrorResponse
     /// Timestamp when the error occurred (ISO 8601 format).
     /// </summary>
     [JsonPropertyName("timestamp")]
-    public string Timestamp { get; set; } = DateTime.UtcNow.ToString("o");
+    public string Timestamp { get; private set; }
+
+    /// <summary>
+    /// Initializes a new instance of the ErrorResponse class with the current UTC timestamp.
+    /// </summary>
+    public ErrorResponse()
+    {
+        Timestamp = DateTime.UtcNow.ToString("o");
+    }
 }

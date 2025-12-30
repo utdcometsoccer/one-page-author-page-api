@@ -6,6 +6,7 @@ using Moq;
 using System.Security.Claims;
 using ImageAPI;
 using ImageAPI.Models;
+using InkStainedWretch.OnePageAuthorLib.Models;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
 using InkStainedWretch.OnePageAuthorAPI.API;

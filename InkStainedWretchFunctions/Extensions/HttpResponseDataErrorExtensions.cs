@@ -3,7 +3,7 @@ using InkStainedWretch.OnePageAuthorLib.Models;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 
-namespace InkStainedWretch.OnePageAuthorLib.Extensions;
+namespace InkStainedWretchFunctions.Extensions;
 
 /// <summary>
 /// Extension methods for creating standardized error responses for HttpResponseData-based Azure Functions.

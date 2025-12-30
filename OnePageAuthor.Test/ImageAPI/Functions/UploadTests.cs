@@ -10,7 +10,7 @@ using InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
-using StandardizedErrorResponse = InkStainedWretch.OnePageAuthorLib.Models.ErrorResponse;
+using InkStainedWretch.OnePageAuthorLib.Models;
 
 namespace OnePageAuthor.Test.ImageAPI.Functions
 {
@@ -143,7 +143,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Assert
             var badRequestResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(400, badRequestResult.StatusCode);
-            var errorResponse = Assert.IsType<StandardizedErrorResponse>(badRequestResult.Value);
+            var errorResponse = Assert.IsType<ErrorResponse>(badRequestResult.Value);
             Assert.Equal("No file provided in the request.", errorResponse.Error);
         }
 
@@ -182,7 +182,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Assert
             var badRequestResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(400, badRequestResult.StatusCode);
-            var errorResponse = Assert.IsType<StandardizedErrorResponse>(badRequestResult.Value);
+            var errorResponse = Assert.IsType<ErrorResponse>(badRequestResult.Value);
             Assert.Equal("Invalid file type. Only image files are allowed.", errorResponse.Error);
         }
 
@@ -221,7 +221,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Assert
             var badRequestResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(400, badRequestResult.StatusCode);
-            var errorResponse = Assert.IsType<StandardizedErrorResponse>(badRequestResult.Value);
+            var errorResponse = Assert.IsType<ErrorResponse>(badRequestResult.Value);
             Assert.Equal("No storage tier assigned to user.", errorResponse.Error);
         }
 
@@ -280,7 +280,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Assert
             var badRequestResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(400, badRequestResult.StatusCode);
-            var errorResponse = Assert.IsType<StandardizedErrorResponse>(badRequestResult.Value);
+            var errorResponse = Assert.IsType<ErrorResponse>(badRequestResult.Value);
             Assert.Contains("File size exceeds limit for your subscription tier", errorResponse.Error);
         }
 
@@ -338,7 +338,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(507, objectResult.StatusCode);
-            var errorResponse = Assert.IsType<StandardizedErrorResponse>(objectResult.Value);
+            var errorResponse = Assert.IsType<ErrorResponse>(objectResult.Value);
             Assert.Equal("Storage quota exceeded for your subscription tier.", errorResponse.Error);
         }
 
@@ -396,7 +396,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(402, objectResult.StatusCode);
-            var errorResponse = Assert.IsType<StandardizedErrorResponse>(objectResult.Value);
+            var errorResponse = Assert.IsType<ErrorResponse>(objectResult.Value);
             Assert.Equal("Bandwidth limit exceeded for your subscription tier.", errorResponse.Error);
         }
 
@@ -454,7 +454,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(403, objectResult.StatusCode);
-            var errorResponse = Assert.IsType<StandardizedErrorResponse>(objectResult.Value);
+            var errorResponse = Assert.IsType<ErrorResponse>(objectResult.Value);
             Assert.Contains("Maximum number of files reached", errorResponse.Error);
         }
     }

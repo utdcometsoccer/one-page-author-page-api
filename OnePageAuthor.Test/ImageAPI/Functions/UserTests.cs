@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
 using ImageAPI.Models;
+using InkStainedWretch.OnePageAuthorLib.Models;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices;
 using InkStainedWretch.OnePageAuthorAPI.API.ImageServices.Models;
 using InkStainedWretch.OnePageAuthorAPI.API;
@@ -118,7 +119,8 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var result = await _userFunction.Run(request.Object);
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            var unauthorizedResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(401, unauthorizedResult.StatusCode);
         }
 
         [Fact]
@@ -229,7 +231,7 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             var objectResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(500, objectResult.StatusCode);
             var errorResponse = Assert.IsType<ErrorResponse>(objectResult.Value);
-            Assert.Equal("Internal server error occurred while retrieving images.", errorResponse.Error);
+            Assert.Equal("An unexpected error occurred", errorResponse.Error);
         }
     }
 }
