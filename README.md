@@ -3933,7 +3933,7 @@ All projects are configured to automatically generate XML documentation during D
 
 This documentation is automatically generated from source code XML comments and can be regenerated using:
 `
-.\Generate-ApiDocumentation.ps1
+.\Scripts\Generate-ApiDocumentation.ps1
 `
 
 #### Project Statistics
@@ -4126,7 +4126,7 @@ Comprehensive script that updates packages, builds the solution, and runs Azure 
 **Usage:**
 
 ```powershell
-.\UpdateAndRun.ps1 [-SkipUpdate] [-SkipBuild] [-Help]
+.\Scripts\UpdateAndRun.ps1 [-SkipUpdate] [-SkipBuild] [-Help]
 
 ```
 
@@ -4154,7 +4154,7 @@ Stops all running Azure Functions background jobs and cleans up completed jobs.
 **Usage:**
 
 ```powershell
-.\StopFunctions.ps1 [-Help]
+.\Scripts\StopFunctions.ps1 [-Help]
 
 ```
 
@@ -4195,13 +4195,13 @@ dotnet tool install --global dotnet-update
 
 ```powershell
 ## Full update and run (recommended daily)
-.\UpdateAndRun.ps1
+.\Scripts\UpdateAndRun.ps1
 
 ## Quick start (skip package updates)
-.\UpdateAndRun.ps1 -SkipUpdate
+.\Scripts\UpdateAndRun.ps1 -SkipUpdate
 
 ## Build and run only (skip updates and initial build)
-.\UpdateAndRun.ps1 -SkipUpdate -SkipBuild
+.\Scripts\UpdateAndRun.ps1 -SkipUpdate -SkipBuild
 
 ```
 
@@ -4229,7 +4229,7 @@ Invoke-RestMethod http://localhost:7002/api/health
 
 ```powershell
 ## Stop all functions cleanly
-.\StopFunctions.ps1
+.\Scripts\StopFunctions.ps1
 
 ## Or manually stop specific functions
 Stop-Job -Name "ImageAPI"

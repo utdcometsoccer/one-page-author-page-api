@@ -155,16 +155,16 @@ The script intelligently sets only relevant secrets for each project:
 **Usage Examples**:
 ```powershell
 # Set for all projects
-.\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
+.\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
 
 # Dry run (preview changes)
-.\Set-DotnetUserSecrets.ps1 -DryRun
+.\Scripts\Set-DotnetUserSecrets.ps1 -DryRun
 
 # Set for specific project only
-.\Set-DotnetUserSecrets.ps1 -ProjectFilter "ImageAPI"
+.\Scripts\Set-DotnetUserSecrets.ps1 -ProjectFilter "ImageAPI"
 
 # Force overwrite existing values
-.\Set-DotnetUserSecrets.ps1 -Force
+.\Scripts\Set-DotnetUserSecrets.ps1 -Force
 
 # Via NPM
 npm run set-user-secrets

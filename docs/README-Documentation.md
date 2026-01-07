@@ -11,7 +11,7 @@ Generate documentation for all 11 projects in the solution:
 **PowerShell (Complete System):**
 
 ```powershell
-.\Generate-Complete-Documentation.ps1
+.\Scripts\Generate-Complete-Documentation.ps1
 
 ```
 
@@ -29,7 +29,7 @@ Generate documentation for just Azure Function projects:
 **PowerShell (API Only):**
 
 ```powershell
-.\Generate-ApiDocumentation.ps1
+.\Scripts\Generate-ApiDocumentation.ps1
 
 ```
 

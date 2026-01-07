@@ -336,7 +336,7 @@ All projects are configured to automatically generate XML documentation during D
 
 This documentation is automatically generated from source code XML comments and can be regenerated using:
 `
-.\Generate-ApiDocumentation.ps1
+.\Scripts\Generate-ApiDocumentation.ps1
 `
 
 ### Project Statistics
