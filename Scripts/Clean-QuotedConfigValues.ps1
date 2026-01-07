@@ -33,7 +33,8 @@ function Remove-WrappingQuotes([string]$value) {
 Write-Host "🧹 Cleaning quoted config values in local.settings.json files..." -ForegroundColor Cyan
 
 # Get solution root (parent of Scripts directory)
-$SolutionRoot = Split-Path -Parent $PSScriptRoot
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$SolutionRoot = Split-Path -Parent $ScriptDir
 
 foreach ($relativePath in $Paths) {
     $path = Join-Path $SolutionRoot $relativePath
