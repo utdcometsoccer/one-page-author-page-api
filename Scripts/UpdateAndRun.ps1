@@ -1,4 +1,4 @@
-# PowerShell script to update, restore, build, and run Azure                    Write-Host "dotnet-update tool is available" -ForegroundColor Green   Write-Host "dotnet-update tool not found. Installing..." -ForegroundColor YellowFunctions projects
+# PowerShell script to update, restore, build, and run Azure Functions projects
 # This script updates all NuGet packages, restores dependencies, builds the solution,
 # and runs the Azure Functions projects
 
@@ -43,8 +43,9 @@ function Write-Success-Step {
     Write-Host "`n✅ SUCCESS: $Message" -ForegroundColor Green
 }
 
-# Get the script directory (solution root)
-$SolutionRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+# Get the script directory and navigate to solution root (parent of Scripts)
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$SolutionRoot = Split-Path -Parent $ScriptDir
 Set-Location $SolutionRoot
 
 Write-Host "🚀 Starting Solution Update and Run Process" -ForegroundColor Magenta

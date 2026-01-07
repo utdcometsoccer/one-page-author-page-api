@@ -144,7 +144,7 @@ Added **18 new environment variables** to support recent platform features. Tota
 
 ### Example 1: Interactive Mode (with quote guards)
 ```powershell
-.\Initialize-GitHubSecrets.ps1 -Interactive
+.\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 
 # User enters: "https://example.com"
 # Warning: Removed surrounding double quotes from KEY_VAULT_URL
@@ -161,7 +161,7 @@ Added **18 new environment variables** to support recent platform features. Tota
 ```
 
 ```powershell
-.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
 # ✓ Set AZURE_CREDENTIALS (value hidden)
 # ✓ Set REFERRAL_BASE_URL = https://inkstainedwretches.com
 # ✓ Set USE_KEY_VAULT = false

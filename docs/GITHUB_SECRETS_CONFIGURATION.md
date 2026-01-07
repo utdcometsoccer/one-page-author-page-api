@@ -40,7 +40,7 @@ The secrets configuration system supports three key workflows:
 
 4. **Set Local User Secrets** (for development)
    ```powershell
-   .\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
+   .\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
    ```
 
 ### Updating Existing Configuration
@@ -49,7 +49,7 @@ When new environment variables are added to the platform:
 
 ```powershell
 # Update your existing secrets file with new variables
-.\Update-SecretsConfig.ps1 -SecretsFile secrets.config.json
+.\Scripts\Update-SecretsConfig.ps1 -SecretsFile secrets.config.json
 
 # Review and fill in the new variables
 code secrets.config.json
@@ -58,7 +58,7 @@ code secrets.config.json
 npm run init-secrets -- -ConfigFile secrets.config.json
 
 # Update local user-secrets
-.\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
+.\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
 ```
 
 ## Available Scripts
@@ -70,10 +70,10 @@ npm run init-secrets -- -ConfigFile secrets.config.json
 **Usage**:
 ```powershell
 # Interactive mode (prompts for each secret)
-.\Initialize-GitHubSecrets.ps1 -Interactive
+.\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 
 # From configuration file
-.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.config.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.config.json
 
 # Via NPM scripts
 npm run init-secrets                    # Base command
@@ -100,16 +100,16 @@ npm run init-secrets:help               # Show help
 **Usage**:
 ```powershell
 # Update with default files
-.\Update-SecretsConfig.ps1
+.\Scripts\Update-SecretsConfig.ps1
 
 # Update specific file
-.\Update-SecretsConfig.ps1 -SecretsFile my-secrets.json
+.\Scripts\Update-SecretsConfig.ps1 -SecretsFile my-secrets.json
 
 # Dry run (show what would be added)
-.\Update-SecretsConfig.ps1 -DryRun
+.\Scripts\Update-SecretsConfig.ps1 -DryRun
 
 # Skip backup
-.\Update-SecretsConfig.ps1 -BackupOriginal:$false
+.\Scripts\Update-SecretsConfig.ps1 -BackupOriginal:$false
 ```
 
 **Features**:
@@ -131,16 +131,16 @@ npm run init-secrets:help               # Show help
 **Usage**:
 ```powershell
 # Set for all projects
-.\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
+.\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
 
 # Set for specific project
-.\Set-DotnetUserSecrets.ps1 -ProjectFilter "ImageAPI"
+.\Scripts\Set-DotnetUserSecrets.ps1 -ProjectFilter "ImageAPI"
 
 # Dry run (show what would be set)
-.\Set-DotnetUserSecrets.ps1 -DryRun
+.\Scripts\Set-DotnetUserSecrets.ps1 -DryRun
 
 # Force overwrite existing values
-.\Set-DotnetUserSecrets.ps1 -Force
+.\Scripts\Set-DotnetUserSecrets.ps1 -Force
 ```
 
 **Features**:
@@ -198,7 +198,7 @@ code secrets.config.json
 npm run init-secrets -- -ConfigFile secrets.config.json
 
 # 4. Configure Local Development (user-secrets)
-.\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
+.\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
 
 # 5. Verify local configuration
 dotnet user-secrets list --project ImageAPI
@@ -216,7 +216,7 @@ When you add a new feature that requires configuration:
 # Add new secret definitions to $secretDefinitions
 
 # 3. Update your secrets.config.json
-.\Update-SecretsConfig.ps1
+.\Scripts\Update-SecretsConfig.ps1
 
 # 4. Fill in values for new variables
 code secrets.config.json
@@ -225,7 +225,7 @@ code secrets.config.json
 npm run init-secrets -- -ConfigFile secrets.config.json
 
 # 6. Update local user-secrets
-.\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
+.\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
 ```
 
 ### Environment-Specific Configuration
@@ -235,7 +235,7 @@ npm run init-secrets -- -ConfigFile secrets.config.json
 # Use test credentials
 Copy-Item secrets-template.json secrets.dev.json
 # Edit with test/sandbox credentials
-.\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.dev.json
+.\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.dev.json
 ```
 
 **Production**:

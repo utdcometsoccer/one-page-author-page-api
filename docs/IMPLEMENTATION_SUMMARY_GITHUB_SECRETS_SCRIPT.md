@@ -163,7 +163,7 @@ This approach:
 ### Quick Start (Interactive)
 ```powershell
 # Direct PowerShell execution (recommended)
-.\Initialize-GitHubSecrets.ps1 -Interactive
+.\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 
 # Or via NPM wrapper (optional)
 npm run init:secrets:interactive
@@ -178,7 +178,7 @@ Copy-Item secrets-template.json secrets.json
 code secrets.json
 
 # 3. Run script directly with PowerShell (recommended)
-.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
 
 # Or via NPM wrapper (optional)
 npm run init:secrets -- -ConfigFile secrets.json
@@ -187,7 +187,7 @@ npm run init:secrets -- -ConfigFile secrets.json
 ### Development Setup (Minimal)
 ```powershell
 # Create minimal config with only required secrets
-.\Initialize-GitHubSecrets.ps1 -ConfigFile dev-secrets.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile dev-secrets.json
 ```
 
 ## Benefits

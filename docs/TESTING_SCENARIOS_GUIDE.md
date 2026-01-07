@@ -120,7 +120,7 @@
 
 ## 🔧 Quick Configuration Script
 
-Save this as `switch-scenario.ps1` to quickly switch between scenarios:
+Save this as `Scripts\switch-scenario.ps1` to quickly switch between scenarios:
 
 ```powershell
 param(
@@ -183,12 +183,12 @@ Write-Host "Configuration updated in $configPath" -ForegroundColor Cyan
 
 ```powershell
 # Switch to Scenario 1
-.\switch-scenario.ps1 -Scenario 1
+.\Scripts\switch-scenario.ps1 -Scenario 1
 
 # Switch to Scenario 2  
-.\switch-scenario.ps1 -Scenario individual
+.\Scripts\switch-scenario.ps1 -Scenario individual
 
 # Switch to Scenario 3
-.\switch-scenario.ps1 -Scenario production
+.\Scripts\switch-scenario.ps1 -Scenario production
 
 ```

@@ -1,6 +1,6 @@
 # Azure Functions Development Scripts
 
-This directory contains PowerShell scripts to streamline development workflow for the One Page Author API solution.
+The `/Scripts` directory contains PowerShell scripts to streamline development workflow for the One Page Author API solution.
 
 ## Scripts Overview
 
@@ -14,21 +14,21 @@ Automates the process of setting up GitHub repository secrets required for CI/CD
 
 ```powershell
 # Interactive mode - prompts for each secret (recommended)
-.\Initialize-GitHubSecrets.ps1 -Interactive
+.\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 
 # Using a configuration file
-.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
 
 # Using a text file (legacy format)
-.\Initialize-GitHubSecrets.ps1 -SecretsFile secrets.txt
+.\Scripts\Initialize-GitHubSecrets.ps1 -SecretsFile secrets.txt
 
 # Display help
-.\Initialize-GitHubSecrets.ps1 -Help
+.\Scripts\Initialize-GitHubSecrets.ps1 -Help
 
 # Optional: Via NPM script wrappers
-npm run init:secrets:interactive
-npm run init:secrets -- -ConfigFile secrets.json
-npm run init:secrets:help
+npm run init-secrets:interactive
+npm run init-secrets -- -ConfigFile secrets.json
+npm run init-secrets:help
 ```
 
 **What it does:**
@@ -82,7 +82,7 @@ Comprehensive script that updates packages, builds the solution, and runs Azure 
 **Usage:**
 
 ```powershell
-.\UpdateAndRun.ps1 [-SkipUpdate] [-SkipBuild] [-Help]
+.\Scripts\UpdateAndRun.ps1 [-SkipUpdate] [-SkipBuild] [-Help]
 
 ```
 
@@ -110,7 +110,7 @@ Stops all running Azure Functions background jobs and cleans up completed jobs.
 **Usage:**
 
 ```powershell
-.\StopFunctions.ps1 [-Help]
+.\Scripts\StopFunctions.ps1 [-Help]
 
 ```
 
@@ -160,9 +160,9 @@ Before deploying to Azure, configure GitHub repository secrets:
 
 ```powershell
 # Option 1: Interactive mode (recommended for first-time setup)
-.\Initialize-GitHubSecrets.ps1 -Interactive
+.\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 # or via NPM
-npm run init:secrets:interactive
+npm run init-secrets:interactive
 
 # Option 2: Using a configuration file
 # 1. Copy the template
@@ -173,9 +173,9 @@ code secrets.json  # VS Code
 notepad secrets.json  # Windows Notepad
 
 # 3. Run the script with the config file
-.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
 # or via NPM
-npm run init:secrets -- -ConfigFile secrets.json
+npm run init-secrets -- -ConfigFile secrets.json
 
 # Verify secrets were set
 gh secret list
@@ -193,13 +193,13 @@ gh secret list
 
 ```powershell
 # Full update and run (recommended daily)
-.\UpdateAndRun.ps1
+.\Scripts\UpdateAndRun.ps1
 
 # Quick start (skip package updates)
-.\UpdateAndRun.ps1 -SkipUpdate
+.\Scripts\UpdateAndRun.ps1 -SkipUpdate
 
 # Build and run only (skip updates and initial build)
-.\UpdateAndRun.ps1 -SkipUpdate -SkipBuild
+.\Scripts\UpdateAndRun.ps1 -SkipUpdate -SkipBuild
 
 ```
 
@@ -227,7 +227,7 @@ Invoke-RestMethod http://localhost:7002/api/health
 
 ```powershell
 # Stop all functions cleanly
-.\StopFunctions.ps1
+.\Scripts\StopFunctions.ps1
 
 # Or manually stop specific functions
 Stop-Job -Name "ImageAPI"

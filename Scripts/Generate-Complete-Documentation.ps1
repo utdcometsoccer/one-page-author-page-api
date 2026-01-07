@@ -33,22 +33,23 @@ $ErrorActionPreference = "Stop"
 
 Write-Host "🚀 Generating Comprehensive API Documentation..." -ForegroundColor Green
 
-# Get the script directory for absolute paths
+# Get the script directory and navigate to solution root (parent of Scripts)
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$SolutionRoot = Split-Path -Parent $ScriptDir
 
 # Define all projects in the solution
 $Projects = @(
-    @{ Name = "ImageAPI"; Path = Join-Path $ScriptDir "ImageAPI"; Type = "AzureFunction"; Description = "Image management API for uploading, retrieving, and deleting user images" },
-    @{ Name = "InkStainedWretchFunctions"; Path = Join-Path $ScriptDir "InkStainedWretchFunctions"; Type = "AzureFunction"; Description = "Core application functions for domain registration and external API integration" },
-    @{ Name = "InkStainedWretchStripe"; Path = Join-Path $ScriptDir "InkStainedWretchStripe"; Type = "AzureFunction"; Description = "Stripe payment processing functions for subscription management and billing" },
-    @{ Name = "function-app"; Path = Join-Path $ScriptDir "function-app"; Type = "AzureFunction"; Description = "Main application functions for author data and localization services" },
-    @{ Name = "OnePageAuthorLib"; Path = Join-Path $ScriptDir "OnePageAuthorLib"; Type = "Library"; Description = "Core library containing business logic, entities, and data services" },
-    @{ Name = "OnePageAuthor.Test"; Path = Join-Path $ScriptDir "OnePageAuthor.Test"; Type = "TestProject"; Description = "Unit and integration tests for the OnePageAuthor application" },
-    @{ Name = "SeedAPIData"; Path = Join-Path $ScriptDir "SeedAPIData"; Type = "Utility"; Description = "Data seeding utility for populating API with initial data" },
-    @{ Name = "SeedLocales"; Path = Join-Path $ScriptDir "SeedLocales"; Type = "Utility"; Description = "Localization data seeding utility for multi-language support" },
-    @{ Name = "SeedImageStorageTiers"; Path = Join-Path $ScriptDir "SeedImageStorageTiers"; Type = "Utility"; Description = "Utility for seeding image storage tier configurations" },
-    @{ Name = "SeedInkStainedWretchesLocale"; Path = Join-Path $ScriptDir "SeedInkStainedWretchesLocale"; Type = "Utility"; Description = "Localization seeding utility for Ink Stained Wretches specific content" },
-    @{ Name = "IntegrationTestAuthorDataService"; Path = Join-Path $ScriptDir "IntegrationTestAuthorDataService"; Type = "TestUtility"; Description = "Integration testing utility for author data service validation" }
+    @{ Name = "ImageAPI"; Path = Join-Path $SolutionRoot "ImageAPI"; Type = "AzureFunction"; Description = "Image management API for uploading, retrieving, and deleting user images" },
+    @{ Name = "InkStainedWretchFunctions"; Path = Join-Path $SolutionRoot "InkStainedWretchFunctions"; Type = "AzureFunction"; Description = "Core application functions for domain registration and external API integration" },
+    @{ Name = "InkStainedWretchStripe"; Path = Join-Path $SolutionRoot "InkStainedWretchStripe"; Type = "AzureFunction"; Description = "Stripe payment processing functions for subscription management and billing" },
+    @{ Name = "function-app"; Path = Join-Path $SolutionRoot "function-app"; Type = "AzureFunction"; Description = "Main application functions for author data and localization services" },
+    @{ Name = "OnePageAuthorLib"; Path = Join-Path $SolutionRoot "OnePageAuthorLib"; Type = "Library"; Description = "Core library containing business logic, entities, and data services" },
+    @{ Name = "OnePageAuthor.Test"; Path = Join-Path $SolutionRoot "OnePageAuthor.Test"; Type = "TestProject"; Description = "Unit and integration tests for the OnePageAuthor application" },
+    @{ Name = "SeedAPIData"; Path = Join-Path $SolutionRoot "SeedAPIData"; Type = "Utility"; Description = "Data seeding utility for populating API with initial data" },
+    @{ Name = "SeedLocales"; Path = Join-Path $SolutionRoot "SeedLocales"; Type = "Utility"; Description = "Localization data seeding utility for multi-language support" },
+    @{ Name = "SeedImageStorageTiers"; Path = Join-Path $SolutionRoot "SeedImageStorageTiers"; Type = "Utility"; Description = "Utility for seeding image storage tier configurations" },
+    @{ Name = "SeedInkStainedWretchesLocale"; Path = Join-Path $SolutionRoot "SeedInkStainedWretchesLocale"; Type = "Utility"; Description = "Localization seeding utility for Ink Stained Wretches specific content" },
+    @{ Name = "IntegrationTestAuthorDataService"; Path = Join-Path $SolutionRoot "IntegrationTestAuthorDataService"; Type = "TestUtility"; Description = "Integration testing utility for author data service validation" }
 )
 
 # Function to ensure XML documentation is enabled for a project

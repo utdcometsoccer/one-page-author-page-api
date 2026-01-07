@@ -21,7 +21,7 @@ echo [1/3] Building projects to generate XML documentation...
 echo.
 
 echo Building ImageAPI...
-cd /d "%~dp0ImageAPI"
+cd /d "%~dp0..\ImageAPI"
 dotnet build --configuration Debug --verbosity minimal
 if %errorlevel% neq 0 (
     echo ERROR: Failed to build ImageAPI
@@ -30,7 +30,7 @@ if %errorlevel% neq 0 (
 )
 
 echo Building InkStainedWretchFunctions...
-cd /d "%~dp0InkStainedWretchFunctions"  
+cd /d "%~dp0..\InkStainedWretchFunctions"  
 dotnet build --configuration Debug --verbosity minimal
 if %errorlevel% neq 0 (
     echo ERROR: Failed to build InkStainedWretchFunctions
@@ -45,7 +45,7 @@ echo [2/3] Generating API documentation...
 echo.
 
 REM Run the PowerShell documentation generator
-pwsh.exe -ExecutionPolicy Bypass -File "%~dp0Generate-ApiDocumentation.ps1" -OutputPath "%~dp0API-Documentation.md"
+pwsh.exe -ExecutionPolicy Bypass -File "%~dp0Generate-ApiDocumentation.ps1" -OutputPath "%~dp0..\API-Documentation.md"
 if %errorlevel% neq 0 (
     echo ERROR: Failed to generate API documentation
     pause
@@ -55,13 +55,13 @@ if %errorlevel% neq 0 (
 echo.
 echo [3/3] Documentation generation complete!
 echo.
-echo Output file: %~dp0API-Documentation.md
+echo Output file: %~dp0..\API-Documentation.md
 echo.
 
 REM Ask if user wants to open the documentation
 set /p "openfile=Would you like to open the documentation file? (Y/N): "
 if /i "!openfile!"=="Y" (
-    start "" "%~dp0API-Documentation.md"
+    start "" "%~dp0..\API-Documentation.md"
 )
 
 echo.

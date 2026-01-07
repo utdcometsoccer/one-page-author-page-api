@@ -24,7 +24,7 @@ gh auth login
 Setting up only the required secrets for basic deployment:
 
 ```powershell
-.\Initialize-GitHubSecrets.ps1 -Interactive
+.\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 ```
 
 **Sample interaction:**
@@ -103,7 +103,7 @@ notepad secrets.json  # or code secrets.json for VS Code
 **Step 3: Run the script:**
 
 ```powershell
-.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
 ```
 
 **Output:**
@@ -154,7 +154,7 @@ Continue? (y/n): y
 ```
 
 ```powershell
-.\Initialize-GitHubSecrets.ps1 -ConfigFile development-secrets.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile development-secrets.json
 ```
 
 ## Example 4: Using NPM Scripts
@@ -184,7 +184,7 @@ STRIPE_API_KEY=sk_live_your_key
 ```
 
 ```powershell
-.\Initialize-GitHubSecrets.ps1 -SecretsFile secrets.txt
+.\Scripts\Initialize-GitHubSecrets.ps1 -SecretsFile secrets.txt
 ```
 
 ## Example 6: Updating Existing Secrets
@@ -193,7 +193,7 @@ To update secrets (e.g., after key rotation):
 
 ```powershell
 # Method 1: Interactive - answer only the secrets you want to update
-.\Initialize-GitHubSecrets.ps1 -Interactive
+.\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 
 # Method 2: Config file with only updated values
 # update-secrets.json:
@@ -202,7 +202,7 @@ To update secrets (e.g., after key rotation):
   "COSMOSDB_PRIMARY_KEY": "new-rotated-key=="
 }
 
-.\Initialize-GitHubSecrets.ps1 -ConfigFile update-secrets.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile update-secrets.json
 ```
 
 ## Example 7: Minimal Required Secrets Only
