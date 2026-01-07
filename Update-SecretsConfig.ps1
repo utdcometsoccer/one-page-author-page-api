@@ -103,6 +103,14 @@ function Write-Section {
     Write-Host ""
 }
 
+# Helper function to check if a value is a comment section
+function Test-CommentSection {
+    param($Value)
+    
+    return ($Value -is [PSCustomObject] -and 
+            ($Value.PSObject.Properties | Where-Object { $_.Name -eq "_description" }))
+}
+
 # Main script
 Write-Section "Update Secrets Configuration"
 
@@ -157,7 +165,7 @@ try {
         $value = $template.$prop
         
         # Skip comment sections
-        if ($value -is [PSCustomObject] -and ($value.PSObject.Properties | Where-Object { $_.Name -eq "_description" })) {
+        if (Test-CommentSection -Value $value) {
             Write-Info "  Skipping section: $prop"
             continue
         }

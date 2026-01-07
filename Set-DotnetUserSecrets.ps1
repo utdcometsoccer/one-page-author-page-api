@@ -220,8 +220,8 @@ function Set-UserSecret {
     }
     
     try {
-        # Escape the value for command line
-        $escapedValue = $Value -replace '"', '\"'
+        # Note: dotnet user-secrets set handles value escaping automatically
+        # We pass the value as-is and let the command handle special characters
         $output = dotnet user-secrets set $Key $Value --project $ProjectPath 2>&1
         
         if ($LASTEXITCODE -eq 0) {
