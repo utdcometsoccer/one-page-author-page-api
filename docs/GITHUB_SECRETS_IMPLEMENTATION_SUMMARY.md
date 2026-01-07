@@ -52,7 +52,7 @@ Audited all Azure Function projects and identified environment variables used:
 
 **Missing Variables Identified and Added**:
 
-1. **Penguin Random House API** (5 new variables):
+1. **Penguin Random House API** (4 new variables):
    - `PENGUIN_RANDOM_HOUSE_API_URL` - Base API URL
    - `PENGUIN_RANDOM_HOUSE_SEARCH_API` - Search endpoint template
    - `PENGUIN_RANDOM_HOUSE_LIST_TITLES_BY_AUTHOR_API` - Author titles endpoint
@@ -65,7 +65,7 @@ Audited all Azure Function projects and identified environment variables used:
    - `AAD_AUTHORITY` - Authority URL for JWT validation
 
 **Files Updated**:
-- `secrets-template.json` - Added 7 new variables
+- `secrets-template.json` - Added 6 new variables
 - `Initialize-GitHubSecrets.ps1` - Added secret definitions for all new variables
 
 ### 3. New Script: Update-SecretsConfig.ps1

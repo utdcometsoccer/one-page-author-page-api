@@ -214,8 +214,7 @@ function Set-UserSecret {
     )
     
     if ($DryRun) {
-        $displayValue = if ($Value.Length -gt 30) { "$($Value.Substring(0, 30))..." } else { $Value }
-        Write-Info "    [DRY RUN] Would set: $Key = $displayValue"
+        Write-Info "    [DRY RUN] Would set: $Key = [REDACTED]"
         return $true
     }
     
