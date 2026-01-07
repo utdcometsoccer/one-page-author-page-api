@@ -36,7 +36,7 @@ This mode prompts you for each secret value with helpful descriptions and exampl
 .\Initialize-GitHubSecrets.ps1 -Interactive
 
 # Or using NPM wrapper (optional)
-npm run init:secrets:interactive
+npm run init-secrets:interactive
 ```
 
 **What to expect:**
@@ -73,7 +73,7 @@ vim secrets.json      # Linux/macOS
 .\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
 
 # Or using NPM wrapper (optional)
-npm run init:secrets -- -ConfigFile secrets.json
+npm run init-secrets -- -ConfigFile secrets.json
 ```
 
 **Security Note:** The `secrets.json` file is automatically excluded from git via `.gitignore`. Never commit this file!
@@ -296,7 +296,7 @@ For interactive mode, special characters are handled automatically.
 .\Initialize-GitHubSecrets.ps1 -Help
 
 # Via NPM
-npm run init:secrets:help
+npm run init-secrets:help
 ```
 
 For issues or questions, please open an issue on the repository.
