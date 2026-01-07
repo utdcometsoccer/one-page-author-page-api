@@ -48,7 +48,7 @@ echo.
 REM Ask if user wants to open the documentation
 set /p "openfile=Would you like to open the complete documentation file? (Y/N): "
 if /i "!openfile!"=="Y" (
-    start "" "%~dp0Complete-System-Documentation.md"
+    start "" "%~dp0..\Complete-System-Documentation.md"
 )
 
 echo.
