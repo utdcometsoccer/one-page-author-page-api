@@ -420,5 +420,61 @@ namespace OnePageAuthor.Test.DomainRegistration
             Assert.Null(result);
             _containerMock.Verify(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()), Times.Never);
         }
+
+        [Fact]
+        public async Task GetByUserAsync_HandlesNullResource_ReturnsEmpty()
+        {
+            // Arrange
+            var upn = "test@example.com";
+
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var mockResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            // Setup null Resource to test null handling
+            mockResponse.Setup(r => r.Resource).Returns((IReadOnlyList<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>?)null!);
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(mockResponse.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetByUserAsync(upn);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetByDomainAsync_HandlesNullResource_ReturnsNull()
+        {
+            // Arrange
+            var topLevelDomain = "com";
+            var secondLevelDomain = "example";
+
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var mockResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            // Setup null Resource to test null handling
+            mockResponse.Setup(r => r.Resource).Returns((IReadOnlyList<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>?)null!);
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(mockResponse.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
+
+            // Assert
+            Assert.Null(result);
+        }
     }
 }

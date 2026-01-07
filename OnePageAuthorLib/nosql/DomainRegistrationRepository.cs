@@ -67,7 +67,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             while (iterator.HasMoreResults)
             {
                 var page = await iterator.ReadNextAsync();
-                results.AddRange(page.Resource);
+                if (page?.Resource != null)
+                {
+                    results.AddRange(page.Resource);
+                }
             }
             
             return results;
@@ -120,7 +123,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 if (iterator.HasMoreResults)
                 {
                     var page = await iterator.ReadNextAsync();
-                    return page.Resource.FirstOrDefault();
+                    return page?.Resource?.FirstOrDefault();
                 }
                 
                 return null;
