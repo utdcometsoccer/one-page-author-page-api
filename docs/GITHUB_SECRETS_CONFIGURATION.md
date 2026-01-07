@@ -70,10 +70,10 @@ npm run init-secrets -- -ConfigFile secrets.config.json
 **Usage**:
 ```powershell
 # Interactive mode (prompts for each secret)
-.\Initialize-GitHubSecrets.ps1 -Interactive
+.\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 
 # From configuration file
-.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.config.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.config.json
 
 # Via NPM scripts
 npm run init-secrets                    # Base command

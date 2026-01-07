@@ -4,7 +4,10 @@ param(
     [string]$Scenario
 )
 
-$configPath = "InkStainedWretchFunctions\local.settings.json"
+# Get solution root (parent of Scripts directory)
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$SolutionRoot = Split-Path -Parent $ScriptDir
+$configPath = Join-Path $SolutionRoot "InkStainedWretchFunctions\local.settings.json"
 
 if (!(Test-Path $configPath)) {
     Write-Error "❌ local.settings.json not found at $configPath"

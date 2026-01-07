@@ -90,10 +90,10 @@ Before deploying to Azure via GitHub Actions, configure repository secrets using
 gh auth login
 
 # Run the PowerShell script directly
-.\Initialize-GitHubSecrets.ps1 -Interactive
+.\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 
 # Or use a configuration file
-.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
 
 # Optional: Use NPM wrappers if preferred
 npm run init-secrets:interactive
@@ -104,10 +104,10 @@ npm run init-secrets -- -ConfigFile secrets.json
 
 ```powershell
 # Update existing secrets file with new variables from template
-.\Update-SecretsConfig.ps1
+.\Scripts\Update-SecretsConfig.ps1
 
 # Set dotnet user-secrets for local development
-.\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
+.\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
 ```
 
 📖 **See [docs/GITHUB_SECRETS_CONFIGURATION.md](docs/GITHUB_SECRETS_CONFIGURATION.md) for comprehensive documentation**

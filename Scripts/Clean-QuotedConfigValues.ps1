@@ -33,7 +33,7 @@ function Remove-WrappingQuotes([string]$value) {
 Write-Host "🧹 Cleaning quoted config values in local.settings.json files..." -ForegroundColor Cyan
 
 foreach ($relativePath in $Paths) {
-    $path = Join-Path $PSScriptRoot $relativePath
+    $path = Join-Path (Split-Path -Parent $PSScriptRoot) $relativePath
     if (-not (Test-Path $path)) { 
         Write-Host "Skipping missing file: $relativePath" -ForegroundColor DarkGray
         continue 

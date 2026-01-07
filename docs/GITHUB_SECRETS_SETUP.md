@@ -33,7 +33,7 @@ This mode prompts you for each secret value with helpful descriptions and exampl
 
 ```powershell
 # Direct PowerShell execution (recommended)
-.\Initialize-GitHubSecrets.ps1 -Interactive
+.\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 
 # Or using NPM wrapper (optional)
 npm run init-secrets:interactive
@@ -70,7 +70,7 @@ vim secrets.json      # Linux/macOS
 **Step 3: Run the script**
 ```powershell
 # Direct PowerShell execution (recommended)
-.\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
+.\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
 
 # Or using NPM wrapper (optional)
 npm run init-secrets -- -ConfigFile secrets.json
@@ -83,7 +83,7 @@ npm run init-secrets -- -ConfigFile secrets.json
 For simple key=value format files:
 
 ```powershell
-.\Initialize-GitHubSecrets.ps1 -SecretsFile my-secrets.txt
+.\Scripts\Initialize-GitHubSecrets.ps1 -SecretsFile my-secrets.txt
 ```
 
 Format of `my-secrets.txt`:
@@ -293,7 +293,7 @@ For interactive mode, special characters are handled automatically.
 
 ```powershell
 # Display detailed help
-.\Initialize-GitHubSecrets.ps1 -Help
+.\Scripts\Initialize-GitHubSecrets.ps1 -Help
 
 # Via NPM
 npm run init-secrets:help
