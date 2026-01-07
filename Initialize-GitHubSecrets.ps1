@@ -237,6 +237,13 @@ $secretDefinitions = @{
             Category = "Authentication"
         },
         @{
+            Name = "AAD_AUTHORITY"
+            Description = "Azure AD authority URL for JWT validation"
+            Required = $false
+            Example = "https://login.microsoftonline.com/{tenant-id}/v2.0"
+            Category = "Authentication"
+        },
+        @{
             Name = "OPEN_ID_CONNECT_METADATA_URL"
             Description = "OpenID Connect metadata URL for JWT validation"
             Required = $false
@@ -367,10 +374,24 @@ $secretDefinitions = @{
             Required = $false
             Example = "www.amazon.com"
             Category = "ExternalAPI"
+        },
+        @{
+            Name = "AMAZON_PRODUCT_API_ENDPOINT"
+            Description = "Amazon Product API endpoint URL"
+            Required = $false
+            Example = "https://webservices.amazon.com/paapi5/..."
+            Category = "ExternalAPI"
         }
     )
     
     "Penguin Random House API (Optional)" = @(
+        @{
+            Name = "PENGUIN_RANDOM_HOUSE_API_URL"
+            Description = "PRH API base URL"
+            Required = $false
+            Example = "https://api.penguinrandomhouse.com"
+            Category = "ExternalAPI"
+        },
         @{
             Name = "PENGUIN_RANDOM_HOUSE_API_KEY"
             Description = "PRH API authentication key"
@@ -384,6 +405,27 @@ $secretDefinitions = @{
             Description = "PRH API domain"
             Required = $false
             Example = "PRH.US"
+            Category = "ExternalAPI"
+        },
+        @{
+            Name = "PENGUIN_RANDOM_HOUSE_SEARCH_API"
+            Description = "PRH search API endpoint template"
+            Required = $false
+            Example = "/resources/titles/domains/{domain}/search"
+            Category = "ExternalAPI"
+        },
+        @{
+            Name = "PENGUIN_RANDOM_HOUSE_LIST_TITLES_BY_AUTHOR_API"
+            Description = "PRH list titles by author API endpoint template"
+            Required = $false
+            Example = "/resources/authors/{authorId}/titles"
+            Category = "ExternalAPI"
+        },
+        @{
+            Name = "PENGUIN_RANDOM_HOUSE_URL"
+            Description = "PRH website base URL"
+            Required = $false
+            Example = "https://www.penguinrandomhouse.com"
             Category = "ExternalAPI"
         }
     )

@@ -4,9 +4,13 @@
   "description": "Optional NPM wrappers for PowerShell development scripts. Scripts can be run directly with PowerShell without npm.",
   "private": true,
   "scripts": {
-    "init:secrets": "pwsh -File ./Initialize-GitHubSecrets.ps1",
-    "init:secrets:interactive": "pwsh -File ./Initialize-GitHubSecrets.ps1 -Interactive",
-    "init:secrets:help": "pwsh -File ./Initialize-GitHubSecrets.ps1 -Help"
+    "init-secrets": "pwsh -File ./Initialize-GitHubSecrets.ps1",
+    "init-secrets:interactive": "pwsh -File ./Initialize-GitHubSecrets.ps1 -Interactive",
+    "init-secrets:help": "pwsh -File ./Initialize-GitHubSecrets.ps1 -Help",
+    "update-secrets": "pwsh -File ./Update-SecretsConfig.ps1",
+    "update-secrets:dry-run": "pwsh -File ./Update-SecretsConfig.ps1 -DryRun",
+    "set-user-secrets": "pwsh -File ./Set-DotnetUserSecrets.ps1",
+    "set-user-secrets:dry-run": "pwsh -File ./Set-DotnetUserSecrets.ps1 -DryRun"
   },
   "keywords": [
     "azure-functions",

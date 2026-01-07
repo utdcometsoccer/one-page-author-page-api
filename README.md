@@ -96,10 +96,21 @@ gh auth login
 .\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
 
 # Optional: Use NPM wrappers if preferred
-npm run init:secrets:interactive
+npm run init-secrets:interactive
+npm run init-secrets -- -ConfigFile secrets.json
 ```
 
-📖 **See [GITHUB_SECRETS_SETUP.md](GITHUB_SECRETS_SETUP.md) for detailed instructions**
+**New in 2026**: Additional secrets management scripts:
+
+```powershell
+# Update existing secrets file with new variables from template
+.\Update-SecretsConfig.ps1
+
+# Set dotnet user-secrets for local development
+.\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
+```
+
+📖 **See [docs/GITHUB_SECRETS_CONFIGURATION.md](docs/GITHUB_SECRETS_CONFIGURATION.md) for comprehensive documentation**
 
 **Note:** The script uses **GitHub CLI (`gh secret set`)** to configure secrets. NPM is optional.
 

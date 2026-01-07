@@ -182,6 +182,18 @@ az cosmosdb keys list \
 3. Copy "Secret key"
 4. **Important**: Use test keys for development, live keys for production
 
+### AAD_AUTHORITY
+
+**Format**: URL string
+**Required**: No (optional)
+**Example**: `https://login.microsoftonline.com/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/v2.0`
+**Description**: Azure AD authority URL for JWT validation. If not provided, it will be constructed from AAD_TENANT_ID.
+
+**How to construct**:
+```
+https://login.microsoftonline.com/{AAD_TENANT_ID}/v2.0
+```
+
 ### AAD_TENANT_ID
 
 **Format**: GUID
@@ -414,8 +426,13 @@ The deployment workflow (`.github/workflows/main_onepageauthorapi.yml`) reads Gi
 | `AMAZON_PRODUCT_PARTNER_TAG` | `AMAZON_PRODUCT_PARTNER_TAG` | Amazon Associates tracking ID |
 | `AMAZON_PRODUCT_REGION` | `AMAZON_PRODUCT_REGION` | AWS region (default: "us-east-1") |
 | `AMAZON_PRODUCT_MARKETPLACE` | `AMAZON_PRODUCT_MARKETPLACE` | Target marketplace (default: "www.amazon.com") |
+| `AMAZON_PRODUCT_API_ENDPOINT` | `AMAZON_PRODUCT_API_ENDPOINT` | Amazon Product API endpoint URL |
+| `PENGUIN_RANDOM_HOUSE_API_URL` | `PENGUIN_RANDOM_HOUSE_API_URL` | PRH API base URL |
 | `PENGUIN_RANDOM_HOUSE_API_KEY` | `PENGUIN_RANDOM_HOUSE_API_KEY` | PRH API authentication key |
 | `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | `PENGUIN_RANDOM_HOUSE_API_DOMAIN` | PRH API domain (default: "PRH.US") |
+| `PENGUIN_RANDOM_HOUSE_SEARCH_API` | `PENGUIN_RANDOM_HOUSE_SEARCH_API` | PRH search API endpoint template |
+| `PENGUIN_RANDOM_HOUSE_LIST_TITLES_BY_AUTHOR_API` | `PENGUIN_RANDOM_HOUSE_LIST_TITLES_BY_AUTHOR_API` | PRH list titles endpoint template |
+| `PENGUIN_RANDOM_HOUSE_URL` | `PENGUIN_RANDOM_HOUSE_URL` | PRH website base URL |
 
 ### ImageAPI Environment Variables
 
