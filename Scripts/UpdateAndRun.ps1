@@ -1,4 +1,4 @@
-# PowerShell script to update, restore, build, and run Azure                    Write-Host "dotnet-update tool is available" -ForegroundColor Green   Write-Host "dotnet-update tool not found. Installing..." -ForegroundColor YellowFunctions projects
+# PowerShell script to update, restore, build, and run Azure Functions projects
 # This script updates all NuGet packages, restores dependencies, builds the solution,
 # and runs the Azure Functions projects
 

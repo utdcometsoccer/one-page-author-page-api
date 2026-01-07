@@ -49,7 +49,7 @@ $Projects = @(
     @{ Name = "SeedLocales"; Path = Join-Path $SolutionRoot "SeedLocales"; Type = "Utility"; Description = "Localization data seeding utility for multi-language support" },
     @{ Name = "SeedImageStorageTiers"; Path = Join-Path $SolutionRoot "SeedImageStorageTiers"; Type = "Utility"; Description = "Utility for seeding image storage tier configurations" },
     @{ Name = "SeedInkStainedWretchesLocale"; Path = Join-Path $SolutionRoot "SeedInkStainedWretchesLocale"; Type = "Utility"; Description = "Localization seeding utility for Ink Stained Wretches specific content" },
-    @{ Name = "IntegrationTestAuthorDataService"; Path = Join-Path $ScriptDir "IntegrationTestAuthorDataService"; Type = "TestUtility"; Description = "Integration testing utility for author data service validation" }
+    @{ Name = "IntegrationTestAuthorDataService"; Path = Join-Path $SolutionRoot "IntegrationTestAuthorDataService"; Type = "TestUtility"; Description = "Integration testing utility for author data service validation" }
 )
 
 # Function to ensure XML documentation is enabled for a project
