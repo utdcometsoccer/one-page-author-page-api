@@ -22,8 +22,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.9" />
   </ItemGroup>
 
   <ItemGroup>

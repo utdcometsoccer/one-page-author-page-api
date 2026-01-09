@@ -277,3 +277,4 @@ infra/*.json
 secrets.json
 secrets-*.json
 !secrets-template.json
+secrets.config.json
