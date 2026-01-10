@@ -18,16 +18,7 @@ var tenantId = config["AAD_TENANT_ID"];
 var audience = config["AAD_AUDIENCE"] ?? config["AAD_CLIENT_ID"];
 var authority = config["AAD_AUTHORITY"] ?? (string.IsNullOrWhiteSpace(tenantId) ? null : $"https://login.microsoftonline.com/{tenantId}/v2.0");
 var validIssuersRaw = config["AAD_VALID_ISSUERS"];
-string[]? validIssuers = null;
-if (!string.IsNullOrWhiteSpace(validIssuersRaw))
-{
-    validIssuers = validIssuersRaw
-        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-        .Select(i => i.TrimEnd('/'))
-        .Where(i => !string.IsNullOrWhiteSpace(i))
-        .Distinct(StringComparer.OrdinalIgnoreCase)
-        .ToArray();
-}
+string[]? validIssuers = InkStainedWretch.OnePageAuthorAPI.Utility.ParseValidIssuers(validIssuersRaw);
 
 // Log Azure AD configuration (masked for security)
 Console.WriteLine($"Azure AD Tenant ID configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(tenantId)}");

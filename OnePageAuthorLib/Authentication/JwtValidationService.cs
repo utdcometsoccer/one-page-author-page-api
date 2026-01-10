@@ -117,16 +117,7 @@ public class JwtValidationService : IJwtValidationService
 
         // Allow multiple issuers via comma-delimited env var AAD_VALID_ISSUERS
         var validIssuersRaw = _configuration["AAD_VALID_ISSUERS"];
-        string[]? validIssuers = null;
-        if (!string.IsNullOrWhiteSpace(validIssuersRaw))
-        {
-            validIssuers = validIssuersRaw
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(i => i.TrimEnd('/'))
-                .Where(i => !string.IsNullOrWhiteSpace(i))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToArray();
-        }
+        string[]? validIssuers = Utility.ParseValidIssuers(validIssuersRaw);
 
         var validationParameters = new TokenValidationParameters
         {

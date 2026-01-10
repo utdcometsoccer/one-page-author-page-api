@@ -32,16 +32,7 @@ Console.WriteLine($"Azure AD Authority configured: {InkStainedWretch.OnePageAuth
 
 // Optional: allow multiple issuers via AAD_VALID_ISSUERS (comma-delimited)
 var validIssuersRaw = config["AAD_VALID_ISSUERS"];
-string[]? validIssuers = null;
-if (!string.IsNullOrWhiteSpace(validIssuersRaw))
-{
-    validIssuers = validIssuersRaw
-        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-        .Select(i => i.TrimEnd('/'))
-        .Where(i => !string.IsNullOrWhiteSpace(i))
-        .Distinct(StringComparer.OrdinalIgnoreCase)
-        .ToArray();
-}
+string[]? validIssuers = InkStainedWretch.OnePageAuthorAPI.Utility.ParseValidIssuers(validIssuersRaw);
 Console.WriteLine($"Azure AD Valid Issuers configured: {(validIssuers is null ? "(not set)" : string.Join(", ", validIssuers.Select(i => InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(i))))}");
 
 // Configure JwtBearer to accept multiple issuers/audience
