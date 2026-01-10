@@ -37,7 +37,7 @@ public class UpdateTestimonial
     [Function("UpdateTestimonial")]
     [Authorize]
     public async Task<HttpResponseData> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "admin/testimonials/{id}")] HttpRequestData req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "testimonials/{id}")] HttpRequestData req,
         string id)
     {
         var user = req.FunctionContext.Features.Get<IHttpContextAccessor>()?.HttpContext?.User;

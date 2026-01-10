@@ -55,6 +55,7 @@ var services = builder.Services
     .AddCosmosClient(endpointUri, primaryKey)
     .AddCosmosDatabase(databaseId)
     .AddUserProfileRepository()
+    .AddAuthorRepositories() // Register author repositories (IAuthorRepository, IGenericRepository<Book>, etc.)
     .AddAuthorDataService() // Add Author data service for GetAuthors function
     .AddInkStainedWretchServices()
     .AddPenguinRandomHouseServices()
@@ -84,6 +85,7 @@ var services = builder.Services
     .AddExperimentServices() // Add Experiment services for A/B testing
     .AddTestimonialRepository() // Add Testimonial repository for testimonials management
     .AddApplicationInsightsTelemetryWorkerService()
+    .AddImageApiRepositories()
     .ConfigureFunctionsApplicationInsights();
 
 // Add Stripe services if API key is configured (needed for subscription validation)

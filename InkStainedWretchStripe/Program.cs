@@ -55,6 +55,7 @@ builder.Services
     .AddUserProfileRepository()
     .AddImageApiRepositories()
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
+    .AddUserIdentityServices()
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights()
     // Register a StripeClient for DI so services can depend on it

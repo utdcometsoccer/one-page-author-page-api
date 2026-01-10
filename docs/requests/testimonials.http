@@ -1,0 +1,37 @@
+### Get testimonials (public)
+GET http://localhost:7001/api/testimonials?featured=true&locale=en-US&limit=3
+Accept: application/json
+
+### Create testimonial (requires JWT)
+POST http://localhost:7001/api/testimonials
+Authorization: Bearer {{JWT_TOKEN}}
+Content-Type: application/json
+
+{
+  "authorName": "Sarah Mitchell",
+  "authorTitle": "Mystery Novelist",
+  "quote": "This platform transformed how I connect with my readers.",
+  "rating": 5,
+  "photoUrl": null,
+  "featured": true,
+  "locale": "en-US"
+}
+
+### Update testimonial (requires JWT)
+PUT http://localhost:7001/api/testimonials/sarah-mitchell-en-us
+Authorization: Bearer {{JWT_TOKEN}}
+Content-Type: application/json
+
+{
+  "authorName": "Sarah Mitchell",
+  "authorTitle": "Mystery Novelist - Updated",
+  "quote": "Updated testimonial text.",
+  "rating": 5,
+  "photoUrl": "https://example.com/photo.jpg",
+  "featured": false,
+  "locale": "en-US"
+}
+
+### Delete testimonial (requires JWT)
+DELETE http://localhost:7001/api/testimonials/sarah-mitchell-en-us
+Authorization: Bearer {{JWT_TOKEN}}

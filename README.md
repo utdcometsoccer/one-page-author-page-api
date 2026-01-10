@@ -437,6 +437,10 @@ The platform supports comprehensive multi-language functionality:
 - `GET /api/localizedtext/{culture}` — Retrieve localized UI text with fallback logic
 - `POST /api/domain-registrations` — Create domain registrations with auto-provisioning
 - `GET /api/domain-registrations` — List user domain registrations
+- `GET /api/testimonials` — Public: list testimonials (`limit`, `featured`, `locale`)
+- `POST /api/testimonials` — Create testimonial (authenticated)
+- `PUT /api/testimonials/{id}` — Update testimonial (authenticated)
+- `DELETE /api/testimonials/{id}` — Delete testimonial (authenticated)
 - **Features**: Azure Front Door integration, multi-language support, external API proxying
 
 #### 💳 InkStainedWretchStripe
@@ -448,6 +452,7 @@ The platform supports comprehensive multi-language functionality:
 - `POST /api/CreateSubscription` — Subscription lifecycle management
 - `POST /api/WebHook` — Stripe webhook event processing
 - `GET /api/ListSubscription/{customerId}` — Subscription queries with filtering
+- `GET /api/stripe/health` — Public: configuration health check (mode and connectivity)
 
 #### 📚 function-app
 
@@ -459,12 +464,16 @@ The platform supports comprehensive multi-language functionality:
 
 ### Authentication
 
-All endpoints require JWT Bearer authentication:
+- Protected endpoints require JWT Bearer authentication. Include:
 
 ```http
 Authorization: Bearer <your-jwt-token>
 
 ```
+
+- Public endpoints (no token required):
+  - `GET /api/testimonials`
+  - `GET /api/stripe/health`
 
 ## 🧪 Testing & Quality Assurance
 

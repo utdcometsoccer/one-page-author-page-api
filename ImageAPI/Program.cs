@@ -96,6 +96,7 @@ builder.Services
     .AddImageApiRepositories()
     .AddImageApiServices()
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
+    .AddUserIdentityServices()
     .AddUserProfileServices()
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();

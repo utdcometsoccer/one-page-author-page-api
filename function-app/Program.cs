@@ -48,6 +48,7 @@ builder.Services
     .AddAuthorDataService() // Register Author data service via DI extension
     .AddLocaleDataService() // Register Locale data service via DI extension
     .AddDomainRegistrationRepository() // Register Domain Registration repository via DI extension
+    .AddUserIdentityServices()
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
