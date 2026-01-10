@@ -17,11 +17,14 @@ var config = builder.Configuration;
 var tenantId = config["AAD_TENANT_ID"];
 var audience = config["AAD_AUDIENCE"] ?? config["AAD_CLIENT_ID"];
 var authority = config["AAD_AUTHORITY"] ?? (string.IsNullOrWhiteSpace(tenantId) ? null : $"https://login.microsoftonline.com/{tenantId}/v2.0");
+var validIssuersRaw = config["AAD_VALID_ISSUERS"];
+string[]? validIssuers = InkStainedWretch.OnePageAuthorAPI.Utility.ParseValidIssuers(validIssuersRaw);
 
 // Log Azure AD configuration (masked for security)
 Console.WriteLine($"Azure AD Tenant ID configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(tenantId)}");
 Console.WriteLine($"Azure AD Audience configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(audience)}");
 Console.WriteLine($"Azure AD Authority configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(authority)}");
+Console.WriteLine($"Azure AD Valid Issuers configured: {(validIssuers is null ? "(not set)" : string.Join(", ", validIssuers.Select(i => InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(i))))}");
 
 // Add AuthN/Z
 builder.Services
@@ -44,7 +47,8 @@ builder.Services
             ValidateIssuerSigningKey = true,
             // Accept both azp/aud depending on app registration configuration
             ValidAudience = audience,
-            ValidIssuer = authority
+            ValidIssuer = validIssuers is null ? authority : null,
+            ValidIssuers = validIssuers
         };
     });
 

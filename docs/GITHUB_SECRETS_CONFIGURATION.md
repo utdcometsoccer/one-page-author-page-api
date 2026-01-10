@@ -265,6 +265,7 @@ npm run init-secrets -- -ConfigFile secrets.prod.json
 | `AAD_AUDIENCE` | Client/App ID | `xxxxxxxx-xxxx-...` | All |
 | `AAD_CLIENT_ID` | Client ID | `xxxxxxxx-xxxx-...` | All |
 | `AAD_AUTHORITY` | Authority URL | `https://login.microsoftonline.com/{tenant}/v2.0` | All |
+| `AAD_VALID_ISSUERS` | Comma-separated v2.0 issuer URLs | `https://login.microsoftonline.com/<tenant>/v2.0, https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0` | All |
 
 ### Storage (Required for ImageAPI)
 

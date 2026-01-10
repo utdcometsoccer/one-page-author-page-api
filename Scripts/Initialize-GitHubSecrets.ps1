@@ -249,6 +249,13 @@ $secretDefinitions = @{
             Required = $false
             Example = "https://login.microsoftonline.com/{tenant-id}/v2.0/.well-known/openid-configuration"
             Category = "Authentication"
+        },
+        @{
+            Name = "AAD_VALID_ISSUERS"
+            Description = "Comma-delimited list of allowed issuer URLs"
+            Required = $false
+            Example = "https://login.microsoftonline.com/<tenant-1>/v2.0, https://login.microsoftonline.com/<tenant-2>/v2.0"
+            Category = "Authentication"
         }
     )
     

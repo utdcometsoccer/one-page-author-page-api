@@ -92,6 +92,9 @@ param aadClientId string = ''
 @description('Azure AD Authority URL (optional)')
 param aadAuthority string = ''
 
+@description('Azure AD Valid Issuers (optional, comma-separated list of issuer URLs)')
+param aadValidIssuers string = ''
+
 // =========================================
 // Azure Infrastructure (Optional - for Domain Management)
 // =========================================
@@ -366,6 +369,12 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
           value: aadAuthority
         }
       ] : [],
+      !empty(aadValidIssuers) ? [
+        {
+          name: 'AAD_VALID_ISSUERS'
+          value: aadValidIssuers
+        }
+      ] : [],
       // Key Vault (optional)
       !empty(keyVaultUri) ? [
         {
@@ -468,6 +477,12 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
         {
           name: 'AAD_AUDIENCE'
           value: aadAudience
+        }
+      ] : [],
+      !empty(aadValidIssuers) ? [
+        {
+          name: 'AAD_VALID_ISSUERS'
+          value: aadValidIssuers
         }
       ] : [],
       // Azure Infrastructure (optional - for domain management)
@@ -681,6 +696,12 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
         {
           name: 'AAD_CLIENT_ID'
           value: aadClientId
+        }
+      ] : [],
+      !empty(aadValidIssuers) ? [
+        {
+          name: 'AAD_VALID_ISSUERS'
+          value: aadValidIssuers
         }
       ] : [],
       // Key Vault (optional)

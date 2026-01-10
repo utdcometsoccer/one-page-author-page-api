@@ -449,6 +449,7 @@ jobs:
           AAD_AUDIENCE: ${{ secrets.AAD_AUDIENCE }}
           AAD_CLIENT_ID: ${{ secrets.AAD_CLIENT_ID }}
           AAD_AUTHORITY: ${{ secrets.AAD_AUTHORITY }}
+          AAD_VALID_ISSUERS: ${{ secrets.AAD_VALID_ISSUERS }}
           
           # Azure Infrastructure (optional - for domain management)
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -528,6 +529,7 @@ jobs:
           [ -n "$AAD_AUDIENCE" ] && PARAMS="$PARAMS aadAudience='$AAD_AUDIENCE'"
           [ -n "$AAD_CLIENT_ID" ] && PARAMS="$PARAMS aadClientId='$AAD_CLIENT_ID'"
           [ -n "$AAD_AUTHORITY" ] && PARAMS="$PARAMS aadAuthority='$AAD_AUTHORITY'"
+          [ -n "$AAD_VALID_ISSUERS" ] && PARAMS="$PARAMS aadValidIssuers='$AAD_VALID_ISSUERS'"
           
           # Add Azure Infrastructure parameters conditionally
           [ -n "$AZURE_SUBSCRIPTION_ID" ] && PARAMS="$PARAMS azureSubscriptionId='$AZURE_SUBSCRIPTION_ID'"

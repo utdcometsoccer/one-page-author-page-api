@@ -5,6 +5,8 @@ using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Stripe;
 
 var builder = FunctionsApplication.CreateBuilder(args);
@@ -25,8 +27,8 @@ var databaseId = configuration["COSMOSDB_DATABASE_ID"] ?? throw new InvalidOpera
 var stripeApiKey = configuration["STRIPE_API_KEY"];
 
 // Log Cosmos DB configuration (masked for security)
-Console.WriteLine($"Cosmos DB Endpoint configured: {Utility.MaskUrl(endpointUri)}");
-Console.WriteLine($"Cosmos DB Primary Key configured: {Utility.MaskSensitiveValue(primaryKey)}");
+Console.WriteLine($"Cosmos DB Endpoint configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(endpointUri)}");
+Console.WriteLine($"Cosmos DB Primary Key configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(primaryKey)}");
 Console.WriteLine($"Cosmos DB Database ID configured: {databaseId}");
 
 // Sanitization status: show if trimming removed quotes/whitespace
@@ -42,7 +44,7 @@ Console.WriteLine($"Config sanitization applied: {(sanitizationApplied ? "yes" :
 
 if (!string.IsNullOrWhiteSpace(stripeApiKey))
 {
-    Console.WriteLine($"Stripe API key configured: {Utility.MaskSensitiveValue(stripeApiKey)}");
+    Console.WriteLine($"Stripe API key configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(stripeApiKey)}");
 }
 else
 {
@@ -50,6 +52,43 @@ else
 }
 
 builder.ConfigureFunctionsWebApplication();
+
+// Configure Entra ID (Azure AD) authentication with optional multiple issuers
+var tenantId = configuration["AAD_TENANT_ID"];
+var audience = configuration["AAD_AUDIENCE"] ?? configuration["AAD_CLIENT_ID"];
+var authority = configuration["AAD_AUTHORITY"] ?? (string.IsNullOrWhiteSpace(tenantId) ? null : $"https://login.microsoftonline.com/{tenantId}/v2.0");
+var validIssuersRaw = configuration["AAD_VALID_ISSUERS"];
+string[]? validIssuers = InkStainedWretch.OnePageAuthorAPI.Utility.ParseValidIssuers(validIssuersRaw);
+
+// Masked confirmation logs
+Console.WriteLine($"Azure AD Tenant ID configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(tenantId)}");
+Console.WriteLine($"Azure AD Audience configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(audience)}");
+Console.WriteLine($"Azure AD Authority configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(authority)}");
+Console.WriteLine($"Azure AD Valid Issuers configured: {(validIssuers is null ? "(not set)" : string.Join(", ", validIssuers.Select(i => InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(i))))}");
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        if (!string.IsNullOrWhiteSpace(authority))
+        {
+            options.Authority = authority;
+        }
+        if (!string.IsNullOrWhiteSpace(audience))
+        {
+            options.Audience = audience;
+        }
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidAudience = audience,
+            ValidIssuer = validIssuers is null ? authority : null,
+            ValidIssuers = validIssuers
+        };
+    });
 
 var services = builder.Services
     .AddCosmosClient(endpointUri, primaryKey)

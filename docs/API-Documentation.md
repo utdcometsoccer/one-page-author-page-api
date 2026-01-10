@@ -7,12 +7,13 @@ This comprehensive API documentation covers all Azure Functions and endpoints av
 ## Table of Contents
 
 - [Authentication](#authentication)
-- [Image API](#image-api)
-- [Domain Registration API](#domain-registration-api)
-- [External Integration API](#external-integration-api)
+- [Azure Functions API](#azure-functions-api)
+- [function-app](#function-app)
+- [ImageAPI](#imageapi)
+- [InkStainedWretchFunctions](#inkstainedwretchfunctions)
+- [Stripe API](#stripe-api)
 - [Testimonials API](#testimonials-api)
 - [Error Handling](#error-handling)
-- [TypeScript Examples](#typescript-examples)
 
 ## Authentication
 
@@ -24,7 +25,7 @@ Authorization: Bearer <your-jwt-token>
 
 ### TypeScript Authentication Helper
 
-`	ypescript
+```typescript
 class ApiClient {
   private baseUrl: string;
   private token: string;
@@ -35,14 +36,14 @@ class ApiClient {
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = ${'$'}{this.baseUrl}{endpoint};
+    const url = `${this.baseUrl}${endpoint}`;
 
     const response = await fetch(url, {
       ...options,
       headers: {
-        'Authorization': Bearer {this.token},
+        'Authorization': `Bearer ${this.token}`,
         'Content-Type': 'application/json',
-        ...options.headers,
+        ...(options.headers || {}),
       },
     });
 
@@ -52,7 +53,7 @@ class ApiClient {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || HTTP {response.status}: {response.statusText});
+      throw new Error(error.error || `HTTP ${response.status}: ${response.statusText}`);
     }
 
     return response.json();
@@ -73,7 +74,7 @@ class ApiClient {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
 }
-`
+```
 
 
 ## Azure Functions API
