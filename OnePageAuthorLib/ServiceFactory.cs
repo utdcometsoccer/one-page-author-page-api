@@ -399,6 +399,15 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
+        /// Registers the user identity service for extracting user information from claims.
+        /// </summary>
+        public static IServiceCollection AddUserIdentityServices(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IUserIdentityService, API.UserIdentityService>();
+            return services;
+        }
+
+        /// <summary>
         /// Registers Ink Stained Wretch domain services and Cosmos container managers for
         /// author-management localization. Includes:
         /// <list type="bullet">
@@ -652,26 +661,27 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddTransient<IContainerManager<Entities.Social>>(sp =>
                 new SocialsContainerManager(sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>()));
 
-            // Register concrete repositories as singletons after ensuring containers
-            services.AddSingleton(sp =>
+            // Register repositories as singletons after ensuring containers
+            // Also map to interfaces used throughout the codebase
+            services.AddSingleton<API.IAuthorRepository>(sp =>
             {
                 var c = sp.GetRequiredService<IContainerManager<Entities.Author>>()
                     .EnsureContainerAsync().GetAwaiter().GetResult();
                 return new NoSQL.AuthorRepository(c);
             });
-            services.AddSingleton(sp =>
+            services.AddSingleton<API.IGenericRepository<Entities.Book>>(sp =>
             {
                 var c = sp.GetRequiredService<IContainerManager<Entities.Book>>()
                     .EnsureContainerAsync().GetAwaiter().GetResult();
                 return new NoSQL.GenericRepository<Entities.Book>(c);
             });
-            services.AddSingleton(sp =>
+            services.AddSingleton<API.IGenericRepository<Entities.Article>>(sp =>
             {
                 var c = sp.GetRequiredService<IContainerManager<Entities.Article>>()
                     .EnsureContainerAsync().GetAwaiter().GetResult();
                 return new NoSQL.GenericRepository<Entities.Article>(c);
             });
-            services.AddSingleton(sp =>
+            services.AddSingleton<API.IGenericRepository<Entities.Social>>(sp =>
             {
                 var c = sp.GetRequiredService<IContainerManager<Entities.Social>>()
                     .EnsureContainerAsync().GetAwaiter().GetResult();

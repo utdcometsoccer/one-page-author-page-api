@@ -55,6 +55,7 @@ var services = builder.Services
     .AddCosmosClient(endpointUri, primaryKey)
     .AddCosmosDatabase(databaseId)
     .AddUserProfileRepository()
+    .AddAuthorRepositories() // Register author repositories (IAuthorRepository, IGenericRepository<Book>, etc.)
     .AddAuthorDataService() // Add Author data service for GetAuthors function
     .AddInkStainedWretchServices()
     .AddPenguinRandomHouseServices()
