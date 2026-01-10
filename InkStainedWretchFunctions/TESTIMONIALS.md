@@ -55,7 +55,7 @@ curl "https://api.example.com/api/testimonials?featured=true&locale=en-US&limit=
 
 All admin endpoints require JWT Bearer token authentication.
 
-#### POST /api/admin/testimonials
+#### POST /api/testimonials
 
 Creates a new testimonial.
 
@@ -74,13 +74,13 @@ Creates a new testimonial.
 
 **Response:** 201 Created
 
-#### PUT /api/admin/testimonials/{id}
+#### PUT /api/testimonials/{id}
 
 Updates an existing testimonial.
 
 **Response:** 200 OK
 
-#### DELETE /api/admin/testimonials/{id}
+#### DELETE /api/testimonials/{id}
 
 Deletes a testimonial.
 

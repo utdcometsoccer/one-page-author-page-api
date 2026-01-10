@@ -35,7 +35,7 @@ public class DeleteTestimonial
     [Function("DeleteTestimonial")]
     [Authorize]
     public async Task<HttpResponseData> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "admin/testimonials/{id}")] HttpRequestData req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "testimonials/{id}")] HttpRequestData req,
         string id)
     {
         var user = req.FunctionContext.Features.Get<IHttpContextAccessor>()?.HttpContext?.User;

@@ -761,6 +761,8 @@ The Testimonials API provides endpoints for managing and retrieving testimonials
 
 **Public endpoint** - Retrieves testimonials with optional filtering and caching.
 
+Note: See the Public Endpoints section for a quick reference to anonymous endpoints.
+
 **Query Parameters:**
 - `limit` (optional, number): Maximum number of testimonials to return. Default: 5, Max: 20
 - `featured` (optional, boolean): Filter to only featured testimonials
@@ -790,30 +792,30 @@ The Testimonials API provides endpoints for managing and retrieving testimonials
 
 **TypeScript Example:**
 ```typescript
-// Get featured testimonials in English
-const response = await fetch('/api/testimonials?featured=true&locale=en-US&limit=3');
-const data = await response.json();
+    // Get featured testimonials in English
+    const response = await fetch('/api/testimonials?featured=true&locale=en-US&limit=3');
+    const data = await response.json();
 
-// Interface
-interface GetTestimonialsResponse {
-  testimonials: Testimonial[];
-  total: number;
-}
+    // Interface
+    interface GetTestimonialsResponse {
+      testimonials: Testimonial[];
+      total: number;
+    }
 
-interface Testimonial {
-  id: string;
-  authorName: string;
-  authorTitle: string;
-  quote: string;
-  rating: number;
-  photoUrl?: string;
-  featured: boolean;
-  createdAt: string;
-  locale: string;
-}
-```
+    interface Testimonial {
+      id: string;
+      authorName: string;
+      authorTitle: string;
+      quote: string;
+      rating: number;
+      photoUrl?: string;
+      featured: boolean;
+      createdAt: string;
+      locale: string;
+    }
+  ```
 
-### POST /api/admin/testimonials
+### POST /api/testimonials
 
 **Protected endpoint** - Creates a new testimonial. Requires authentication.
 
@@ -862,11 +864,11 @@ const newTestimonial = {
   locale: "en-US"
 };
 
-const created = await apiClient.post<Testimonial>('/api/admin/testimonials', newTestimonial);
+const created = await apiClient.post<Testimonial>('/api/testimonials', newTestimonial);
 console.log('Created testimonial:', created.id);
 ```
 
-### PUT /api/admin/testimonials/{id}
+### PUT /api/testimonials/{id}
 
 **Protected endpoint** - Updates an existing testimonial. Requires authentication.
 
@@ -902,10 +904,10 @@ const updates = {
   locale: "en-US"
 };
 
-const updated = await apiClient.put<Testimonial>('/api/admin/testimonials/sarah-mitchell-en-us', updates);
+const updated = await apiClient.put<Testimonial>('/api/testimonials/sarah-mitchell-en-us', updates);
 ```
 
-### DELETE /api/admin/testimonials/{id}
+### DELETE /api/testimonials/{id}
 
 **Protected endpoint** - Deletes a testimonial. Requires authentication.
 
@@ -917,7 +919,7 @@ const updated = await apiClient.put<Testimonial>('/api/admin/testimonials/sarah-
 **TypeScript Example:**
 ```typescript
 const apiClient = new ApiClient(baseUrl, token);
-await apiClient.delete('/api/admin/testimonials/sarah-mitchell-en-us');
+await apiClient.delete('/api/testimonials/sarah-mitchell-en-us');
 console.log('Testimonial deleted successfully');
 ```
 

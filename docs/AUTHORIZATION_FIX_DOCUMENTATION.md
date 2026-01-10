@@ -60,9 +60,9 @@ The following functions were already correctly configured and did NOT require ch
 
 #### Functions with `[Authorize]` Attribute (ASP.NET Core Authorization)
 These use `AuthorizationLevel.Anonymous` with declarative authorization:
-- `CreateTestimonial` (POST /api/admin/testimonials)
-- `UpdateTestimonial` (PUT /api/admin/testimonials/{id})
-- `DeleteTestimonial` (DELETE /api/admin/testimonials/{id})
+- `CreateTestimonial` (POST /api/testimonials)
+- `UpdateTestimonial` (PUT /api/testimonials/{id})
+- `DeleteTestimonial` (DELETE /api/testimonials/{id})
 
 #### Functions with Manual JWT Validation Already Using Anonymous
 These already used `AuthorizationLevel.Anonymous`:

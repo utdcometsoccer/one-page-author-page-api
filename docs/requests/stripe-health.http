@@ -1,0 +1,3 @@
+### Stripe health (public)
+GET http://localhost:7002/api/stripe/health
+Accept: application/json

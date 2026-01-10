@@ -37,18 +37,18 @@ December 20, 2025
 - Implementation: `InkStainedWretchFunctions/GetTestimonials.cs`
 
 #### Admin Endpoints (Authenticated with JWT)
-**POST /api/admin/testimonials**
+**POST /api/testimonials**
 - Create new testimonial
 - Validation: Required fields, rating 1-5
 - Returns: 201 Created with testimonial object
 - Implementation: `InkStainedWretchFunctions/CreateTestimonial.cs`
 
-**PUT /api/admin/testimonials/{id}**
+**PUT /api/testimonials/{id}**
 - Update existing testimonial
 - Returns: 200 OK with updated testimonial
 - Implementation: `InkStainedWretchFunctions/UpdateTestimonial.cs`
 
-**DELETE /api/admin/testimonials/{id}**
+**DELETE /api/testimonials/{id}**
 - Delete testimonial by ID
 - Returns: 204 No Content
 - Implementation: `InkStainedWretchFunctions/DeleteTestimonial.cs`
@@ -201,7 +201,7 @@ const { testimonials, total } = await response.json();
 ### Create Testimonial (TypeScript)
 ```typescript
 const apiClient = new ApiClient(baseUrl, jwtToken);
-const testimonial = await apiClient.post('/api/admin/testimonials', {
+const testimonial = await apiClient.post('/api/testimonials', {
   authorName: "Sarah Mitchell",
   authorTitle: "Mystery Novelist",
   quote: "This platform transformed my writing career!",

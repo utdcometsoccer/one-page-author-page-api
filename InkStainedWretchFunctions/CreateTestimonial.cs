@@ -37,7 +37,7 @@ public class CreateTestimonial
     [Function("CreateTestimonial")]
     [Authorize]
     public async Task<HttpResponseData> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "admin/testimonials")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "testimonials")] HttpRequestData req)
     {
         var user = req.FunctionContext.Features.Get<IHttpContextAccessor>()?.HttpContext?.User;
         var userId = AuthenticatedFunctionTelemetryService.ExtractUserId(user);
