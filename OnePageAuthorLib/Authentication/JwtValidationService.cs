@@ -115,13 +115,28 @@ public class JwtValidationService : IJwtValidationService
 
         var openIdConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None);
 
+        // Allow multiple issuers via comma-delimited env var AAD_VALID_ISSUERS
+        var validIssuersRaw = _configuration["AAD_VALID_ISSUERS"];
+        string[]? validIssuers = null;
+        if (!string.IsNullOrWhiteSpace(validIssuersRaw))
+        {
+            validIssuers = validIssuersRaw
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(i => i.TrimEnd('/'))
+                .Where(i => !string.IsNullOrWhiteSpace(i))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+        }
+
         var validationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = authority.TrimEnd('/'),
+            // If multiple issuers provided, use ValidIssuers; otherwise fall back to single ValidIssuer
+            ValidIssuer = validIssuers is null ? authority.TrimEnd('/') : null,
+            ValidIssuers = validIssuers,
             ValidAudiences = new[] { audience },
             IssuerSigningKeys = openIdConfig.SigningKeys,
             ClockSkew = TimeSpan.FromMinutes(5)

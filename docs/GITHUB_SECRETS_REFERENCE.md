@@ -16,6 +16,10 @@ Use this checklist when setting up the deployment workflow:
 - [ ] `AAD_TENANT_ID` - Microsoft Entra ID tenant GUID
 - [ ] `AAD_AUDIENCE` - API application/client ID
 
+### 🔐 Recommended Authentication Secret (Multi-issuer support)
+
+- [ ] `AAD_VALID_ISSUERS` - Comma-separated list of allowed issuer URLs (v2.0)
+
 ### 🔄 Optional Secrets (For existing function-app deployment)
 
 - [ ] `AZURE_FUNCTIONAPP_NAME` - Existing function app name
@@ -224,6 +228,21 @@ az account show --query tenantId -o tsv
 2. Go to "Microsoft Entra ID" → "App registrations"
 3. Select your API application
 4. Copy "Application (client) ID"
+
+### AAD_VALID_ISSUERS
+
+**Format**: Comma-separated URL list
+**Required**: No (recommended)
+**Example**:
+```
+https://login.microsoftonline.com/5c6d167a-2c48-4da0-8a21-29340b0f461e/v2.0, https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0
+```
+**Description**: Allows multiple JWT issuers for validation. If not set, the apps fall back to a single issuer derived from `AAD_TENANT_ID`/`AAD_AUTHORITY`.
+
+**Guidance**:
+- Use v2.0 endpoints.
+- Include your tenant’s issuer and (optionally) Microsoft’s common tenant when needed.
+- Keep this in GitHub Secrets for CI/CD and in user-secrets locally.
 
 ### AZURE_FUNCTIONAPP_NAME
 
