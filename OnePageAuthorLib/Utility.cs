@@ -100,7 +100,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// Trims whitespace, removes trailing slashes, filters empty values, and ensures case-insensitive uniqueness.
         /// </summary>
         /// <param name="validIssuersRaw">Comma-separated string of issuer URLs (e.g., "https://login.microsoftonline.com/tenant1/v2.0, https://login.microsoftonline.com/tenant2/v2.0")</param>
-        /// <returns>Array of normalized issuer URLs, or null if the input is null/empty</returns>
+        /// <returns>Array of normalized issuer URLs, or null if the input is null/empty or results in no valid issuers</returns>
         public static string[]? ParseValidIssuers(string? validIssuersRaw)
         {
             if (string.IsNullOrWhiteSpace(validIssuersRaw))
@@ -108,12 +108,14 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 return null;
             }
 
-            return validIssuersRaw
+            var issuers = validIssuersRaw
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Select(i => i.TrimEnd('/'))
                 .Where(i => !string.IsNullOrWhiteSpace(i))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray();
+
+            return issuers.Length > 0 ? issuers : null;
         }
     }
 }
