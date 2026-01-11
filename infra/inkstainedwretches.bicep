@@ -761,7 +761,7 @@ resource inkStainedWretchesConfigApp 'Microsoft.Web/sites@2024-04-01' = if (depl
   properties: {
     serverFarmId: appServicePlan.id
     siteConfig: {
-      appSettings: [
+      appSettings: concat([
         {
           name: 'AzureWebJobsStorage'
           value: storageConnectionString
@@ -786,19 +786,82 @@ resource inkStainedWretchesConfigApp 'Microsoft.Web/sites@2024-04-01' = if (depl
           name: 'WEBSITE_RUN_FROM_PACKAGE'
           value: '1'
         }
+      ],
+      // Application Insights (optional)
+      !empty(deployAppInsights ? appInsights!.properties.ConnectionString : '') ? [
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: deployAppInsights ? appInsights!.properties.ConnectionString : ''
+          value: appInsights!.properties.ConnectionString
         }
+      ] : [],
+      // Cosmos DB Configuration
+      !empty(cosmosDbConnectionString) ? [
+        {
+          name: 'COSMOSDB_CONNECTION_STRING'
+          value: cosmosDbConnectionString
+        }
+      ] : [],
+      !empty(cosmosDbEndpointUri) ? [
+        {
+          name: 'COSMOSDB_ENDPOINT_URI'
+          value: cosmosDbEndpointUri
+        }
+      ] : [],
+      !empty(cosmosDbPrimaryKey) ? [
+        {
+          name: 'COSMOSDB_PRIMARY_KEY'
+          value: cosmosDbPrimaryKey
+        }
+      ] : [],
+      !empty(cosmosDbDatabaseId) ? [
+        {
+          name: 'COSMOSDB_DATABASE_ID'
+          value: cosmosDbDatabaseId
+        }
+      ] : [],
+      // Azure AD Authentication (optional)
+      !empty(aadTenantId) ? [
+        {
+          name: 'AAD_TENANT_ID'
+          value: aadTenantId
+        }
+      ] : [],
+      !empty(aadAudience) ? [
+        {
+          name: 'AAD_AUDIENCE'
+          value: aadAudience
+        }
+      ] : [],
+      !empty(aadClientId) ? [
+        {
+          name: 'AAD_CLIENT_ID'
+          value: aadClientId
+        }
+      ] : [],
+      !empty(aadAuthority) ? [
+        {
+          name: 'AAD_AUTHORITY'
+          value: aadAuthority
+        }
+      ] : [],
+      !empty(aadValidIssuers) ? [
+        {
+          name: 'AAD_VALID_ISSUERS'
+          value: aadValidIssuers
+        }
+      ] : [],
+      // Key Vault (optional)
+      !empty(keyVaultUri) ? [
         {
           name: 'KEY_VAULT_URL'
           value: keyVaultUri
         }
         {
           name: 'USE_KEY_VAULT'
-          value: 'true'
+          value: 'false'
         }
-      ]
+      ] : []
+      )
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
     }
