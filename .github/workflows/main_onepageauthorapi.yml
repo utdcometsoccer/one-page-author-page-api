@@ -522,43 +522,43 @@ jobs:
           SECURE_PARAMS=""
           
           # Add Cosmos DB parameters conditionally
-          [ -n "$COSMOSDB_CONNECTION_STRING" ] && SECURE_PARAMS="$SECURE_PARAMS cosmosDbConnectionString='$COSMOSDB_CONNECTION_STRING'"
-          [ -n "$COSMOSDB_ENDPOINT_URI" ] && PARAMS="$PARAMS cosmosDbEndpointUri='$COSMOSDB_ENDPOINT_URI'"
-          [ -n "$COSMOSDB_PRIMARY_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS cosmosDbPrimaryKey='$COSMOSDB_PRIMARY_KEY'"
-          [ -n "$COSMOSDB_DATABASE_ID" ] && PARAMS="$PARAMS cosmosDbDatabaseId='$COSMOSDB_DATABASE_ID'"
+          [ -n "$COSMOSDB_CONNECTION_STRING" ] && SECURE_PARAMS="$SECURE_PARAMS cosmosDbConnectionString=$COSMOSDB_CONNECTION_STRING"
+          [ -n "$COSMOSDB_ENDPOINT_URI" ] && PARAMS="$PARAMS cosmosDbEndpointUri=$COSMOSDB_ENDPOINT_URI"
+          [ -n "$COSMOSDB_PRIMARY_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS cosmosDbPrimaryKey=$COSMOSDB_PRIMARY_KEY"
+          [ -n "$COSMOSDB_DATABASE_ID" ] && PARAMS="$PARAMS cosmosDbDatabaseId=$COSMOSDB_DATABASE_ID"
           
           # Add ImageAPI storage parameter conditionally
-          [ -n "$AZURE_STORAGE_CONNECTION_STRING" ] && SECURE_PARAMS="$SECURE_PARAMS azureStorageConnectionString='$AZURE_STORAGE_CONNECTION_STRING'"
+          [ -n "$AZURE_STORAGE_CONNECTION_STRING" ] && SECURE_PARAMS="$SECURE_PARAMS azureStorageConnectionString=$AZURE_STORAGE_CONNECTION_STRING"
           
           # Add Stripe parameters conditionally
-          [ -n "$STRIPE_API_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS stripeApiKey='$STRIPE_API_KEY'"
-          [ -n "$STRIPE_WEBHOOK_SECRET" ] && SECURE_PARAMS="$SECURE_PARAMS stripeWebhookSecret='$STRIPE_WEBHOOK_SECRET'"
+          [ -n "$STRIPE_API_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS stripeApiKey=$STRIPE_API_KEY"
+          [ -n "$STRIPE_WEBHOOK_SECRET" ] && SECURE_PARAMS="$SECURE_PARAMS stripeWebhookSecret=$STRIPE_WEBHOOK_SECRET"
           
           # Add Azure AD parameters conditionally
-          [ -n "$AAD_TENANT_ID" ] && PARAMS="$PARAMS aadTenantId='$AAD_TENANT_ID'"
-          [ -n "$AAD_AUDIENCE" ] && PARAMS="$PARAMS aadAudience='$AAD_AUDIENCE'"
-          [ -n "$AAD_CLIENT_ID" ] && PARAMS="$PARAMS aadClientId='$AAD_CLIENT_ID'"
-          [ -n "$AAD_AUTHORITY" ] && PARAMS="$PARAMS aadAuthority='$AAD_AUTHORITY'"
-          [ -n "$AAD_VALID_ISSUERS" ] && PARAMS="$PARAMS aadValidIssuers='$AAD_VALID_ISSUERS'"
+          [ -n "$AAD_TENANT_ID" ] && PARAMS="$PARAMS aadTenantId=$AAD_TENANT_ID"
+          [ -n "$AAD_AUDIENCE" ] && PARAMS="$PARAMS aadAudience=$AAD_AUDIENCE"
+          [ -n "$AAD_CLIENT_ID" ] && PARAMS="$PARAMS aadClientId=$AAD_CLIENT_ID"
+          [ -n "$AAD_AUTHORITY" ] && PARAMS="$PARAMS aadAuthority=$AAD_AUTHORITY"
+          [ -n "$AAD_VALID_ISSUERS" ] && PARAMS="$PARAMS aadValidIssuers=$AAD_VALID_ISSUERS"
           
           # Add Azure Infrastructure parameters conditionally
-          [ -n "$AZURE_SUBSCRIPTION_ID" ] && PARAMS="$PARAMS azureSubscriptionId='$AZURE_SUBSCRIPTION_ID'"
-          [ -n "$AZURE_DNS_RESOURCE_GROUP" ] && PARAMS="$PARAMS azureDnsResourceGroup='$AZURE_DNS_RESOURCE_GROUP'"
+          [ -n "$AZURE_SUBSCRIPTION_ID" ] && PARAMS="$PARAMS azureSubscriptionId=$AZURE_SUBSCRIPTION_ID"
+          [ -n "$AZURE_DNS_RESOURCE_GROUP" ] && PARAMS="$PARAMS azureDnsResourceGroup=$AZURE_DNS_RESOURCE_GROUP"
           
           # Add Google Domains parameters conditionally
-          [ -n "$GOOGLE_CLOUD_PROJECT_ID" ] && PARAMS="$PARAMS googleCloudProjectId='$GOOGLE_CLOUD_PROJECT_ID'"
-          [ -n "$GOOGLE_DOMAINS_LOCATION" ] && PARAMS="$PARAMS googleDomainsLocation='$GOOGLE_DOMAINS_LOCATION'"
+          [ -n "$GOOGLE_CLOUD_PROJECT_ID" ] && PARAMS="$PARAMS googleCloudProjectId=$GOOGLE_CLOUD_PROJECT_ID"
+          [ -n "$GOOGLE_DOMAINS_LOCATION" ] && PARAMS="$PARAMS googleDomainsLocation=$GOOGLE_DOMAINS_LOCATION"
           
           # Add Amazon API parameters conditionally
-          [ -n "$AMAZON_PRODUCT_ACCESS_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS amazonProductAccessKey='$AMAZON_PRODUCT_ACCESS_KEY'"
-          [ -n "$AMAZON_PRODUCT_SECRET_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS amazonProductSecretKey='$AMAZON_PRODUCT_SECRET_KEY'"
-          [ -n "$AMAZON_PRODUCT_PARTNER_TAG" ] && PARAMS="$PARAMS amazonProductPartnerTag='$AMAZON_PRODUCT_PARTNER_TAG'"
-          [ -n "$AMAZON_PRODUCT_REGION" ] && PARAMS="$PARAMS amazonProductRegion='$AMAZON_PRODUCT_REGION'"
-          [ -n "$AMAZON_PRODUCT_MARKETPLACE" ] && PARAMS="$PARAMS amazonProductMarketplace='$AMAZON_PRODUCT_MARKETPLACE'"
+          [ -n "$AMAZON_PRODUCT_ACCESS_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS amazonProductAccessKey=$AMAZON_PRODUCT_ACCESS_KEY"
+          [ -n "$AMAZON_PRODUCT_SECRET_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS amazonProductSecretKey=$AMAZON_PRODUCT_SECRET_KEY"
+          [ -n "$AMAZON_PRODUCT_PARTNER_TAG" ] && PARAMS="$PARAMS amazonProductPartnerTag=$AMAZON_PRODUCT_PARTNER_TAG"
+          [ -n "$AMAZON_PRODUCT_REGION" ] && PARAMS="$PARAMS amazonProductRegion=$AMAZON_PRODUCT_REGION"
+          [ -n "$AMAZON_PRODUCT_MARKETPLACE" ] && PARAMS="$PARAMS amazonProductMarketplace=$AMAZON_PRODUCT_MARKETPLACE"
           
           # Add Penguin Random House parameters conditionally
-          [ -n "$PENGUIN_RANDOM_HOUSE_API_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS penguinRandomHouseApiKey='$PENGUIN_RANDOM_HOUSE_API_KEY'"
-          [ -n "$PENGUIN_RANDOM_HOUSE_API_DOMAIN" ] && PARAMS="$PARAMS penguinRandomHouseApiDomain='$PENGUIN_RANDOM_HOUSE_API_DOMAIN'"
+          [ -n "$PENGUIN_RANDOM_HOUSE_API_KEY" ] && SECURE_PARAMS="$SECURE_PARAMS penguinRandomHouseApiKey=$PENGUIN_RANDOM_HOUSE_API_KEY"
+          [ -n "$PENGUIN_RANDOM_HOUSE_API_DOMAIN" ] && PARAMS="$PARAMS penguinRandomHouseApiDomain=$PENGUIN_RANDOM_HOUSE_API_DOMAIN"
 
           # Deploy infrastructure
           echo "🚀 Starting infrastructure deployment..."
