@@ -80,7 +80,6 @@ jobs:
         run: |
           echo "Running unit tests..."
           dotnet test OnePageAuthor.Test/OnePageAuthor.Test.csproj --configuration Release --verbosity normal --logger "console;verbosity=detailed"
-          echo "✅ All unit tests passed successfully."
 
       # =========================================
       # Build all Function Apps
