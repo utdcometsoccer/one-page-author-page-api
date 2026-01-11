@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Stripe;
 
 var builder = FunctionsApplication.CreateBuilder(args);
@@ -35,7 +37,7 @@ var validIssuersRaw = config["AAD_VALID_ISSUERS"];
 string[]? validIssuers = InkStainedWretch.OnePageAuthorAPI.Utility.ParseValidIssuers(validIssuersRaw);
 Console.WriteLine($"Azure AD Valid Issuers configured: {(validIssuers is null ? "(not set)" : string.Join(", ", validIssuers.Select(i => InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(i))))}");
 
-// Configure JwtBearer to accept multiple issuers/audience
+// Configure JwtBearer to accept multiple issuers/audience with automatic key refresh
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -48,6 +50,24 @@ builder.Services
         {
             options.Audience = audience;
         }
+        
+        // Configure automatic refresh of signing keys from OpenID Connect metadata
+        // This prevents SecurityTokenSignatureKeyNotFoundException when Azure AD rotates keys
+        if (!string.IsNullOrWhiteSpace(authority))
+        {
+            var metadataAddress = $"{authority.TrimEnd('/')}/.well-known/openid-configuration";
+            options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                metadataAddress,
+                new OpenIdConnectConfigurationRetriever(),
+                new HttpDocumentRetriever())
+            {
+                // Refresh metadata every 6 hours (default is 24 hours)
+                AutomaticRefreshInterval = TimeSpan.FromHours(6),
+                // Minimum time between refreshes to prevent hammering the endpoint
+                RefreshInterval = TimeSpan.FromMinutes(30)
+            };
+        }
+        
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
