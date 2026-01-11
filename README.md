@@ -557,7 +557,7 @@ dotnet test --filter "Category=Unit"
 
 The platform uses GitHub Actions for automated deployment to Azure with built-in quality gates:
 
-- **Unit Tests** - All 780+ unit tests must pass before deployment proceeds
+- **Unit Tests** - All unit tests must pass before deployment proceeds
 - **Build Validation** - All Azure Functions are compiled and validated
 - **Infrastructure Deployment** - Automated Bicep template deployments
 
