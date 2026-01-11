@@ -178,7 +178,13 @@ Comprehensive deployment template for the Ink Stained Wretches platform includin
 - `deployCommunicationServices` (optional) - Deploy Azure Communication Services for email notifications
 - Various function app deployment flags
 
-**Note**: When deploying with `deployCommunicationServices=true`, the `Microsoft.Communication` resource provider must be registered in your Azure subscription. The GitHub Actions workflow handles this automatically.
+**Important Notes:**
+1. **Key Vault Role Assignments**: Role assignments for Function App access to Key Vault have been removed from this template to avoid permission errors during automated deployments. After deployment, you must manually grant the Function Apps access to Key Vault using one of these methods:
+   - Use the `./infra/Assign-KeyVaultRole.sh` script (recommended)
+   - Grant the service principal "User Access Administrator" role using `./infra/Grant-ServicePrincipalPermissions.sh` and redeploy
+   - Manually create role assignments via Azure Portal or CLI
+
+2. **Communication Services**: When deploying with `deployCommunicationServices=true`, the `Microsoft.Communication` resource provider must be registered in your Azure subscription. The GitHub Actions workflow handles this automatically.
 
 ### communication-services.bicep
 Deploys Azure Communication Services for email notifications used by the Author Invitation Tool.
