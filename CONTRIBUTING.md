@@ -38,6 +38,7 @@ Thanks for your interest in contributing! This document describes how to get set
 
 - Run the entire test suite before opening a PR: `dotnet test OnePageAuthorAPI.sln`.
 - Add tests alongside new code; for fixes, add a regression test.
+- **CI/CD Quality Gate**: All unit tests are automatically run in the GitHub Actions workflow. If any tests fail, deployment to Azure is blocked. Ensure all tests pass locally before pushing.
 
 ## Security and secrets
 

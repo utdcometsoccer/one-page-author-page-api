@@ -72,6 +72,16 @@ jobs:
           echo "BUILD_NUMBER=${BUILD_NUMBER}" >> $GITHUB_ENV
 
       # =========================================
+      # Run Unit Tests
+      # =========================================
+
+      - name: 'Run Unit Tests'
+        shell: bash
+        run: |
+          echo "Running unit tests..."
+          dotnet test OnePageAuthorAPI.sln --configuration Release --verbosity normal --logger "console;verbosity=detailed"
+
+      # =========================================
       # Build all Function Apps
       # =========================================
 
