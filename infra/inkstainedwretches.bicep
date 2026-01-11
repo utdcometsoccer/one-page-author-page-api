@@ -809,50 +809,24 @@ resource inkStainedWretchesConfigApp 'Microsoft.Web/sites@2024-04-01' = if (depl
 // =========================================
 // Key Vault Role Assignments
 // =========================================
-
-// Grant ImageAPI access to Key Vault
-resource imageApiKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployImageApi && deployStorageAccount) {
-  name: guid(keyVault!.id, imageApiFunctionApp!.id, 'Key Vault Secrets User')
-  scope: keyVault
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-    principalId: imageApiFunctionApp!.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-// Grant InkStainedWretchFunctions access to Key Vault
-resource functionsKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployInkStainedWretchFunctions && deployStorageAccount) {
-  name: guid(keyVault!.id, inkStainedWretchFunctionsApp!.id, 'Key Vault Secrets User')
-  scope: keyVault
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-    principalId: inkStainedWretchFunctionsApp!.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-// Grant InkStainedWretchStripe access to Key Vault
-resource stripeKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployInkStainedWretchStripe && deployStorageAccount) {
-  name: guid(keyVault!.id, inkStainedWretchStripeApp!.id, 'Key Vault Secrets User')
-  scope: keyVault
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-    principalId: inkStainedWretchStripeApp!.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-// Grant InkStainedWretchesConfig access to Key Vault
-resource configKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (deployKeyVault && deployInkStainedWretchesConfig && deployStorageAccount) {
-  name: guid(keyVault!.id, inkStainedWretchesConfigApp!.id, 'Key Vault Secrets User')
-  scope: keyVault
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-    principalId: inkStainedWretchesConfigApp!.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
+// NOTE: Role assignments have been removed from this template to avoid permission errors
+// during automated deployments. The GitHub Actions service principal typically lacks the
+// "User Access Administrator" role required to create role assignments.
+//
+// To grant Function Apps access to Key Vault after deployment, run the following commands
+// or use the provided scripts in the infra/ directory:
+//
+// az role assignment create \
+//   --assignee <function-app-principal-id> \
+//   --role "Key Vault Secrets User" \
+//   --scope <key-vault-id>
+//
+// Or use the helper script:
+// ./infra/Assign-KeyVaultRole.sh -k <keyvault-name>
+//
+// For automated deployments, ensure the service principal has "User Access Administrator"
+// role by running:
+// ./infra/Grant-ServicePrincipalPermissions.sh
 
 // =========================================
 // Outputs
@@ -860,6 +834,7 @@ resource configKeyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-0
 
 output storageAccountName string = deployStorageAccount ? storageAccount!.name : ''
 output keyVaultName string = deployKeyVault ? keyVault!.name : ''
+output keyVaultId string = deployKeyVault ? keyVault!.id : ''
 output keyVaultUri string = deployKeyVault ? keyVaultUri : ''
 output dnsZoneName string = deployDnsZone && !empty(dnsZoneName) ? dnsZone!.name : ''
 output appInsightsName string = deployAppInsights ? appInsights!.name : ''
@@ -867,14 +842,19 @@ output appInsightsInstrumentationKey string = deployAppInsights ? appInsights!.p
 output appInsightsConnectionString string = deployAppInsights ? appInsights!.properties.ConnectionString : ''
 output imageApiFunctionName string = deployImageApi && deployStorageAccount ? imageApiFunctionApp!.name : ''
 output imageApiFunctionUrl string = deployImageApi && deployStorageAccount ? 'https://${imageApiFunctionApp!.properties.defaultHostName}' : ''
+output imageApiFunctionPrincipalId string = deployImageApi && deployStorageAccount ? imageApiFunctionApp!.identity.principalId : ''
 output inkStainedWretchFunctionsName string = deployInkStainedWretchFunctions && deployStorageAccount ? inkStainedWretchFunctionsApp!.name : ''
 output inkStainedWretchFunctionsUrl string = deployInkStainedWretchFunctions && deployStorageAccount ? 'https://${inkStainedWretchFunctionsApp!.properties.defaultHostName}' : ''
+output inkStainedWretchFunctionsPrincipalId string = deployInkStainedWretchFunctions && deployStorageAccount ? inkStainedWretchFunctionsApp!.identity.principalId : ''
 output inkStainedWretchStripeName string = deployInkStainedWretchStripe && deployStorageAccount ? inkStainedWretchStripeApp!.name : ''
 output inkStainedWretchStripeUrl string = deployInkStainedWretchStripe && deployStorageAccount ? 'https://${inkStainedWretchStripeApp!.properties.defaultHostName}' : ''
+output inkStainedWretchStripePrincipalId string = deployInkStainedWretchStripe && deployStorageAccount ? inkStainedWretchStripeApp!.identity.principalId : ''
 output inkStainedWretchesConfigName string = deployInkStainedWretchesConfig && deployStorageAccount ? inkStainedWretchesConfigApp!.name : ''
 output inkStainedWretchesConfigUrl string = deployInkStainedWretchesConfig && deployStorageAccount ? 'https://${inkStainedWretchesConfigApp!.properties.defaultHostName}' : ''
+output inkStainedWretchesConfigPrincipalId string = deployInkStainedWretchesConfig && deployStorageAccount ? inkStainedWretchesConfigApp!.identity.principalId : ''
 output communicationServicesDeployed string = deployCommunicationServices ? 'true' : 'false'
 output communicationServicesNote string = deployCommunicationServices ? 'Communication Services deployed. Retrieve connection string from Azure Portal -> Communication Services -> Keys' : 'Communication Services not deployed'
+output postDeploymentNote string = deployKeyVault ? 'IMPORTANT: Role assignments for Key Vault access have been removed from this template. To grant Function Apps access to Key Vault, run: ./infra/Assign-KeyVaultRole.sh -k ${keyVault!.name} for each Function App, or grant the service principal User Access Administrator role using ./infra/Grant-ServicePrincipalPermissions.sh and redeploy.' : ''
 
 // =========================================
 // Azure Communication Services (Optional)

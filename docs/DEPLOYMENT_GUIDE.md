@@ -132,6 +132,70 @@ The workflow runs automatically on:
 13. **Deploy InkStainedWretchesConfig** (Conditional)
     - Only if `DEPLOY_ISW_CONFIG=true`
 
+### Post-Deployment Steps
+
+After the automated deployment completes successfully, you must perform these manual steps:
+
+#### 1. Grant Function Apps Access to Key Vault
+
+The Bicep template no longer creates Key Vault role assignments automatically to avoid permission errors. You must grant access manually using one of these methods:
+
+**Method 1: Use Helper Script (Recommended)**
+```bash
+cd infra
+
+# Grant access for each Function App that needs Key Vault access
+./Assign-KeyVaultRole.sh -k <key-vault-name>
+```
+
+The script will:
+- Check if role assignment already exists (idempotent)
+- Assign "Key Vault Secrets User" role to the Function App's managed identity
+- Provide clear success/error messages
+
+**Method 2: Use Azure CLI**
+```bash
+# Get principal IDs from deployment outputs
+az deployment group show \
+  --resource-group <resource-group> \
+  --name <deployment-name> \
+  --query 'properties.outputs'
+
+# Assign role for each Function App
+az role assignment create \
+  --assignee <function-app-principal-id> \
+  --role "Key Vault Secrets User" \
+  --scope <key-vault-id>
+```
+
+**Method 3: Azure Portal**
+1. Navigate to Key Vault → Access control (IAM)
+2. Click "Add role assignment"
+3. Select "Key Vault Secrets User" role
+4. Select each Function App's managed identity
+5. Review and assign
+
+**Function Apps that need Key Vault access:**
+- ImageAPI
+- InkStainedWretchFunctions
+- InkStainedWretchStripe
+- InkStainedWretchesConfig
+
+#### 2. Verify Communication Services (If Enabled)
+
+If you deployed Communication Services (`DEPLOY_COMMUNICATION_SERVICES=true`):
+1. Navigate to Azure Portal → Communication Services
+2. Go to "Keys" to retrieve the connection string
+3. Store the connection string in Key Vault or update Function App configuration
+
+#### 3. Test Function Apps
+
+After granting Key Vault access:
+1. Navigate to each Function App in Azure Portal
+2. Check the "Functions" tab to verify functions are loaded
+3. Test an HTTP trigger function to ensure everything works
+4. Review Application Insights for any startup errors
+
 ## 🏗️ Infrastructure Components
 
 ### Storage Account
@@ -367,6 +431,38 @@ fi
 - Verify domain name format (no https://, no trailing slash)
 - Ensure you own the domain
 - Check if DNS Zone already exists in another resource group
+
+#### 6. Key Vault Role Assignment Errors (FIXED)
+
+**Error**: `Authorization failed for template resource ... of type 'Microsoft.Authorization/roleAssignments'. The client ... does not have permission to perform action 'Microsoft.Authorization/roleAssignments/write'`
+
+**Context**: This error occurred in previous versions when the Bicep template attempted to create role assignments for Function App access to Key Vault.
+
+**Solution** (Already Implemented):
+- Role assignments have been removed from the Bicep template to avoid this permission error
+- After infrastructure deployment completes successfully, you must manually grant Function Apps access to Key Vault using one of these methods:
+
+  **Option 1: Use Helper Script (Recommended)**
+  ```bash
+  cd infra
+  ./Assign-KeyVaultRole.sh -k <key-vault-name>
+  ```
+
+  **Option 2: Manual Azure CLI**
+  ```bash
+  # Get the Function App principal ID from deployment outputs
+  az role assignment create \
+    --assignee <function-app-principal-id> \
+    --role "Key Vault Secrets User" \
+    --scope <key-vault-id>
+  ```
+
+  **Option 3: For Automated Deployments**
+  - Grant the GitHub Actions service principal "User Access Administrator" role
+  - Run: `./infra/Grant-ServicePrincipalPermissions.sh`
+  - Redeploy the infrastructure
+
+**Note**: The deployment outputs now include Function App principal IDs to make manual role assignment easier.
 
 ### Viewing Deployment Logs
 
