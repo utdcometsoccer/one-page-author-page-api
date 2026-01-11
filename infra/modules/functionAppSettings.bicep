@@ -297,7 +297,7 @@ var googleDomainsSettings = concat(
       name: 'GOOGLE_DOMAINS_LOCATION'
       value: googleDomainsLocation
     }
-  ] : !empty(googleCloudProjectId) ? [
+  ] : (!empty(googleCloudProjectId) && empty(googleDomainsLocation)) ? [
     {
       name: 'GOOGLE_DOMAINS_LOCATION'
       value: 'global'
@@ -330,7 +330,7 @@ var amazonProductSettings = concat(
       name: 'AMAZON_PRODUCT_REGION'
       value: amazonProductRegion
     }
-  ] : !empty(amazonProductAccessKey) ? [
+  ] : (!empty(amazonProductAccessKey) && empty(amazonProductRegion)) ? [
     {
       name: 'AMAZON_PRODUCT_REGION'
       value: 'us-east-1'
@@ -341,7 +341,7 @@ var amazonProductSettings = concat(
       name: 'AMAZON_PRODUCT_MARKETPLACE'
       value: amazonProductMarketplace
     }
-  ] : !empty(amazonProductAccessKey) ? [
+  ] : (!empty(amazonProductAccessKey) && empty(amazonProductMarketplace)) ? [
     {
       name: 'AMAZON_PRODUCT_MARKETPLACE'
       value: 'www.amazon.com'
@@ -362,7 +362,7 @@ var penguinRandomHouseSettings = concat(
       name: 'PENGUIN_RANDOM_HOUSE_API_DOMAIN'
       value: penguinRandomHouseApiDomain
     }
-  ] : !empty(penguinRandomHouseApiKey) ? [
+  ] : (!empty(penguinRandomHouseApiKey) && empty(penguinRandomHouseApiDomain)) ? [
     {
       name: 'PENGUIN_RANDOM_HOUSE_API_DOMAIN'
       value: 'PRH.US'
