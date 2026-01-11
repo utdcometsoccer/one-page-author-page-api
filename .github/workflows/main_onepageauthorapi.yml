@@ -570,7 +570,7 @@ jobs:
           az deployment group create \
             --resource-group "$ISW_RESOURCE_GROUP" \
             --template-file infra/inkstainedwretches.bicep \
-            --parameters "${PARAMS_ARRAY[@]}" "${SECURE_PARAMS_ARRAY[@]}" \
+            --parameters $PARAMS "${PARAMS_ARRAY[@]}" "${SECURE_PARAMS_ARRAY[@]}" \
             --output json > deployment-output.json
 
           echo "✓ Infrastructure deployment completed"
