@@ -555,10 +555,18 @@ dotnet test --filter "Category=Unit"
 
 ### Automated CI/CD Deployment
 
-The platform uses GitHub Actions for automated deployment to Azure. See the comprehensive guides:
+The platform uses GitHub Actions for automated deployment to Azure with built-in quality gates:
+
+- **Unit Tests** - All 780+ unit tests must pass before deployment proceeds
+- **Build Validation** - All Azure Functions are compiled and validated
+- **Infrastructure Deployment** - Automated Bicep template deployments
+
+See the comprehensive guides:
 
 - **[Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Complete deployment workflow documentation
 - **[GitHub Secrets Reference](docs/GITHUB_SECRETS_REFERENCE.md)** - Quick reference for all required secrets
+
+**Note:** The CI/CD pipeline automatically runs unit tests before any deployment. If tests fail, the deployment is blocked to prevent broken code from reaching production.
 
 ### Azure Resources Required
 
