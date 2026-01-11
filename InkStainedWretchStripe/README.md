@@ -71,6 +71,12 @@ dotnet user-secrets set "AAD_CLIENT_ID" "YOUR_ACTUAL_CLIENT_ID"
 # Azure AD Audience (Usually same as Client ID)
 dotnet user-secrets set "AAD_AUDIENCE" "YOUR_ACTUAL_CLIENT_ID"
 
+# Optional: Azure AD Authority URL (auto-constructed if not provided)
+# dotnet user-secrets set "AAD_AUTHORITY" "https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0"
+
+# Optional: Multiple valid issuers (comma-separated)
+# dotnet user-secrets set "AAD_VALID_ISSUERS" "https://login.microsoftonline.com/TENANT1/v2.0,https://login.microsoftonline.com/TENANT2/v2.0"
+
 ```
 
 #### Verify Setup
@@ -96,6 +102,8 @@ The following environment variables are required for the application to run:
 | `AAD_TENANT_ID` | Azure Active Directory tenant ID | Yes | Azure Portal → Azure Active Directory → Properties → Directory ID |
 | `AAD_CLIENT_ID` | Azure AD application client ID | Yes | Azure Portal → Azure Active Directory → App registrations → [Your app] → Application ID |
 | `AAD_AUDIENCE` | Azure AD API audience/scope | Yes | Usually same as Client ID |
+| `AAD_AUTHORITY` | Azure AD authority URL | No (optional) | Auto-constructed from tenant ID if not provided (e.g., `https://login.microsoftonline.com/{tenantId}/v2.0`) |
+| `AAD_VALID_ISSUERS` | Comma-separated list of valid JWT issuers | No (optional) | Multiple issuer URLs for multi-tenant scenarios |
 
 ### Why These Settings Are Needed
 
@@ -214,6 +222,12 @@ dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthor"
 dotnet user-secrets set "AAD_TENANT_ID" "YOUR_ACTUAL_TENANT_ID"
 dotnet user-secrets set "AAD_CLIENT_ID" "YOUR_ACTUAL_CLIENT_ID"
 dotnet user-secrets set "AAD_AUDIENCE" "YOUR_ACTUAL_CLIENT_ID"
+
+# Optional: Azure AD Authority URL (auto-constructed if not provided)
+# dotnet user-secrets set "AAD_AUTHORITY" "https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0"
+
+# Optional: Multiple valid issuers (comma-separated)
+# dotnet user-secrets set "AAD_VALID_ISSUERS" "https://login.microsoftonline.com/TENANT1/v2.0,https://login.microsoftonline.com/TENANT2/v2.0"
 ```
 
 **Step 3:** Verify Setup
@@ -238,6 +252,8 @@ For Azure deployments:
    - `AAD_TENANT_ID`
    - `AAD_CLIENT_ID`
    - `AAD_AUDIENCE`
+   - `AAD_AUTHORITY` (optional - auto-constructed from tenant ID if not provided)
+   - `AAD_VALID_ISSUERS` (optional - for multi-tenant scenarios)
 
 3. **Enhanced Security**: Use Azure Key Vault integration
 

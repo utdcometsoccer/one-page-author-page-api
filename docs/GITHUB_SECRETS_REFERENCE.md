@@ -436,6 +436,9 @@ The deployment workflow (`.github/workflows/main_onepageauthorapi.yml`) reads Gi
 | `COSMOSDB_DATABASE_ID` | `COSMOSDB_DATABASE_ID` | Database name |
 | `AAD_TENANT_ID` | `AAD_TENANT_ID` | Azure AD tenant ID |
 | `AAD_AUDIENCE` | `AAD_AUDIENCE` | Azure AD client ID |
+| `AAD_CLIENT_ID` | `AAD_CLIENT_ID` | Azure AD client ID (alternative to audience) |
+| `AAD_AUTHORITY` | `AAD_AUTHORITY` | Azure AD authority URL |
+| `AAD_VALID_ISSUERS` | `AAD_VALID_ISSUERS` | Comma-separated list of valid JWT issuers |
 | `AZURE_SUBSCRIPTION_ID` | `AZURE_SUBSCRIPTION_ID` | Azure subscription for DNS/Front Door |
 | `AZURE_DNS_RESOURCE_GROUP` | `AZURE_DNS_RESOURCE_GROUP` | Resource group for DNS zones |
 | `GOOGLE_CLOUD_PROJECT_ID` | `GOOGLE_CLOUD_PROJECT_ID` | Google Cloud project ID |
@@ -464,7 +467,9 @@ The deployment workflow (`.github/workflows/main_onepageauthorapi.yml`) reads Gi
 | `AZURE_STORAGE_CONNECTION_STRING` | `AZURE_STORAGE_CONNECTION_STRING` | Blob storage connection |
 | `AAD_TENANT_ID` | `AAD_TENANT_ID` | Azure AD tenant ID |
 | `AAD_AUDIENCE` | `AAD_AUDIENCE` | Azure AD client ID |
+| `AAD_CLIENT_ID` | `AAD_CLIENT_ID` | Azure AD client ID (alternative to audience) |
 | `AAD_AUTHORITY` | `AAD_AUTHORITY` | Azure AD authority URL |
+| `AAD_VALID_ISSUERS` | `AAD_VALID_ISSUERS` | Comma-separated list of valid JWT issuers |
 
 ### InkStainedWretchStripe Environment Variables
 
@@ -479,6 +484,8 @@ The deployment workflow (`.github/workflows/main_onepageauthorapi.yml`) reads Gi
 | `AAD_TENANT_ID` | `AAD_TENANT_ID` | Azure AD tenant ID |
 | `AAD_AUDIENCE` | `AAD_AUDIENCE` | Azure AD audience/client ID |
 | `AAD_CLIENT_ID` | `AAD_CLIENT_ID` | Azure AD client ID |
+| `AAD_AUTHORITY` | `AAD_AUTHORITY` | Azure AD authority URL |
+| `AAD_VALID_ISSUERS` | `AAD_VALID_ISSUERS` | Comma-separated list of valid JWT issuers |
 
 ## 📞 Support
 

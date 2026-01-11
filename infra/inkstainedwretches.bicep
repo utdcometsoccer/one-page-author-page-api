@@ -363,6 +363,12 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
           value: aadAudience
         }
       ] : [],
+      !empty(aadClientId) ? [
+        {
+          name: 'AAD_CLIENT_ID'
+          value: aadClientId
+        }
+      ] : [],
       !empty(aadAuthority) ? [
         {
           name: 'AAD_AUTHORITY'
@@ -477,6 +483,18 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
         {
           name: 'AAD_AUDIENCE'
           value: aadAudience
+        }
+      ] : [],
+      !empty(aadClientId) ? [
+        {
+          name: 'AAD_CLIENT_ID'
+          value: aadClientId
+        }
+      ] : [],
+      !empty(aadAuthority) ? [
+        {
+          name: 'AAD_AUTHORITY'
+          value: aadAuthority
         }
       ] : [],
       !empty(aadValidIssuers) ? [
@@ -696,6 +714,12 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
         {
           name: 'AAD_CLIENT_ID'
           value: aadClientId
+        }
+      ] : [],
+      !empty(aadAuthority) ? [
+        {
+          name: 'AAD_AUTHORITY'
+          value: aadAuthority
         }
       ] : [],
       !empty(aadValidIssuers) ? [
