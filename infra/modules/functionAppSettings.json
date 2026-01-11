@@ -1,0 +1,263 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.39.26.7824",
+      "templateHash": "15975349785335299581"
+    }
+  },
+  "parameters": {
+    "functionAppName": {
+      "type": "string",
+      "metadata": {
+        "description": "Function App name (used for WEBSITE_CONTENTSHARE)"
+      }
+    },
+    "storageConnectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage account connection string for AzureWebJobsStorage"
+      }
+    },
+    "appInsightsConnectionString": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Application Insights connection string (optional)"
+      }
+    },
+    "cosmosDbConnectionString": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Cosmos DB connection string (optional)"
+      }
+    },
+    "cosmosDbEndpointUri": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Cosmos DB endpoint URI (optional)"
+      }
+    },
+    "cosmosDbPrimaryKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Cosmos DB primary key (optional)"
+      }
+    },
+    "cosmosDbDatabaseId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Cosmos DB database ID (optional)"
+      }
+    },
+    "aadTenantId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure AD tenant ID (optional)"
+      }
+    },
+    "aadAudience": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure AD audience/client ID (optional)"
+      }
+    },
+    "aadClientId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure AD client ID (optional)"
+      }
+    },
+    "aadAuthority": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure AD authority URL (optional)"
+      }
+    },
+    "aadValidIssuers": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure AD valid issuers (optional, comma-separated)"
+      }
+    },
+    "azureStorageConnectionString": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure Storage connection string (optional, for ImageAPI)"
+      }
+    },
+    "stripeApiKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Stripe API key (optional)"
+      }
+    },
+    "stripeWebhookSecret": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Stripe webhook secret (optional)"
+      }
+    },
+    "azureSubscriptionId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure subscription ID (optional)"
+      }
+    },
+    "azureDnsResourceGroup": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure DNS resource group (optional)"
+      }
+    },
+    "googleCloudProjectId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Google Cloud project ID (optional)"
+      }
+    },
+    "googleDomainsLocation": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Google Domains location (optional)"
+      }
+    },
+    "amazonProductAccessKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Amazon Product access key (optional)"
+      }
+    },
+    "amazonProductSecretKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Amazon Product secret key (optional)"
+      }
+    },
+    "amazonProductPartnerTag": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Amazon Product partner tag (optional)"
+      }
+    },
+    "amazonProductRegion": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Amazon Product region (optional)"
+      }
+    },
+    "amazonProductMarketplace": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Amazon Product marketplace (optional)"
+      }
+    },
+    "penguinRandomHouseApiKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Penguin Random House API key (optional)"
+      }
+    },
+    "penguinRandomHouseApiDomain": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Penguin Random House API domain (optional)"
+      }
+    },
+    "keyVaultUri": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Key Vault URI (optional)"
+      }
+    },
+    "useKeyVault": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Whether to use Key Vault (optional)"
+      }
+    }
+  },
+  "variables": {
+    "baseSettings": [
+      {
+        "name": "AzureWebJobsStorage",
+        "value": "[parameters('storageConnectionString')]"
+      },
+      {
+        "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+        "value": "[parameters('storageConnectionString')]"
+      },
+      {
+        "name": "WEBSITE_CONTENTSHARE",
+        "value": "[toLower(parameters('functionAppName'))]"
+      },
+      {
+        "name": "FUNCTIONS_EXTENSION_VERSION",
+        "value": "~4"
+      },
+      {
+        "name": "FUNCTIONS_WORKER_RUNTIME",
+        "value": "dotnet-isolated"
+      },
+      {
+        "name": "WEBSITE_RUN_FROM_PACKAGE",
+        "value": "1"
+      }
+    ],
+    "appInsightsSettings": "[if(not(empty(parameters('appInsightsConnectionString'))), createArray(createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', parameters('appInsightsConnectionString'))), createArray())]",
+    "cosmosDbSettings": "[concat(if(not(empty(parameters('cosmosDbConnectionString'))), createArray(createObject('name', 'COSMOSDB_CONNECTION_STRING', 'value', parameters('cosmosDbConnectionString'))), createArray()), if(not(empty(parameters('cosmosDbEndpointUri'))), createArray(createObject('name', 'COSMOSDB_ENDPOINT_URI', 'value', parameters('cosmosDbEndpointUri'))), createArray()), if(not(empty(parameters('cosmosDbPrimaryKey'))), createArray(createObject('name', 'COSMOSDB_PRIMARY_KEY', 'value', parameters('cosmosDbPrimaryKey'))), createArray()), if(not(empty(parameters('cosmosDbDatabaseId'))), createArray(createObject('name', 'COSMOSDB_DATABASE_ID', 'value', parameters('cosmosDbDatabaseId'))), createArray()))]",
+    "aadSettings": "[concat(if(not(empty(parameters('aadTenantId'))), createArray(createObject('name', 'AAD_TENANT_ID', 'value', parameters('aadTenantId'))), createArray()), if(not(empty(parameters('aadAudience'))), createArray(createObject('name', 'AAD_AUDIENCE', 'value', parameters('aadAudience'))), createArray()), if(not(empty(parameters('aadClientId'))), createArray(createObject('name', 'AAD_CLIENT_ID', 'value', parameters('aadClientId'))), createArray()), if(not(empty(parameters('aadAuthority'))), createArray(createObject('name', 'AAD_AUTHORITY', 'value', parameters('aadAuthority'))), createArray()), if(not(empty(parameters('aadValidIssuers'))), createArray(createObject('name', 'AAD_VALID_ISSUERS', 'value', parameters('aadValidIssuers'))), createArray()))]",
+    "azureStorageSettings": "[if(not(empty(parameters('azureStorageConnectionString'))), createArray(createObject('name', 'AZURE_STORAGE_CONNECTION_STRING', 'value', parameters('azureStorageConnectionString'))), createArray())]",
+    "stripeSettings": "[concat(if(not(empty(parameters('stripeApiKey'))), createArray(createObject('name', 'STRIPE_API_KEY', 'value', parameters('stripeApiKey'))), createArray()), if(not(empty(parameters('stripeWebhookSecret'))), createArray(createObject('name', 'STRIPE_WEBHOOK_SECRET', 'value', parameters('stripeWebhookSecret'))), createArray()))]",
+    "azureInfraSettings": "[concat(if(not(empty(parameters('azureSubscriptionId'))), createArray(createObject('name', 'AZURE_SUBSCRIPTION_ID', 'value', parameters('azureSubscriptionId'))), createArray()), if(not(empty(parameters('azureDnsResourceGroup'))), createArray(createObject('name', 'AZURE_DNS_RESOURCE_GROUP', 'value', parameters('azureDnsResourceGroup'))), createArray()))]",
+    "googleDomainsSettings": "[concat(if(not(empty(parameters('googleCloudProjectId'))), createArray(createObject('name', 'GOOGLE_CLOUD_PROJECT_ID', 'value', parameters('googleCloudProjectId'))), createArray()), if(not(empty(parameters('googleDomainsLocation'))), createArray(createObject('name', 'GOOGLE_DOMAINS_LOCATION', 'value', parameters('googleDomainsLocation'))), if(not(empty(parameters('googleCloudProjectId'))), createArray(createObject('name', 'GOOGLE_DOMAINS_LOCATION', 'value', 'global')), createArray())))]",
+    "amazonProductSettings": "[concat(if(not(empty(parameters('amazonProductAccessKey'))), createArray(createObject('name', 'AMAZON_PRODUCT_ACCESS_KEY', 'value', parameters('amazonProductAccessKey'))), createArray()), if(not(empty(parameters('amazonProductSecretKey'))), createArray(createObject('name', 'AMAZON_PRODUCT_SECRET_KEY', 'value', parameters('amazonProductSecretKey'))), createArray()), if(not(empty(parameters('amazonProductPartnerTag'))), createArray(createObject('name', 'AMAZON_PRODUCT_PARTNER_TAG', 'value', parameters('amazonProductPartnerTag'))), createArray()), if(not(empty(parameters('amazonProductRegion'))), createArray(createObject('name', 'AMAZON_PRODUCT_REGION', 'value', parameters('amazonProductRegion'))), if(not(empty(parameters('amazonProductAccessKey'))), createArray(createObject('name', 'AMAZON_PRODUCT_REGION', 'value', 'us-east-1')), createArray())), if(not(empty(parameters('amazonProductMarketplace'))), createArray(createObject('name', 'AMAZON_PRODUCT_MARKETPLACE', 'value', parameters('amazonProductMarketplace'))), if(not(empty(parameters('amazonProductAccessKey'))), createArray(createObject('name', 'AMAZON_PRODUCT_MARKETPLACE', 'value', 'www.amazon.com')), createArray())))]",
+    "penguinRandomHouseSettings": "[concat(if(not(empty(parameters('penguinRandomHouseApiKey'))), createArray(createObject('name', 'PENGUIN_RANDOM_HOUSE_API_KEY', 'value', parameters('penguinRandomHouseApiKey'))), createArray()), if(not(empty(parameters('penguinRandomHouseApiDomain'))), createArray(createObject('name', 'PENGUIN_RANDOM_HOUSE_API_DOMAIN', 'value', parameters('penguinRandomHouseApiDomain'))), if(not(empty(parameters('penguinRandomHouseApiKey'))), createArray(createObject('name', 'PENGUIN_RANDOM_HOUSE_API_DOMAIN', 'value', 'PRH.US')), createArray())))]",
+    "keyVaultSettings": "[if(not(empty(parameters('keyVaultUri'))), createArray(createObject('name', 'KEY_VAULT_URL', 'value', parameters('keyVaultUri')), createObject('name', 'USE_KEY_VAULT', 'value', string(parameters('useKeyVault')))), createArray())]",
+    "allSettings": "[concat(variables('baseSettings'), variables('appInsightsSettings'), variables('cosmosDbSettings'), variables('aadSettings'), variables('azureStorageSettings'), variables('stripeSettings'), variables('azureInfraSettings'), variables('googleDomainsSettings'), variables('amazonProductSettings'), variables('penguinRandomHouseSettings'), variables('keyVaultSettings'))]"
+  },
+  "resources": [],
+  "outputs": {
+    "appSettings": {
+      "type": "array",
+      "metadata": {
+        "description": "Complete app settings array ready for use in Function App configuration"
+      },
+      "value": "[variables('allSettings')]"
+    },
+    "settingsCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Count of configured settings"
+      },
+      "value": "[length(variables('allSettings'))]"
+    }
+  }
+}
