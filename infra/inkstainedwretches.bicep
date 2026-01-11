@@ -698,6 +698,12 @@ resource inkStainedWretchStripeApp 'Microsoft.Web/sites@2024-04-01' = if (deploy
           value: aadClientId
         }
       ] : [],
+      !empty(aadAuthority) ? [
+        {
+          name: 'AAD_AUTHORITY'
+          value: aadAuthority
+        }
+      ] : [],
       !empty(aadValidIssuers) ? [
         {
           name: 'AAD_VALID_ISSUERS'
