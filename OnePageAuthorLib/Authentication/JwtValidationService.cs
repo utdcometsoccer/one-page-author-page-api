@@ -13,7 +13,7 @@ public interface IJwtValidationService
     Task<ClaimsPrincipal?> ValidateTokenAsync(string token);
 }
 
-public class JwtValidationService : IJwtValidationService
+public class JwtValidationService : IJwtValidationService, IDisposable
 {
     private readonly ILogger<JwtValidationService> _logger;
     private readonly IConfiguration _configuration;
@@ -21,6 +21,7 @@ public class JwtValidationService : IJwtValidationService
     private readonly ITokenIntrospectionService _tokenIntrospectionService;
     private ConfigurationManager<OpenIdConnectConfiguration>? _configurationManager;
     private readonly SemaphoreSlim _configurationManagerLock = new(1, 1);
+    private bool _disposed;
 
     public JwtValidationService(ILogger<JwtValidationService> logger, IConfiguration configuration, ITokenIntrospectionService tokenIntrospectionService)
     {
@@ -28,6 +29,15 @@ public class JwtValidationService : IJwtValidationService
         _configuration = configuration;
         _tokenHandler = new JwtSecurityTokenHandler();
         _tokenIntrospectionService = tokenIntrospectionService;
+    }
+
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            _configurationManagerLock.Dispose();
+            _disposed = true;
+        }
     }
 
     public async Task<ClaimsPrincipal?> ValidateTokenAsync(string token)
@@ -101,7 +111,11 @@ public class JwtValidationService : IJwtValidationService
         try
         {
             // Double-check after acquiring lock
+            // This is the double-check locking pattern - another thread may have initialized
+            // _configurationManager between the first check and acquiring the lock
+#pragma warning disable CS0472 // The result of the expression is always the same - this is intentional for double-check locking
             if (_configurationManager != null)
+#pragma warning restore CS0472
             {
                 return _configurationManager;
             }
@@ -169,12 +183,10 @@ public class JwtValidationService : IJwtValidationService
         var validIssuersRaw = _configuration["AAD_VALID_ISSUERS"];
         string[]? validIssuers = Utility.ParseValidIssuers(validIssuersRaw);
 
-        // Try validation with current configuration
-        try
+        // Local helper to construct TokenValidationParameters from the given configuration
+        TokenValidationParameters CreateTokenValidationParameters(OpenIdConnectConfiguration config)
         {
-            var openIdConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None);
-
-            var validationParameters = new TokenValidationParameters
+            return new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
@@ -184,9 +196,16 @@ public class JwtValidationService : IJwtValidationService
                 ValidIssuer = validIssuers is null ? authority.TrimEnd('/') : null,
                 ValidIssuers = validIssuers,
                 ValidAudiences = new[] { audience },
-                IssuerSigningKeys = openIdConfig.SigningKeys,
+                IssuerSigningKeys = config.SigningKeys,
                 ClockSkew = TimeSpan.FromMinutes(5)
             };
+        }
+
+        // Try validation with current configuration
+        try
+        {
+            var openIdConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+            var validationParameters = CreateTokenValidationParameters(openIdConfig);
 
             _logger.LogDebug("Attempting to validate JWT token with {SegmentCount} segments", 3);
             var principal = _tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
@@ -202,21 +221,11 @@ public class JwtValidationService : IJwtValidationService
             
             // Force refresh the configuration to get latest signing keys
             // This handles the case where Azure AD has rotated keys
+            // Note: Only one retry attempt is made. If the refreshed metadata still doesn't contain
+            // the required key, the exception will bubble up and be caught by the outer exception handler.
             configurationManager.RequestRefresh();
             var refreshedConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None);
-
-            var validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = validIssuers is null ? authority.TrimEnd('/') : null,
-                ValidIssuers = validIssuers,
-                ValidAudiences = new[] { audience },
-                IssuerSigningKeys = refreshedConfig.SigningKeys,
-                ClockSkew = TimeSpan.FromMinutes(5)
-            };
+            var validationParameters = CreateTokenValidationParameters(refreshedConfig);
 
             _logger.LogDebug("Retrying JWT token validation with refreshed signing keys");
             var principal = _tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
