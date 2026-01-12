@@ -142,11 +142,16 @@ This fix follows the repository's coding conventions:
 - ✅ Documentation complete - Created comprehensive docs following repository style
 - ✅ Conventional commits - Used "fix:" and "docs:" commit prefixes
 
-## Contact
-For questions or issues related to this fix, refer to:
-- [AUTHORIZATION_FIX_DOCUMENTATION.md](../AUTHORIZATION_FIX_DOCUMENTATION.md) - Detailed technical guide
+## Related Documentation
+
+For additional authentication and authorization topics, see:
+- [AUTHORIZATION_FIX_DOCUMENTATION.md](../AUTHORIZATION_FIX_DOCUMENTATION.md) - Detailed technical guide for the 401 fix
+- [REFRESH_ON_ISSUER_KEY_NOT_FOUND.md](./REFRESH_ON_ISSUER_KEY_NOT_FOUND.md) - Documentation for automatic signing key refresh configuration
 - [Azure Functions HTTP triggers documentation](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger)
 - [Microsoft identity platform documentation](https://learn.microsoft.com/en-us/entra/identity-platform/)
+
+## Contact
+For questions or issues related to this fix, refer to the documentation links above.
 
 ---
 **Resolution Date:** December 23, 2024  
