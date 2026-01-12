@@ -19,6 +19,8 @@ public class JwtValidationService : IJwtValidationService
     private readonly IConfiguration _configuration;
     private readonly JwtSecurityTokenHandler _tokenHandler;
     private readonly ITokenIntrospectionService _tokenIntrospectionService;
+    private ConfigurationManager<OpenIdConnectConfiguration>? _configurationManager;
+    private readonly SemaphoreSlim _configurationManagerLock = new(1, 1);
 
     public JwtValidationService(ILogger<JwtValidationService> logger, IConfiguration configuration, ITokenIntrospectionService tokenIntrospectionService)
     {
@@ -88,6 +90,59 @@ public class JwtValidationService : IJwtValidationService
         }
     }
 
+    private async Task<ConfigurationManager<OpenIdConnectConfiguration>> GetOrCreateConfigurationManagerAsync()
+    {
+        if (_configurationManager != null)
+        {
+            return _configurationManager;
+        }
+
+        await _configurationManagerLock.WaitAsync();
+        try
+        {
+            // Double-check after acquiring lock
+            if (_configurationManager != null)
+            {
+                return _configurationManager;
+            }
+
+            var tenantId = _configuration["AAD_TENANT_ID"];
+            var openIdMetadataUrl = _configuration["OPEN_ID_CONNECT_METADATA_URL"] ??
+                                    (!string.IsNullOrWhiteSpace(tenantId)
+                                        ? $"https://login.microsoftonline.com/{tenantId}/v2.0/.well-known/openid-configuration"
+                                        : null);
+
+            if (string.IsNullOrWhiteSpace(openIdMetadataUrl))
+            {
+                throw new InvalidOperationException("OpenID Connect metadata URL is not configured. Set AAD_TENANT_ID or OPEN_ID_CONNECT_METADATA_URL.");
+            }
+
+            _logger.LogInformation("Initializing ConfigurationManager with metadata URL: {MetadataUrl}", 
+                Utility.MaskUrl(openIdMetadataUrl));
+
+            // Create configuration manager with automatic refresh settings
+            // This matches the configuration in Program.cs files to prevent key rotation issues
+            _configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                openIdMetadataUrl,
+                new OpenIdConnectConfigurationRetriever(),
+                new HttpDocumentRetriever())
+            {
+                // Refresh metadata every 6 hours (default is 24 hours)
+                // This proactively updates signing keys before they become stale
+                AutomaticRefreshInterval = TimeSpan.FromHours(6),
+                // Minimum time between refreshes to prevent hammering the endpoint
+                // This rate limits metadata refreshes during key rotation events
+                RefreshInterval = TimeSpan.FromMinutes(30)
+            };
+
+            return _configurationManager;
+        }
+        finally
+        {
+            _configurationManagerLock.Release();
+        }
+    }
+
     private async Task<ClaimsPrincipal?> ValidateJwtTokenAsync(string token)
     {
         var tenantId = _configuration["AAD_TENANT_ID"];
@@ -107,38 +162,69 @@ public class JwtValidationService : IJwtValidationService
             return null;
         }
 
-        // Get OpenID Connect configuration for token validation
-        //var openIdConnectUrl = $"{authority.TrimEnd('/')}/.well-known/openid_connect_configuration";
-        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-            openIdMetadataUrl,
-            new OpenIdConnectConfigurationRetriever());
-
-        var openIdConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+        // Get or create the singleton configuration manager with automatic refresh
+        var configurationManager = await GetOrCreateConfigurationManagerAsync();
 
         // Allow multiple issuers via comma-delimited env var AAD_VALID_ISSUERS
         var validIssuersRaw = _configuration["AAD_VALID_ISSUERS"];
         string[]? validIssuers = Utility.ParseValidIssuers(validIssuersRaw);
 
-        var validationParameters = new TokenValidationParameters
+        // Try validation with current configuration
+        try
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            // If multiple issuers provided, use ValidIssuers; otherwise fall back to single ValidIssuer
-            ValidIssuer = validIssuers is null ? authority.TrimEnd('/') : null,
-            ValidIssuers = validIssuers,
-            ValidAudiences = new[] { audience },
-            IssuerSigningKeys = openIdConfig.SigningKeys,
-            ClockSkew = TimeSpan.FromMinutes(5)
-        };
+            var openIdConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None);
 
-        _logger.LogDebug("Attempting to validate JWT token with {SegmentCount} segments", 3);
-        var principal = _tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                // If multiple issuers provided, use ValidIssuers; otherwise fall back to single ValidIssuer
+                ValidIssuer = validIssuers is null ? authority.TrimEnd('/') : null,
+                ValidIssuers = validIssuers,
+                ValidAudiences = new[] { audience },
+                IssuerSigningKeys = openIdConfig.SigningKeys,
+                ClockSkew = TimeSpan.FromMinutes(5)
+            };
 
-        _logger.LogInformation("JWT token validated successfully for user: {UserId}",
-            principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Unknown");
+            _logger.LogDebug("Attempting to validate JWT token with {SegmentCount} segments", 3);
+            var principal = _tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-        return principal;
+            _logger.LogInformation("JWT token validated successfully for user: {UserId}",
+                principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Unknown");
+
+            return principal;
+        }
+        catch (SecurityTokenSignatureKeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Signing key not found in current configuration. Attempting to refresh metadata and retry validation.");
+            
+            // Force refresh the configuration to get latest signing keys
+            // This handles the case where Azure AD has rotated keys
+            configurationManager.RequestRefresh();
+            var refreshedConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = validIssuers is null ? authority.TrimEnd('/') : null,
+                ValidIssuers = validIssuers,
+                ValidAudiences = new[] { audience },
+                IssuerSigningKeys = refreshedConfig.SigningKeys,
+                ClockSkew = TimeSpan.FromMinutes(5)
+            };
+
+            _logger.LogDebug("Retrying JWT token validation with refreshed signing keys");
+            var principal = _tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+            _logger.LogInformation("JWT token validated successfully after metadata refresh for user: {UserId}",
+                principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Unknown");
+
+            return principal;
+        }
     }
 }
