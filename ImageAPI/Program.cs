@@ -42,6 +42,10 @@ builder.Services
             options.Audience = audience;
         }
         
+        // Enable automatic metadata refresh when signing key is not found
+        // This helps prevent SecurityTokenSignatureKeyNotFoundException when Azure AD rotates keys
+        options.RefreshOnIssuerKeyNotFound = true;
+        
         // Configure automatic refresh of signing keys from OpenID Connect metadata
         // This prevents SecurityTokenSignatureKeyNotFoundException when Azure AD rotates keys
         if (!string.IsNullOrWhiteSpace(authority))
