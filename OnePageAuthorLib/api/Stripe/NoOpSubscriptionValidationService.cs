@@ -1,4 +1,6 @@
+using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using Microsoft.Extensions.Logging;
 
