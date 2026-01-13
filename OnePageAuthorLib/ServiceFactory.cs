@@ -823,6 +823,9 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<Interfaces.IUserIdentityService, API.UserIdentityService>();
             services.AddScoped<Interfaces.IDomainValidationService, Services.DomainValidationService>();
             services.AddScoped<Interfaces.IContactInformationValidationService, Services.ContactInformationValidationService>();
+            // Register NoOp subscription validation service by default (no Stripe dependency)
+            // This will be overridden by the real implementation if AddStripeServices() is called later
+            services.AddScoped<ISubscriptionValidationService, InkStainedWretch.OnePageAuthorLib.API.Stripe.NoOpSubscriptionValidationService>();
             services.AddScoped<Interfaces.IDomainRegistrationService, API.DomainRegistrationService>();
             return services;
         }
