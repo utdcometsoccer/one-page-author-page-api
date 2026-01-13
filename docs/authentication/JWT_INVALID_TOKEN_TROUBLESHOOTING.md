@@ -1036,7 +1036,7 @@ done
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | 2026-01-13 | GitHub Copilot | Initial comprehensive JWT troubleshooting guide |
+| 1.0 | 2025-01-13 | GitHub Copilot | Initial comprehensive JWT troubleshooting guide |
 
 ---
 

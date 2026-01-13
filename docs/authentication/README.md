@@ -99,7 +99,7 @@ For questions or issues:
 
 | Version | Date | Description |
 |---------|------|-------------|
-| 1.0 | 2026-01-13 | Initial consolidated authentication documentation |
+| 1.0 | 2025-01-13 | Initial consolidated authentication documentation |
 
 ---
 

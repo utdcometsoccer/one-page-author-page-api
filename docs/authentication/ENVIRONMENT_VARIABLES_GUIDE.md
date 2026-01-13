@@ -620,7 +620,7 @@ Print this and keep handy:
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | 2026-01-13 | GitHub Copilot | Initial comprehensive environment variables guide |
+| 1.0 | 2025-01-13 | GitHub Copilot | Initial comprehensive environment variables guide |
 
 ---
 

@@ -701,7 +701,7 @@ union exceptions, traces
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | 2026-01-13 | GitHub Copilot | Initial comprehensive exceptions reference |
+| 1.0 | 2025-01-13 | GitHub Copilot | Initial comprehensive exceptions reference |
 
 ---
 
