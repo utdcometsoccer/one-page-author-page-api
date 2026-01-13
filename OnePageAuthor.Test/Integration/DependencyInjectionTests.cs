@@ -84,5 +84,49 @@ namespace OnePageAuthor.Test.Integration
             Assert.NotNull(domainService);
             Assert.IsType<DomainRegistrationService>(domainService);
         }
+
+        [Fact]
+        public void ServiceFactory_RegistersNoOpSubscriptionValidationService_WithoutStripe()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            services.AddLogging();
+            
+            // Add domain registration services only (no Stripe services)
+            services.AddDomainRegistrationServices();
+            
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Act
+            var subscriptionValidationService = serviceProvider.GetRequiredService<ISubscriptionValidationService>();
+
+            // Assert - Should resolve to NoOp implementation when Stripe is not configured
+            Assert.NotNull(subscriptionValidationService);
+            Assert.IsType<InkStainedWretch.OnePageAuthorLib.API.Stripe.NoOpSubscriptionValidationService>(subscriptionValidationService);
+        }
+
+        [Fact]
+        public void ServiceFactory_DomainRegistrationService_CanBeResolved_WithoutStripe()
+        {
+            // Arrange - Simulate the configuration without Stripe API key
+            var services = new ServiceCollection();
+            services.AddLogging();
+            
+            // Mock the repository dependency
+            var mockRepo = new Moq.Mock<IDomainRegistrationRepository>();
+            services.AddSingleton(mockRepo.Object);
+            
+            // Add domain registration services (which includes NoOp subscription validation)
+            services.AddDomainRegistrationServices();
+            
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Act - Should not throw InvalidOperationException
+            var domainService = serviceProvider.GetRequiredService<IDomainRegistrationService>();
+
+            // Assert - Should be able to resolve successfully
+            Assert.NotNull(domainService);
+            Assert.IsType<DomainRegistrationService>(domainService);
+        }
     }
 }
