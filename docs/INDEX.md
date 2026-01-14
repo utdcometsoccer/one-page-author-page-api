@@ -16,6 +16,28 @@ Start here if you're new to the project:
 4. [**CODE_OF_CONDUCT**](CODE_OF_CONDUCT.md) - Community guidelines
 5. [**SECURITY**](SECURITY.md) - Security policies and vulnerability reporting
 
+### 🔐 Authentication & Authorization
+
+**NEW: Comprehensive Microsoft Entra ID documentation** - Start here for authentication setup:
+
+- [**Authentication Documentation Hub**](authentication/README.md) - **START HERE** - Complete authentication guide index
+- [**ENTRA_CIAM_CONFIGURATION_GUIDE**](authentication/ENTRA_CIAM_CONFIGURATION_GUIDE.md) - Step-by-step Entra ID CIAM setup
+- [**AZURE_ENTRA_ID_CONFIGURATION_CHECKLIST**](authentication/AZURE_ENTRA_ID_CONFIGURATION_CHECKLIST.md) - Configuration checklist
+- [**ENVIRONMENT_VARIABLES_GUIDE**](authentication/ENVIRONMENT_VARIABLES_GUIDE.md) - All Entra ID environment variables explained
+- [**JWT_INVALID_TOKEN_TROUBLESHOOTING**](authentication/JWT_INVALID_TOKEN_TROUBLESHOOTING.md) - JWT troubleshooting guide
+- [**ENTRA_ID_EXCEPTIONS_REFERENCE**](authentication/ENTRA_ID_EXCEPTIONS_REFERENCE.md) - Complete exception reference
+- [**APPLICATION_INSIGHTS_QUERIES**](authentication/APPLICATION_INSIGHTS_QUERIES.md) - KQL queries for monitoring
+
+**Legacy Authentication Docs** (refer to new docs above):
+- [MICROSOFT_ENTRA_ID_CONFIG](MICROSOFT_ENTRA_ID_CONFIG.md) - ⚠️ Legacy - See new ENTRA_CIAM_CONFIGURATION_GUIDE
+- [IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES](IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES.md) - Entra ID roles implementation
+- [MIGRATION_GUIDE_ENTRA_ID_ROLES](MIGRATION_GUIDE_ENTRA_ID_ROLES.md) - Roles migration guide
+- [401_UNAUTHORIZED_RESOLUTION](401_UNAUTHORIZED_RESOLUTION.md) - 401 error resolution
+- [AUTHORIZATION_FIX_DOCUMENTATION](AUTHORIZATION_FIX_DOCUMENTATION.md) - Authorization fix details
+- [JWT_KEY_ROTATION_FIX](JWT_KEY_ROTATION_FIX.md) - JWT key rotation fix
+- [REFRESH_ON_ISSUER_KEY_NOT_FOUND](REFRESH_ON_ISSUER_KEY_NOT_FOUND.md) - Key refresh configuration
+- [AUTHENTICATED_FUNCTION_LOGGING_IMPLEMENTATION](AUTHENTICATED_FUNCTION_LOGGING_IMPLEMENTATION.md) - Logging implementation
+
 ### 🔧 Development & Setup
 
 Documentation for local development and configuration:

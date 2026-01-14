@@ -1,4 +1,28 @@
+# ⚠️ NOTICE: This document has been superseded
+
+**This document is now legacy.** For current, comprehensive Microsoft Entra ID authentication documentation, please see:
+
+## 📍 New Documentation Location
+
+**Main Guide**: [authentication/ENTRA_CIAM_CONFIGURATION_GUIDE.md](authentication/ENTRA_CIAM_CONFIGURATION_GUIDE.md)
+
+## 📚 Complete Authentication Documentation Suite
+
+The authentication documentation has been consolidated and significantly expanded:
+
+- **[Authentication Hub](authentication/README.md)** - Start here for all authentication topics
+- **[CIAM Configuration Guide](authentication/ENTRA_CIAM_CONFIGURATION_GUIDE.md)** - Complete setup guide (replaces this document)
+- **[Configuration Checklist](authentication/AZURE_ENTRA_ID_CONFIGURATION_CHECKLIST.md)** - Step-by-step checklist
+- **[Environment Variables Guide](authentication/ENVIRONMENT_VARIABLES_GUIDE.md)** - All variables explained
+- **[JWT Troubleshooting](authentication/JWT_INVALID_TOKEN_TROUBLESHOOTING.md)** - Comprehensive troubleshooting
+- **[Exceptions Reference](authentication/ENTRA_ID_EXCEPTIONS_REFERENCE.md)** - All errors and resolutions
+- **[Application Insights Queries](authentication/APPLICATION_INSIGHTS_QUERIES.md)** - Monitoring queries
+
+---
+
 # Azure Static Web Apps + Azure Functions + Microsoft Entra ID Authentication Setup
+
+**⚠️ Legacy Document - See above for current documentation**
 
 This document provides a complete, end‑to‑end configuration for:
 
