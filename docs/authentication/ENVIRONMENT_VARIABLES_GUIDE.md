@@ -277,11 +277,6 @@ If using a non-Microsoft identity provider:
 2. Usually follows format: `{authority}/.well-known/openid-configuration`
 3. Test the URL in a browser - should return JSON with `issuer`, `jwks_uri`, etc.
 
-#### For Azure AD B2C (if applicable)
-```
-https://{tenant-name}.b2clogin.com/{tenant-name}.onmicrosoft.com/{policy-name}/v2.0/.well-known/openid-configuration
-```
-
 **Example Configuration**:
 ```bash
 OPEN_ID_CONNECT_METADATA_URL=https://custom-identity.example.com/.well-known/openid-configuration
@@ -289,7 +284,6 @@ OPEN_ID_CONNECT_METADATA_URL=https://custom-identity.example.com/.well-known/ope
 
 **When to Use**:
 - Testing with a mock identity provider
-- Using Azure AD B2C instead of standard Entra ID
 - Using a custom or third-party identity provider
 - Special sovereign cloud configurations (government clouds)
 
