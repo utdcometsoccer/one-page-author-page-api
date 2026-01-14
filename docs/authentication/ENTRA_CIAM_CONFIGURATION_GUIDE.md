@@ -173,13 +173,7 @@ Your SPA needs permission to call your API:
 7. Click **Add permissions**
 8. (Optional) Click **Grant admin consent** if you want to pre-consent for all users
 
-#### Step 5: Configure Token Configuration (Optional)
-
-1. Go to **Token configuration**
-2. Add optional claims if needed:
-   - **ID tokens**: `email`, `preferred_username`
-   - **Access tokens**: `email`, `preferred_username`
-3. Add group claims if using group-based authorization
+**Note**: In CIAM, user claims like `email` and `preferred_username` are automatically included in tokens based on the user profile. Unlike Azure AD B2C, CIAM does not require explicit token configuration for standard claims.
 
 ## Configure API Application
 
@@ -192,17 +186,12 @@ Your SPA needs permission to call your API:
    - ✅ **ID tokens** (for hybrid flows)
 3. Click **Save**
 
-#### Configure Token Lifetime (Optional)
+**Note**: CIAM token lifetimes are managed at the tenant level with sensible defaults optimized for customer-facing applications:
+- **Access token**: 60-90 minutes (default)
+- **Refresh token**: 14 days (default)  
+- **ID token**: 60 minutes (default)
 
-CIAM has sensible defaults, but you can customize:
-
-1. Go to **Token configuration**
-2. Configure token lifetimes as needed:
-   - **Access token**: Default 60-90 minutes
-   - **Refresh token**: Default 14 days
-   - **ID token**: Default 60 minutes
-
-**Note**: In CIAM, token lifetime policies are simpler than workforce tenants.
+Unlike traditional Azure AD or Azure AD B2C, CIAM does not expose token lifetime configuration through the "Token configuration" UI in individual app registrations. Token policies are simplified and managed centrally for the entire CIAM tenant.
 
 ### Configure Service Principal for Automation (Optional)
 
