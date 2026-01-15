@@ -140,7 +140,7 @@ This represents your React/Angular/Vue Single Page Application.
      
      | Framework/Platform | Default Port | Redirect URI |
      |-------------------|--------------|--------------|
-     | Vite | 5173 | `https://localhost:5173/auth-callback/` |
+     | Vite | 5173 | `http://localhost:5173/auth-callback/` |
      | Create React App | 3000 | `http://localhost:3000/auth-callback/` |
      | Next.js | 3000 | `http://localhost:3000/auth-callback/` |
      | Angular | 4200 | `http://localhost:4200/auth-callback/` |
