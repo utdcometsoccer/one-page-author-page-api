@@ -265,7 +265,7 @@ npm run init-secrets -- -ConfigFile secrets.prod.json
 | `AAD_AUDIENCE` | Client/App ID | `xxxxxxxx-xxxx-...` | All |
 | `AAD_CLIENT_ID` | Client ID | `xxxxxxxx-xxxx-...` | All |
 | `AAD_AUTHORITY` | Authority URL | `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/` | All |
-| `AAD_VALID_ISSUERS` | Comma-separated v2.0 issuer URLs | `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/, https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0` | All |
+| `AAD_VALID_ISSUERS` | Comma-separated v2.0 issuer URLs | `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/, https://{your-other-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/` | All |
 
 ### Storage (Required for ImageAPI)
 

@@ -390,24 +390,6 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
           value: entraPolicy
         }
       ] : [],
-      !empty(entraPolicy) ? [
-        {
-          name: 'ENTRA_POLICY'
-          value: entraPolicy
-        }
-      ] : [],
-      !empty(entraPolicy) ? [
-        {
-          name: 'ENTRA_POLICY'
-          value: entraPolicy
-        }
-      ] : [],
-      !empty(entraPolicy) ? [
-        {
-          name: 'ENTRA_POLICY'
-          value: entraPolicy
-        }
-      ] : [],
       // Key Vault (optional)
       !empty(keyVaultUri) ? [
         {

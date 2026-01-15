@@ -150,7 +150,7 @@ All optional configuration uses the conditional pattern:
 | `AAD_AUDIENCE` | API application/client ID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` | Yes |
 | `AAD_CLIENT_ID` | Client ID (alternative to audience) | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` | Optional |
 | `AAD_AUTHORITY` | Authority URL | `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/` | Optional |
-| `AAD_VALID_ISSUERS` | Comma-separated issuer URLs | `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/, https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0` | Optional |
+| `AAD_VALID_ISSUERS` | Comma-separated issuer URLs | `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/, https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_SignUpSignIn/v2.0` | Optional |
 
 ### Configuration in GitHub Workflow
 
