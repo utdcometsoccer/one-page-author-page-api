@@ -136,7 +136,16 @@ This represents your React/Angular/Vue Single Page Application.
    - **Redirect URI**: 
      - Platform: **Single-page application (SPA)**
      - URI: `https://inkstainedwretches.com/auth-callback/`
-     - For local development, also add: `http://localhost:4280/auth-callback/`
+     - For local development, add the appropriate localhost URL based on your frontend framework:
+     
+     | Framework/Platform | Default Port | Redirect URI |
+     |-------------------|--------------|--------------|
+     | Vite | 5173 | `https://localhost:5173/auth-callback/` |
+     | Create React App | 3000 | `http://localhost:3000/auth-callback/` |
+     | Next.js | 3000 | `http://localhost:3000/auth-callback/` |
+     | Angular | 4200 | `http://localhost:4200/auth-callback/` |
+     | Vue CLI | 8080 | `http://localhost:8080/auth-callback/` |
+     | Custom/Other | varies | `http://localhost:{PORT}/auth-callback/` |
 4. Click **Register**
 
 #### Step 2: Record Application Details
@@ -153,7 +162,7 @@ Record these values for your SPA configuration:
 1. Go to **Authentication**
 2. Under **Single-page application** section, verify redirect URIs:
    - Production: `https://inkstainedwretches.com/auth-callback/`
-   - Development: `http://localhost:4280/auth-callback/`
+   - Development: Add the appropriate localhost URL for your frontend framework (see registration table above)
 3. Under **Implicit grant and hybrid flows**:
    - ✅ **ID tokens** (for sign-in)
    - ⚪ **Access tokens** (NOT needed for SPA - MSAL handles this)
@@ -535,7 +544,7 @@ traces
 1. Go to SPA app registration → Authentication
 2. Verify redirect URI matches exactly (case-sensitive, trailing slashes matter)
 3. Ensure URI is registered under **Single-page application** platform
-4. For local development, ensure `http://localhost:4280/auth-callback/` is added
+4. For local development, ensure the appropriate localhost redirect URI for your frontend framework is added (see framework-specific ports in the registration section above)
 
 ### Issue: API Returns 401 Unauthorized
 
