@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides complete, step-by-step instructions for configuring Microsoft Entra ID Customer Identity Access Management (CIAM) for the OnePageAuthor API platform. CIAM is optimized for customer-facing applications and provides a simplified configuration experience compared to traditional Azure AD workforce tenants.
+This guide provides complete, step-by-step instructions for configuring Microsoft Entra ID Customer Identity Access Management (CIAM) for the InkStainedWretches API platform. CIAM is optimized for customer-facing applications and provides a simplified configuration experience compared to traditional Azure AD workforce tenants.
 
 ## Table of Contents
 
@@ -72,7 +72,7 @@ This represents your Azure Functions backend API.
 1. Navigate to **Microsoft Entra ID** → **App registrations**
 2. Click **New registration**
 3. Configure the registration:
-   - **Name**: `OnePageAuthor API` (or `InkStainedWretches API`)
+   - **Name**: `InkStainedWretches API`
    - **Supported account types**: 
      - Choose **Accounts in this organizational directory only (Single tenant)**
      - For CIAM, select **Accounts in this tenant directory**
@@ -135,8 +135,17 @@ This represents your React/Angular/Vue Single Page Application.
      - **Accounts in this organizational directory only**
    - **Redirect URI**: 
      - Platform: **Single-page application (SPA)**
-     - URI: `https://inkstainedwretches.com/.auth/login/aad/callback`
-     - For local development, also add: `http://localhost:4280/.auth/login/aad/callback`
+     - URI: `https://inkstainedwretches.com/auth-callback/`
+     - For local development, add the appropriate localhost URL based on your frontend framework:
+     
+     | Framework/Platform | Default Port | Redirect URI |
+     |-------------------|--------------|--------------|
+     | Vite | 5173 | `http://localhost:5173/auth-callback/` |
+     | Create React App | 3000 | `http://localhost:3000/auth-callback/` |
+     | Next.js | 3000 | `http://localhost:3000/auth-callback/` |
+     | Angular | 4200 | `http://localhost:4200/auth-callback/` |
+     | Vue CLI | 8080 | `http://localhost:8080/auth-callback/` |
+     | Custom/Other | varies | `http://localhost:{PORT}/auth-callback/` |
 4. Click **Register**
 
 #### Step 2: Record Application Details
@@ -152,8 +161,8 @@ Record these values for your SPA configuration:
 
 1. Go to **Authentication**
 2. Under **Single-page application** section, verify redirect URIs:
-   - Production: `https://inkstainedwretches.com/.auth/login/aad/callback`
-   - Development: `http://localhost:4280/.auth/login/aad/callback`
+   - Production: `https://inkstainedwretches.com/auth-callback/`
+   - Development: Add the appropriate localhost URL for your frontend framework (see registration table above)
 3. Under **Implicit grant and hybrid flows**:
    - ✅ **ID tokens** (for sign-in)
    - ⚪ **Access tokens** (NOT needed for SPA - MSAL handles this)
@@ -167,19 +176,13 @@ Your SPA needs permission to call your API:
 1. Go to **API permissions**
 2. Click **Add a permission**
 3. Select **My APIs** tab
-4. Choose **OnePageAuthor API** (your API app registration)
+4. Choose **InkStainedWretches API** (your API app registration)
 5. Select **Delegated permissions**
 6. Check **access_as_user** scope
 7. Click **Add permissions**
 8. (Optional) Click **Grant admin consent** if you want to pre-consent for all users
 
-#### Step 5: Configure Token Configuration (Optional)
-
-1. Go to **Token configuration**
-2. Add optional claims if needed:
-   - **ID tokens**: `email`, `preferred_username`
-   - **Access tokens**: `email`, `preferred_username`
-3. Add group claims if using group-based authorization
+**Note**: In CIAM, user claims like `email` and `preferred_username` are automatically included in tokens based on the user profile. Unlike Azure AD B2C, CIAM does not require explicit token configuration for standard claims.
 
 ## Configure API Application
 
@@ -192,17 +195,12 @@ Your SPA needs permission to call your API:
    - ✅ **ID tokens** (for hybrid flows)
 3. Click **Save**
 
-#### Configure Token Lifetime (Optional)
+**Note**: CIAM token lifetimes are managed at the tenant level with sensible defaults optimized for customer-facing applications:
+- **Access token**: 60-90 minutes (default)
+- **Refresh token**: 14 days (default)  
+- **ID token**: 60 minutes (default)
 
-CIAM has sensible defaults, but you can customize:
-
-1. Go to **Token configuration**
-2. Configure token lifetimes as needed:
-   - **Access token**: Default 60-90 minutes
-   - **Refresh token**: Default 14 days
-   - **ID token**: Default 60 minutes
-
-**Note**: In CIAM, token lifetime policies are simpler than workforce tenants.
+Unlike traditional Azure AD or Azure AD B2C, CIAM does not expose token lifetime configuration through the "Token configuration" UI in individual app registrations. Token policies are simplified and managed centrally for the entire CIAM tenant.
 
 ### Configure Service Principal for Automation (Optional)
 
@@ -244,7 +242,7 @@ export const msalConfig = {
   auth: {
     clientId: "{YOUR_SPA_CLIENT_ID}",
     authority: "https://login.microsoftonline.com/{YOUR_TENANT_ID}",
-    redirectUri: "https://inkstainedwretches.com/.auth/login/aad/callback",
+    redirectUri: "https://inkstainedwretches.com/auth-callback/",
     // CIAM-specific
     knownAuthorities: ["login.microsoftonline.com"]
   },
@@ -546,7 +544,7 @@ traces
 1. Go to SPA app registration → Authentication
 2. Verify redirect URI matches exactly (case-sensitive, trailing slashes matter)
 3. Ensure URI is registered under **Single-page application** platform
-4. For local development, ensure `http://localhost:4280/.auth/login/aad/callback` is added
+4. For local development, ensure the appropriate localhost redirect URI for your frontend framework is added (see framework-specific ports in the registration section above)
 
 ### Issue: API Returns 401 Unauthorized
 
