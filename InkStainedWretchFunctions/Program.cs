@@ -86,10 +86,15 @@ builder.Services
         options.RefreshOnIssuerKeyNotFound = true;
         
         // Configure automatic refresh of signing keys from OpenID Connect metadata
-        // This prevents SecurityTokenSignatureKeyNotFoundException when Azure AD rotates keys
-        if (!string.IsNullOrWhiteSpace(authority))
+        // Prefer an explicit OPEN_ID_CONNECT_METADATA_URL if provided; otherwise derive from authority
+        var metadataAddress = configuration["OPEN_ID_CONNECT_METADATA_URL"];
+        if (string.IsNullOrWhiteSpace(metadataAddress) && !string.IsNullOrWhiteSpace(authority))
         {
-            var metadataAddress = $"{authority.TrimEnd('/')}/.well-known/openid-configuration";
+            metadataAddress = $"{authority.TrimEnd('/')}/.well-known/openid-configuration";
+        }
+
+        if (!string.IsNullOrWhiteSpace(metadataAddress))
+        {
             options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
                 metadataAddress,
                 new OpenIdConnectConfigurationRetriever(),

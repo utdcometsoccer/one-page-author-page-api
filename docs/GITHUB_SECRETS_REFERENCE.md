@@ -190,10 +190,16 @@ az cosmosdb keys list \
 
 **Format**: URL string
 **Required**: No (optional)
-**Example**: `https://login.microsoftonline.com/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/v2.0`
-**Description**: Azure AD authority URL for JWT validation. If not provided, it will be constructed from AAD_TENANT_ID.
+**Example**: `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/`
+**Description**: Entra External ID (CIAM) or Azure AD authority URL for JWT validation. If not provided, a default authority will be constructed from `AAD_TENANT_ID` for standard Entra ID tenants.
 
 **How to construct**:
+For Entra External ID/CIAM tenants:
+```
+https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/
+```
+
+For standard Entra ID tenants (default behavior when only `AAD_TENANT_ID` is set):
 ```
 https://login.microsoftonline.com/{AAD_TENANT_ID}/v2.0
 ```
@@ -235,7 +241,8 @@ az account show --query tenantId -o tsv
 **Required**: No (recommended)
 **Example**:
 ```
-https://login.microsoftonline.com/5c6d167a-2c48-4da0-8a21-29340b0f461e/v2.0, https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0
+https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/,
+https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0
 ```
 **Description**: Allows multiple JWT issuers for validation. If not set, the apps fall back to a single issuer derived from `AAD_TENANT_ID`/`AAD_AUTHORITY`.
 

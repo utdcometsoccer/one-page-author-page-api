@@ -126,7 +126,7 @@ npm run init-secrets -- -ConfigFile secrets.json
 | `STRIPE_API_KEY` | Stripe secret API key | ✅ Yes | [Stripe Dashboard](https://dashboard.stripe.com) → Developers → API Keys → Secret key |
 | `AAD_TENANT_ID` | Microsoft Entra ID tenant GUID | ✅ Yes | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
 | `AAD_AUDIENCE` | API application/client ID | ✅ Yes | Azure Portal → Microsoft Entra ID → App Registrations → Your App → Application (client) ID |
-| `AAD_VALID_ISSUERS` | Comma-separated v2.0 issuer URLs (multi-issuer JWT support) | Optional | Construct from tenant: https://login.microsoftonline.com/{tenant}/v2.0; optionally include common tenant 9188040d-6c67-4c5b-b112-36a304b66dad |
+| `AAD_VALID_ISSUERS` | Comma-separated v2.0 issuer URLs (multi-issuer JWT support) | Optional | For Entra External ID/CIAM, use issuers like `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/` (and other policies as needed); for standard Entra ID tenants you can also include `https://login.microsoftonline.com/{tenant}/v2.0` |
 | `STRIPE_WEBHOOK_SECRET` | Webhook endpoint secret for verification | For webhooks | [Stripe Dashboard](https://dashboard.stripe.com) → Developers → Webhooks → Select endpoint → Signing secret |
 
 ### Why These Settings Are Needed
@@ -191,7 +191,7 @@ npm run init-secrets -- -ConfigFile secrets.json
 - For personal Microsoft accounts, configure the app registration with `signInAudience: "PersonalMicrosoftAccount"`
 - For organizational accounts, use `signInAudience: "AzureADMyOrg"`
 - Audience tip: Use the raw Application (client) ID for `AAD_AUDIENCE` (not an `api://` scope) to match token `aud`.
-- Issuer tip: Provide v2.0 issuer URLs in `AAD_VALID_ISSUERS`, e.g., `https://login.microsoftonline.com/<tenant>/v2.0` and optionally `https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0`.
+- Issuer tip: Provide v2.0 issuer URLs in `AAD_VALID_ISSUERS`, for example CIAM issuers like `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/` (and other policies as needed), and optionally standard Entra ID issuers such as `https://login.microsoftonline.com/{tenant}/v2.0`.
 
 </details>
 

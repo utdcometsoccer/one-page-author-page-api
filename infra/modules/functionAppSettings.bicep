@@ -60,6 +60,9 @@ param aadAuthority string = ''
 @description('Azure AD valid issuers (optional, comma-separated)')
 param aadValidIssuers string = ''
 
+@description('Entra (CIAM) policy name (optional), for example B2C_1_signup_signin')
+param entraPolicy string = ''
+
 // =========================================
 // Azure Storage Parameters (Optional)
 // =========================================
@@ -240,6 +243,12 @@ var aadSettings = concat(
     {
       name: 'AAD_VALID_ISSUERS'
       value: aadValidIssuers
+    }
+  ] : [],
+  !empty(entraPolicy) ? [
+    {
+      name: 'ENTRA_POLICY'
+      value: entraPolicy
     }
   ] : []
 )
