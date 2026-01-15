@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides complete, step-by-step instructions for configuring Microsoft Entra ID Customer Identity Access Management (CIAM) for the OnePageAuthor API platform. CIAM is optimized for customer-facing applications and provides a simplified configuration experience compared to traditional Azure AD workforce tenants.
+This guide provides complete, step-by-step instructions for configuring Microsoft Entra ID Customer Identity Access Management (CIAM) for the InkStainedWretches API platform. CIAM is optimized for customer-facing applications and provides a simplified configuration experience compared to traditional Azure AD workforce tenants.
 
 ## Table of Contents
 
@@ -72,7 +72,7 @@ This represents your Azure Functions backend API.
 1. Navigate to **Microsoft Entra ID** → **App registrations**
 2. Click **New registration**
 3. Configure the registration:
-   - **Name**: `OnePageAuthor API` (or `InkStainedWretches API`)
+   - **Name**: `InkStainedWretches API`
    - **Supported account types**: 
      - Choose **Accounts in this organizational directory only (Single tenant)**
      - For CIAM, select **Accounts in this tenant directory**
@@ -167,7 +167,7 @@ Your SPA needs permission to call your API:
 1. Go to **API permissions**
 2. Click **Add a permission**
 3. Select **My APIs** tab
-4. Choose **OnePageAuthor API** (your API app registration)
+4. Choose **InkStainedWretches API** (your API app registration)
 5. Select **Delegated permissions**
 6. Check **access_as_user** scope
 7. Click **Add permissions**
