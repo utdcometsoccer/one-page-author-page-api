@@ -135,8 +135,8 @@ This represents your React/Angular/Vue Single Page Application.
      - **Accounts in this organizational directory only**
    - **Redirect URI**: 
      - Platform: **Single-page application (SPA)**
-     - URI: `https://inkstainedwretches.com/.auth/login/aad/callback`
-     - For local development, also add: `http://localhost:4280/.auth/login/aad/callback`
+     - URI: `https://inkstainedwretches.com/auth-callback/`
+     - For local development, also add: `http://localhost:4280/auth-callback/`
 4. Click **Register**
 
 #### Step 2: Record Application Details
@@ -152,8 +152,8 @@ Record these values for your SPA configuration:
 
 1. Go to **Authentication**
 2. Under **Single-page application** section, verify redirect URIs:
-   - Production: `https://inkstainedwretches.com/.auth/login/aad/callback`
-   - Development: `http://localhost:4280/.auth/login/aad/callback`
+   - Production: `https://inkstainedwretches.com/auth-callback/`
+   - Development: `http://localhost:4280/auth-callback/`
 3. Under **Implicit grant and hybrid flows**:
    - ✅ **ID tokens** (for sign-in)
    - ⚪ **Access tokens** (NOT needed for SPA - MSAL handles this)
@@ -233,7 +233,7 @@ export const msalConfig = {
   auth: {
     clientId: "{YOUR_SPA_CLIENT_ID}",
     authority: "https://login.microsoftonline.com/{YOUR_TENANT_ID}",
-    redirectUri: "https://inkstainedwretches.com/.auth/login/aad/callback",
+    redirectUri: "https://inkstainedwretches.com/auth-callback/",
     // CIAM-specific
     knownAuthorities: ["login.microsoftonline.com"]
   },
@@ -535,7 +535,7 @@ traces
 1. Go to SPA app registration → Authentication
 2. Verify redirect URI matches exactly (case-sensitive, trailing slashes matter)
 3. Ensure URI is registered under **Single-page application** platform
-4. For local development, ensure `http://localhost:4280/.auth/login/aad/callback` is added
+4. For local development, ensure `http://localhost:4280/auth-callback/` is added
 
 ### Issue: API Returns 401 Unauthorized
 
