@@ -149,8 +149,8 @@ All optional configuration uses the conditional pattern:
 | `AAD_TENANT_ID` | Microsoft Entra ID tenant GUID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` | Yes |
 | `AAD_AUDIENCE` | API application/client ID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` | Yes |
 | `AAD_CLIENT_ID` | Client ID (alternative to audience) | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` | Optional |
-| `AAD_AUTHORITY` | Authority URL | `https://login.microsoftonline.com/{tenant}` | Optional |
-| `AAD_VALID_ISSUERS` | Comma-separated issuer URLs | `https://login.microsoftonline.com/{tenant}/v2.0` | Optional |
+| `AAD_AUTHORITY` | Authority URL | `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/` | Optional |
+| `AAD_VALID_ISSUERS` | Comma-separated issuer URLs | `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/, https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_SignUpSignIn/v2.0` | Optional |
 
 ### Configuration in GitHub Workflow
 

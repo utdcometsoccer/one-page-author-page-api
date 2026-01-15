@@ -254,6 +254,7 @@ function Get-RelevantSecretsForProject {
         "AAD_AUDIENCE",
         "AAD_CLIENT_ID",
         "AAD_AUTHORITY",
+        "ENTRA_POLICY",
         "OPEN_ID_CONNECT_METADATA_URL"
     )
     

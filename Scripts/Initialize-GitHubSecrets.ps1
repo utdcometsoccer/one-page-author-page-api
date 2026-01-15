@@ -238,9 +238,16 @@ $secretDefinitions = @{
         },
         @{
             Name = "AAD_AUTHORITY"
-            Description = "Azure AD authority URL for JWT validation"
+            Description = "Azure AD / Entra CIAM authority URL for JWT validation"
             Required = $false
-            Example = "https://login.microsoftonline.com/{tenant-id}/v2.0"
+            Example = "https://inkswcustomers.ciamlogin.com/inkswcustomers.onmicrosoft.com/"
+            Category = "Authentication"
+        },
+        @{
+            Name = "ENTRA_POLICY"
+            Description = "Entra CIAM user flow / policy name (e.g., B2C_1_signup_signin)"
+            Required = $false
+            Example = "B2C_1_signup_signin"
             Category = "Authentication"
         },
         @{

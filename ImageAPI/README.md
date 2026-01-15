@@ -323,10 +323,10 @@ dotnet user-secrets set "COSMOSDB_DATABASE_ID" "OnePageAuthorDb"
 # Azure Blob Storage (Required for Image Upload)
 dotnet user-secrets set "AZURE_STORAGE_CONNECTION_STRING" "your-storage-connection-string"
 
-# Azure AD Authentication (Optional for local testing)
+# Azure AD / Entra ID Authentication (Optional for local testing)
 dotnet user-secrets set "AAD_TENANT_ID" "your-tenant-id"
 dotnet user-secrets set "AAD_AUDIENCE" "your-client-id"
-dotnet user-secrets set "AAD_AUTHORITY" "https://login.microsoftonline.com/consumers/v2.0"
+dotnet user-secrets set "AAD_AUTHORITY" "https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/"
 ```
 
 #### 3. Verify Configuration
@@ -343,9 +343,9 @@ dotnet user-secrets list
 | `COSMOSDB_PRIMARY_KEY` | ✅ Yes | Cosmos DB primary access key |
 | `COSMOSDB_DATABASE_ID` | ✅ Yes | Database name (typically "OnePageAuthorDb") |
 | `AZURE_STORAGE_CONNECTION_STRING` | ✅ Yes | Azure Blob Storage connection string |
-| `AAD_TENANT_ID` | ⚪ Optional | Azure AD tenant ID for authentication |
-| `AAD_AUDIENCE` | ⚪ Optional | Azure AD client ID |
-| `AAD_AUTHORITY` | ⚪ Optional | Azure AD authority URL |
+| `AAD_TENANT_ID` | ⚪ Optional | Entra ID / CIAM tenant ID for authentication |
+| `AAD_AUDIENCE` | ⚪ Optional | Entra ID / CIAM client ID |
+| `AAD_AUTHORITY` | ⚪ Optional | Entra ID / CIAM authority URL |
 
 ### Why These Settings Are Needed
 
@@ -402,9 +402,9 @@ DefaultEndpointsProtocol=https;AccountName=your-account;AccountKey=your-key;Endp
 
 | Variable | Purpose | How to Obtain |
 |----------|---------|---------------|
-| `AAD_TENANT_ID` | Your Azure AD tenant identifier | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
+| `AAD_TENANT_ID` | Your Entra ID / CIAM tenant identifier | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
 | `AAD_AUDIENCE` | API application client ID | Azure Portal → Microsoft Entra ID → App registrations → Your App → Application (client) ID |
-| `AAD_AUTHORITY` | Token issuer URL | `https://login.microsoftonline.com/{tenant-id}/v2.0` or `https://login.microsoftonline.com/consumers/v2.0` for personal accounts |
+| `AAD_AUTHORITY` | Token issuer URL | `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/` for CIAM, or `https://login.microsoftonline.com/{tenant-id}/v2.0` for standard Entra ID tenants |
 
 **Why It's Needed**:
 - All ImageAPI endpoints require authentication

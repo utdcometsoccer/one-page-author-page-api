@@ -183,6 +183,16 @@ public class JwtValidationService : IJwtValidationService, IDisposable
         var validIssuersRaw = _configuration["AAD_VALID_ISSUERS"];
         string[]? validIssuers = Utility.ParseValidIssuers(validIssuersRaw);
 
+        // Log which issuers will be used for validation (explicit list vs. derived authority)
+        if (validIssuers is { Length: > 0 })
+        {
+            _logger.LogDebug("JWT issuer validation using AAD_VALID_ISSUERS: {Issuers}", string.Join(", ", validIssuers));
+        }
+        else
+        {
+            _logger.LogDebug("JWT issuer validation using single issuer derived from authority: {Issuer}", authority.TrimEnd('/'));
+        }
+
         // Local helper to construct TokenValidationParameters from the given configuration
         TokenValidationParameters CreateTokenValidationParameters(OpenIdConnectConfiguration config)
         {

@@ -95,6 +95,9 @@ param aadAuthority string = ''
 @description('Azure AD Valid Issuers (optional, comma-separated list of issuer URLs)')
 param aadValidIssuers string = ''
 
+@description('Entra (CIAM) policy name (optional), for example B2C_1_signup_signin')
+param entraPolicy string = ''
+
 // =========================================
 // Azure Infrastructure (Optional - for Domain Management)
 // =========================================
@@ -379,6 +382,12 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = if (deployImageA
         {
           name: 'AAD_VALID_ISSUERS'
           value: aadValidIssuers
+        }
+      ] : [],
+      !empty(entraPolicy) ? [
+        {
+          name: 'ENTRA_POLICY'
+          value: entraPolicy
         }
       ] : [],
       // Key Vault (optional)

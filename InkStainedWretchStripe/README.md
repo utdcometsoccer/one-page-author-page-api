@@ -71,11 +71,11 @@ dotnet user-secrets set "AAD_CLIENT_ID" "YOUR_ACTUAL_CLIENT_ID"
 # Azure AD Audience (Usually same as Client ID)
 dotnet user-secrets set "AAD_AUDIENCE" "YOUR_ACTUAL_CLIENT_ID"
 
-# Optional: Azure AD Authority URL (auto-constructed if not provided)
-# dotnet user-secrets set "AAD_AUTHORITY" "https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0"
+# Optional: Entra ID / CIAM Authority URL (auto-constructed for standard tenants if not provided)
+# dotnet user-secrets set "AAD_AUTHORITY" "https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/"
 
 # Optional: Multiple valid issuers (comma-separated)
-# dotnet user-secrets set "AAD_VALID_ISSUERS" "https://login.microsoftonline.com/TENANT1/v2.0,https://login.microsoftonline.com/TENANT2/v2.0"
+# dotnet user-secrets set "AAD_VALID_ISSUERS" "https://inkswcustomers.ciamlogin.com/inkswcustomers.onmicrosoft.com/v2.0,https://inkswcustomers.ciamlogin.com/inkswcustomers.onmicrosoft.com/B2C_1_signup_signin/v2.0"
 
 ```
 
@@ -99,11 +99,11 @@ The following environment variables are required for the application to run:
 | `COSMOSDB_ENDPOINT_URI` | Cosmos DB account endpoint | Yes | Azure Portal → Cosmos DB account → Keys → URI |
 | `COSMOSDB_PRIMARY_KEY` | Cosmos DB primary access key | Yes | Azure Portal → Cosmos DB account → Keys → Primary Key |
 | `COSMOSDB_DATABASE_ID` | Cosmos DB database name | Yes | Your database name (e.g., "OnePageAuthor") |
-| `AAD_TENANT_ID` | Azure Active Directory tenant ID | Yes | Azure Portal → Azure Active Directory → Properties → Directory ID |
-| `AAD_CLIENT_ID` | Azure AD application client ID | Yes | Azure Portal → Azure Active Directory → App registrations → [Your app] → Application ID |
-| `AAD_AUDIENCE` | Azure AD API audience/scope | Yes | Usually same as Client ID |
-| `AAD_AUTHORITY` | Azure AD authority URL | No (optional) | Auto-constructed from tenant ID if not provided (e.g., `https://login.microsoftonline.com/{tenantId}/v2.0`) |
-| `AAD_VALID_ISSUERS` | Comma-separated list of valid JWT issuers | No (optional) | Multiple issuer URLs for multi-tenant scenarios |
+| `AAD_TENANT_ID` | Entra ID / CIAM tenant ID | Yes | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
+| `AAD_CLIENT_ID` | Entra ID / CIAM application client ID | Yes | Azure Portal → Microsoft Entra ID → App registrations → [Your app] → Application (client) ID |
+| `AAD_AUDIENCE` | Entra ID / CIAM API audience/scope | Yes | Usually same as Client ID |
+| `AAD_AUTHORITY` | Entra ID / CIAM authority URL | No (optional) | For CIAM, set explicitly (e.g., `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/`); for standard Entra ID tenants, it is auto-constructed from tenant ID if not provided (e.g., `https://login.microsoftonline.com/{tenantId}/v2.0`) |
+| `AAD_VALID_ISSUERS` | Comma-separated list of valid JWT issuers | No (optional) | Include your CIAM policy issuers such as `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/` and any additional policies or tenants you need |
 
 ### Why These Settings Are Needed
 
