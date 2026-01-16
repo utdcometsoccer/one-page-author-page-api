@@ -178,5 +178,25 @@ namespace OnePageAuthor.Test.API
             // Assert
             Assert.Equal(email, result);
         }
+
+        [Fact]
+        public void GetUserUpn_Success_WithPreferredUsernameClaim()
+        {
+            // Arrange
+            var preferredUsername = "preferred@example.com";
+            var claims = new List<Claim>
+            {
+                new Claim("preferred_username", preferredUsername),
+                new Claim("oid", "test-oid-123")
+            };
+            var identity = new ClaimsIdentity(claims, "test");
+            var user = new ClaimsPrincipal(identity);
+
+            // Act
+            var result = _service.GetUserUpn(user);
+
+            // Assert
+            Assert.Equal(preferredUsername, result);
+        }
     }
 }
