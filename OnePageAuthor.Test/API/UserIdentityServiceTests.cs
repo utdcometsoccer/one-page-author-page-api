@@ -178,5 +178,91 @@ namespace OnePageAuthor.Test.API
             // Assert
             Assert.Equal(email, result);
         }
+
+        [Fact]
+        public void GetUserUpn_Success_WithPreferredUsernameClaim()
+        {
+            // Arrange
+            var preferredUsername = "preferred@example.com";
+            var claims = new List<Claim>
+            {
+                new Claim("preferred_username", preferredUsername),
+                new Claim("oid", "test-oid-123")
+            };
+            var identity = new ClaimsIdentity(claims, "test");
+            var user = new ClaimsPrincipal(identity);
+
+            // Act
+            var result = _service.GetUserUpn(user);
+
+            // Assert
+            Assert.Equal(preferredUsername, result);
+        }
+
+        [Fact]
+        public void GetUserUpn_Success_PreferUpnOverPreferredUsername()
+        {
+            // Arrange
+            var upn = "test@example.com";
+            var preferredUsername = "preferred@example.com";
+            var claims = new List<Claim>
+            {
+                new Claim("upn", upn),
+                new Claim("preferred_username", preferredUsername),
+                new Claim("oid", "test-oid-123")
+            };
+            var identity = new ClaimsIdentity(claims, "test");
+            var user = new ClaimsPrincipal(identity);
+
+            // Act
+            var result = _service.GetUserUpn(user);
+
+            // Assert
+            Assert.Equal(upn, result); // Should prefer UPN over preferred_username
+        }
+
+        [Fact]
+        public void GetUserUpn_Success_PreferEmailOverPreferredUsername()
+        {
+            // Arrange
+            var email = "email@domain.com";
+            var preferredUsername = "preferred@example.com";
+            var claims = new List<Claim>
+            {
+                new Claim("email", email),
+                new Claim("preferred_username", preferredUsername),
+                new Claim("oid", "test-oid-123")
+            };
+            var identity = new ClaimsIdentity(claims, "test");
+            var user = new ClaimsPrincipal(identity);
+
+            // Act
+            var result = _service.GetUserUpn(user);
+
+            // Assert
+            Assert.Equal(email, result); // Should prefer email over preferred_username
+        }
+
+        [Fact]
+        public void GetUserUpn_Success_FallbackToPreferredUsernameWhenUpnAndEmailEmpty()
+        {
+            // Arrange
+            var preferredUsername = "preferred@example.com";
+            var claims = new List<Claim>
+            {
+                new Claim("upn", ""), // Empty UPN
+                new Claim("email", "   "), // Whitespace email
+                new Claim("preferred_username", preferredUsername),
+                new Claim("oid", "test-oid-123")
+            };
+            var identity = new ClaimsIdentity(claims, "test");
+            var user = new ClaimsPrincipal(identity);
+
+            // Act
+            var result = _service.GetUserUpn(user);
+
+            // Assert
+            Assert.Equal(preferredUsername, result); // Should fall back to preferred_username
+        }
     }
 }

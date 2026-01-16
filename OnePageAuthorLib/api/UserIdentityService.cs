@@ -26,6 +26,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                      ?? GetNonEmptyClaimValue(user, "email")
                      ?? GetNonEmptyClaimValue(user, nameClaimType)
                      ?? GetNonEmptyClaimValue(user, emailClaimType)
+                     ?? GetNonEmptyClaimValue(user, "preferred_username")
                      ?? (string.IsNullOrWhiteSpace(user.Identity?.Name) ? null : user.Identity.Name);
 
             if (string.IsNullOrWhiteSpace(upn))
