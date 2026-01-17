@@ -459,6 +459,7 @@ jobs:
           AAD_AUDIENCE: ${{ secrets.AAD_AUDIENCE }}
           AAD_CLIENT_ID: ${{ secrets.AAD_CLIENT_ID }}
           AAD_AUTHORITY: ${{ secrets.AAD_AUTHORITY }}
+          OPEN_ID_CONNECT_METADATA_URL: ${{ secrets.OPEN_ID_CONNECT_METADATA_URL }}
           AAD_VALID_ISSUERS: ${{ secrets.AAD_VALID_ISSUERS }}
           
           # Azure Infrastructure (optional - for domain management)
@@ -540,6 +541,7 @@ jobs:
           [ -n "$AAD_AUDIENCE" ] && PARAMS_ARRAY+=("aadAudience=$AAD_AUDIENCE")
           [ -n "$AAD_CLIENT_ID" ] && PARAMS_ARRAY+=("aadClientId=$AAD_CLIENT_ID")
           [ -n "$AAD_AUTHORITY" ] && PARAMS_ARRAY+=("aadAuthority=$AAD_AUTHORITY")
+          [ -n "$OPEN_ID_CONNECT_METADATA_URL" ] && PARAMS_ARRAY+=("openIdConnectMetadataUrl=$OPEN_ID_CONNECT_METADATA_URL")
           [ -n "$AAD_VALID_ISSUERS" ] && PARAMS_ARRAY+=("aadValidIssuers=$AAD_VALID_ISSUERS")
           
           # Add Azure Infrastructure parameters conditionally
