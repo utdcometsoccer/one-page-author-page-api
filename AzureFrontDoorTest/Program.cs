@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using InkStainedWretch.OnePageAuthorAPI;
+using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 
 partial class Program
@@ -33,16 +34,29 @@ partial class Program
                 string subscriptionId = config["AZURE_SUBSCRIPTION_ID"] ?? throw new InvalidOperationException("AZURE_SUBSCRIPTION_ID is required");
                 string resourceGroupName = config["AZURE_RESOURCE_GROUP_NAME"] ?? throw new InvalidOperationException("AZURE_RESOURCE_GROUP_NAME is required");
                 string frontDoorProfileName = config["AZURE_FRONTDOOR_PROFILE_NAME"] ?? throw new InvalidOperationException("AZURE_FRONTDOOR_PROFILE_NAME is required");
+                string dnsResourceGroup = config["AZURE_DNS_RESOURCE_GROUP"] ?? throw new InvalidOperationException("AZURE_DNS_RESOURCE_GROUP is required");
+                
+                // Cosmos DB Configuration (for reading test data from database)
+                string endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
+                string primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
+                string databaseId = config["COSMOSDB_DATABASE_ID"] ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
                 // Log configuration (masked for security)
                 Console.WriteLine($"Azure Subscription ID: {Utility.MaskSensitiveValue(subscriptionId)}");
                 Console.WriteLine($"Resource Group: {resourceGroupName}");
                 Console.WriteLine($"Front Door Profile: {frontDoorProfileName}");
+                Console.WriteLine($"DNS Resource Group: {dnsResourceGroup}");
+                Console.WriteLine($"Cosmos DB Endpoint: {Utility.MaskUrl(endpointUri)}");
+                Console.WriteLine($"Cosmos DB Database: {databaseId}");
                 Console.WriteLine();
 
                 // Register services
-                services.AddFrontDoorServices();
-                services.AddDnsZoneService();
+                services
+                    .AddCosmosClient(endpointUri, primaryKey)
+                    .AddCosmosDatabase(databaseId)
+                    .AddDomainRegistrationRepository()
+                    .AddFrontDoorServices()
+                    .AddDnsZoneService();
             })
             .ConfigureLogging(logging =>
             {
@@ -55,35 +69,55 @@ partial class Program
         // Get services
         var frontDoorService = host.Services.GetRequiredService<IFrontDoorService>();
         var dnsZoneService = host.Services.GetRequiredService<IDnsZoneService>();
+        var domainRepository = host.Services.GetRequiredService<IDomainRegistrationRepository>();
         var logger = host.Services.GetRequiredService<ILogger<Program>>();
 
         try
         {
             // Parse command line arguments
-            string? jsonFilePath = args.Length > 0 ? args[0] : null;
-            string dataRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
-            
-            if (!string.IsNullOrEmpty(jsonFilePath))
+            if (args.Length > 0)
             {
-                // Use specified file
-                if (!File.Exists(jsonFilePath))
+                if (args[0] == "--interactive" || args[0] == "-i")
                 {
-                    Console.WriteLine($"Error: File not found: {jsonFilePath}");
+                    // Interactive mode: select from database
+                    await RunInteractiveTestsAsync(frontDoorService, dnsZoneService, domainRepository, logger);
+                }
+                else if (args[0] == "--upn" && args.Length > 1)
+                {
+                    // Filter by UPN from database
+                    await RunTestsFromDatabaseAsync(frontDoorService, dnsZoneService, domainRepository, logger, args[1]);
+                }
+                else if (args[0] == "--domain" && args.Length > 1)
+                {
+                    // Test specific domain name
+                    await RunSingleDomainTestAsync(frontDoorService, dnsZoneService, domainRepository, logger, args[1]);
+                }
+                else if (File.Exists(args[0]))
+                {
+                    // Use specified JSON file
+                    await RunTestsFromFileAsync(frontDoorService, dnsZoneService, logger, args[0]);
+                }
+                else
+                {
+                    Console.WriteLine($"Error: Invalid argument or file not found: {args[0]}");
+                    PrintUsage();
                     return;
                 }
-                await RunTestsAsync(frontDoorService, dnsZoneService, logger, jsonFilePath);
             }
             else
             {
-                // Use default test file
+                // Default: use test file or interactive
+                string dataRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
                 string defaultFile = Path.Combine(dataRoot, "test-domains.json");
-                if (!File.Exists(defaultFile))
+                if (File.Exists(defaultFile))
                 {
-                    Console.WriteLine($"Error: Default test file not found: {defaultFile}");
-                    Console.WriteLine("Usage: AzureFrontDoorTest [path-to-json-file]");
-                    return;
+                    await RunTestsFromFileAsync(frontDoorService, dnsZoneService, logger, defaultFile);
                 }
-                await RunTestsAsync(frontDoorService, dnsZoneService, logger, defaultFile);
+                else
+                {
+                    Console.WriteLine("No default test file found. Use --interactive mode or specify options.");
+                    PrintUsage();
+                }
             }
         }
         catch (Exception ex)
@@ -93,7 +127,158 @@ partial class Program
         }
     }
 
-    static async Task RunTestsAsync(
+    static void PrintUsage()
+    {
+        Console.WriteLine();
+        Console.WriteLine("Usage:");
+        Console.WriteLine("  AzureFrontDoorTest                           - Use default test file");
+        Console.WriteLine("  AzureFrontDoorTest <json-file>               - Use specified JSON file");
+        Console.WriteLine("  AzureFrontDoorTest --interactive             - Select domain from database");
+        Console.WriteLine("  AzureFrontDoorTest --upn <email>             - Test all domains for a user");
+        Console.WriteLine("  AzureFrontDoorTest --domain <domain-name>    - Test specific domain");
+        Console.WriteLine();
+        Console.WriteLine("Examples:");
+        Console.WriteLine("  AzureFrontDoorTest --interactive");
+        Console.WriteLine("  AzureFrontDoorTest --upn testuser@example.com");
+        Console.WriteLine("  AzureFrontDoorTest --domain example.com");
+    }
+
+    static async Task RunInteractiveTestsAsync(
+        IFrontDoorService frontDoorService,
+        IDnsZoneService dnsZoneService,
+        IDomainRegistrationRepository domainRepository,
+        ILogger logger)
+    {
+        Console.WriteLine("Interactive Mode: Select domain registrations from database");
+        Console.WriteLine(new string('-', 60));
+        Console.WriteLine();
+        
+        Console.Write("Enter User Principal Name (UPN/email) to search: ");
+        string? upn = Console.ReadLine();
+        
+        if (string.IsNullOrWhiteSpace(upn))
+        {
+            Console.WriteLine("Error: UPN is required.");
+            return;
+        }
+
+        await RunTestsFromDatabaseAsync(frontDoorService, dnsZoneService, domainRepository, logger, upn);
+    }
+
+    static async Task RunTestsFromDatabaseAsync(
+        IFrontDoorService frontDoorService,
+        IDnsZoneService dnsZoneService,
+        IDomainRegistrationRepository domainRepository,
+        ILogger logger,
+        string upn)
+    {
+        Console.WriteLine($"Retrieving domain registrations for UPN: {upn}");
+        Console.WriteLine(new string('-', 60));
+
+        try
+        {
+            var registrations = (await domainRepository.GetByUserAsync(upn)).ToList();
+            
+            if (registrations == null || !registrations.Any())
+            {
+                Console.WriteLine($"No domain registrations found for UPN: {upn}");
+                return;
+            }
+
+            Console.WriteLine($"Found {registrations.Count} domain registration(s)\n");
+
+            int passCount = 0;
+            int failCount = 0;
+            int skipCount = 0;
+
+            int testNumber = 1;
+            foreach (var registration in registrations)
+            {
+                if (registration.Domain == null) continue;
+                
+                var testDomain = new TestDomain
+                {
+                    DomainName = registration.Domain.FullDomainName,
+                    Upn = registration.Upn,
+                    Description = $"Domain registration from database (ID: {registration.id})"
+                };
+                
+                var result = await RunSingleTestAsync(frontDoorService, dnsZoneService, logger, testDomain, testNumber++);
+                
+                switch (result)
+                {
+                    case TestResult.Pass:
+                        passCount++;
+                        break;
+                    case TestResult.Fail:
+                        failCount++;
+                        break;
+                    case TestResult.Skip:
+                        skipCount++;
+                        break;
+                }
+            }
+
+            Console.WriteLine("\n" + new string('=', 60));
+            Console.WriteLine("Test Summary");
+            Console.WriteLine(new string('=', 60));
+            Console.WriteLine($"Total Tests: {registrations.Count}");
+            Console.WriteLine($"Passed: {passCount}");
+            Console.WriteLine($"Failed: {failCount}");
+            Console.WriteLine($"Skipped: {skipCount}");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving domains from database for UPN {Upn}", upn);
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    static async Task RunSingleDomainTestAsync(
+        IFrontDoorService frontDoorService,
+        IDnsZoneService dnsZoneService,
+        IDomainRegistrationRepository domainRepository,
+        ILogger logger,
+        string domainName)
+    {
+        Console.WriteLine($"Testing domain: {domainName}");
+        Console.WriteLine(new string('-', 60));
+
+        try
+        {
+            // Try to find in database first
+            var parts = domainName.Split('.');
+            if (parts.Length >= 2)
+            {
+                string tld = parts[^1];
+                string sld = string.Join(".", parts.Take(parts.Length - 1));
+                
+                var registration = await domainRepository.GetByDomainAsync(tld, sld);
+                
+                var testDomain = new TestDomain
+                {
+                    DomainName = domainName,
+                    Upn = registration?.Upn ?? "test@example.com",
+                    Description = registration != null 
+                        ? $"Domain registration from database (ID: {registration.id})"
+                        : "Domain specified via command line"
+                };
+
+                await RunSingleTestAsync(frontDoorService, dnsZoneService, logger, testDomain, 1);
+            }
+            else
+            {
+                Console.WriteLine($"Error: Invalid domain name format: {domainName}");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error testing domain {Domain}", domainName);
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    static async Task RunTestsFromFileAsync(
         IFrontDoorService frontDoorService,
         IDnsZoneService dnsZoneService,
         ILogger logger,

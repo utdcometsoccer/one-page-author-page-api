@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -62,30 +62,49 @@ partial class Program
         try
         {
             // Parse command line arguments
-            string? jsonFilePath = args.Length > 0 ? args[0] : null;
-            string dataRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
-            
-            if (!string.IsNullOrEmpty(jsonFilePath))
+            if (args.Length > 0)
             {
-                // Use specified file
-                if (!File.Exists(jsonFilePath))
+                if (args[0] == "--interactive" || args[0] == "-i")
                 {
-                    Console.WriteLine($"Error: File not found: {jsonFilePath}");
+                    // Interactive mode: select from database
+                    await RunInteractiveTestsAsync(googleDomainsService, domainRepository, logger);
+                }
+                else if (args[0] == "--upn" && args.Length > 1)
+                {
+                    // Filter by UPN from database
+                    await RunTestsFromDatabaseAsync(googleDomainsService, domainRepository, logger, args[1]);
+                }
+                else if (args[0] == "--domain" && args.Length > 2)
+                {
+                    // Specify TLD and SLD from command line
+                    await RunSingleDomainTestAsync(googleDomainsService, domainRepository, logger, args[1], args[2]);
+                }
+                else if (File.Exists(args[0]))
+                {
+                    // Use specified JSON file
+                    await RunTestsFromFileAsync(googleDomainsService, domainRepository, logger, args[0]);
+                }
+                else
+                {
+                    Console.WriteLine($"Error: Invalid argument or file not found: {args[0]}");
+                    PrintUsage();
                     return;
                 }
-                await RunTestsAsync(googleDomainsService, domainRepository, logger, jsonFilePath);
             }
             else
             {
-                // Use default test file
+                // Default: use test file or interactive
+                string dataRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
                 string defaultFile = Path.Combine(dataRoot, "test-domains.json");
-                if (!File.Exists(defaultFile))
+                if (File.Exists(defaultFile))
                 {
-                    Console.WriteLine($"Error: Default test file not found: {defaultFile}");
-                    Console.WriteLine("Usage: GoogleDomainRegistrationTest [path-to-json-file]");
-                    return;
+                    await RunTestsFromFileAsync(googleDomainsService, domainRepository, logger, defaultFile);
                 }
-                await RunTestsAsync(googleDomainsService, domainRepository, logger, defaultFile);
+                else
+                {
+                    Console.WriteLine("No default test file found. Use --interactive mode or specify options.");
+                    PrintUsage();
+                }
             }
         }
         catch (Exception ex)
@@ -95,7 +114,135 @@ partial class Program
         }
     }
 
-    static async Task RunTestsAsync(
+    static void PrintUsage()
+    {
+        Console.WriteLine();
+        Console.WriteLine("Usage:");
+        Console.WriteLine("  GoogleDomainRegistrationTest                           - Use default test file");
+        Console.WriteLine("  GoogleDomainRegistrationTest <json-file>               - Use specified JSON file");
+        Console.WriteLine("  GoogleDomainRegistrationTest --interactive             - Select domain from database");
+        Console.WriteLine("  GoogleDomainRegistrationTest --upn <email>             - Test all domains for a user");
+        Console.WriteLine("  GoogleDomainRegistrationTest --domain <tld> <sld>      - Test specific domain");
+        Console.WriteLine();
+        Console.WriteLine("Examples:");
+        Console.WriteLine("  GoogleDomainRegistrationTest --interactive");
+        Console.WriteLine("  GoogleDomainRegistrationTest --upn testuser@example.com");
+        Console.WriteLine("  GoogleDomainRegistrationTest --domain com example");
+    }
+
+    static async Task RunInteractiveTestsAsync(
+        IGoogleDomainsService googleDomainsService,
+        IDomainRegistrationRepository domainRepository,
+        ILogger logger)
+    {
+        Console.WriteLine("Interactive Mode: Select domain registrations from database");
+        Console.WriteLine(new string('-', 60));
+        Console.WriteLine();
+        
+        Console.Write("Enter User Principal Name (UPN/email) to search: ");
+        string? upn = Console.ReadLine();
+        
+        if (string.IsNullOrWhiteSpace(upn))
+        {
+            Console.WriteLine("Error: UPN is required.");
+            return;
+        }
+
+        await RunTestsFromDatabaseAsync(googleDomainsService, domainRepository, logger, upn);
+    }
+
+    static async Task RunTestsFromDatabaseAsync(
+        IGoogleDomainsService googleDomainsService,
+        IDomainRegistrationRepository domainRepository,
+        ILogger logger,
+        string upn)
+    {
+        Console.WriteLine($"Retrieving domain registrations for UPN: {upn}");
+        Console.WriteLine(new string('-', 60));
+
+        try
+        {
+            var registrations = (await domainRepository.GetByUserAsync(upn)).ToList();
+            
+            if (registrations == null || !registrations.Any())
+            {
+                Console.WriteLine($"No domain registrations found for UPN: {upn}");
+                return;
+            }
+
+            Console.WriteLine($"Found {registrations.Count} domain registration(s)\n");
+
+            int testNumber = 1;
+            foreach (var registration in registrations)
+            {
+                await RunSingleTestAsync(googleDomainsService, domainRepository, logger, registration, testNumber++);
+            }
+
+            Console.WriteLine("\n" + new string('=', 60));
+            Console.WriteLine("Test Summary");
+            Console.WriteLine(new string('=', 60));
+            Console.WriteLine($"Total Tests: {registrations.Count}");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving domains from database for UPN {Upn}", upn);
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    static async Task RunSingleDomainTestAsync(
+        IGoogleDomainsService googleDomainsService,
+        IDomainRegistrationRepository domainRepository,
+        ILogger logger,
+        string topLevelDomain,
+        string secondLevelDomain)
+    {
+        Console.WriteLine($"Testing domain: {secondLevelDomain}.{topLevelDomain}");
+        Console.WriteLine(new string('-', 60));
+
+        try
+        {
+            var registration = await domainRepository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
+            
+            if (registration == null)
+            {
+                Console.WriteLine($"Domain {secondLevelDomain}.{topLevelDomain} not found in database.");
+                Console.WriteLine("Creating test registration from command line parameters...");
+                
+                // Create a minimal test registration
+                registration = new DomainRegistration
+                {
+                    Upn = "test@example.com",
+                    Domain = new Domain
+                    {
+                        TopLevelDomain = topLevelDomain,
+                        SecondLevelDomain = secondLevelDomain
+                    },
+                    ContactInformation = new ContactInformation
+                    {
+                        FirstName = "Test",
+                        LastName = "User",
+                        Address = "123 Test St",
+                        City = "Test City",
+                        State = "CA",
+                        Country = "United States",
+                        ZipCode = "12345",
+                        EmailAddress = "test@example.com",
+                        TelephoneNumber = "+1-555-123-4567"
+                    }
+                };
+            }
+
+            await RunSingleTestAsync(googleDomainsService, domainRepository, logger, registration, 1);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error testing domain {Domain}", $"{secondLevelDomain}.{topLevelDomain}");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    static async Task RunTestsFromFileAsync(
         IGoogleDomainsService googleDomainsService,
         IDomainRegistrationRepository domainRepository,
         ILogger logger,
@@ -107,10 +254,7 @@ partial class Program
         try
         {
             string json = await File.ReadAllTextAsync(jsonFilePath);
-            var registrations = JsonSerializer.Deserialize<List<DomainRegistration>>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var registrations = JsonConvert.DeserializeObject<List<DomainRegistration>>(json);
 
             if (registrations == null || registrations.Count == 0)
             {
