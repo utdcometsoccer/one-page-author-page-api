@@ -1,0 +1,60 @@
+[
+  {
+    "upn": "testuser@example.com",
+    "domain": {
+      "topLevelDomain": "com",
+      "secondLevelDomain": "gcptest001"
+    },
+    "contactInformation": {
+      "firstName": "GCP",
+      "lastName": "TestUser",
+      "address": "123 Test Street",
+      "address2": "Suite 100",
+      "city": "Mountain View",
+      "state": "CA",
+      "country": "United States",
+      "zipCode": "94043",
+      "emailAddress": "testuser@example.com",
+      "telephoneNumber": "+1-555-100-0001"
+    },
+    "status": 0
+  },
+  {
+    "upn": "testuser@example.com",
+    "domain": {
+      "topLevelDomain": "org",
+      "secondLevelDomain": "gcptest002"
+    },
+    "contactInformation": {
+      "firstName": "GCP",
+      "lastName": "TestUser",
+      "address": "123 Test Street",
+      "city": "Mountain View",
+      "state": "CA",
+      "country": "United States",
+      "zipCode": "94043",
+      "emailAddress": "testuser@example.com",
+      "telephoneNumber": "+1-555-100-0002"
+    },
+    "status": 0
+  },
+  {
+    "upn": "testuser2@example.com",
+    "domain": {
+      "topLevelDomain": "net",
+      "secondLevelDomain": "gcptest003"
+    },
+    "contactInformation": {
+      "firstName": "GCP",
+      "lastName": "TestUser2",
+      "address": "456 Another Street",
+      "city": "San Francisco",
+      "state": "CA",
+      "country": "United States",
+      "zipCode": "94102",
+      "emailAddress": "testuser2@example.com",
+      "telephoneNumber": "+1-555-100-0003"
+    },
+    "status": 0
+  }
+]
