@@ -51,7 +51,15 @@ Cosmos DB (DomainRegistrations container)
 - Registration parameter validation
 - Contact information verification
 - Database compatibility testing
+- **Interactive mode** for testing existing domains from Cosmos DB
+- **Command line options** for UPN and domain filtering
 - Safe for repeated execution (no charges)
+
+**Test Modes**:
+- JSON file input (default or custom file)
+- Interactive database selection (`--interactive`)
+- User-specific testing (`--upn <email>`)
+- Single domain testing (`--domain <tld> <sld>`)
 
 **Documentation**: See `GoogleDomainRegistrationTest/README.md`
 
@@ -66,7 +74,15 @@ Cosmos DB (DomainRegistrations container)
 - Front Door domain conflict detection
 - Domain format validation
 - TLS configuration verification
+- **Interactive mode** for testing existing domains from Cosmos DB
+- **Command line options** for UPN and domain filtering
 - Safe for repeated execution (no infrastructure changes)
+
+**Test Modes**:
+- JSON file input (default or custom file)
+- Interactive database selection (`--interactive`)
+- User-specific testing (`--upn <email>`)
+- Single domain testing (`--domain <domain-name>`)
 
 **Documentation**: See `AzureFrontDoorTest/README.md`
 

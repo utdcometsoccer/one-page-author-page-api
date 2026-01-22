@@ -114,6 +114,40 @@ This uses the default test file: `data/test-domains.json`
 dotnet run -- /path/to/your-test-data.json
 ```
 
+### Run in Interactive Mode (Database)
+
+```bash
+dotnet run -- --interactive
+```
+
+Prompts for a User Principal Name (UPN/email) and retrieves all domain registrations for that user from Cosmos DB.
+
+### Test All Domains for a Specific User
+
+```bash
+dotnet run -- --upn testuser@example.com
+```
+
+Retrieves and tests all domain registrations for the specified user from the database.
+
+### Test a Specific Domain
+
+```bash
+dotnet run -- --domain example.com
+```
+
+Tests a specific domain name. Looks up the domain in the database first to get associated metadata.
+
+### Command Line Options Summary
+
+| Option | Arguments | Description |
+|--------|-----------|-------------|
+| (none) | - | Use default test file (`data/test-domains.json`) |
+| `<file-path>` | JSON file path | Use specified JSON file |
+| `--interactive` or `-i` | - | Interactive mode - prompt for UPN |
+| `--upn` | email address | Test all domains for a user from database |
+| `--domain` | domain name | Test specific domain (e.g., `example.com`) |
+
 ## Test Data Format
 
 The test data file should contain an array of test domain objects:
