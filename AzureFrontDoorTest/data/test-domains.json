@@ -1,0 +1,22 @@
+[
+  {
+    "domainName": "afdtest001.com",
+    "upn": "testuser@example.com",
+    "description": "Test domain for Azure Front Door integration - basic setup"
+  },
+  {
+    "domainName": "afdtest002.org",
+    "upn": "testuser@example.com",
+    "description": "Test domain for Azure Front Door integration - org TLD"
+  },
+  {
+    "domainName": "afdtest003.net",
+    "upn": "testuser2@example.com",
+    "description": "Test domain for Azure Front Door integration - different user"
+  },
+  {
+    "domainName": "afdtest004.io",
+    "upn": "testuser@example.com",
+    "description": "Test domain for Azure Front Door integration - io TLD"
+  }
+]
