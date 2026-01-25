@@ -75,11 +75,24 @@ public class AuthorInvitationFunction
         try
         {
             // Parse request body
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var request = JsonSerializer.Deserialize<CreateAuthorInvitationRequest>(requestBody, new JsonSerializerOptions
+            using var reader = new StreamReader(req.Body);
+            string requestBody = await reader.ReadToEndAsync();
+            
+            CreateAuthorInvitationRequest? request;
+            try
             {
-                PropertyNameCaseInsensitive = true
-            });
+                request = JsonSerializer.Deserialize<CreateAuthorInvitationRequest>(requestBody, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "Invalid JSON in CreateAuthorInvitation request body");
+                return await req.CreateErrorResponseAsync(
+                    HttpStatusCode.BadRequest,
+                    "Invalid JSON in request body.");
+            }
 
             if (request == null)
             {
@@ -125,8 +138,11 @@ public class AuthorInvitationFunction
             {
                 _logger.LogWarning("Invitation already exists for {Email}. Status: {Status}", 
                     request.EmailAddress, existingInvitation.Status);
-                // Note: Console app prompts user for confirmation, but for API we'll just log a warning
-                // and continue to create a new invitation
+                
+                // For the API, treat an existing invitation as a conflict to avoid duplicates
+                return await req.CreateErrorResponseAsync(
+                    HttpStatusCode.Conflict,
+                    $"An invitation already exists for {request.EmailAddress} with status '{existingInvitation.Status}'.");
             }
 
             // Create the invitation
@@ -146,19 +162,32 @@ public class AuthorInvitationFunction
             bool emailSent = false;
             if (_emailService != null)
             {
-                _logger.LogInformation("Sending invitation email to {Email}", savedInvitation.EmailAddress);
-                emailSent = await _emailService.SendInvitationEmailAsync(
-                    savedInvitation.EmailAddress,
-                    savedInvitation.DomainName,
-                    savedInvitation.id);
+                try
+                {
+                    _logger.LogInformation("Sending invitation email to {Email}", savedInvitation.EmailAddress);
+                    emailSent = await _emailService.SendInvitationEmailAsync(
+                        savedInvitation.EmailAddress,
+                        savedInvitation.DomainName,
+                        savedInvitation.id);
 
-                if (emailSent)
-                {
-                    _logger.LogInformation("Invitation email sent successfully");
+                    if (emailSent)
+                    {
+                        _logger.LogInformation("Invitation email sent successfully");
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to send invitation email");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.LogWarning("Failed to send invitation email");
+                    // Treat email delivery failure as non-fatal to avoid duplicate invitations on client retry
+                    _logger.LogError(
+                        ex,
+                        "Error sending invitation email for InvitationId {InvitationId} to {Email}",
+                        savedInvitation.id,
+                        savedInvitation.EmailAddress);
+                    emailSent = false;
                 }
             }
             else
@@ -216,9 +245,69 @@ public class AuthorInvitationFunction
         if (string.IsNullOrWhiteSpace(domain))
             return false;
 
-        // Use Uri.CheckHostName for more robust domain validation
-        // This checks for valid DNS hostname format
-        return Uri.CheckHostName(domain) != UriHostNameType.Unknown;
+        // Trim and normalize
+        domain = domain.Trim();
+
+        if (domain.Length == 0)
+            return false;
+
+        // Remove trailing dot (allow "example.com." style FQDNs)
+        if (domain.EndsWith(".", StringComparison.Ordinal))
+        {
+            domain = domain[..^1];
+            if (domain.Length == 0)
+                return false;
+        }
+
+        domain = domain.ToLowerInvariant();
+
+        // No spaces allowed
+        if (domain.Contains(' ', StringComparison.Ordinal))
+            return false;
+
+        // Require at least one dot (FQDN-like)
+        if (!domain.Contains('.', StringComparison.Ordinal))
+            return false;
+
+        // Reject localhost explicitly
+        if (string.Equals(domain, "localhost", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        // Reject IP addresses (IPv4/IPv6)
+        var hostType = Uri.CheckHostName(domain);
+        if (hostType == UriHostNameType.IPv4 || hostType == UriHostNameType.IPv6)
+            return false;
+
+        // Enforce overall length limit for DNS names
+        if (domain.Length > 253)
+            return false;
+
+        // Validate each label
+        var labels = domain.Split('.');
+        foreach (var label in labels)
+        {
+            // Labels must be non-empty and up to 63 characters
+            if (string.IsNullOrEmpty(label) || label.Length > 63)
+                return false;
+
+            // Labels cannot start or end with hyphen
+            if (label.StartsWith("-", StringComparison.Ordinal) ||
+                label.EndsWith("-", StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            // Only allow a-z, 0-9, and hyphen
+            foreach (var ch in label)
+            {
+                var isLetter = ch is >= 'a' and <= 'z';
+                var isDigit = ch is >= '0' and <= '9';
+                if (!isLetter && !isDigit && ch != '-')
+                    return false;
+            }
+        }
+
+        return true;
     }
 }
 
