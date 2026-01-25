@@ -216,8 +216,9 @@ public class AuthorInvitationFunction
         if (string.IsNullOrWhiteSpace(domain))
             return false;
 
-        // Basic domain validation - at least one dot and no spaces
-        return domain.Contains('.') && !domain.Contains(' ') && domain.Length > 3;
+        // Use Uri.CheckHostName for more robust domain validation
+        // This checks for valid DNS hostname format
+        return Uri.CheckHostName(domain) != UriHostNameType.Unknown;
     }
 }
 
