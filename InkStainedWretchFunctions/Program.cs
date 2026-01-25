@@ -28,6 +28,10 @@ var databaseId = configuration["COSMOSDB_DATABASE_ID"] ?? throw new InvalidOpera
 // Stripe configuration (optional for domain registration updates)
 var stripeApiKey = configuration["STRIPE_API_KEY"];
 
+// Email service configuration (optional for author invitation emails)
+var emailConnectionString = configuration["ACS_CONNECTION_STRING"];
+var emailSenderAddress = configuration["ACS_SENDER_ADDRESS"] ?? "DoNotReply@onepageauthor.com";
+
 // Log Cosmos DB configuration (masked for security)
 Console.WriteLine($"Cosmos DB Endpoint configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(endpointUri)}");
 Console.WriteLine($"Cosmos DB Primary Key configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(primaryKey)}");
@@ -51,6 +55,16 @@ if (!string.IsNullOrWhiteSpace(stripeApiKey))
 else
 {
     Console.WriteLine("Warning: STRIPE_API_KEY not configured. Subscription validation for domain updates will not work.");
+}
+
+if (!string.IsNullOrWhiteSpace(emailConnectionString))
+{
+    Console.WriteLine($"Azure Communication Services connection string configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(emailConnectionString)}");
+    Console.WriteLine($"Email sender address configured: {emailSenderAddress}");
+}
+else
+{
+    Console.WriteLine("Warning: ACS_CONNECTION_STRING not configured. Invitation emails will not be sent.");
 }
 
 builder.ConfigureFunctionsWebApplication();
@@ -152,6 +166,7 @@ var services = builder.Services
     .AddExperimentRepository() // Add Experiment repository for A/B testing
     .AddExperimentServices() // Add Experiment services for A/B testing
     .AddTestimonialRepository() // Add Testimonial repository for testimonials management
+    .AddAuthorInvitationRepository() // Add AuthorInvitation repository for managing author invitations
     .AddApplicationInsightsTelemetryWorkerService()
     .AddImageApiRepositories()
     .ConfigureFunctionsApplicationInsights();
@@ -162,6 +177,12 @@ if (!string.IsNullOrWhiteSpace(stripeApiKey))
     services.AddSingleton<StripeClient>(_ => new StripeClient(stripeApiKey))
             .AddStripeServices()
             .AddStripeOrchestrators();
+}
+
+// Add Email service if connection string is configured (needed for invitation emails)
+if (!string.IsNullOrWhiteSpace(emailConnectionString))
+{
+    services.AddEmailService(emailConnectionString, emailSenderAddress);
 }
 
 builder.Build().Run();
