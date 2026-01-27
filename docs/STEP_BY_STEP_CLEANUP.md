@@ -6,7 +6,6 @@
 
 1. **Create a backup** (in case anything goes wrong):
 
-
    ```powershell
 
    git clone --mirror . ../backup-$(Get-Date -Format 'yyyy-MM-dd-HHmmss')
@@ -14,7 +13,6 @@
    ```
 
 2. **Commit any pending changes**:
-
 
    ```powershell
 
@@ -125,6 +123,7 @@ Send this message to all team members:
 > The Git history has been cleaned to remove exposed secrets.
 >
 > **YOU MUST:**
+>
 > 1. Delete your local clone
 > 2. Re-clone from GitHub
 > 3. Set up user secrets (see instructions in repository)

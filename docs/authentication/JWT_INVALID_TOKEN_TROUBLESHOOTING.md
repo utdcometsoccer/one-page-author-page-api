@@ -33,6 +33,7 @@ Check which symptoms you're experiencing:
 Run through these quick checks first:
 
 1. **Token Present?**
+
    ```bash
    # Check request headers
    curl -v https://your-api.azurewebsites.net/api/endpoint \
@@ -43,13 +44,14 @@ Run through these quick checks first:
 
 2. **Token Format Valid?**
    - JWT tokens have 3 parts separated by dots: `header.payload.signature`
-   - Decode at https://jwt.ms to verify structure
+   - Decode at <https://jwt.ms> to verify structure
 
 3. **Token Expired?**
    - Check `exp` claim in decoded token
-   - Compare to current Unix timestamp: https://www.unixtimestamp.com/
+   - Compare to current Unix timestamp: <https://www.unixtimestamp.com/>
 
 4. **Environment Variables Set?**
+
    ```bash
    # Check in Azure Portal
    Function App → Configuration → Application settings
@@ -69,6 +71,7 @@ Run through these quick checks first:
 **Cause**: No Authorization header in request, or header is empty.
 
 **Error Message**:
+
 ```json
 {
   "error": "Authorization header is required"
@@ -76,18 +79,21 @@ Run through these quick checks first:
 ```
 
 **Resolution**:
+
 1. Ensure request includes `Authorization` header
 2. Format must be: `Authorization: Bearer <token>`
 3. No extra spaces or typos
 4. Header name is case-sensitive in some HTTP clients
 
 **Example (Correct)**:
+
 ```bash
 curl -X GET "https://api.example.com/endpoint" \
   -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
 **Example (Incorrect)**:
+
 ```bash
 # Missing Authorization header
 curl -X GET "https://api.example.com/endpoint"
@@ -113,11 +119,13 @@ curl -X GET "https://api.example.com/endpoint" \
 Add "Bearer " prefix (with space after) to your token.
 
 **Example (Correct)**:
+
 ```
 Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Example (Incorrect)**:
+
 ```
 Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 Authorization: bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9... (lowercase)
@@ -135,21 +143,25 @@ Authorization: Bearer  eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9... (double space)
 **Resolution**:
 
 **If Token has 1 segment** (opaque token):
+
 - Platform attempts introspection service
 - Verify introspection endpoint is configured
 - Check if using wrong type of token (e.g., refresh token instead of access token)
 
 **If Token has 2 segments**:
+
 - Malformed JWT
 - Missing signature component
 - Obtain a new token from identity provider
 
 **If Token has more than 3 segments**:
+
 - Token contains dots in payload (unlikely)
 - Token was corrupted during transmission
 - Obtain a new token
 
 **Valid JWT Structure**:
+
 ```
 eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9    ← Header (Base64URL)
 .
@@ -169,7 +181,7 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk...    ← Signature (Base64URL)
 **Resolution**:
 
 1. **Check expiration**:
-   - Decode token at https://jwt.ms
+   - Decode token at <https://jwt.ms>
    - Look at `exp` claim (Unix timestamp)
    - Compare to current time
    - If expired, acquire new token
@@ -203,7 +215,9 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk...    ← Signature (Base64URL)
 **Resolution**:
 
 #### Immediate Fix
+
 Wait 2-3 minutes and retry. The platform automatically:
+
 1. Detects the missing key (`kid` not found)
 2. Refreshes metadata from OpenID Connect endpoint
 3. Retries validation with new keys
@@ -234,15 +248,19 @@ Check `Program.cs` in each Function App:
 #### If Still Failing
 
 1. **Check connectivity to metadata endpoint**:
+
    ```bash
    curl https://login.microsoftonline.com/{tenant-id}/v2.0/.well-known/openid-configuration
    ```
+
    Should return JSON with `jwks_uri` property.
 
 2. **Check JWKS endpoint**:
+
    ```bash
    curl https://login.microsoftonline.com/{tenant-id}/discovery/v2.0/keys
    ```
+
    Should return JSON with array of signing keys.
 
 3. **Verify no firewall blocking**:
@@ -266,7 +284,7 @@ See [../JWT_KEY_ROTATION_FIX.md](../JWT_KEY_ROTATION_FIX.md) for detailed inform
 
 **Resolution**:
 
-1. **Decode token** at https://jwt.ms and check `iss` claim
+1. **Decode token** at <https://jwt.ms> and check `iss` claim
 2. **Expected issuer format**: `https://login.microsoftonline.com/{tenant-id}/v2.0`
 3. **Common mismatches**:
    - Using v1.0 endpoint instead of v2.0
@@ -274,6 +292,7 @@ See [../JWT_KEY_ROTATION_FIX.md](../JWT_KEY_ROTATION_FIX.md) for detailed inform
    - Token from different tenant
 
 **Fix**:
+
 ```bash
 # Verify AAD_TENANT_ID matches tenant in token issuer
 # Token iss: https://login.microsoftonline.com/12345678-1234-1234-1234-123456789012/v2.0
@@ -298,12 +317,14 @@ See [../JWT_KEY_ROTATION_FIX.md](../JWT_KEY_ROTATION_FIX.md) for detailed inform
    - Token requested for wrong resource
 
 **Fix Option 1**: Update AAD_AUDIENCE
+
 ```bash
 # If token aud is: 87654321-4321-4321-4321-210987654321
 # Set AAD_AUDIENCE to: 87654321-4321-4321-4321-210987654321
 ```
 
 **Fix Option 2**: Update SPA scope request
+
 ```javascript
 // In MSAL configuration
 const loginRequest = {
@@ -323,10 +344,11 @@ const loginRequest = {
 
 1. **Verify expiration**:
    - Decode token, check `exp` claim (Unix timestamp)
-   - Convert timestamp: https://www.unixtimestamp.com/
+   - Convert timestamp: <https://www.unixtimestamp.com/>
    - Compare to current time
 
 2. **Acquire new token**:
+
    ```javascript
    // In SPA with MSAL
    const tokenResponse = await msalInstance.acquireTokenSilent(loginRequest);
@@ -343,6 +365,7 @@ const loginRequest = {
    - Configure in Azure Portal if needed (rare)
 
 **Prevention**:
+
 - Implement token refresh before expiration
 - Use MSAL's `acquireTokenSilent` which automatically handles refresh
 
@@ -357,7 +380,7 @@ Follow these steps to validate a token:
 #### Step 1: Decode the Token
 
 1. Copy the full JWT token (without "Bearer " prefix)
-2. Go to https://jwt.ms
+2. Go to <https://jwt.ms>
 3. Paste the token
 4. Review the decoded claims
 
@@ -426,6 +449,7 @@ If you see `SecurityTokenSignatureKeyNotFoundException`:
 #### Step 1: Verify Key Rotation Configuration
 
 Check Program.cs:
+
 ```csharp
 options.RefreshOnIssuerKeyNotFound = true;  // Should be true
 ```
@@ -438,6 +462,7 @@ curl "https://login.microsoftonline.com/$TENANT_ID/v2.0/.well-known/openid-confi
 ```
 
 Should return:
+
 ```json
 {
   "issuer": "https://login.microsoftonline.com/{tenant-id}/v2.0",
@@ -453,6 +478,7 @@ curl "https://login.microsoftonline.com/$TENANT_ID/discovery/v2.0/keys" | jq
 ```
 
 Should return array of keys with `kid` values:
+
 ```json
 {
   "keys": [
@@ -471,6 +497,7 @@ Should return array of keys with `kid` values:
 #### Step 4: Check Token Kid
 
 Decode token header (first part before first dot):
+
 ```bash
 TOKEN="eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlVvMWFfUVV3ZVRGcWlxTF9IU2VTalFJb1JqMCJ9.eyJ..."
 HEADER=$(echo "$TOKEN" | cut -d'.' -f1)
@@ -478,6 +505,7 @@ echo "$HEADER" | base64 -d 2>/dev/null | jq
 ```
 
 Should show:
+
 ```json
 {
   "alg": "RS256",
@@ -493,6 +521,7 @@ Check if the token's `kid` is in the JWKS response from Step 3.
 **If yes**: Key is available, issue is with caching. Wait and retry.
 
 **If no**: Key has been rotated but token was signed with old key. Options:
+
 - Wait for token to expire and acquire new token
 - Force token refresh in SPA
 - If token is valid but key rotated, platform will auto-refresh
@@ -502,6 +531,7 @@ Check if the token's `kid` is in the JWKS response from Step 3.
 #### Step 1: Get Token Audience
 
 Decode token, find `aud` claim:
+
 ```json
 {
   "aud": "87654321-4321-4321-4321-210987654321",
@@ -512,6 +542,7 @@ Decode token, find `aud` claim:
 #### Step 2: Get Expected Audience
 
 Check Function App configuration:
+
 ```bash
 # In Azure Portal
 Function App → Configuration → Application settings → AAD_AUDIENCE
@@ -541,10 +572,12 @@ fi
 #### Step 4: Determine Correct Value
 
 **Option A**: Update Function App configuration to match token
+
 - Use if token `aud` is correct
 - Update `AAD_AUDIENCE` to match token `aud`
 
 **Option B**: Update SPA to request correct audience
+
 - Use if Function App `AAD_AUDIENCE` is correct
 - Update MSAL scope to: `api://{AAD_AUDIENCE}/access_as_user`
 
@@ -560,24 +593,27 @@ fi
 
 ### jwt.ms (Microsoft)
 
-**URL**: https://jwt.ms
+**URL**: <https://jwt.ms>
 
 **Features**:
+
 - Decode JWT tokens
 - View all claims
 - No token leaves your browser (client-side only)
 - Trusted Microsoft tool
 
 **Usage**:
+
 1. Copy JWT token (without "Bearer ")
 2. Paste into jwt.ms
 3. Review decoded claims
 
 ### jwt.io (Auth0)
 
-**URL**: https://jwt.io
+**URL**: <https://jwt.io>
 
 **Features**:
+
 - Decode JWT tokens
 - Verify signatures (with public key)
 - Edit and re-encode tokens (for testing)
@@ -587,6 +623,7 @@ fi
 ### Browser Developer Tools
 
 **Check Requests**:
+
 ```javascript
 // In browser console, intercept fetch requests
 const originalFetch = window.fetch;
@@ -599,6 +636,7 @@ window.fetch = function(...args) {
 ```
 
 **View Local Storage (MSAL cache)**:
+
 1. Open Developer Tools (F12)
 2. Go to Application tab
 3. Expand Local Storage
@@ -608,12 +646,14 @@ window.fetch = function(...args) {
 ### Postman
 
 **Import Token**:
+
 1. Authorization tab → Type: OAuth 2.0
 2. Configure grant type: Authorization Code (PKCE)
 3. Get New Access Token
 4. Use token in requests
 
 **Decode Token**:
+
 - Postman automatically decodes JWT in Authorization tab
 
 ## Application Insights Queries
@@ -749,6 +789,7 @@ union traces, requests
 **When to Use**: Token expired or about to expire
 
 **Implementation (MSAL)**:
+
 ```javascript
 async function getAccessToken() {
   const account = msalInstance.getAllAccounts()[0];
@@ -776,6 +817,7 @@ async function getAccessToken() {
 ### Strategy 2: Configuration Validation Script
 
 **PowerShell Script**:
+
 ```powershell
 # validate-jwt-config.ps1
 
@@ -835,6 +877,7 @@ Write-Host "`n✅ All validations passed" -ForegroundColor Green
 ### Strategy 3: Automated Token Testing
 
 **Python Script**:
+
 ```python
 #!/usr/bin/env python3
 """Test JWT token validation"""
@@ -928,6 +971,7 @@ async function getValidToken() {
 Configure Application Insights alerts:
 
 **Alert 1: High Authentication Failure Rate**
+
 ```kql
 requests
 | where timestamp > ago(5m)
@@ -937,6 +981,7 @@ requests
 ```
 
 **Alert 2: Signing Key Rotation Issues**
+
 ```kql
 traces
 | where timestamp > ago(5m)

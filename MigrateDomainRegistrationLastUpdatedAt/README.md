@@ -19,11 +19,13 @@ When the `LastUpdatedAt` field was added to the `DomainRegistration` entity, exi
 ## Configuration
 
 Configure the following settings either through:
+
 - User Secrets (recommended for local development)
 - Environment variables
 - `appsettings.json` (not recommended for sensitive data)
 
 Required settings:
+
 ```
 COSMOSDB_ENDPOINT_URI=<your-cosmos-endpoint>
 COSMOSDB_PRIMARY_KEY=<your-primary-key>
@@ -49,6 +51,7 @@ dotnet run
 ## What It Does
 
 The migration:
+
 1. Connects to your Cosmos DB database
 2. Queries for all `DomainRegistration` records where `LastUpdatedAt` is not set
 3. For each record found:
@@ -67,6 +70,7 @@ The migration:
 ## Verification
 
 After running the migration, all `DomainRegistration` records should have:
+
 - `LastUpdatedAt` equal to `CreatedAt` (for records that existed before the field was added)
 - Both timestamps present and valid
 

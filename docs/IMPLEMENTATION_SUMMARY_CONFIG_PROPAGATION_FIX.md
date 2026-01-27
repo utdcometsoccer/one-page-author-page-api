@@ -18,6 +18,7 @@ The InkStainedWretchesConfig Function App in `infra/inkstainedwretches.bicep` wa
 ### Code Pattern Comparison
 
 **Before (InkStainedWretchesConfig)**:
+
 ```bicep
 appSettings: [
   {
@@ -33,6 +34,7 @@ appSettings: [
 ```
 
 **After (All Function Apps)**:
+
 ```bicep
 appSettings: concat([
   {
@@ -109,10 +111,12 @@ All four function apps now use the same conditional configuration pattern:
 ### Bicep concat() Pattern
 
 The `concat()` function allows merging multiple arrays of app settings:
+
 - Base array with required settings (always present)
 - Conditional arrays that are only added when parameters are not empty
 
 **Syntax**:
+
 ```bicep
 concat(
   [baseSettings],
@@ -124,6 +128,7 @@ concat(
 ### Conditional Expression
 
 Each optional section uses the `!empty()` check:
+
 ```bicep
 !empty(aadAudience) ? [
   {
@@ -134,33 +139,41 @@ Each optional section uses the `!empty()` check:
 ```
 
 This ensures:
+
 - If parameter is provided and not empty → setting is added
 - If parameter is empty or not provided → empty array is added (no setting)
 
 ## Testing & Validation
 
 ### Bicep Validation
+
 ```bash
 az bicep build --file infra/inkstainedwretches.bicep --stdout
 ```
+
 **Result**: ✅ Successful compilation, no errors
 
 ### Configuration Verification
+
 Verified that all four function apps now have consistent AAD configuration:
+
 ```bash
 grep -n "AAD_AUDIENCE\|AAD_CLIENT_ID\|AAD_VALID_ISSUERS" infra/inkstainedwretches.bicep
 ```
+
 **Result**: All three variables present in all four function apps (lines 362-380, 484-502, 709-727, 831-849)
 
 ## Impact & Benefits
 
 ### Before Fix
+
 - ❌ AAD authentication variables not available in InkStainedWretchesConfig
 - ❌ Cosmos DB connection settings not available
 - ❌ Static configuration required redeployment for changes
 - ❌ Inconsistent configuration pattern across function apps
 
 ### After Fix
+
 - ✅ AAD authentication variables properly propagate to all function apps
 - ✅ Cosmos DB and other optional settings available when needed
 - ✅ GitHub Secrets can be updated without code changes
@@ -170,13 +183,17 @@ grep -n "AAD_AUDIENCE\|AAD_CLIENT_ID\|AAD_VALID_ISSUERS" infra/inkstainedwretche
 ## Deployment Considerations
 
 ### No Breaking Changes
+
 This is a **non-breaking change**:
+
 - Existing function apps continue to work
 - Only affects new deployments
 - Adds optional configuration support
 
 ### Required GitHub Secrets
+
 For full functionality, ensure these secrets are configured:
+
 - `AAD_TENANT_ID`
 - `AAD_AUDIENCE`
 - `AAD_CLIENT_ID` (optional, alternative to AUDIENCE)

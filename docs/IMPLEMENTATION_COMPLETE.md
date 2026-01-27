@@ -1,6 +1,7 @@
 # Authenticated Function Logging - Implementation Complete ✅
 
 ## Issue Summary
+
 **Issue**: Add extensive logging to Authenticated functions
 **Requirement**: Add logging to authenticated functions and include KQL queries to extract them. Make the KQL queries work from the Log Analytics workbook.
 
@@ -9,6 +10,7 @@
 ### What Was Implemented
 
 #### 1. Custom Telemetry Service ✅
+
 - **File**: `OnePageAuthorLib/api/AuthenticatedFunctionTelemetryService.cs`
 - **Features**:
   - Interface `IAuthenticatedFunctionTelemetryService` with 3 tracking methods
@@ -24,6 +26,7 @@
 #### 2. Enhanced Authenticated Functions ✅
 
 **Stripe Functions** (4 functions updated):
+
 1. `InkStainedWretchStripe/FindSubscription.cs`
    - User context tracking
    - Search parameters (email, domain)
@@ -49,6 +52,7 @@
    - Error tracking with customer context
 
 **Testimonial Functions** (3 functions updated):
+
 1. `InkStainedWretchFunctions/CreateTestimonial.cs`
    - User context tracking
    - Testimonial details (author name, rating)
@@ -70,6 +74,7 @@
 #### 3. KQL Queries for Log Analytics ✅
 
 **Core Analytics Queries** (5 queries):
+
 1. `kql/authenticated-function-calls.kql`
    - Tracks all authenticated function calls
    - Time chart visualization
@@ -97,11 +102,12 @@
 
 **Feature-Specific Queries** (2 queries):
 6. `kql/testimonial-operations.kql`
-   - Testimonial CRUD tracking
-   - Time chart visualization
-   - Metrics: Operations, success rate, unique users/testimonials
 
-7. `kql/subscription-management-operations.kql`
+- Testimonial CRUD tracking
+- Time chart visualization
+- Metrics: Operations, success rate, unique users/testimonials
+
+1. `kql/subscription-management-operations.kql`
    - Subscription operation tracking
    - Time chart visualization
    - Metrics: Operations, success rate, unique users/customers
@@ -132,19 +138,23 @@
 ### Technical Details
 
 #### Custom Dimensions Tracked
+
 **Standard for all events**:
+
 - FunctionName: Azure Function name
 - UserId: User ID from JWT token
 - UserEmailDomain: Email domain (privacy-safe)
 - Timestamp: ISO 8601 timestamp
 
 **Context-specific**:
+
 - CustomerId, SubscriptionId, TestimonialId
 - Domain, TargetEmail, PriceId
 - ErrorMessage, ErrorType
 - Status, Rating, and operation-specific fields
 
 #### Event Flow
+
 ```
 1. Function invoked with JWT token
 2. Extract user context (ID, email domain)
@@ -156,6 +166,7 @@
 ```
 
 #### Privacy & Security
+
 - Email addresses stored as domains only (e.g., "example.com")
 - User IDs from JWT claims (not PII)
 - No sensitive data (passwords, tokens, keys) logged
@@ -164,6 +175,7 @@
 ### Testing Results ✅
 
 **Build Status**: ✅ All projects build successfully
+
 ```
 Build succeeded.
     0 Warning(s)
@@ -172,6 +184,7 @@ Time Elapsed 00:00:23.23
 ```
 
 **Test Status**: ✅ All tests pass
+
 ```
 Test Run Successful.
 Total tests: 755
@@ -181,14 +194,16 @@ Total tests: 755
 
 ### How to Use
 
-#### For Immediate Use:
+#### For Immediate Use
+
 1. Deploy the updated functions to Azure
 2. Navigate to Application Insights in Azure Portal
 3. Go to "Logs" section
 4. Copy any query from `kql/` directory
 5. Run the query to see telemetry data
 
-#### For Workbook Setup:
+#### For Workbook Setup
+
 1. Navigate to Application Insights
 2. Select "Workbooks" → "New"
 3. Follow instructions in `kql/WORKBOOK_TEMPLATE.md`
@@ -196,7 +211,8 @@ Total tests: 755
 5. Configure auto-refresh and time range
 6. Save and share with team
 
-#### For Monitoring:
+#### For Monitoring
+
 - **Real-time**: Use Azure Dashboard with pinned charts
 - **Historical**: Use Log Analytics Workbooks
 - **Alerts**: Configure based on error rates or activity patterns
@@ -205,6 +221,7 @@ Total tests: 755
 ### Files Changed/Added
 
 **Code Changes** (7 files):
+
 - `OnePageAuthorLib/api/AuthenticatedFunctionTelemetryService.cs` (new)
 - `OnePageAuthorLib/ServiceFactory.cs` (modified)
 - `InkStainedWretchStripe/FindSubscription.cs` (modified)
@@ -216,6 +233,7 @@ Total tests: 755
 - `InkStainedWretchFunctions/DeleteTestimonial.cs` (modified)
 
 **KQL Queries** (7 files):
+
 - `kql/authenticated-function-calls.kql` (new)
 - `kql/authenticated-user-activity.kql` (new)
 - `kql/authenticated-function-success.kql` (new)
@@ -225,6 +243,7 @@ Total tests: 755
 - `kql/subscription-management-operations.kql` (new)
 
 **Documentation** (3 files):
+
 - `kql/AUTHENTICATED_FUNCTIONS_README.md` (new)
 - `AUTHENTICATED_FUNCTION_LOGGING_IMPLEMENTATION.md` (new)
 - `kql/WORKBOOK_TEMPLATE.md` (new)
@@ -232,23 +251,27 @@ Total tests: 755
 ### Benefits Delivered
 
 **For Operations**:
+
 - Real-time authenticated API usage monitoring
 - User engagement metrics
 - Error detection and alerting
 - Performance monitoring per function
 
 **For Support**:
+
 - Detailed error context for troubleshooting
 - User activity history
 - Operation success/failure tracking
 
 **For Product**:
+
 - Feature usage analytics
 - User behavior insights
 - Subscription management patterns
 - Testimonial management activity
 
 **For Compliance**:
+
 - Audit trail of authenticated operations
 - Privacy-compliant user activity tracking
 - Security monitoring
@@ -256,12 +279,14 @@ Total tests: 755
 ### Next Steps
 
 **Immediate** (No code changes needed):
+
 1. Verify Application Insights is receiving telemetry
 2. Import KQL queries into Log Analytics
 3. Create Log Analytics Workbook using template
 4. Set up alerts for high error rates
 
 **Future Enhancements** (Optional):
+
 1. Create pre-built Azure Dashboard
 2. Add automated alerting rules
 3. Integrate with Power BI
@@ -280,6 +305,7 @@ Total tests: 755
 ## Summary
 
 ✅ **All requirements met**:
+
 - ✅ Extensive logging added to all 7 authenticated functions
 - ✅ User context (ID, email domain) tracked for every call
 - ✅ Success/failure metrics captured

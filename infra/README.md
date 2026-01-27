@@ -5,9 +5,11 @@ This directory contains Bicep templates and management scripts for deploying and
 ## Management Scripts
 
 ### Grant-ServicePrincipalPermissions.ps1 / Grant-ServicePrincipalPermissions.sh
+
 Grants the User Access Administrator role to a service principal at the subscription or resource group scope. This permission is **required** for the service principal to create role assignments during Bicep deployments (e.g., assigning Key Vault roles to Function Apps).
 
 **PowerShell Usage:**
+
 ```powershell
 # Grant permissions at subscription scope (recommended)
 ./Grant-ServicePrincipalPermissions.ps1
@@ -20,6 +22,7 @@ Grants the User Access Administrator role to a service principal at the subscrip
 ```
 
 **Bash Usage:**
+
 ```bash
 # Grant permissions at subscription scope (recommended)
 ./Grant-ServicePrincipalPermissions.sh
@@ -35,11 +38,13 @@ Grants the User Access Administrator role to a service principal at the subscrip
 ```
 
 **Default Values:**
+
 - Service Principal Name: `github-actions-inkstainedwretches`
 - Role Name: `User Access Administrator` (fixed - required for role assignments)
 - Scope: `subscription`
 
 **Features:**
+
 - Idempotent - Safe to run multiple times
 - Validates Azure CLI installation and authentication
 - Checks if role assignment already exists
@@ -48,21 +53,24 @@ Grants the User Access Administrator role to a service principal at the subscrip
 - Comprehensive error handling
 
 **Requirements:**
+
 - Azure CLI installed
 - User authenticated with `az login`
 - User must have Owner role or User Access Administrator role at the target scope
 - **jq** command-line JSON processor (for Bash script only)
   - Ubuntu/Debian: `sudo apt-get install jq`
   - macOS: `brew install jq`
-  - Other: https://stedolan.github.io/jq/download/
+  - Other: <https://stedolan.github.io/jq/download/>
 
 **Why is this needed?**
 The error message `"The client '***' with object id '...' does not have permission to perform action 'Microsoft.Authorization/roleAssignments/write'"` occurs when the service principal lacks permission to create role assignments. The Bicep template `inkstainedwretches.bicep` needs to assign Key Vault roles to Function Apps, which requires the User Access Administrator role.
 
 ### Assign-KeyVaultRole.ps1 / Assign-KeyVaultRole.sh
+
 Assigns the Key Vault Secrets Officer role (or any other specified role) to a service principal for a specific Key Vault. The script checks if the role assignment already exists before creating it, making it idempotent.
 
 **PowerShell Usage:**
+
 ```powershell
 # Basic usage with required parameter
 ./Assign-KeyVaultRole.ps1 -KeyVaultName "mykeyvault"
@@ -75,6 +83,7 @@ Assigns the Key Vault Secrets Officer role (or any other specified role) to a se
 ```
 
 **Bash Usage:**
+
 ```bash
 # Basic usage with required parameter
 ./Assign-KeyVaultRole.sh -k mykeyvault
@@ -90,10 +99,12 @@ Assigns the Key Vault Secrets Officer role (or any other specified role) to a se
 ```
 
 **Default Values:**
+
 - Service Principal Name: `github-actions-inkstainedwretches`
 - Role Name: `Key Vault Secrets Officer`
 
 **Features:**
+
 - Idempotent - Safe to run multiple times
 - Validates Azure CLI installation and authentication
 - Checks if role assignment already exists
@@ -102,6 +113,7 @@ Assigns the Key Vault Secrets Officer role (or any other specified role) to a se
 - Uses variables to avoid hardcoding values
 
 **Requirements:**
+
 - Azure CLI installed
 - User authenticated with `az login`
 - Sufficient permissions to assign roles (typically Owner or User Access Administrator)
@@ -109,11 +121,13 @@ Assigns the Key Vault Secrets Officer role (or any other specified role) to a se
 ## Available Templates
 
 ### keyvault.bicep
+
 Deploys a standalone Azure Key Vault for secure storage of secrets, keys, and certificates.
 
 **Note**: This template is available for manual deployment but is not used by the GitHub Actions workflow. The Key Vault is automatically deployed as part of the `inkstainedwretches.bicep` infrastructure template.
 
 **Parameters:**
+
 - `keyVaultName` (required) - Name of the Key Vault (3-24 chars, globally unique)
 - `location` (optional) - Azure region (defaults to resource group location)
 - `enableRbacAuthorization` (optional) - Enable RBAC authorization (default: true, recommended)
@@ -126,11 +140,13 @@ Deploys a standalone Azure Key Vault for secure storage of secrets, keys, and ce
 - `publicNetworkAccess` (optional) - Enabled or Disabled (default: Enabled)
 
 **Outputs:**
+
 - `keyVaultName` - The name of the deployed Key Vault
 - `keyVaultId` - The resource ID
 - `keyVaultUri` - The vault URI for accessing secrets
 
 **Example deployment:**
+
 ```bash
 az deployment group create \
   --resource-group MyResourceGroup \
@@ -142,9 +158,11 @@ az deployment group create \
 ```
 
 ### cosmosdb.bicep
+
 Deploys an Azure Cosmos DB account with serverless or provisioned capacity.
 
 **Key parameters:**
+
 - `cosmosDbAccountName` (required)
 - `location` (optional)
 - `enableFreeTier` (optional) - Enable free tier (one per subscription)
@@ -152,24 +170,30 @@ Deploys an Azure Cosmos DB account with serverless or provisioned capacity.
 - `enableZoneRedundancy` (optional)
 
 ### applicationinsights.bicep
+
 Deploys Application Insights for monitoring and diagnostics.
 
 **Key parameters:**
+
 - `appInsightsName` (required)
 - `location` (optional)
 - `retentionInDays` (optional) - 30-730 days
 
 ### functionapp.bicep
+
 Deploys a Function App with storage and app service plan.
 
 **Key parameters:**
+
 - `functionAppName` (required)
 - `location` (optional)
 
 ### inkstainedwretches.bicep
+
 Comprehensive deployment template for the Ink Stained Wretches platform including storage, Key Vault, App Insights, DNS, and multiple Function Apps.
 
 **Key parameters:**
+
 - `baseName` (required) - Base name for all resources
 - `location` (optional)
 - `deployKeyVault` (optional) - Deploy Key Vault component
@@ -179,6 +203,7 @@ Comprehensive deployment template for the Ink Stained Wretches platform includin
 - Various function app deployment flags
 
 **Important Notes:**
+
 1. **Key Vault Role Assignments**: Role assignments for Function App access to Key Vault have been removed from this template to avoid permission errors during automated deployments. After deployment, you must manually grant the Function Apps access to Key Vault using one of these methods:
    - Use the `./infra/Assign-KeyVaultRole.sh` script (recommended)
    - Grant the service principal "User Access Administrator" role using `./infra/Grant-ServicePrincipalPermissions.sh` and redeploy
@@ -187,23 +212,28 @@ Comprehensive deployment template for the Ink Stained Wretches platform includin
 2. **Communication Services**: When deploying with `deployCommunicationServices=true`, the `Microsoft.Communication` resource provider must be registered in your Azure subscription. The GitHub Actions workflow handles this automatically.
 
 ### communication-services.bicep
+
 Deploys Azure Communication Services for email notifications used by the Author Invitation Tool.
 
 **Key parameters:**
+
 - `baseName` (required) - Base name for the Communication Services resource
 - `dataLocation` (optional) - Data location (default: "United States")
 - `tags` (optional) - Resource tags
 
 **Prerequisites:**
+
 - The `Microsoft.Communication` resource provider must be registered: `az provider register --namespace Microsoft.Communication --wait`
 - In GitHub Actions, this is handled automatically by the "Register Microsoft.Communication Resource Provider" workflow step
 
 **Resources created:**
+
 - Communication Services resource (`${baseName}-acs`)
 - Email Service (`${baseName}-email`)
 - Azure Managed Domain for quick setup (e.g., `<uniqueid>.azurecomm.net`)
 
 **Outputs:**
+
 - `communicationServiceName` - Name of the Communication Services resource
 - `communicationServiceId` - Resource ID
 - `communicationServiceEndpoint` - Endpoint hostname
@@ -212,6 +242,7 @@ Deploys Azure Communication Services for email notifications used by the Author 
 - Connection string must be retrieved via Azure Portal or CLI after deployment
 
 **Example deployment:**
+
 ```bash
 # Register provider first
 az provider register --namespace Microsoft.Communication --wait

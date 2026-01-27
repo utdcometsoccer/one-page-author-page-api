@@ -7,7 +7,6 @@ Comprehensive, idempotent console application for seeding all InkStainedWretch l
 
 ## Overview
 
-
 - **Comprehensive**: Seeds data for ALL containers in the LocalizationText model (25+ containers)
 - **Idempotent**: Safe to run multiple times - automatically detects and skips existing data
 - **Multi-language**: Supports North American countries (US, CA, MX) in 6 languages: English, Spanish, French, Arabic, Simplified Chinese, Traditional Chinese
@@ -17,7 +16,6 @@ Comprehensive, idempotent console application for seeding all InkStainedWretch l
 - Uses reflection to construct POCOs under `InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement` and inserts via a generic repository.
 
 ## Quickstart
-
 
 ```pwsh
 dotnet build SeedInkStainedWretchesLocale.csproj
@@ -126,7 +124,6 @@ All locale files now include comprehensive ARIA labels for improved accessibilit
 These accessibility labels are properly translated across all 20 supported locales (EN, ES, FR, AR, ZH-CN, ZH-TW for US, CA, MX, and EG).
 
 ## Notes
-
 
 - Container managers and repository are provided by `OnePageAuthorLib` via `.AddInkStainedWretchServices()`.
 - Partition key convention is usually `/Culture` for localization containers.

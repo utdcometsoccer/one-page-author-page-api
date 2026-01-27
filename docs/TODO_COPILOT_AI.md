@@ -9,7 +9,8 @@
 
 This document outlines tasks that can be automated and executed by Copilot AI. These tasks include code analysis, test creation, documentation generation, validation, and automated checks.
 
-**Recent Update (2025-12-30):** 
+**Recent Update (2025-12-30):**
+
 - Standardized error handling completed (PR #203)
 - Authentication validation completed and confirmed satisfactory
 - Immediate focus is now on Domain Registration validation through comprehensive testing
@@ -19,6 +20,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 ## 🟢 RECENT ACCOMPLISHMENTS
 
 ### Authentication System Validation ✅ COMPLETE (2025-12-30)
+
 - ✅ JWT authentication validated and confirmed working
 - ✅ Authorization level configurations verified across all Function Apps
 - ✅ Microsoft Entra ID integration tested and operational
@@ -28,6 +30,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 **Impact:** Security foundation validated, authentication system operational
 
 ### Standardized Error Handling ✅ COMPLETE (2025-12-30)
+
 - ✅ Implemented consistent error response format across all APIs
 - ✅ Created ErrorResponse model with standardized fields
 - ✅ Built extension methods for IActionResult and HttpResponseData
@@ -51,6 +54,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 **Priority:** CRITICAL - Must validate core feature workflows
 
 **Action Items:**
+
 - [ ] **PRIORITY 1:** Enhance unit tests for domain validation
   - Test domain name format validation (valid TLDs, invalid formats)
   - Test TLD validation against Google Domains supported TLDs
@@ -84,6 +88,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
   - **Target:** 20+ edge case tests
 
 **Files to Create/Update:**
+
 - `OnePageAuthor.Test/DomainRegistration/DomainValidationServiceTests.cs` (ENHANCE - add 40+ tests)
 - `OnePageAuthor.Test/DomainRegistration/ContactInformationValidationTests.cs` (NEW - 30+ tests)
 - `OnePageAuthor.Test/DomainRegistration/DomainRegistrationWorkflowTests.cs` (NEW - 25+ tests)
@@ -92,6 +97,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 - `OnePageAuthor.Test/DomainRegistration/TestHelpers/DomainRegistrationTestFixtures.cs` (NEW)
 
 **Success Criteria:**
+
 - ✅ 115+ domain registration tests created and passing
 - ✅ All validation logic thoroughly tested
 - ✅ All critical workflows covered
@@ -108,6 +114,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 **Status:** ✅ COMPLETE - Authentication validated and satisfactory  
 
 **Completed Items:**
+
 - ✅ JWT authentication implementation analyzed
 - ✅ Authentication helpers verified (JwtAuthenticationHelper, JwtValidationService, JwtDebugHelper, TokenIntrospectionService)
 - ✅ Authorization documented in `AUTHORIZATION_FIX_DOCUMENTATION.md`
@@ -123,6 +130,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 
 **Status:** ✅ COMPLETE (2025-12-27)  
 **Findings:**
+
 - ✅ Domain registration implemented in `OnePageAuthorLib/api/DomainRegistrationService.cs`
 - ✅ Repository pattern used: `IDomainRegistrationRepository`
 - ✅ Validation services exist (Domain, ContactInfo, Subscription validation)
@@ -147,6 +155,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 **Priority:** CRITICAL - Domain functionality depends on this
 
 **Action Items:**
+
 - [ ] **PRIORITY 1:** Create/enhance unit tests for DNS zone operations
   - Test zone creation logic with various domain formats
   - Test zone existence checks
@@ -177,6 +186,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
   - **Target:** 15+ trigger function tests
 
 **Files to Create/Update:**
+
 - `OnePageAuthor.Test/DnsZoneServiceTests.cs` (ENHANCE existing - add 30+ tests)
 - `OnePageAuthor.Test/DNS/DnsZoneCreationTests.cs` (NEW - 25+ tests)
 - `OnePageAuthor.Test/DNS/DnsZoneErrorHandlingTests.cs` (NEW - 20+ tests)
@@ -185,6 +195,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 - `OnePageAuthor.Test/DNS/TestHelpers/DnsTestFixtures.cs` (NEW)
 
 **Success Criteria:**
+
 - ✅ 90+ DNS tests created and passing
 - ✅ All zone operations thoroughly tested
 - ✅ All error scenarios handled
@@ -198,6 +209,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 
 **Status:** ✅ COMPLETE (2025-12-27)  
 **Findings:**
+
 - ✅ DNS Zone service implemented: `OnePageAuthorLib/api/DnsZoneService.cs`
 - ✅ Uses Azure DNS with Resource Manager SDK
 - ✅ Automatic zone creation with existence checks
@@ -218,6 +230,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 **Priority:** HIGH - Required for custom domain functionality
 
 **Action Items:**
+
 - [ ] Create unit tests for Front Door operations
   - Test domain addition logic
   - Test domain existence checks
@@ -240,6 +253,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
   - Test automatic routing configuration
 
 **Files to Create/Update:**
+
 - `OnePageAuthor.Test/FrontDoor/FrontDoorServiceTests.cs` (enhance existing)
 - `OnePageAuthor.Test/FrontDoor/FrontDoorDomainAdditionTests.cs`
 - `OnePageAuthor.Test/FrontDoor/FrontDoorErrorHandlingTests.cs`
@@ -253,6 +267,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 **Estimated Time:** 1-2 hours
 
 **Action Items:**
+
 - [ ] Document DNS zone creation process
   - Automated vs manual creation
   - Configuration requirements
@@ -274,6 +289,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
   - Diagnostic commands
 
 **Files to Create:**
+
 - `docs/DNS_CONFIGURATION_GUIDE.md`
 - `docs/FRONTDOOR_INTEGRATION_GUIDE.md`
 - `docs/DNS_TROUBLESHOOTING.md`
@@ -287,6 +303,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 **Estimated Time:** 1 hour
 
 **Action Items:**
+
 - [ ] Create PowerShell/Bash script to validate DNS configuration
 - [ ] Script should check:
   - Azure DNS resource group exists
@@ -300,6 +317,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 - [ ] Provide remediation suggestions
 
 **Files to Create:**
+
 - `scripts/Validate-DnsConfiguration.ps1`
 - `scripts/validate-dns-configuration.sh`
 
@@ -313,6 +331,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 **Estimated Time:** 30 minutes
 
 **Action Items:**
+
 - [ ] Run all existing tests
 - [ ] Generate test coverage report
 - [ ] Identify gaps in coverage
@@ -320,12 +339,14 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 - [ ] Run tests in all configurations
 
 **Commands:**
+
 ```bash
 dotnet test OnePageAuthorAPI.sln --collect:"XPlat Code Coverage"
 dotnet test --logger "console;verbosity=detailed"
 ```
 
 **Output:**
+
 - `docs/TEST_COVERAGE_REPORT.md`
 
 ---
@@ -336,6 +357,7 @@ dotnet test --logger "console;verbosity=detailed"
 **Estimated Time:** 30 minutes
 
 **Action Items:**
+
 - [ ] Run code analysis on all projects
 - [ ] Identify code smells
 - [ ] Find potential bugs
@@ -343,11 +365,13 @@ dotnet test --logger "console;verbosity=detailed"
 - [ ] Generate report with findings
 
 **Commands:**
+
 ```bash
 dotnet build /p:RunCodeAnalysis=true
 ```
 
 **Output:**
+
 - `docs/CODE_ANALYSIS_REPORT.md`
 
 ---
@@ -358,6 +382,7 @@ dotnet build /p:RunCodeAnalysis=true
 **Estimated Time:** 20 minutes
 
 **Action Items:**
+
 - [ ] Audit all NuGet packages for vulnerabilities
 - [ ] Check for outdated packages
 - [ ] Identify packages with security issues
@@ -365,12 +390,14 @@ dotnet build /p:RunCodeAnalysis=true
 - [ ] Check license compatibility
 
 **Commands:**
+
 ```bash
 dotnet list package --vulnerable
 dotnet list package --outdated
 ```
 
 **Output:**
+
 - `docs/DEPENDENCY_SECURITY_AUDIT.md`
 
 ---
@@ -381,6 +408,7 @@ dotnet list package --outdated
 **Estimated Time:** 1 hour
 
 **Action Items:**
+
 - [ ] Scan for undocumented public APIs
 - [ ] Check XML documentation completeness
 - [ ] Verify parameter descriptions
@@ -388,6 +416,7 @@ dotnet list package --outdated
 - [ ] Generate documentation completeness report
 
 **Output:**
+
 - `docs/CODE_DOCUMENTATION_REPORT.md`
 
 ---
@@ -400,6 +429,7 @@ dotnet list package --outdated
 **Estimated Time:** 2-3 hours
 
 **Action Items:**
+
 - [ ] Create integration test that covers full workflow:
   1. Authenticate user
   2. Create domain registration request
@@ -413,6 +443,7 @@ dotnet list package --outdated
 - [ ] Create test data cleanup
 
 **Files to Create:**
+
 - `OnePageAuthor.Test/Integration/EndToEndDomainRegistrationTests.cs`
 
 ---
@@ -423,6 +454,7 @@ dotnet list package --outdated
 **Estimated Time:** 1-2 hours
 
 **Action Items:**
+
 - [ ] Create integration test for full auth flow:
   1. Mock JWT token generation
   2. Test each authenticated endpoint
@@ -433,6 +465,7 @@ dotnet list package --outdated
 - [ ] Test role-based access (if implemented)
 
 **Files to Create:**
+
 - `OnePageAuthor.Test/Integration/EndToEndAuthenticationTests.cs`
 
 ---
@@ -443,6 +476,7 @@ dotnet list package --outdated
 **Estimated Time:** 2-3 hours
 
 **Action Items:**
+
 - [ ] Create performance baseline tests
   - Measure response times for key endpoints
   - Measure database query performance
@@ -455,6 +489,7 @@ dotnet list package --outdated
 - [ ] Set performance regression thresholds
 
 **Files to Create:**
+
 - `OnePageAuthor.Test/Performance/PerformanceBaselineTests.cs`
 - `docs/PERFORMANCE_BENCHMARKS.md`
 
@@ -468,6 +503,7 @@ dotnet list package --outdated
 **Estimated Time:** 1 hour
 
 **Action Items:**
+
 - [ ] Generate API documentation from code
 - [ ] Use DocFX or similar tool
 - [ ] Include:
@@ -479,6 +515,7 @@ dotnet list package --outdated
 - [ ] Add to docs folder
 
 **Output:**
+
 - `docs/api-reference/` (directory with generated docs)
 
 ---
@@ -489,6 +526,7 @@ dotnet list package --outdated
 **Estimated Time:** 2-3 hours
 
 **Action Items:**
+
 - [ ] Create console app for configuration validation
 - [ ] Validate all required environment variables
 - [ ] Test connections to:
@@ -501,6 +539,7 @@ dotnet list package --outdated
 - [ ] Generate configuration checklist
 
 **Files to Create:**
+
 - `ConfigurationValidator/` (new project)
 - `ConfigurationValidator/Program.cs`
 - `ConfigurationValidator/Validators/`
@@ -513,6 +552,7 @@ dotnet list package --outdated
 **Estimated Time:** 2 hours
 
 **Action Items:**
+
 - [ ] Create script to automate local setup
 - [ ] Script should:
   - Check prerequisites (.NET SDK, Azure CLI, etc.)
@@ -527,6 +567,7 @@ dotnet list package --outdated
 - [ ] Support Windows (PowerShell) and Linux/Mac (Bash)
 
 **Files to Create:**
+
 - `scripts/Setup-DevEnvironment.ps1`
 - `scripts/setup-dev-environment.sh`
 
@@ -538,6 +579,7 @@ dotnet list package --outdated
 **Estimated Time:** 1-2 hours
 
 **Action Items:**
+
 - [ ] Create API collection for testing
 - [ ] Include all endpoints:
   - Authentication examples
@@ -550,6 +592,7 @@ dotnet list package --outdated
 - [ ] Export collection
 
 **Output:**
+
 - `docs/postman/OnePageAuthor-API.postman_collection.json`
 - `docs/thunder-client/OnePageAuthor-API.json`
 
@@ -561,6 +604,7 @@ dotnet list package --outdated
 **Estimated Time:** 2-3 hours
 
 **Action Items:**
+
 - [ ] Create system architecture diagram
 - [ ] Create authentication flow diagram
 - [ ] Create domain registration workflow diagram
@@ -570,6 +614,7 @@ dotnet list package --outdated
 - [ ] Include in documentation
 
 **Files to Create:**
+
 - `docs/diagrams/system-architecture.md`
 - `docs/diagrams/authentication-flow.md`
 - `docs/diagrams/domain-registration-workflow.md`
@@ -585,6 +630,7 @@ dotnet list package --outdated
 **Estimated Time:** 1-2 hours
 
 **Action Items:**
+
 - [ ] Create KQL queries for:
   - Authentication failures analysis
   - Domain registration success rate
@@ -596,6 +642,7 @@ dotnet list package --outdated
 - [ ] Create Azure Monitor workbook
 
 **Files to Create:**
+
 - `kql/authentication-monitoring.kql`
 - `kql/domain-registration-monitoring.kql`
 - `kql/dns-monitoring.kql`
@@ -609,6 +656,7 @@ dotnet list package --outdated
 **Estimated Time:** 1-2 hours
 
 **Action Items:**
+
 - [ ] Add health check endpoints to each Function App
 - [ ] Check:
   - Cosmos DB connectivity
@@ -620,6 +668,7 @@ dotnet list package --outdated
 - [ ] Integrate with Application Insights
 
 **Files to Create/Update:**
+
 - `ImageAPI/HealthCheck.cs`
 - `InkStainedWretchFunctions/HealthCheck.cs`
 - `InkStainedWretchStripe/HealthCheck.cs`
@@ -632,6 +681,7 @@ dotnet list package --outdated
 ### 🔴 Critical - Validation Phase (IMMEDIATE - This Week)
 
 **Domain Registration Validation:**
+
 - ✅ 2. Analyze Domain Registration Implementation (COMPLETE - 2025-12-27)
 - ⚠️ 1. Create Comprehensive Domain Registration Tests (IN PROGRESS - Due Jan 8)
 - ⏳ 8. Create Domain Registration Validation Report (TO DO)
@@ -639,6 +689,7 @@ dotnet list package --outdated
 - ⏳ 10. Add Domain Registration Monitoring (TO DO)
 
 **DNS Configuration Validation:**
+
 - ✅ 11. Analyze DNS Configuration Implementation (COMPLETE - 2025-12-27)
 - ⚠️ 12. Create Comprehensive DNS Tests (IN PROGRESS - Due Jan 8)
 - ✅ 13. Analyze Front Door Configuration (COMPLETE - 2025-12-27)
@@ -647,6 +698,7 @@ dotnet list package --outdated
 - ⏳ 16. Add DNS Configuration Validation Script (TO DO)
 
 ### 🟢 Recent Accomplishments
+
 - ✅ Authentication System Validation (COMPLETE - 2025-12-30)
   - JWT authentication validated and operational
   - Authorization configurations verified
@@ -657,19 +709,24 @@ dotnet list package --outdated
   - Development vs production error details
 
 ### Medium Priority
+
 **Code Quality:**
+
 - ⏳ 17. Run Comprehensive Test Suite
 - ⏳ 18. Static Code Analysis
 - ⏳ 19. Dependency Security Audit
 - ⏳ 20. Code Documentation Review
 
 **Integration Testing:**
+
 - ⏳ 21. Create End-to-End Domain Registration Test
 - ⏳ 22. Create Integration Test for Authentication Flow
 - ⏳ 23. Create Performance Tests
 
 ### Low Priority
+
 **Documentation & Tools:**
+
 - ⏳ 24. Generate API Reference Documentation
 - ⏳ 25. Create Configuration Validation Tool
 - ⏳ 26. Create Development Environment Setup Script
@@ -677,6 +734,7 @@ dotnet list package --outdated
 - ⏳ 28. Create Architecture Diagrams
 
 **Monitoring:**
+
 - ⏳ 29. Create Custom Application Insights Queries
 - ⏳ 30. Create Health Check Endpoints
 
@@ -685,6 +743,7 @@ dotnet list package --outdated
 ## Execution Plan
 
 ### Phase 1: Critical Validation Tasks (IMMEDIATE - Week of Dec 30, 2025)
+
 **Estimated Time:** 5-7 days total
 **Target Completion:** January 8, 2026
 
@@ -705,6 +764,7 @@ dotnet list package --outdated
    - **Due:** January 8, 2026
 
 ### Phase 2: Medium Priority Tasks (Priority 2)
+
 **Estimated Time:** 8-12 hours  
 **Target:** After Phase 1 validation complete
 
@@ -720,6 +780,7 @@ dotnet list package --outdated
    - Create performance tests
 
 ### Phase 3: Low Priority Tasks (Priority 3)
+
 **Estimated Time:** 10-15 hours
 
 1. **Documentation & Tools (7-10 hours)**
@@ -738,6 +799,7 @@ dotnet list package --outdated
 ## Success Criteria
 
 ### Phase 1: Critical Validation (Week 1)
+
 - ✅ 205+ tests created across domain registration and DNS (down from 300+ with auth removed)
 - ✅ All critical workflows validated and working
 - ✅ Comprehensive documentation for each area
@@ -745,24 +807,28 @@ dotnet list package --outdated
 - ✅ Validation scripts created and tested
 
 ### Authentication ✅ COMPLETE
+
 - ✅ Authentication system validated and operational
 - ✅ Authorization configurations verified
 - ✅ Production authentication flows confirmed satisfactory
 - ✅ JWT validation working correctly
 
 ### Domain Registration
+
 - ✅ 115+ domain registration tests created and passing
 - ✅ Validation report generated
 - ✅ Complete workflow documentation
 - ✅ Monitoring dashboards created
 
 ### DNS Configuration
+
 - ✅ 90+ DNS/Front Door tests created and passing
 - ✅ Integration tests for full workflow
 - ✅ Configuration validation script working
 - ✅ Comprehensive documentation
 
 ### Overall
+
 - ✅ Test coverage > 85% for critical code
 - ✅ All static analysis issues addressed
 - ✅ No critical security vulnerabilities
@@ -774,6 +840,7 @@ dotnet list package --outdated
 ## Notes
 
 ### Test Strategy
+
 - Focus on critical paths first
 - Use mocks for external services
 - Create reusable test fixtures
@@ -781,6 +848,7 @@ dotnet list package --outdated
 - Add both positive and negative test cases
 
 ### Documentation Strategy
+
 - Keep documentation close to code
 - Use markdown for easy maintenance
 - Include code examples
@@ -788,6 +856,7 @@ dotnet list package --outdated
 - Keep documentation up-to-date
 
 ### Monitoring Strategy
+
 - Use Application Insights for telemetry
 - Create custom metrics for business logic
 - Set up alerts for critical failures

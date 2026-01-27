@@ -22,6 +22,7 @@ This document summarizes the implementation of the Platform Statistics API, whic
 ```
 
 ### Features
+
 - **Public endpoint**: No authentication required
 - **Caching**: Response cached for 1 hour (both server-side and browser-side)
 - **Error handling**: Returns cached or default values on errors
@@ -68,8 +69,10 @@ This document summarizes the implementation of the Platform Statistics API, whic
 ### Database Schema
 
 **Container**: `PlatformStats`
+
 - **Partition Key**: `/id`
 - **Document Structure**:
+
   ```json
   {
     "id": "current",
@@ -85,12 +88,14 @@ This document summarizes the implementation of the Platform Statistics API, whic
 ## Caching Strategy
 
 ### Server-Side Cache
+
 - **Type**: Static in-memory cache (shared across service instances)
 - **TTL**: 1 hour
 - **Invalidation**: Time-based expiration
 - **Fallback**: Returns stale cache or default values on errors
 
 ### Client-Side Cache
+
 - **Header**: `Cache-Control: public, max-age=3600`
 - **Duration**: 1 hour
 - **Benefit**: Reduces server load for repeat visitors
@@ -122,17 +127,20 @@ using var iterator = container.GetItemQueryIterator<int>(queryDefinition);
 - **Computation**: ~500-1000ms (multiple COUNT queries)
 
 Expected database load:
+
 - **With cache**: 1 read per hour per instance
 - **Without cache**: 1 read per request (not recommended)
 
 ## Future Enhancements
 
 ### Short Term
+
 1. **Timer Trigger Function**: Create Azure Function with timer trigger to call `ComputeAndUpdateStatsAsync()` nightly
 2. **Stripe Integration**: Calculate TotalRevenue from actual subscription data
 3. **Rating System**: Implement user ratings and calculate AverageRating
 
 ### Long Term
+
 1. **Distributed Cache**: Use Redis for multi-instance deployments
 2. **Repository Enhancement**: Add Count methods to repository interfaces to avoid reflection
 3. **Real-time Updates**: Consider using Change Feed for more frequent updates
@@ -142,6 +150,7 @@ Expected database load:
 ## Usage Example
 
 ### Client-Side JavaScript
+
 ```javascript
 async function loadPlatformStats() {
   const response = await fetch('/api/stats/platform');
@@ -156,6 +165,7 @@ async function loadPlatformStats() {
 ```
 
 ### Periodic Update (Future)
+
 ```csharp
 [Function("UpdatePlatformStats")]
 public async Task Run(
@@ -175,12 +185,14 @@ public async Task Run(
 ## Monitoring & Observability
 
 ### Metrics to Track
+
 - Cache hit rate
 - Response times
 - Error rates
 - Staleness of cached data
 
 ### Logs to Monitor
+
 - "Returning cached platform stats" - Cache hit
 - "Cache miss or expired" - Cache miss
 - "No platform stats found in database" - Missing data
@@ -206,6 +218,7 @@ public async Task Run(
 ## Files Changed
 
 ### New Files (9)
+
 1. `OnePageAuthorLib/entities/PlatformStats.cs`
 2. `OnePageAuthorLib/interfaces/IPlatformStatsRepository.cs`
 3. `OnePageAuthorLib/interfaces/IPlatformStatsService.cs`
@@ -217,6 +230,7 @@ public async Task Run(
 9. `OnePageAuthor.Test/PlatformStatsServiceTests.cs`
 
 ### Modified Files (3)
+
 1. `OnePageAuthorLib/ServiceFactory.cs` - Added DI extensions
 2. `InkStainedWretchFunctions/Program.cs` - Registered services
 3. `OnePageAuthor.Test/InkStainedWretchFunctions/GetPlatformStatsTests.cs`
@@ -224,6 +238,7 @@ public async Task Run(
 ## Conclusion
 
 The Platform Statistics API has been successfully implemented with:
+
 - ✅ Public HTTP endpoint
 - ✅ Comprehensive caching (1-hour TTL)
 - ✅ Graceful error handling

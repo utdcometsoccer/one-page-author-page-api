@@ -6,7 +6,6 @@ This console application creates or updates Stripe products for the Ink Stained 
 
 ### 1. Annual Subscription ($59/year)
 
-
 - **Name**: "Ink Stained Wretch - Annual Subscription"
 - **Price**: $59.00 USD
 - **Billing**: Annually (every 1 year)
@@ -14,14 +13,12 @@ This console application creates or updates Stripe products for the Ink Stained 
 
 ### 2. 2-Year Subscription ($118/2 years)
 
-
 - **Name**: "Ink Stained Wretch - 2-Year Subscription"
 - **Price**: $118.00 USD
 - **Billing**: Every 2 years
 - **Nickname**: "2 year subscription"
 
 ### 3. 3-Year Subscription ($149/3 years)
-
 
 - **Name**: "Ink Stained Wretch - 3-Year Subscription"
 - **Price**: $149.00 USD
@@ -34,7 +31,6 @@ All products include comprehensive features from the Ink Stained Wretch platform
 
 ### Core Features
 
-
 - Microsoft Entra ID Integration & SSO
 - Multi-format image upload & Azure Blob Storage
 - Custom domain registration & DNS management
@@ -43,13 +39,11 @@ All products include comprehensive features from the Ink Stained Wretch platform
 
 ### Multi-Language Support
 
-
 - English (EN), Spanish (ES), French (FR)
 - Arabic (AR) with RTL support
 - Chinese Simplified (ZH-CN) & Traditional (ZH-TW)
 
 ### Technical Infrastructure
-
 
 - Azure Functions serverless architecture
 - Azure Cosmos DB for data persistence
@@ -68,6 +62,7 @@ All products include comprehensive features from the Ink Stained Wretch platform
 ### Why This Setting Is Needed
 
 **`Stripe:SecretKey`**
+
 - **Purpose**: Authenticates all Stripe API operations including creating products, prices, and updating metadata
 - **Key Types**:
   - Test keys (`sk_test_...`): Use for development and testing - creates products in test mode
@@ -163,14 +158,12 @@ dotnet run
 
 ### Product Metadata
 
-
 - **Features**: All major platform capabilities
 - **Culture Support**: Multi-language and localization data
 - **Technical Info**: Cloud provider, architecture, version
 - **Business Info**: Plan type, creation date, total features
 
 ### Price Metadata
-
 
 - **Billing Info**: Cycle, renewal period, currency
 - **Policies**: Cancellation, refund, auto-renewal
@@ -229,18 +222,15 @@ The application includes comprehensive culture information for internationalizat
 
 #### English Variants
 
-
 - **en-US**: English (United States) - Primary
 - **en-CA**: English (Canada)
 
 #### Spanish Variants
 
-
 - **es-US**: Spanish (United States)
 - **es-MX**: Spanish (Mexico)
 
 #### French Variants
-
 
 - **fr-CA**: French (Canada)
 - **fr-FR**: French (France)
@@ -388,12 +378,10 @@ To change pricing, cultures, or add new products:
 
 ### Error: "Stripe:SecretKey is required"
 
-
 - Make sure you've set your Stripe API key using one of the methods above
 - Verify the key starts with `sk_test_` for test mode or `sk_live_` for live mode
 
 ### Error: "Invalid API Key"
-
 
 - Double-check your Stripe API key is correct
 - Ensure you're using the correct key for your Stripe account
@@ -401,13 +389,11 @@ To change pricing, cultures, or add new products:
 
 ### Error: Network/Connection Issues
 
-
 - Check your internet connection
 - Verify you can access <https://api.stripe.com>
 - Check if you're behind a corporate firewall
 
 ### Warning: "Stripe.net version resolved to newer version"
-
 
 - This is harmless - NuGet automatically resolved to a newer compatible version
 - The application will work correctly with Stripe.net 47.0.0

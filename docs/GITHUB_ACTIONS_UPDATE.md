@@ -7,12 +7,14 @@ This document describes the updates made to the GitHub Actions workflows for the
 ## Changes Made
 
 ### 1. Removed Obsolete Workflow
+
 - **Deleted**: `.github/workflows/main_authorpageapi.yml`
   - This workflow used outdated authentication method with hard-coded client IDs
   - It was targeting a specific function app name `authorpageapi` that may no longer be in use
   - The workflow was not functioning properly
 
 ### 2. Updated Main Workflow
+
 - **Updated**: `.github/workflows/main_onepageauthorapi.yml`
   - Confirmed .NET version is `10.0.x` (matching the actual project version)
   - Added conditional checks for all Azure deployment steps
@@ -20,6 +22,7 @@ This document describes the updates made to the GitHub Actions workflows for the
   - Workflow now gracefully skips Azure deployment if required secrets are missing
 
 ### 3. New Infrastructure as Code
+
 - **Created**: `infra/functionapp.bicep`
   - Bicep template for deploying Azure Function App infrastructure
   - Includes:
@@ -29,6 +32,7 @@ This document describes the updates made to the GitHub Actions workflows for the
   - Configured with security best practices (HTTPS only, TLS 1.2, disabled public blob access)
 
 ### 4. Updated .gitignore
+
 - Added `infra/*.json` to ignore compiled Bicep templates
 
 ## How the Workflow Works
@@ -55,6 +59,7 @@ if: ${{ secrets.AZURE_CREDENTIALS != '' && secrets.AZURE_FUNCTIONAPP_NAME != '' 
 ```
 
 This allows the workflow to:
+
 - ✅ Run successfully even without Azure secrets (build-only mode)
 - ✅ Deploy automatically when secrets are configured
 - ✅ Create infrastructure automatically if it doesn't exist
@@ -64,6 +69,7 @@ This allows the workflow to:
 To enable full deployment functionality, configure the following secrets in your GitHub repository:
 
 ### Required for Deployment
+
 | Secret Name | Description | Example |
 |------------|-------------|---------|
 | `AZURE_CREDENTIALS` | Azure service principal credentials (JSON) | `{"clientId":"...","clientSecret":"...","subscriptionId":"...","tenantId":"..."}` |
@@ -71,6 +77,7 @@ To enable full deployment functionality, configure the following secrets in your
 | `AZURE_RESOURCE_GROUP` | Azure resource group name | `onepageauthor-rg` |
 
 ### Required for Infrastructure Creation
+
 | Secret Name | Description | Example |
 |------------|-------------|---------|
 | `AZURE_LOCATION` | Azure region for resources | `eastus`, `westus2`, `centralus` |
@@ -105,15 +112,18 @@ az ad sp create-for-rbac \
 The Bicep template (`infra/functionapp.bicep`) creates:
 
 ### Storage Account
+
 - **SKU**: Standard_LRS (Locally Redundant Storage)
 - **Kind**: StorageV2
 - **Security**: HTTPS only, TLS 1.2 minimum, no public blob access
 
 ### App Service Plan
+
 - **SKU**: Y1 (Consumption/Dynamic)
 - **Tier**: Dynamic (pay-per-execution)
 
 ### Function App
+
 - **Runtime**: .NET 10 isolated worker
 - **Functions Version**: v4
 - **Configuration**:
@@ -138,19 +148,25 @@ fi
 ## Testing the Workflow
 
 ### Build-Only Mode (No Secrets)
+
 ```bash
 git push origin main
 ```
+
 The workflow will:
+
 - ✅ Build the function-app project
 - ✅ Create the deployment package
 - ⏭️ Skip Azure deployment steps
 
 ### Full Deployment Mode (With Secrets)
+
 ```bash
 git push origin main
 ```
+
 The workflow will:
+
 - ✅ Build the function-app project
 - ✅ Create the deployment package
 - ✅ Login to Azure
@@ -160,15 +176,18 @@ The workflow will:
 ## Troubleshooting
 
 ### Build Fails
+
 - Ensure .NET 10.0.x SDK is available in the build environment
 - Check that `function-app/function-app.csproj` exists and is valid
 
 ### Infrastructure Deployment Fails
+
 - Verify `AZURE_LOCATION` secret is set and valid
 - Ensure service principal has permissions to create resources
 - Check that resource group exists
 
 ### Code Deployment Fails
+
 - Verify Function App exists or infrastructure deployment succeeded
 - Ensure service principal has permissions to deploy to the Function App
 - Check that the zip package was created successfully

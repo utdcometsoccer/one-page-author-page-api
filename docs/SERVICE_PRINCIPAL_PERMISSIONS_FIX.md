@@ -76,11 +76,13 @@ cd infra
 ## Prerequisites
 
 1. **Azure CLI**: Must be installed and accessible
+
    ```bash
    az version
    ```
 
 2. **Azure Authentication**: You must be logged in
+
    ```bash
    az login
    ```
@@ -88,10 +90,11 @@ cd infra
 3. **Sufficient Permissions**: Your user account must have:
    - **Owner** role, OR
    - **User Access Administrator** role
-   
+
    at the target scope (subscription or resource group)
 
 4. **jq (for Bash script)**: JSON processor for parsing Azure CLI output
+
    ```bash
    # Ubuntu/Debian
    sudo apt-get install jq
@@ -111,6 +114,7 @@ cd infra
 After running the script successfully, you can verify the role assignment:
 
 ### Verify at Subscription Scope
+
 ```bash
 az role assignment list \
   --assignee 3102a205-746e-4c19-b856-18fd3c3b31d8 \
@@ -119,6 +123,7 @@ az role assignment list \
 ```
 
 ### Verify at Resource Group Scope
+
 ```bash
 az role assignment list \
   --assignee 3102a205-746e-4c19-b856-18fd3c3b31d8 \
@@ -139,6 +144,7 @@ After granting the permissions:
 ### Why User Access Administrator?
 
 The **User Access Administrator** role is the least privileged role that allows creating role assignments. It:
+
 - ✅ Allows creating/deleting role assignments only
 - ✅ Does NOT grant full control over resources (unlike Owner)
 - ✅ Follows the principle of least privilege
@@ -147,11 +153,13 @@ The **User Access Administrator** role is the least privileged role that allows 
 ### Scope Selection
 
 **Subscription Scope (Recommended)**:
+
 - Allows the service principal to create role assignments anywhere in the subscription
 - Required if deploying to multiple resource groups
 - More flexible for infrastructure changes
 
 **Resource Group Scope**:
+
 - Limits role assignment permissions to a specific resource group
 - More restrictive security posture
 - Requires the service principal to have this role in each resource group where it deploys
@@ -169,23 +177,30 @@ However, this approach requires manual intervention after each deployment.
 ## Troubleshooting
 
 ### Error: "Not logged in to Azure"
+
 **Solution**: Run `az login` first
 
 ### Error: "Service principal not found"
+
 **Solution**: Verify the service principal name matches the one used in GitHub Actions
+
 ```bash
 az ad sp list --display-name github-actions-inkstainedwretches
 ```
 
 ### Error: "Failed to create role assignment"
+
 **Solution**: Ensure your account has Owner or User Access Administrator role
+
 ```bash
 az role assignment list --assignee YOUR_USER_EMAIL --role "Owner"
 az role assignment list --assignee YOUR_USER_EMAIL --role "User Access Administrator"
 ```
 
 ### Script runs but deployment still fails
-**Solution**: 
+
+**Solution**:
+
 1. Wait a few minutes for role propagation (can take up to 5 minutes)
 2. Verify the role assignment was created (see Verification section)
 3. Check the exact scope matches what the Bicep template expects

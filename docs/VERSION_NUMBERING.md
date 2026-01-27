@@ -109,6 +109,7 @@ The build number is automatically incremented with each GitHub Actions workflow 
 ### Automatic (Minor Version - Monthly)
 
 The minor version is automatically calculated based on the current month (1-12):
+
 - January = 1
 - February = 2
 - ...
@@ -119,6 +120,7 @@ The minor version automatically resets to 1 each January.
 ### Automatic (Major Version - Yearly)
 
 The major version is automatically calculated based on years since the project start (2025):
+
 - 2025 = 0
 - 2026 = 1
 - 2027 = 2
@@ -147,6 +149,7 @@ This is expected. Local builds use the default version from `Directory.Build.pro
 ### Version conflicts
 
 If you see version conflicts or binding redirect warnings, check that:
+
 - `AssemblyVersion` remains stable (only change for breaking changes)
 - `Version` and `FileVersion` are properly set in builds
 

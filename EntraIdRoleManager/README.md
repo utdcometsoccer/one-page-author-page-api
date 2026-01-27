@@ -61,7 +61,6 @@ Your existing ImageAPI app registration should be configured for Microsoft Accou
 
 ### 3. Additional Requirements
 
-
 - Cosmos DB access to read ImageStorageTiers and ImageStorageTierMemberships
 - Both applications must be in the same Azure AD tenant
 

@@ -20,16 +20,19 @@ This module provides REST API endpoints for managing and retrieving testimonials
 Retrieves testimonials with optional filtering.
 
 **Query Parameters:**
+
 - `limit` (optional, default: 5, max: 20) - Maximum number of testimonials to return
 - `featured` (optional) - Filter to only featured testimonials
 - `locale` (optional) - Filter by locale (e.g., "en-US", "es-ES")
 
 **Example Request:**
+
 ```bash
 curl "https://api.example.com/api/testimonials?featured=true&locale=en-US&limit=3"
 ```
 
 **Example Response:**
+
 ```json
 {
   "testimonials": [
@@ -60,6 +63,7 @@ All admin endpoints require JWT Bearer token authentication.
 Creates a new testimonial.
 
 **Request Body:**
+
 ```json
 {
   "authorName": "Sarah Mitchell",
@@ -108,6 +112,7 @@ public class Testimonial
 ## Storage
 
 Testimonials are stored in Azure Cosmos DB in the `Testimonials` container with:
+
 - **Partition Key:** `/Locale`
 - **ID:** String-based unique identifier
 
@@ -142,6 +147,7 @@ dotnet test --filter "FullyQualifiedName~Testimonial"
 ```
 
 Test coverage includes:
+
 - Repository CRUD operations
 - Filtering by featured and locale
 - Limit enforcement
@@ -151,6 +157,7 @@ Test coverage includes:
 ## Configuration
 
 No additional configuration required beyond standard Cosmos DB settings:
+
 - `COSMOSDB_ENDPOINT_URI`
 - `COSMOSDB_PRIMARY_KEY`
 - `COSMOSDB_DATABASE_ID`
@@ -166,6 +173,7 @@ The public GET endpoint includes a `Cache-Control: public, max-age=900` header, 
 ## Multi-Language Support
 
 Testimonials support the same locales as the rest of the platform:
+
 - English (en-US)
 - Spanish (es-ES, es-MX)
 - French (fr-FR, fr-CA)

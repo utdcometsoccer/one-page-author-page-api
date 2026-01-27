@@ -10,7 +10,7 @@ Azure Functions application providing domain registration management, external A
 
 - [Overview](#overview)
 - [Quick Start](#quick-start)
-- [Configuration](#configuration)
+- [Configuration](#️-configuration-net-10)
 - [HTTP API Endpoints](#http-api-endpoints)
 - [Cosmos DB Triggered Functions](#cosmos-db-triggered-functions)
 - [External API Integrations](#external-api-integrations)
@@ -48,7 +48,6 @@ The InkStainedWretchFunctions project provides a comprehensive Azure Functions a
 - **GET /api/GetPenguinTitlesByAuthor** - Gets Penguin titles by author
 
 #### Cosmos DB Triggered Functions
-
 
 - **DomainRegistrationTrigger** - Automatically adds domains to Azure Front Door
 - **CreateDnsZoneFunction** - Automatically creates Azure DNS zones
@@ -182,6 +181,7 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 | `AZURE_DNS_RESOURCE_GROUP` | Resource group where DNS zones will be created | Azure Portal → Resource Groups → Name of your DNS resource group |
 
 **RBAC Permissions Required**:
+
 - DNS Zone Contributor role on the DNS resource group
 - CDN Profile Contributor on the Front Door profile (if using Front Door integration)
 
@@ -198,6 +198,7 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 | `GOOGLE_DOMAINS_LOCATION` | Regional location for domain operations | Usually "global" |
 
 **Setup Steps**:
+
 1. Create a project in [Google Cloud Console](https://console.cloud.google.com)
 2. Enable the Cloud Domains API
 3. Set up authentication via Workload Identity Federation or service account
@@ -219,6 +220,7 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 | `AMAZON_PRODUCT_MARKETPLACE` | Target Amazon marketplace | E.g., "www.amazon.com", "www.amazon.co.uk" |
 
 **Prerequisites**:
+
 1. Join [Amazon Associates Program](https://affiliate-program.amazon.com)
 2. Apply for Product Advertising API access (separate approval required)
 3. Partner tag format varies by region: US `-20`, UK `-21`, DE `-03`
@@ -269,6 +271,7 @@ dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "$(jq -r '.Values.COSMOSDB_ENDPO
 ### Production Deployment
 
 For Azure deployment, configure these values in:
+
 - Azure Portal → Function App → Configuration → Application Settings
 - Or use Azure CLI: `az functionapp config appsettings set`
 
@@ -660,7 +663,6 @@ The project includes a comprehensive testing framework with three distinct scena
 
 #### Scenario 1: Frontend UI Testing (Completely Safe)
 
-
 - **Purpose**: Test client UI without creating actual resources
 - **Cost**: $0.00 (all operations mocked)
 - **Safety**: 100% safe - no real resources created
@@ -681,7 +683,6 @@ The project includes a comprehensive testing framework with three distinct scena
 
 #### Scenario 2: Individual Function Testing (Minimal Cost)
 
-
 - **Purpose**: Test each function with real Azure APIs but mock expensive operations
 - **Cost**: ~$0.50-2.00 per test run
 - **Safety**: Low cost - creates some Azure resources but no domain purchases
@@ -698,7 +699,6 @@ The project includes a comprehensive testing framework with three distinct scena
 ```
 
 #### Scenario 3: Full End-to-End with Real Money (Production Test)
-
 
 - **Purpose**: Complete production test with real domains, DNS, and Front Door
 - **Cost**: $12-50+ per test (domain registration costs vary by TLD)

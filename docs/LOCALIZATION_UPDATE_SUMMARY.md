@@ -46,6 +46,7 @@ Added ARIA label accessibility fields to the `Navbar` section across **all 20 lo
 The seeder now supports nested JSON structures and automatically flattens them to match entity properties.
 
 **Before:**
+
 ```csharp
 // Could only handle flat structures
 foreach (var field in obj.EnumerateObject())
@@ -59,6 +60,7 @@ foreach (var field in obj.EnumerateObject())
 ```
 
 **After:**
+
 ```csharp
 // Handles nested structures recursively
 ProcessJsonFields(obj, pocoInstance, pocoType, string.Empty);
@@ -72,6 +74,7 @@ ProcessJsonFields(obj, pocoInstance, pocoType, string.Empty);
 - **Supports null values** for optional fields
 
 **Example Mapping:**
+
 ```json
 {
   "navItems": {
@@ -81,16 +84,19 @@ ProcessJsonFields(obj, pocoInstance, pocoType, string.Empty);
   }
 }
 ```
+
 → Maps to entity property: `navItems_login_ariaLabel`
 
 ### 3. Documentation Updates
 
 #### SeedInkStainedWretchesLocale/README.md
+
 - Added "Nested JSON Support" section with examples
 - Added "Recent Updates" section documenting accessibility enhancements
 - Enhanced "Notes" section with information about nested structure handling
 
 #### docs/LocalizationREADME.md
+
 - Fixed typo in Navbar container table entry
 - Added "Nested JSON Handling" section to Seeding Process
 - Added new "Accessibility (ARIA Labels)" section
@@ -99,16 +105,19 @@ ProcessJsonFields(obj, pocoInstance, pocoType, string.Empty);
 ## Impact
 
 ### Accessibility
+
 - **WCAG 2.1 Compliance**: All navigation elements now have descriptive labels for screen readers
 - **Multi-language Support**: ARIA labels are properly translated across all supported languages
 - **User Experience**: Improved navigation for users with visual impairments
 
 ### Code Quality
+
 - **Maintainability**: Nested JSON structures are now supported, making future schema changes easier
 - **Flexibility**: The seeder can handle both flat and nested JSON without code changes
 - **Robustness**: Better handling of optional/nullable properties
 
 ### Testing
+
 - All **611 existing tests pass** without modification
 - Created validation tests to verify nested JSON processing
 - Validated all 20 locale files have complete aria-labels
@@ -160,6 +169,7 @@ The JSON uses nested objects for better organization:
 ### For Developers
 
 No migration needed! The changes are:
+
 - **Backward compatible**: Existing functionality is unchanged
 - **Additive only**: Only new optional fields were added
 - **Automatic**: The seeder handles the new structure automatically
@@ -167,6 +177,7 @@ No migration needed! The changes are:
 ### For Operations
 
 When running the seeder:
+
 1. It will automatically detect and process the new aria-labels
 2. Existing data can be updated by running the seeder (it's idempotent)
 3. No database schema changes required (Cosmos DB is schema-less)
@@ -174,9 +185,11 @@ When running the seeder:
 ## Files Changed
 
 ### Code Files
+
 - `SeedInkStainedWretchesLocale/Program.cs` - Enhanced with nested JSON processing
 
 ### Data Files (20 total)
+
 - `SeedInkStainedWretchesLocale/data/inkstainedwretch.en-us.json`
 - `SeedInkStainedWretchesLocale/data/inkstainedwretch.en-ca.json`
 - `SeedInkStainedWretchesLocale/data/inkstainedwretch.en-mx.json`
@@ -199,22 +212,28 @@ When running the seeder:
 - `SeedInkStainedWretchesLocale/data/inkstainedwretch.zh-tw.json`
 
 ### Documentation Files
+
 - `SeedInkStainedWretchesLocale/README.md`
 - `docs/LocalizationREADME.md`
 
 ## Validation Results
 
 ### Build Status
+
 ✅ **All projects build successfully** with 0 warnings and 0 errors
 
 ### Test Results
+
 ✅ **611 tests passed** (2 skipped - pre-existing)
+
 - No test failures
 - No new test failures introduced
 - All existing tests remain passing
 
 ### Localization Validation
+
 ✅ **All 20 locale files validated**
+
 - All files have `brandAriaLabel`
 - All files have 6 navigation item aria-labels
 - All translations are complete and appropriate

@@ -8,7 +8,6 @@ Enhanced the `SubscriptionPlanService` to ensure that the `Label` property alway
 
 ### 1. Created `GetValidLabel` Method
 
-
 - **Purpose**: Ensures Label always has a valid, non-null, non-empty value
 - **Logic**:
 
@@ -17,7 +16,6 @@ Enhanced the `SubscriptionPlanService` to ensure that the `Label` property alway
   3. Has ultimate fallback to "Plan" if all else fails
 
 ### 2. Enhanced `ExtractLabelFromProductName` Method
-
 
 - **Improvements**:
 
@@ -28,14 +26,12 @@ Enhanced the `SubscriptionPlanService` to ensure that the `Label` property alway
 
 ### 3. Updated Label Assignment
 
-
 - **Before**: `Label = priceDto.Nickname ?? ExtractLabelFromProductName(priceDto.ProductName)`
 - **After**: `Label = GetValidLabel(priceDto.Nickname, priceDto.ProductName)`
 
 ## Label Priority Logic
 
-### Priority Order:
-
+### Priority Order
 
 1. **Stripe Price Nickname** (if not null/empty/whitespace)
 2. **Extract from Product Name** using pattern matching:
@@ -54,13 +50,11 @@ Added comprehensive tests to verify Label validation:
 
 ### `MapToSubscriptionPlanAsync_Label_AlwaysHasValidValue`
 
-
 - Tests 9 different scenarios with various nickname/product name combinations
 - Validates that Label is never null, empty, or whitespace
 - Covers edge cases like null, empty string, and whitespace-only values
 
 ### `MapToSubscriptionPlanAsync_Label_HandlesComplexProductNames`
-
 
 - Tests complex product names with multiple spaces and formatting
 - Ensures proper trimming and pattern extraction
@@ -85,15 +79,11 @@ ull`
 | Nickname | Product Name | Result Label |
 |----------|--------------|--------------|
 | "Pro Monthly" | "Professional Plan" | "Pro Monthly" |
-|
-ull` | "Basic Starter Plan" | "Basic" |
+| `null` | "Basic Starter Plan" | "Basic" |
 | `""` | "Enterprise Solution" | "Enterprise" |
 | `"   "` | "Premium Package" | "Premium" |
-|
-ull` |
-ull` | "Plan" |
+| `null` | `null` | "Plan" |
 | "Custom Label" | "Whatever Name" | "Custom Label" |
-|
-ull` | "  Advanced   Premium   Solution  " | "Premium" |
+| `null` | "  Advanced   Premium   Solution  " | "Premium" |
 
 This ensures that the Label field will always be suitable for display in UI components and will never cause null reference exceptions or empty display issues.

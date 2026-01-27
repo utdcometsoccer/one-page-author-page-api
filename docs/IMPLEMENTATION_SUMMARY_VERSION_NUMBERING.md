@@ -27,6 +27,7 @@ Created `Directory.Build.props` at the repository root to define default version
 ```
 
 **Benefits:**
+
 - Single source of truth for version defaults
 - All projects inherit version properties automatically
 - Local development has fallback version (0.1.0-local)
@@ -63,12 +64,14 @@ Added a dedicated step in `.github/workflows/main_onepageauthorapi.yml`:
 **Version Format:** `MAJOR.MINOR.BUILD+sha.COMMIT`
 
 **Components:**
+
 - **MAJOR**: Years since 2025 (increments yearly, starts at 0)
 - **MINOR**: Current month number (1-12, resets each January)
 - **BUILD**: GitHub Actions run number (auto-incremented)
 - **COMMIT**: Short git SHA (7 characters)
 
 **Examples:**
+
 - `0.12.42+sha.1bb3c74` (December 2025, build 42)
 - `1.3.100+sha.abc1234` (March 2026, build 100)
 
@@ -94,6 +97,7 @@ Modified all dotnet build and publish commands to include version parameters:
 ```
 
 **Applied to all function apps:**
+
 - function-app
 - ImageAPI
 - InkStainedWretchFunctions
@@ -103,6 +107,7 @@ Modified all dotnet build and publish commands to include version parameters:
 ### 4. Documentation and Tooling
 
 **Documentation:**
+
 - `docs/VERSION_NUMBERING.md` - Comprehensive guide covering:
   - Version format and components
   - Implementation details
@@ -111,6 +116,7 @@ Modified all dotnet build and publish commands to include version parameters:
   - Troubleshooting guide
 
 **Verification Tooling:**
+
 - `get-assembly-version.sh` - Bash script to extract and display version information from built assemblies
   - Works on single DLL files or directories
   - Uses `strings` utility to avoid .NET version compatibility issues
@@ -146,6 +152,7 @@ The `InformationalVersion` includes git commit SHA using the format defined in [
 ```
 
 This provides:
+
 - **Traceability**: Every build can be traced to exact source code
 - **Debugging**: Easy to identify which commit produced a specific build
 - **Compliance**: Audit trail for deployed versions
@@ -169,6 +176,7 @@ dotnet build function-app/function-app.csproj \
 ```
 
 **Results:**
+
 ```
 Assembly: function-app.dll
 ----------------------------------------
@@ -198,6 +206,7 @@ Assembly: function-app.dll
 ### CI/CD (GitHub Actions)
 
 No action required. The workflow automatically:
+
 1. Generates version from MAJOR, MINOR, and GitHub run number
 2. Extracts git commit SHA
 3. Passes version to all build commands
@@ -227,10 +236,12 @@ dotnet build --configuration Release \
 **Build Number**: Automatically incremented with each GitHub Actions run
 
 **Minor Version**: Automatically calculated from current month (1-12)
+
 - January = 1, February = 2, ..., December = 12
 - Resets to 1 each January automatically
 
 **Major Version**: Automatically calculated from years since 2025
+
 - 2025 = 0, 2026 = 1, 2027 = 2, etc.
 - Increments automatically each January
 
@@ -239,11 +250,13 @@ No manual intervention required for any version component.
 ## Files Modified/Created
 
 ### Modified
+
 - `.github/workflows/main_onepageauthorapi.yml` (+54 lines)
   - Added version generation step
   - Updated all build commands with version parameters
 
 ### Created
+
 - `Directory.Build.props` (new)
   - Centralized version property definitions
   

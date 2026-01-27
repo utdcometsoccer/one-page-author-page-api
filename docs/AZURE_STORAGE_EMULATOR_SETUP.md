@@ -140,7 +140,7 @@ If you get "azurite command not found":
 
 pm install -g azurite`
 
-2. Or update the program path to local installation:
+1. Or update the program path to local installation:
 
    ```json
 

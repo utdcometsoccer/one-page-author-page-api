@@ -23,7 +23,7 @@ A .NET console application for testing and debugging the Amazon Product Advertis
 | `AMAZON_PRODUCT_PARTNER_TAG` | Amazon Associates Partner Tag | [Amazon Associates](https://affiliate-program.amazon.com) → Your tracking IDs | Required for PA API access and affiliate attribution |
 | `AMAZON_PRODUCT_REGION` | AWS Region | Based on your marketplace (typically "us-east-1") | Route API requests to correct regional endpoint |
 | `AMAZON_PRODUCT_MARKETPLACE` | Target Amazon Marketplace | Your target marketplace (e.g., "www.amazon.com") | Specify which Amazon store to search |
-| `AMAZON_PRODUCT_API_ENDPOINT` | PA API Endpoint URL | API documentation (typically "https://webservices.amazon.com/paapi5/searchitems") | Target endpoint for API calls |
+| `AMAZON_PRODUCT_API_ENDPOINT` | PA API Endpoint URL | API documentation (typically "<https://webservices.amazon.com/paapi5/searchitems>") | Target endpoint for API calls |
 
 ### Why These Settings Are Needed
 
@@ -31,11 +31,13 @@ A .NET console application for testing and debugging the Amazon Product Advertis
 <summary>🔐 AWS Credentials</summary>
 
 **`AMAZON_PRODUCT_ACCESS_KEY` & `AMAZON_PRODUCT_SECRET_KEY`**
+
 - **Purpose**: Authenticate and sign all requests to Amazon's Product Advertising API
 - **Security**: Uses AWS Signature Version 4 for request signing
 - **Important**: Never share or commit these credentials
 
 **How to Obtain**:
+
 1. Sign up for [Amazon Associates Program](https://affiliate-program.amazon.com)
 2. Apply for [Product Advertising API](https://webservices.amazon.com/paapi5/documentation/) access (separate approval required)
 3. After approval, go to [AWS Console](https://console.aws.amazon.com) → Security Credentials
@@ -47,11 +49,13 @@ A .NET console application for testing and debugging the Amazon Product Advertis
 <summary>🏷️ Partner Tag</summary>
 
 **`AMAZON_PRODUCT_PARTNER_TAG`**
+
 - **Purpose**: Identifies you as an Amazon Associate for API access and affiliate tracking
 - **Format**: Varies by region (US: `-20`, UK: `-21`, DE: `-03`, JP: `-22`)
 - **Required**: PA API access requires an active Associates account
 
 **How to Obtain**:
+
 1. Log in to [Amazon Associates Central](https://affiliate-program.amazon.com)
 2. Go to your tracking IDs/Store IDs
 3. Copy your Partner Tag (e.g., "yourstore-20")
@@ -80,7 +84,6 @@ dotnet user-secrets list
 
 1. **Build the application:**
 
-
    ```bash
 
    dotnet build AmazonProductTestConsole.csproj
@@ -92,7 +95,6 @@ dotnet user-secrets list
 ## Usage
 
 ### Basic Usage
-
 
 ```bash
 # Test with Stephen King (default)
@@ -107,7 +109,6 @@ dotnet run -- "George R.R. Martin"
 ```
 
 ### Advanced Usage
-
 
 ```bash
 # Show current configuration
@@ -141,7 +142,6 @@ dotnet run -- --nowait "Agatha Christie"
 
 ### Successful API Call
 
-
 ```
 === Amazon Product API Test Console ===
 
@@ -164,7 +164,6 @@ dotnet run -- --nowait "Agatha Christie"
 ```
 
 ### Configuration Error (404)
-
 
 ```
 ❌ Configuration Error:

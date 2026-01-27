@@ -1,16 +1,19 @@
 # Authenticated Function Logging Implementation Summary
 
 ## Overview
+
 This implementation adds extensive logging and telemetry tracking to all authenticated Azure Functions in the OnePageAuthor API platform. The logging infrastructure captures user context, operation details, success/failure metrics, and provides KQL queries for analysis in Log Analytics workbooks.
 
 ## What Was Added
 
 ### 1. Telemetry Service (`AuthenticatedFunctionTelemetryService`)
+
 **Location**: `OnePageAuthorLib/api/AuthenticatedFunctionTelemetryService.cs`
 
 A comprehensive telemetry service that tracks authenticated function activity with Application Insights custom events:
 
-#### Features:
+#### Features
+
 - **User Context Extraction**: Automatically extracts user ID and email from JWT claims
 - **Privacy-First Design**: Only stores email domain (not full email addresses)
 - **Three Event Types**:
@@ -18,7 +21,8 @@ A comprehensive telemetry service that tracks authenticated function activity wi
   - `AuthenticatedFunctionSuccess`: Tracks successful operations with metrics
   - `AuthenticatedFunctionError`: Tracks errors with full context
 
-#### Methods:
+#### Methods
+
 ```csharp
 public interface IAuthenticatedFunctionTelemetryService
 {
@@ -45,7 +49,8 @@ public interface IAuthenticatedFunctionTelemetryService
 }
 ```
 
-#### Helper Methods:
+#### Helper Methods
+
 ```csharp
 // Extract user ID from various JWT claim types
 public static string? ExtractUserId(ClaimsPrincipal? user)
@@ -57,6 +62,7 @@ public static string? ExtractUserEmail(ClaimsPrincipal? user)
 ### 2. Updated Authenticated Functions
 
 #### Stripe Functions (`InkStainedWretchStripe/`)
+
 All authenticated Stripe functions now include comprehensive logging:
 
 1. **FindSubscription.cs**
@@ -80,6 +86,7 @@ All authenticated Stripe functions now include comprehensive logging:
    - Error tracking: Validation and operation errors
 
 #### Testimonial Functions (`InkStainedWretchFunctions/`)
+
 All testimonial management functions now include comprehensive logging:
 
 1. **CreateTestimonial.cs**
@@ -162,7 +169,8 @@ public async Task<IActionResult> Run(HttpRequest req)
 
 Seven comprehensive KQL queries were created in the `kql/` directory:
 
-#### Core Queries:
+#### Core Queries
+
 1. **authenticated-function-calls.kql**
    - Tracks all authenticated function calls over time
    - Shows: Call count, unique users, unique email domains
@@ -188,13 +196,14 @@ Seven comprehensive KQL queries were created in the `kql/` directory:
    - Shows: Full error context with all metadata
    - Visualization: Table
 
-#### Feature-Specific Queries:
-6. **testimonial-operations.kql**
+#### Feature-Specific Queries
+
+1. **testimonial-operations.kql**
    - Tracks Create/Update/Delete testimonial operations
    - Shows: Success rate, unique users, unique testimonials
    - Visualization: Time chart
 
-7. **subscription-management-operations.kql**
+2. **subscription-management-operations.kql**
    - Tracks Find/List/Update subscription operations
    - Shows: Success rate, unique users, unique customers
    - Visualization: Time chart
@@ -202,6 +211,7 @@ Seven comprehensive KQL queries were created in the `kql/` directory:
 ### 5. Documentation
 
 **AUTHENTICATED_FUNCTIONS_README.md** provides:
+
 - Query descriptions and use cases
 - Instructions for using queries in Azure Portal and Log Analytics Workbooks
 - Custom dimension reference
@@ -211,12 +221,14 @@ Seven comprehensive KQL queries were created in the `kql/` directory:
 ## Custom Dimensions Tracked
 
 All events include these standard dimensions:
+
 - **FunctionName**: Azure Function name
 - **UserId**: User ID from JWT token (oid/sub/nameidentifier claim)
 - **UserEmailDomain**: Domain part of user email (e.g., "example.com")
 - **Timestamp**: ISO 8601 timestamp
 
 Context-specific dimensions (as applicable):
+
 - **CustomerId**: Stripe customer ID
 - **SubscriptionId**: Stripe subscription ID
 - **TestimonialId**: Testimonial document ID
@@ -230,14 +242,16 @@ Context-specific dimensions (as applicable):
 
 ## Using the KQL Queries
 
-### In Azure Portal:
+### In Azure Portal
+
 1. Navigate to Application Insights resource
 2. Select "Logs" from left menu
 3. Copy/paste desired query
 4. Click "Run"
 5. Configure visualization
 
-### In Log Analytics Workbooks:
+### In Log Analytics Workbooks
+
 1. Navigate to Application Insights
 2. Select "Workbooks"
 3. Create new workbook or edit existing
@@ -247,7 +261,8 @@ Context-specific dimensions (as applicable):
 7. Set time range and refresh interval
 8. Save workbook
 
-### Example Filters:
+### Example Filters
+
 ```kql
 // Last 24 hours
 | where timestamp > ago(24h)
@@ -274,49 +289,57 @@ The implementation follows privacy best practices:
 
 ## Benefits
 
-### For Operations:
+### For Operations
+
 - Real-time monitoring of authenticated API usage
 - User engagement metrics and patterns
 - Error detection and alerting
 - Performance monitoring per function
 
-### For Support:
+### For Support
+
 - Detailed error context for troubleshooting
 - User activity history for support cases
 - Operation success/failure tracking
 
-### For Product:
+### For Product
+
 - Feature usage analytics
 - User behavior insights
 - Subscription management patterns
 - Testimonial management activity
 
-### For Compliance:
+### For Compliance
+
 - Audit trail of authenticated operations
 - User activity tracking
 - Privacy-compliant logging
 
 ## Configuration
 
-### Required Setup:
+### Required Setup
+
 1. **Application Insights** must be configured and connected
 2. **Instrumentation Key** must be set in application configuration
 3. **Service Registration**: `IAuthenticatedFunctionTelemetryService` is registered in DI via `ServiceFactory.AddStripeServices()`
 
-### No Additional Configuration Needed:
+### No Additional Configuration Needed
+
 - Telemetry service is automatically injected into functions
 - Custom events are automatically sent to Application Insights
 - KQL queries work immediately once data is available
 
 ## Testing Recommendations
 
-### Manual Testing:
+### Manual Testing
+
 1. Call authenticated endpoints with valid JWT tokens
 2. Verify telemetry appears in Application Insights (may take 2-3 minutes)
 3. Run KQL queries in Log Analytics
 4. Test various scenarios: success, validation errors, operation errors
 
-### Validation:
+### Validation
+
 ```kql
 // Check for recent authenticated function calls
 customEvents
@@ -326,7 +349,8 @@ customEvents
 | take 10
 ```
 
-### Workbook Creation:
+### Workbook Creation
+
 1. Create Log Analytics Workbook
 2. Add sections for each query type
 3. Configure auto-refresh (e.g., 5 minutes)
@@ -354,6 +378,7 @@ Potential improvements for future iterations:
 ## Questions or Issues?
 
 For questions about the logging infrastructure or KQL queries, refer to:
+
 - `kql/AUTHENTICATED_FUNCTIONS_README.md` - Detailed query documentation
 - `OnePageAuthorLib/api/AuthenticatedFunctionTelemetryService.cs` - Implementation reference
 - Azure Application Insights documentation for troubleshooting

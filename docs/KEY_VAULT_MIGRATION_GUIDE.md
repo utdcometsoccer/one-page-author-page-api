@@ -133,6 +133,7 @@ GET https://{base-name}-config.azurewebsites.net/api/config/penguin-api-key?code
 ```
 
 Response format:
+
 ```json
 {
   "connectionString": "InstrumentationKey=...",
@@ -182,6 +183,7 @@ resource keyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 ## GitHub Secrets Required
 
 ### Existing Secrets
+
 - `AZURE_CREDENTIALS` - Azure service principal credentials
 - `ISW_RESOURCE_GROUP` - Resource group name
 - `ISW_BASE_NAME` - Base name for resources
@@ -191,6 +193,7 @@ resource keyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 - `AAD_AUDIENCE` - Azure AD audience
 
 ### New Secrets (Recommended)
+
 - `ISW_FRONTEND_URL` - InkStainedWretch frontend URL for CORS configuration
 - `DEPLOY_ISW_CONFIG` - Set to `true` to deploy InkStainedWretchesConfig function app
 - `KEY_VAULT_SECRETS_JSON` - (Future) JSON string containing all secrets to populate Key Vault
@@ -200,6 +203,7 @@ resource keyVaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 ### Secret Naming Convention
 
 Key Vault secret names use hyphens instead of underscores:
+
 - Environment variable: `COSMOSDB_PRIMARY_KEY`
 - Key Vault secret: `COSMOSDB-PRIMARY-KEY`
 
@@ -246,6 +250,7 @@ az monitor diagnostic-settings create \
 ### Logging
 
 KeyVaultConfigService logs all operations:
+
 - Debug: Secret retrieval attempts
 - Info: Successful Key Vault initialization
 - Warning: Secrets not found, falling back to environment
@@ -300,6 +305,7 @@ If issues arise:
 ## Support
 
 For questions or issues:
+
 - Review Application Insights logs
 - Check Key Vault audit logs
 - Consult [Azure Key Vault documentation](https://learn.microsoft.com/en-us/azure/key-vault/)

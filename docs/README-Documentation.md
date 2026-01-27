@@ -158,7 +158,6 @@ The API enforces different limits based on subscription tiers:
 
 ### Current Documentation Statistics
 
-
 - **Total Projects**: 10 (complete solution coverage)
 - **Azure Functions**: 4 projects (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStripe, function-app)
 - **Libraries**: 1 project (OnePageAuthorLib)

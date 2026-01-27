@@ -17,6 +17,7 @@ This document summarizes the comprehensive update to the GitHub Secrets Configur
 **Change**: Renamed scripts to match Ink Stained Wretches convention (hyphen instead of colon)
 
 **Before**:
+
 ```json
 "init:secrets": "pwsh -File ./Initialize-GitHubSecrets.ps1",
 "init:secrets:interactive": "pwsh -File ./Initialize-GitHubSecrets.ps1 -Interactive",
@@ -24,6 +25,7 @@ This document summarizes the comprehensive update to the GitHub Secrets Configur
 ```
 
 **After**:
+
 ```json
 "init-secrets": "pwsh -File ./Initialize-GitHubSecrets.ps1",
 "init-secrets:interactive": "pwsh -File ./Initialize-GitHubSecrets.ps1 -Interactive",
@@ -35,6 +37,7 @@ This document summarizes the comprehensive update to the GitHub Secrets Configur
 ```
 
 **Impact**:
+
 - Users should now use `npm run init-secrets` instead of `npm run init:secrets`
 - Added convenience scripts for the new tools
 - Consistent with existing repository naming conventions
@@ -44,6 +47,7 @@ This document summarizes the comprehensive update to the GitHub Secrets Configur
 **Complete Audit Results**:
 
 Audited all Azure Function projects and identified environment variables used:
+
 - `ImageAPI/Program.cs`
 - `InkStainedWretchFunctions/Program.cs` and `TestingConfiguration.cs`
 - `InkStainedWretchStripe/Program.cs`
@@ -65,6 +69,7 @@ Audited all Azure Function projects and identified environment variables used:
    - `AAD_AUTHORITY` - Authority URL for JWT validation
 
 **Files Updated**:
+
 - `secrets-template.json` - Added 6 new variables
 - `Initialize-GitHubSecrets.ps1` - Added secret definitions for all new variables
 
@@ -73,6 +78,7 @@ Audited all Azure Function projects and identified environment variables used:
 **Purpose**: Update existing secrets configuration files with new variables from the template.
 
 **Features**:
+
 - Compares existing secrets file with template
 - Identifies and adds missing variables
 - Preserves existing values (never overwrites)
@@ -82,6 +88,7 @@ Audited all Azure Function projects and identified environment variables used:
 - Provides detailed reporting
 
 **Usage Examples**:
+
 ```powershell
 # Update with defaults
 .\Scripts\Update-SecretsConfig.ps1
@@ -101,6 +108,7 @@ npm run update-secrets:dry-run
 ```
 
 **Output Example**:
+
 ```
 ═══════════════════════════════════════════════════════
   Update Secrets Configuration
@@ -133,6 +141,7 @@ npm run update-secrets:dry-run
 **Purpose**: Configure dotnet user-secrets for all Azure Function projects from a configuration file.
 
 **Features**:
+
 - Automatic project discovery (all 5 Azure Function projects)
 - Initializes user-secrets if not already set up
 - Project-specific secret filtering (only sets relevant secrets)
@@ -153,6 +162,7 @@ The script intelligently sets only relevant secrets for each project:
 | **InkStainedWretchesConfig** | Cosmos DB + Azure AD + Key Vault |
 
 **Usage Examples**:
+
 ```powershell
 # Set for all projects
 .\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
@@ -172,6 +182,7 @@ npm run set-user-secrets:dry-run
 ```
 
 **Output Example**:
+
 ```
 ╔═══════════════════════════════════════════════════════════════════════╗
 ║   Set Dotnet User-Secrets from Configuration                         ║
@@ -288,6 +299,7 @@ npm run set-user-secrets -- -ConfigFile secrets.config.json
 If you were using the old NPM script names:
 
 **Old Commands**:
+
 ```powershell
 npm run init:secrets:interactive
 npm run init:secrets -- -ConfigFile secrets.json
@@ -295,6 +307,7 @@ npm run init:secrets:help
 ```
 
 **New Commands**:
+
 ```powershell
 npm run init-secrets:interactive
 npm run init-secrets -- -ConfigFile secrets.json
@@ -302,6 +315,7 @@ npm run init-secrets:help
 ```
 
 **Additional New Commands**:
+
 ```powershell
 # Update existing secrets file
 npm run update-secrets
@@ -439,6 +453,7 @@ Potential improvements for future iterations:
 ## Support
 
 For issues or questions:
+
 - See [docs/GITHUB_SECRETS_CONFIGURATION.md](GITHUB_SECRETS_CONFIGURATION.md) for comprehensive documentation
 - Check the troubleshooting section in documentation
 - Open an issue on the repository

@@ -110,7 +110,6 @@ Separates usage tracking from tier membership:
 
 ### Before
 
-
 ```
 Request → JWT Validation
               ↓
@@ -123,7 +122,6 @@ Request → JWT Validation
 ```
 
 ### After
-
 
 ```
 Request → JWT Validation
@@ -142,7 +140,6 @@ Request → JWT Validation
 
 ### Positive Security Aspects
 
-
 1. **Centralized Identity Management**: Roles managed through Azure AD
 2. **Audit Trail**: All role assignments logged in Azure AD
 3. **Standard RBAC**: Uses Microsoft's standard role-based access control
@@ -150,13 +147,11 @@ Request → JWT Validation
 
 ### Potential Security Notes
 
-
 1. **Role Spoofing**: Ensure JWT signature validation is enabled
 2. **Privilege Escalation**: Roles should only be assigned through approved processes
 3. **Token Expiration**: Role changes only take effect after token refresh
 
 ### Mitigations In Place
-
 
 - JWT validation already implemented in ImageAPI
 - Role assignment requires Azure AD admin permissions
@@ -179,13 +174,11 @@ Request → JWT Validation
 
 ### Preserved
 
-
 - `ImageStorageTierMembership` entity still exists
 - Repository still registered in DI
 - Historical data preserved
 
 ### Deprecated
-
 
 - Runtime usage of `ImageStorageTierMembership` for tier determination
 - Direct database lookups for tier assignment
@@ -202,13 +195,11 @@ Users can continue using old memberships until migration is complete. After migr
 
 ### Expected Improvements
 
-
 - **Reduced latency**: One fewer database query per upload
 - **Better scalability**: JWT parsing is faster than database queries
 - **Lower costs**: Fewer Cosmos DB RU consumption
 
 ### Monitoring Recommendations
-
 
 - Monitor JWT token size (roles add to token payload)
 - Track Cosmos DB RU usage before/after
@@ -218,13 +209,11 @@ Users can continue using old memberships until migration is complete. After migr
 
 ### Created
 
-
 1. **EntraIdRoleManager/README.md** - Console app usage
 2. **MIGRATION_GUIDE_ENTRA_ID_ROLES.md** - Comprehensive migration guide
 3. This summary document
 
 ### Updated
-
 
 - ServiceFactory documentation
 - ImageUploadService documentation
@@ -233,14 +222,12 @@ Users can continue using old memberships until migration is complete. After migr
 
 ### Potential Enhancements
 
-
 1. Automatic role assignment during user registration
 2. Role-based access to other API endpoints
 3. Integration with Stripe subscriptions for automatic role updates
 4. Usage reporting and analytics dashboard
 
 ### Known Limitations
-
 
 1. Automatic tier assignment is request-scoped (no persistent DB update)
 2. Role changes require token refresh

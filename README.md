@@ -15,7 +15,6 @@ For strategic planning, feature roadmap, technical debt tracking, and release pl
 
 ### Key Features
 
-
 - **.NET 10** Azure Functions with isolated worker runtime
 - **Azure Cosmos DB** with NoSQL document storage and repository patterns
 - **Stripe Integration** for subscription management, checkout, and webhook processing
@@ -30,7 +29,6 @@ For strategic planning, feature roadmap, technical debt tracking, and release pl
 
 #### 🏗️ Azure Functions (API Layer)
 
-
 - **ImageAPI** — Image upload, management, and retrieval services
 - **InkStainedWretchFunctions** — Domain registration, localization, and external API integrations
 - **InkStainedWretchStripe** — Stripe payment processing and subscription management
@@ -38,11 +36,9 @@ For strategic planning, feature roadmap, technical debt tracking, and release pl
 
 #### 📚 Core Libraries (Business Logic Layer)
 
-
 - **OnePageAuthorLib** — Shared library with entities, repositories, services, and orchestrators
 
 #### 🛠️ Data Management (Seeding & Utilities)
-
 
 - **SeedAPIData** — Author, book, and article data initialization
 - **SeedInkStainedWretchesLocale** — Comprehensive multi-language localization and UI text (North America: EN, ES, FR, AR, ZH-CN, ZH-TW)
@@ -52,14 +48,12 @@ For strategic planning, feature roadmap, technical debt tracking, and release pl
 
 #### 🧪 Testing & Quality Assurance
 
-
 - **OnePageAuthor.Test** — Comprehensive unit and integration tests
 - **IntegrationTestAuthorDataService** — Author data service validation testing
 
 ## 🛠️ Prerequisites & Setup
 
 ### System Requirements
-
 
 - **.NET SDK 10.0** or later
 - **Azure Functions Core Tools v4** (optional for local development)
@@ -143,6 +137,7 @@ npm run init-secrets -- -ConfigFile secrets.json
 | `COSMOSDB_DATABASE_ID` | Identifies which database within your Cosmos DB account contains the application containers (Authors, Books, Articles, Locales, etc.). |
 
 **How to Obtain**:
+
 1. Navigate to [Azure Portal](https://portal.azure.com)
 2. Go to your Cosmos DB account
 3. Click on "Keys" in the left sidebar
@@ -161,6 +156,7 @@ npm run init-secrets -- -ConfigFile secrets.json
 | `STRIPE_WEBHOOK_SECRET` | Validates that webhook events are genuinely from Stripe. Used to verify the signature of incoming webhook payloads to prevent spoofing attacks. |
 
 **How to Obtain**:
+
 1. Sign up at [Stripe Dashboard](https://dashboard.stripe.com)
 2. Navigate to Developers → API keys
 3. Copy the Secret key (use Test mode key for development)
@@ -182,12 +178,14 @@ npm run init-secrets -- -ConfigFile secrets.json
 | `AAD_VALID_ISSUERS` | Enables accepting tokens from multiple issuers (v2.0 URLs). If not set, a single issuer derived from tenant/authority is used. |
 
 **How to Obtain**:
+
 1. Navigate to [Azure Portal](https://portal.azure.com)
 2. Go to Microsoft Entra ID (formerly Azure Active Directory)
 3. **Tenant ID**: Found on the Overview page
 4. **Client ID**: Go to App registrations → Select your app → Application (client) ID
 
 **Additional Setup**:
+
 - For personal Microsoft accounts, configure the app registration with `signInAudience: "PersonalMicrosoftAccount"`
 - For organizational accounts, use `signInAudience: "AzureADMyOrg"`
 - Audience tip: Use the raw Application (client) ID for `AAD_AUDIENCE` (not an `api://` scope) to match token `aud`.
@@ -225,11 +223,12 @@ npm run init-secrets -- -ConfigFile secrets.json
 | `AMAZON_PRODUCT_SECRET_KEY` | AWS Secret Access Key | Created with the Access Key ID (save immediately, shown only once) |
 | `AMAZON_PRODUCT_PARTNER_TAG` | Associates Partner Tag | [Amazon Associates](https://affiliate-program.amazon.com) → Your tracking IDs |
 | `AMAZON_PRODUCT_REGION` | AWS region (e.g., "us-east-1") | Based on your marketplace location |
-| `AMAZON_PRODUCT_MARKETPLACE` | Marketplace domain | Your target Amazon marketplace (e.g., www.amazon.com) |
+| `AMAZON_PRODUCT_MARKETPLACE` | Marketplace domain | Your target Amazon marketplace (e.g., <www.amazon.com>) |
 
 **Why It's Needed**: Allows the platform to search Amazon's catalog for book information and generate affiliate links for author pages.
 
 **Setup Steps**:
+
 1. Sign up for [Amazon Associates Program](https://affiliate-program.amazon.com)
 2. Apply for [Product Advertising API](https://webservices.amazon.com/paapi5/documentation/) access (separate approval required)
 3. After approval, create AWS credentials with PA API permissions
@@ -277,7 +276,6 @@ dotnet user-secrets list
 
 ### Building the Solution
 
-
 ```bash
 # Build entire solution
 dotnet build OnePageAuthorAPI.sln -c Debug
@@ -288,7 +286,6 @@ dotnet build OnePageAuthorLib/OnePageAuthorLib.csproj
 ```
 
 ### Running Locally
-
 
 ```bash
 # Run a specific Azure Function app
@@ -329,7 +326,6 @@ This behavior helps surface misconfiguration or unsupported retrieval states ear
 
 ### Testing
 
-
 ```bash
 # Run all tests
 dotnet test OnePageAuthorAPI.sln -c Debug
@@ -345,12 +341,10 @@ The platform provides comprehensive DI extensions through `OnePageAuthorLib`:
 
 ### Database & Storage
 
-
 - `AddCosmosClient(endpointUri, primaryKey)` — Azure Cosmos DB client
 - `AddCosmosDatabase(databaseId)` — Database configuration
 
 ### Repositories & Data Access
-
 
 - `AddAuthorRepositories()` — Author data repositories
 - `AddLocaleRepository()` — Localization data access
@@ -358,7 +352,6 @@ The platform provides comprehensive DI extensions through `OnePageAuthorLib`:
 - `AddStateProvinceRepository()` — Geographic data access
 
 ### Business Services
-
 
 - `AddAuthorDataService()` — Author management services
 - `AddLocaleDataService()` — Localization services
@@ -368,12 +361,10 @@ The platform provides comprehensive DI extensions through `OnePageAuthorLib`:
 
 ### Authentication & Security
 
-
 - `AddJwtAuthentication()` — JWT token validation
 - `AddUserProfileServices()` — User authentication services
 
 ### External Integrations
-
 
 - `AddPenguinRandomHouseServices()` — Book catalog integration
 - `AddDomainRegistrationServices()` — Domain management
@@ -391,14 +382,12 @@ The platform provides comprehensive DI extensions through `OnePageAuthorLib`:
 
 ### Available Seeders
 
-
 - **SeedAPIData** — Author profiles, books, articles, and relationships
 - **SeedInkStainedWretchesLocale** — Comprehensive multi-language localization for all UI components (North America: EN, ES, FR, AR, ZH-CN, ZH-TW for US, CA, MX)
 - **SeedImageStorageTiers** — Image storage configuration
 - **OnePageAuthor.DataSeeder** — StateProvince geographic data
 
 ### Running Seeders
-
 
 ```bash
 # Seed author and content data
@@ -483,14 +472,12 @@ Authorization: Bearer <your-jwt-token>
 
 ### Test Coverage
 
-
 - **Unit Tests**: Business logic validation with 90%+ coverage
 - **Integration Tests**: End-to-end API workflow validation
 - **Service Tests**: External API integration verification
 - **Performance Tests**: Load testing for critical endpoints
 
 ### Running Tests
-
 
 ```bash
 # Run all tests with coverage
@@ -606,12 +593,14 @@ See the comprehensive guides:
 **Service Principal Permissions Error**
 
 If you encounter this error during deployment:
+
 ```
 ERROR: "The client '***' does not have permission to perform action 
 'Microsoft.Authorization/roleAssignments/write'"
 ```
 
 **Quick Fix**: Run the permission script **once** before deploying:
+
 ```bash
 cd infra
 ./Grant-ServicePrincipalPermissions.ps1  # Windows PowerShell
@@ -643,14 +632,12 @@ az functionapp deployment source config-zip \
 
 ### Development Workflow
 
-
 1. Read [`CONTRIBUTING.md`](docs/CONTRIBUTING.md) for guidelines
 2. Follow [`CODE_OF_CONDUCT.md`](docs/CODE_OF_CONDUCT.md) for community standards
 3. Review [`SECURITY.md`](docs/SECURITY.md) for security considerations
 4. Check existing issues and PRs before creating new ones
 
 ### Getting Help
-
 
 - **Documentation**: Check project-specific README files for detailed information
 - **Issues**: Use GitHub Issues for bug reports and feature requests
@@ -661,12 +648,14 @@ az functionapp deployment source config-zip \
 For detailed documentation on specific features, enhancements, and implementations, see the [`docs/`](docs/) directory:
 
 ### Feature Enhancements
+
 - [Active Products Filter Enhancement](docs/ACTIVE_PRODUCTS_FILTER_ENHANCEMENT.md) - Stripe product filtering
 - [Culture Support Enhancement](docs/CULTURE_SUPPORT_ENHANCEMENT.md) - Multi-language subscription plans
 - [Label Validation Enhancement](docs/LABEL_VALIDATION_ENHANCEMENT.md) - Input validation improvements
 - [Subscription Plan Service Refactoring](docs/SUBSCRIPTION_PLAN_SERVICE_REFACTORING.md) - Service architecture improvements
 
 ### Implementation Summaries
+
 - [DNS Zone Implementation](docs/IMPLEMENTATION_SUMMARY.md) - Azure DNS zone automation
 - [Entra ID Roles](docs/IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES.md) - Role-based access control
 - [Language Support](docs/IMPLEMENTATION_SUMMARY_LANGUAGES.md) - Multi-language implementation
@@ -729,7 +718,6 @@ These settings have reasonable defaults or fallback behavior:
 
 #### ✅ Production Applications
 
-
 1. **ImageAPI** (`ImageAPI/Program.cs`)
 
    - ✅ Added validation for `COSMOSDB_ENDPOINT_URI`, `COSMOSDB_PRIMARY_KEY`, `COSMOSDB_DATABASE_ID`
@@ -755,12 +743,11 @@ These settings have reasonable defaults or fallback behavior:
 
 #### ✅ Management/Utility Applications
 
-
-5. **EntraIdRoleManager** (`EntraIdRoleManager/Program.cs`)
+1. **EntraIdRoleManager** (`EntraIdRoleManager/Program.cs`)
 
    - ✅ Already had proper validation - verified consistency
 
-6. **SeedImageStorageTiers** (`SeedImageStorageTiers/Program.cs`)
+2. **SeedImageStorageTiers** (`SeedImageStorageTiers/Program.cs`)
 
    - ✅ Already had proper validation - verified consistency
 
@@ -768,33 +755,33 @@ These settings have reasonable defaults or fallback behavior:
 
 All seeder applications updated to use standardized keys with backward compatibility:
 
-7. **SeedLocalizationData** (`SeedLocalizationData/Program.cs`)
+1. **SeedLocalizationData** (`SeedLocalizationData/Program.cs`)
 
    - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy `EndpointUri`, `PrimaryKey`, `DatabaseId`
    - ✅ Added environment variable support
 
-8. **OnePageAuthor.DataSeeder** (`OnePageAuthor.DataSeeder/Program.cs`)
+2. **OnePageAuthor.DataSeeder** (`OnePageAuthor.DataSeeder/Program.cs`)
 
    - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy keys
    - ✅ Removed unsafe emulator defaults
    - ✅ Added helpful error messages with emulator information
 
-9. **SeedLocales** (`SeedLocales/Program.cs`)
+3. **SeedLocales** (`SeedLocales/Program.cs`)
 
    - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy keys
    - ✅ Added environment variable support
 
-10. **SeedInkStainedWretchesLocale** (`SeedInkStainedWretchesLocale/Program.cs`)
+4. **SeedInkStainedWretchesLocale** (`SeedInkStainedWretchesLocale/Program.cs`)
 
     - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy keys
     - ✅ Added environment variable support
 
-11. **SeedAPIData** (`SeedAPIData/Program.cs`)
+5. **SeedAPIData** (`SeedAPIData/Program.cs`)
 
     - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy keys
     - ✅ Added environment variable support
 
-12. **IntegrationTestAuthorDataService** (`IntegrationTestAuthorDataService/Program.cs`)
+6. **IntegrationTestAuthorDataService** (`IntegrationTestAuthorDataService/Program.cs`)
 
     - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy keys
     - ✅ Added proper validation (was using empty strings as defaults)
@@ -826,7 +813,6 @@ All error messages are clear and actionable:
 
 ### Benefits
 
-
 1. **Production Safety** - No more silent failures due to missing configuration
 2. **Consistency** - Standardized configuration keys across all applications
 3. **Developer Experience** - Clear error messages with actionable guidance
@@ -854,7 +840,6 @@ All applications in the OnePageAuthor API repository have been updated with stan
 
 #### Helper Functions Added to All Applications
 
-
 ```csharp
 // Helper function to mask sensitive configuration values
 static string MaskSensitiveValue(string? value, string notSetText = "(not set)")
@@ -876,7 +861,6 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 #### Masking Rules
 
-
 - **Short values (< 8 chars)**: Show "(set)" to avoid revealing too much
 - **Sensitive values (8+ chars)**: Show first 4 chars + "****" + last 4 chars
 - **URLs (12+ chars)**: Show first 8 chars + "****" + last 4 chars (more context for debugging)
@@ -888,9 +872,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 #### ✅ Production Azure Functions
 
-
 1. **ImageAPI** (`ImageAPI/Program.cs`)
-
 
    ```
 
@@ -906,7 +888,6 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 2. **InkStainedWretchFunctions** (`InkStainedWretchFunctions/Program.cs`)
 
-
    ```
 
    Cosmos DB Endpoint configured: https:****com/
@@ -916,7 +897,6 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
    ```
 
 3. **InkStainedWretchStripe** (`InkStainedWretchStripe/Program.cs`)
-
 
    ```
 
@@ -932,7 +912,6 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 4. **function-app** (`function-app/Program.cs`)
 
-
    ```
 
    Cosmos DB Endpoint configured: https:****com/
@@ -943,9 +922,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 #### ✅ Management/Utility Applications
 
-
-5. **EntraIdRoleManager** (`EntraIdRoleManager/Program.cs`)
-
+1. **EntraIdRoleManager** (`EntraIdRoleManager/Program.cs`)
 
    ```
 
@@ -958,8 +935,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
    ```
 
-6. **SeedImageStorageTiers** (`SeedImageStorageTiers/Program.cs`)
-
+2. **SeedImageStorageTiers** (`SeedImageStorageTiers/Program.cs`)
 
    ```
 
@@ -971,9 +947,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 #### ✅ Data Seeder Applications
 
-
-7. **SeedAPIData** (`SeedAPIData/Program.cs`)
-
+1. **SeedAPIData** (`SeedAPIData/Program.cs`)
 
    ```
 
@@ -983,8 +957,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
    ```
 
-8. **SeedInkStainedWretchesLocale** (`SeedInkStainedWretchesLocale/Program.cs`)
-
+2. **SeedInkStainedWretchesLocale** (`SeedInkStainedWretchesLocale/Program.cs`)
 
    ```
 
@@ -994,8 +967,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
    ```
 
-9. **OnePageAuthor.DataSeeder** (`OnePageAuthor.DataSeeder/Program.cs`)
-
+3. **OnePageAuthor.DataSeeder** (`OnePageAuthor.DataSeeder/Program.cs`)
 
    ```
 
@@ -1005,8 +977,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
    ```
 
-10. **IntegrationTestAuthorDataService** (`IntegrationTestAuthorDataService/Program.cs`)
-
+4. **IntegrationTestAuthorDataService** (`IntegrationTestAuthorDataService/Program.cs`)
 
     ```
 
@@ -1021,7 +992,6 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 #### Always Masked
 
-
 - **Cosmos DB Primary Keys**: `MaskSensitiveValue()` - Shows `C2y6****Jw==`
 - **Azure Storage Connection Strings**: `MaskSensitiveValue()` - Shows connection string secrets masked
 - **Stripe API Keys**: `MaskSensitiveValue()` - Shows `sk_t****_1N2`
@@ -1031,12 +1001,10 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 #### URL Masked (More Context)
 
-
 - **Cosmos DB Endpoints**: `MaskUrl()` - Shows `https:****com/`
 - **Azure AD Authority URLs**: `MaskUrl()` - Shows `https:****v2.0`
 
 #### Never Masked (Not Sensitive)
-
 
 - **Database IDs**: Shown in full (useful for debugging, not sensitive)
 - **Domain Names**: Shown in full (not sensitive)
@@ -1044,12 +1012,10 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 #### Optional Values
 
-
 - **Azure AD Settings**: Show "(not set)" when not configured
 - All optional authentication parameters handled gracefully
 
 ### Security Benefits
-
 
 1. **No Secrets in Logs**: All sensitive values are properly masked
 2. **Debugging Friendly**: Enough context to verify configuration without exposing secrets
@@ -1212,7 +1178,7 @@ If you get "azurite command not found":
 
 pm install -g azurite`
 
-2. Or update the program path to local installation:
+1. Or update the program path to local installation:
 
    ```json
 
@@ -1273,12 +1239,10 @@ This configuration makes local Azure Storage development much more convenient an
 
 #### 1. **Access Amazon Associates Central**
 
-
 ```
 URL: https://affiliate-program.amazon.com/
 
 ```
-
 
 - Sign in with your Amazon Associates account
 - If you don't have one, apply first (approval required)
@@ -1287,13 +1251,11 @@ URL: https://affiliate-program.amazon.com/
 
 ##### Option A: Dashboard Method
 
-
 1. After login, look at your main dashboard
 2. Find "Associate ID" or "Tracking ID"
 3. Copy the value (format: `yourstore-20`)
 
 ##### Option B: Account Settings Method
-
 
 1. Go to **"Account & Login Info"**
 2. Click **"Manage Your Tracking IDs"**
@@ -1301,7 +1263,6 @@ URL: https://affiliate-program.amazon.com/
 4. Copy the one you want to use
 
 ##### Option C: Link Generator Method
-
 
 1. Go to **"Product Linking"** → **"Link to Any Page"**
 2. Generate any affiliate link
@@ -1313,7 +1274,6 @@ URL: https://affiliate-program.amazon.com/
 ❌ **Wrong Format**: `storename`, `20-storename`, `storename_20`
 
 #### 4. **Regional Suffixes**
-
 
 - 🇺🇸 **US**: `-20` (amazon.com)
 - 🇬🇧 **UK**: `-21` (amazon.co.uk)
@@ -1330,12 +1290,10 @@ You need **separate approval** for Product Advertising API:
 
 #### 1. Apply for PA API Access
 
-
 ```
 URL: https://developer.amazon.com/
 
 ```
-
 
 1. Sign in to Amazon Developer Portal
 2. Navigate to **"Product Advertising API"**
@@ -1409,7 +1367,6 @@ Your Partner Tag should work once both your Associates account and Product Adver
 
 ---
 
-
 ## 📖 Development & Maintenance
 
 ### Refactoring Summary
@@ -1478,13 +1435,11 @@ Successfully refactored the `GetUserUpn` method in `DomainRegistrationService` t
 
 #### 1. **Testability** ✅
 
-
 - User identity extraction is now fully testable in isolation
 - Mock-able dependency allows comprehensive testing of error scenarios
 - Clean separation of concerns between business logic and identity extraction
 
 #### 2. **Maintainability** ✅
-
 
 - Single responsibility: `UserIdentityService` handles only user identity extraction
 - Easy to modify claim extraction logic without touching business logic
@@ -1492,20 +1447,17 @@ Successfully refactored the `GetUserUpn` method in `DomainRegistrationService` t
 
 #### 3. **Reusability** ✅
 
-
 - `IUserIdentityService` can be injected into other services that need user identity
 - Consistent user identity handling across the application
 - Centralized claim extraction logic
 
 #### 4. **Dependency Injection** ✅
 
-
 - Follows IoC principles with proper dependency injection
 - Easy to substitute implementations for different authentication providers
 - Better integration with ASP.NET Core DI container
 
 ### Test Results
-
 
 - **UserIdentityServiceTests**: 9/9 tests passing ✅
 - **DomainRegistrationServiceTests**: 20/20 tests passing ✅
@@ -1517,7 +1469,6 @@ Successfully refactored the `GetUserUpn` method in `DomainRegistrationService` t
 When deploying this refactor, ensure that:
 
 1. **Dependency Injection Setup**: ✅ **COMPLETED** - `IUserIdentityService` is now automatically registered in your DI container via:
-
 
    ```csharp
 
@@ -1583,7 +1534,6 @@ The refactored architecture now supports:
 
 #### Configuration Files ✅
 
-
 - `InkStainedWretchFunctions/local.settings.json` - ✅ Properly ignored
 - `InkStainedWretchStripe/local.settings.json` - ✅ Fixed (secrets removed)
 - `ImageAPI/local.settings.json` - ✅ Properly ignored
@@ -1592,13 +1542,11 @@ The refactored architecture now supports:
 
 #### Source Code ✅
 
-
 - All C# files scanned - ✅ No hardcoded secrets found
 - Configuration classes - ✅ Proper abstraction patterns
 - Service classes - ✅ Use dependency injection for config
 
 #### Documentation ✅
-
 
 - README files - ✅ No sensitive information
 - Setup guides - ✅ Proper security instructions
@@ -1640,13 +1588,11 @@ Use the testing scenarios or set up user secrets as documented.
 
 #### Immediate Actions ✅ COMPLETED
 
-
 - [x] Remove exposed secrets from local.settings.json
 - [x] Create user secrets setup documentation
 - [x] Verify all secrets are properly ignored by git
 
 #### Ongoing Best Practices
-
 
 - [ ] Regular security audits (quarterly)
 - [ ] Key rotation schedule (every 6 months)
@@ -2183,7 +2129,6 @@ The **Ink Stained Wretch Application** is a comprehensive author management and 
 
 ---
 
-
 ## 📖 Migration & Guides
 
 ### Migration Guide Entra Id Roles
@@ -2203,7 +2148,6 @@ The image storage tier system has been refactored to use Microsoft Entra ID App 
 
 #### Before
 
-
 ```
 User Authentication → Cosmos DB Lookup (ImageStorageTierMembership) → Tier Determination
                                     ↓
@@ -2212,7 +2156,6 @@ User Authentication → Cosmos DB Lookup (ImageStorageTierMembership) → Tier D
 ```
 
 #### After
-
 
 ```
 User Authentication → JWT Roles Claim → Tier Determination
@@ -2242,7 +2185,6 @@ The EntraIdRoleManager console application performs the migration:
 
 1. Configure environment variables or user secrets:
 
-
    ```bash
 
    dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "<your-endpoint>"
@@ -2255,7 +2197,6 @@ The EntraIdRoleManager console application performs the migration:
    ```
 
 2. Run the migration:
-
 
    ```bash
 
@@ -2649,7 +2590,6 @@ Write-Host "Configuration updated in $configPath" -ForegroundColor Cyan
 
 1. **Create a backup** (in case anything goes wrong):
 
-
    ```powershell
 
    git clone --mirror . ../backup-$(Get-Date -Format 'yyyy-MM-dd-HHmmss')
@@ -2657,7 +2597,6 @@ Write-Host "Configuration updated in $configPath" -ForegroundColor Cyan
    ```
 
 2. **Commit any pending changes**:
-
 
    ```powershell
 
@@ -2768,6 +2707,7 @@ Send this message to all team members:
 > The Git history has been cleaned to remove exposed secrets.
 >
 > **YOU MUST:**
+>
 > 1. Delete your local clone
 > 2. Re-clone from GitHub
 > 3. Set up user secrets (see instructions in repository)
@@ -2810,7 +2750,6 @@ After completing these steps:
 
 ---
 
-
 ## 📖 API & System Documentation
 
 ### Api Documentation
@@ -2820,7 +2759,6 @@ After completing these steps:
 This REST API provides access to a list of author objects for a given domain. Authentication is handled via Microsoft Entra ID (Azure AD) using OAuth 2.0. Only authenticated users with the appropriate permissions can access the endpoints.
 
 ### Authentication
-
 
 - **Protocol:** OAuth 2.0 (OpenID Connect)
 - **Provider:** Microsoft Entra ID (Azure AD)
@@ -2835,7 +2773,6 @@ Returns a list of author objects for the specified domain.
 
 ##### Request
 
-
 ```http
 GET /api/authors/{secondLevelDomain}/{topLevelDomain}
 Authorization: Bearer <access_token>
@@ -2843,7 +2780,6 @@ Authorization: Bearer <access_token>
 ```
 
 ##### Parameters
-
 
 - `secondLevelDomain` (path): The second-level domain name (e.g., "example" from "example.com")
 - `topLevelDomain` (path): The top-level domain (e.g., "com" from "example.com")
@@ -2895,7 +2831,6 @@ Authorization: Bearer <access_token>
 
 ### Error Codes
 
-
 - `401 Unauthorized`: Invalid or missing access token
 - `403 Forbidden`: Insufficient permissions (missing Author.Read scope)
 - `404 Not Found`: Domain not found
@@ -2914,7 +2849,6 @@ See `src/services/fetchAuthorsByDomain.ts` for a complete example including:
 
 #### Using cURL
 
-
 ```bash
 curl -X GET "https://your-function-app.azurewebsites.net/api/authors/example/com" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
@@ -2923,7 +2857,6 @@ curl -X GET "https://your-function-app.azurewebsites.net/api/authors/example/com
 ```
 
 #### Using PowerShell
-
 
 ```powershell
 $headers = @{
@@ -2937,7 +2870,6 @@ $response | ConvertTo-Json -Depth 10
 ```
 
 ### Security Requirements
-
 
 - All requests must use HTTPS
 - Access tokens must be obtained from Microsoft Entra ID
@@ -2972,23 +2904,18 @@ This comprehensive API documentation covers all Azure Functions and endpoints av
 ### Table of Contents
 
 - [Authentication](#authentication)
-- [Image API](#image-api)
-- [Domain Registration API](#domain-registration-api)
-- [External Integration API](#external-integration-api)
-- [Error Handling](#error-handling)
-- [TypeScript Examples](#typescript-examples)
 
 ### Authentication
 
 All API endpoints require authentication using JWT Bearer tokens. Include the token in the Authorization header:
 
-`http
+```http
 Authorization: Bearer <your-jwt-token>
-`
+```
 
 #### TypeScript Authentication Helper
 
-`	ypescript
+```typescript
 class ApiClient {
   private baseUrl: string;
   private token: string;
@@ -3038,7 +2965,6 @@ class ApiClient {
   }
 }
 `
-
 
 ### Azure Functions API
 
@@ -3517,8 +3443,6 @@ System.Xml.XmlElement
 
 ---
 
-
-
 ### Testing & Validation
 
 The following projects provide comprehensive testing coverage:
@@ -3526,7 +3450,6 @@ The following projects provide comprehensive testing coverage:
 #### OnePageAuthor.Test
 
 Unit and integration tests for the OnePageAuthor application
-
 
 ### Error Handling
 
@@ -3555,7 +3478,7 @@ All API endpoints return consistent error responses:
 
 #### TypeScript Error Handling
 
-`	ypescript
+```typescript
 interface ApiError {
   error: string;
   details?: any;
@@ -3630,7 +3553,6 @@ The OnePageAuthor system consists of multiple Azure Functions, core libraries, a
 
 #### Azure Functions (API Layer)
 
-
 - **ImageAPI**: Image upload, management and retrieval
 - **InkStainedWretchFunctions**: Domain registration and external integrations
 - **InkStainedWretchStripe**: Payment processing and subscription management
@@ -3638,18 +3560,15 @@ The OnePageAuthor system consists of multiple Azure Functions, core libraries, a
 
 #### Libraries (Business Logic Layer)
 
-
 - **OnePageAuthorLib**: Core business logic, entities, and data access services
 
 #### Utilities (Data Management Layer)
-
 
 - **SeedAPIData**: API data initialization
 - **SeedImageStorageTiers**: Storage tier configuration
 - **SeedInkStainedWretchesLocale**: Comprehensive localization for all containers (North America: US, CA, MX in EN, ES, FR, AR, ZH-CN, ZH-TW)
 
 #### Testing (Quality Assurance Layer)
-
 
 - **OnePageAuthor.Test**: Unit and integration tests
 - **IntegrationTestAuthorDataService**: Author data service validation
@@ -3807,7 +3726,6 @@ Main application functions for author data and localization services
 
   - `IHostBuilder)`: System.Xml.XmlElement
 
-
 #### Libraries
 
 ##### OnePageAuthorLib
@@ -3917,7 +3835,6 @@ Core library containing business logic, entities, and data services
 - `SubscriptionPlanListResponse`: A response model analogous to StripePriceListResponse but containing SubscriptionPlan items.
 - `SubscriptionsResponse`: Represents the result of a request to list Stripe subscriptions.
 
-
 #### Utilities & Tools
 
 ##### SeedAPIData
@@ -3932,7 +3849,6 @@ Utility for seeding image storage tier configurations
 
 Comprehensive, idempotent localization seeding utility for all UI components and containers. Supports North American countries (US, CA, MX) in multiple languages: English (EN), Spanish (ES), French (FR), Arabic (AR), Simplified Chinese (ZH-CN), and Traditional Chinese (ZH-TW). Features automatic container creation, duplicate detection, and support for both standard (en-us) and extended (zh-cn-us) locale codes.
 
-
 #### Testing Projects
 
 ##### OnePageAuthor.Test
@@ -3942,7 +3858,6 @@ Unit and integration tests for the OnePageAuthor application
 ##### IntegrationTestAuthorDataService
 
 Integration testing utility for author data service validation
-
 
 ### Development Information
 
@@ -3958,7 +3873,6 @@ This documentation is automatically generated from source code XML comments and 
 `
 
 #### Project Statistics
-
 
 - **Total Projects**: 11
 - **Azure Functions**: 4
@@ -4005,8 +3919,7 @@ Each top-level section is stored in its own Cosmos DB container. The partition k
 | AuthorRegistration | `AuthorRegistration` | `/Culture` |
 | LoginRegister | `LoginRegister` | `/Culture` |
 | ThankYou | `ThankYou` | `/Culture` |
-| Navbar |
-avbar` | `/Culture` |
+| Navbar | `Navbar` | `/Culture` |
 | DomainRegistration | `DomainRegistration` | `/Culture` |
 | ErrorPage | `ErrorPage` | `/Culture` |
 | ImageManager | `ImageManager` | `/Culture` |
@@ -4018,7 +3931,6 @@ avbar` | `/Culture` |
 (Extend this table if additional POCOs are added.)
 
 ### Seeding Process
-
 
 1. The seeding project enumerates `data/` and matches files with pattern: `inkstainedwretch.{language}-{country}.json`.
 2. For each file:
@@ -4073,15 +3985,12 @@ Response: `200 OK` with `LocalizationText` JSON or `400 Bad Request` if invalid 
 
 #### Sample Request
 
-
 ```
 GET https://localhost:7071/api/localizedtext/en-US
 
 ```
 
-
 #### Sample (truncated) Response
-
 
 ```json
 {
@@ -4109,7 +4018,6 @@ This registers:
 
 ### Extending Localization
 
-
 1. Add new JSON section to culture files.
 2. Create corresponding POCO inheriting `AuthorManagementBase`.
 3. Register new container manager + DI mapping.
@@ -4117,12 +4025,10 @@ This registers:
 
 ### Error Handling
 
-
 - Invalid culture -> `ArgumentException` surfaced as 400.
 - Missing container item -> returns empty object (never null) for resilience.
 
 ### Future Enhancements
-
 
 - Caching layer (Memory / Distributed) per culture.
 - Versioning or last-modified metadata.
@@ -4190,14 +4096,12 @@ Stops all running Azure Functions background jobs and cleans up completed jobs.
 
 #### Required Tools
 
-
 - **PowerShell 5.1+** or **PowerShell Core 7+**
 - **.NET SDK 10.0** or later
 - **Azure Functions Core Tools v4** (`func`)
 - **dotnet-update tool** (automatically installed if missing)
 
 #### Install Prerequisites
-
 
 ```powershell
 ## Install Azure Functions Core Tools (if needed)
@@ -4213,7 +4117,6 @@ dotnet tool install --global dotnet-update
 
 #### 🚀 Start Development Session
 
-
 ```powershell
 ## Full update and run (recommended daily)
 .\Scripts\UpdateAndRun.ps1
@@ -4227,7 +4130,6 @@ dotnet tool install --global dotnet-update
 ```
 
 #### 🔧 During Development
-
 
 ```powershell
 ## Check function status
@@ -4247,7 +4149,6 @@ Invoke-RestMethod http://localhost:7002/api/health
 
 #### 🛑 End Development Session
 
-
 ```powershell
 ## Stop all functions cleanly
 .\Scripts\StopFunctions.ps1
@@ -4262,7 +4163,6 @@ Stop-Job -Name "InkStainedWretchStripe"
 ### Job Management Commands
 
 #### View Jobs
-
 
 ```powershell
 ## List all background jobs
@@ -4280,7 +4180,6 @@ Receive-Job -Id <JobId>
 ```
 
 #### Control Jobs
-
 
 ```powershell
 ## Stop specific job
@@ -4309,7 +4208,6 @@ Once started, the Azure Functions will be available at:
 | **InkStainedWretchStripe** | `http://localhost:7002` | Stripe payment processing |
 
 #### Common API Endpoints
-
 
 ```powershell
 ## StateProvince endpoints (InkStainedWretchFunctions)
@@ -4375,7 +4273,6 @@ func start --port 8002  # In InkStainedWretchStripe directory
 
 #### Performance Tips
 
-
 - Use `-SkipUpdate` flag when packages don't need updating (faster startup)
 - Use `-SkipBuild` when only restarting functions after minor changes
 - Monitor job output with `Receive-Job -Keep` to preserve logs for debugging
@@ -4396,6 +4293,7 @@ The scripts can be modified to suit your development preferences:
 All detailed documentation has been organized in the [`docs/`](docs/) folder. For a complete navigation guide, see the **[Documentation Index](docs/INDEX.md)**.
 
 ### Quick Links
+
 - [**Documentation Index**](docs/INDEX.md) - Complete navigation guide to all documentation
 - [**API Reference**](docs/API-Documentation.md) - Comprehensive API documentation
 - [**Deployment Guide**](docs/DEPLOYMENT_GUIDE.md) - Complete deployment workflow
@@ -4403,6 +4301,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 - [**Development Scripts**](docs/DEVELOPMENT_SCRIPTS.md) - Development automation
 
 ### Core Documentation
+
 | Document | Description |
 |----------|-------------|
 | [CONTRIBUTING.md](docs/CONTRIBUTING.md) | Guidelines for contributing to the project |
@@ -4410,6 +4309,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [SECURITY.md](docs/SECURITY.md) | Security policies and vulnerability reporting |
 
 ### API Documentation
+
 | Document | Description |
 |----------|-------------|
 | [API-Documentation.md](docs/API-Documentation.md) | Comprehensive API reference |
@@ -4418,6 +4318,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [WIKIPEDIA_API.md](docs/WIKIPEDIA_API.md) | Wikipedia API integration |
 
 ### Implementation Guides
+
 | Document | Description |
 |----------|-------------|
 | [IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md) | DNS zone automation |
@@ -4437,6 +4338,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [INK_STAINED_WRETCH_USER_FEATURES.md](docs/INK_STAINED_WRETCH_USER_FEATURES.md) | User features documentation |
 
 ### Enhancement Documentation
+
 | Document | Description |
 |----------|-------------|
 | [CULTURE_SUPPORT_ENHANCEMENT.md](docs/CULTURE_SUPPORT_ENHANCEMENT.md) | Culture/localization features |
@@ -4446,6 +4348,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [REFACTORING_SUMMARY.md](docs/REFACTORING_SUMMARY.md) | Refactoring documentation |
 
 ### Deployment & Infrastructure
+
 | Document | Description |
 |----------|-------------|
 | [DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) | Complete deployment workflow |
@@ -4456,6 +4359,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [QUICKSTART_COSMOS_APPINSIGHTS.md](docs/QUICKSTART_COSMOS_APPINSIGHTS.md) | Quick start guide |
 
 ### Configuration & Setup
+
 | Document | Description |
 |----------|-------------|
 | [ConfigurationValidation.md](docs/ConfigurationValidation.md) | Configuration validation guide |
@@ -4466,6 +4370,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [DOTNET_10_UPGRADE.md](docs/DOTNET_10_UPGRADE.md) | .NET 10 upgrade guide |
 
 ### Migration & Testing
+
 | Document | Description |
 |----------|-------------|
 | [MIGRATION_GUIDE_ENTRA_ID_ROLES.md](docs/MIGRATION_GUIDE_ENTRA_ID_ROLES.md) | Entra ID migration guide |
@@ -4474,6 +4379,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [SECURITY_AUDIT_REPORT.md](docs/SECURITY_AUDIT_REPORT.md) | Security audit findings |
 
 ### Development & Utilities
+
 | Document | Description |
 |----------|-------------|
 | [DEVELOPMENT_SCRIPTS.md](docs/DEVELOPMENT_SCRIPTS.md) | Development automation scripts |
@@ -4492,49 +4398,54 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 The following external resources are referenced throughout this project:
 
 ### Azure Services
+
 | Resource | URL | Description |
 |----------|-----|-------------|
-| Azure Portal | https://portal.azure.com | Azure management portal |
-| Azure Functions Docs | https://docs.microsoft.com/en-us/azure/azure-functions/ | Azure Functions documentation |
-| Azure Cosmos DB Trigger | https://learn.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger | Cosmos DB trigger bindings |
-| Azure Managed Identity | https://learn.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview | Managed identity documentation |
+| Azure Portal | <https://portal.azure.com> | Azure management portal |
+| Azure Functions Docs | <https://docs.microsoft.com/en-us/azure/azure-functions/> | Azure Functions documentation |
+| Azure Cosmos DB Trigger | <https://learn.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger> | Cosmos DB trigger bindings |
+| Azure Managed Identity | <https://learn.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview> | Managed identity documentation |
 
 ### Stripe
+
 | Resource | URL | Description |
 |----------|-----|-------------|
-| Stripe Dashboard | https://dashboard.stripe.com | Stripe management dashboard |
+| Stripe Dashboard | <https://dashboard.stripe.com> | Stripe management dashboard |
 
 ### Amazon Services
+
 | Resource | URL | Description |
 |----------|-----|-------------|
-| Amazon Associates | https://affiliate-program.amazon.com | Amazon affiliate program |
-| Amazon Associates Help | https://affiliate-program.amazon.com/help/ | Affiliate program documentation |
-| PA API Documentation | https://webservices.amazon.com/paapi5/documentation/ | Product Advertising API docs |
-| Amazon Developer Portal | https://developer.amazon.com/apps-and-games/services/paapi | Developer services |
-| AWS Console | https://console.aws.amazon.com | AWS management console |
+| Amazon Associates | <https://affiliate-program.amazon.com> | Amazon affiliate program |
+| Amazon Associates Help | <https://affiliate-program.amazon.com/help/> | Affiliate program documentation |
+| PA API Documentation | <https://webservices.amazon.com/paapi5/documentation/> | Product Advertising API docs |
+| Amazon Developer Portal | <https://developer.amazon.com/apps-and-games/services/paapi> | Developer services |
+| AWS Console | <https://console.aws.amazon.com> | AWS management console |
 
 ### Google Cloud
+
 | Resource | URL | Description |
 |----------|-----|-------------|
-| Google Cloud Domains API | https://cloud.google.com/domains/docs | Domain registration API |
-| Workload Identity Federation | https://cloud.google.com/iam/docs/workload-identity-federation | Identity federation docs |
+| Google Cloud Domains API | <https://cloud.google.com/domains/docs> | Domain registration API |
+| Workload Identity Federation | <https://cloud.google.com/iam/docs/workload-identity-federation> | Identity federation docs |
 
 ### Development Tools
+
 | Resource | URL | Description |
 |----------|-----|-------------|
-| .NET Downloads | https://dotnet.microsoft.com/download | .NET SDK downloads |
-| Penguin Random House API | https://developer.penguinrandomhouse.com | PRH developer portal |
-| BFG Repo Cleaner | https://rtyley.github.io/bfg-repo-cleaner/ | Git history cleaning tool |
+| .NET Downloads | <https://dotnet.microsoft.com/download> | .NET SDK downloads |
+| Penguin Random House API | <https://developer.penguinrandomhouse.com> | PRH developer portal |
+| BFG Repo Cleaner | <https://rtyley.github.io/bfg-repo-cleaner/> | Git history cleaning tool |
 
 ### Project Links
+
 | Resource | URL | Description |
 |----------|-----|-------------|
-| GitHub Repository | https://github.com/utdcometsoccer/one-page-author-page-api | Source code repository |
-| CI/CD Pipeline | https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml | Build status |
+| GitHub Repository | <https://github.com/utdcometsoccer/one-page-author-page-api> | Source code repository |
+| CI/CD Pipeline | <https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml> | Build status |
 
 ---
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-

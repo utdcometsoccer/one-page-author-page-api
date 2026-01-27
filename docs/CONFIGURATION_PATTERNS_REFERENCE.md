@@ -121,6 +121,7 @@ All optional configuration uses the conditional pattern:
 ### Common Mistake
 
 ❌ **Don't do this:**
+
 ```bicep
 {
   name: 'AAD_AUDIENCE'
@@ -129,6 +130,7 @@ All optional configuration uses the conditional pattern:
 ```
 
 ✅ **Do this instead:**
+
 ```bicep
 !empty(aadAudience) ? [
   {
@@ -358,6 +360,7 @@ az bicep lint --file infra/inkstainedwretches.bicep
 **Symptom**: Empty values appear in Function App settings
 
 **Problem**:
+
 ```bicep
 appSettings: [
   { name: 'AAD_AUDIENCE', value: aadAudience }  // ❌ Always added
@@ -365,6 +368,7 @@ appSettings: [
 ```
 
 **Solution**:
+
 ```bicep
 appSettings: concat([
   // base settings
@@ -411,6 +415,7 @@ param aadAudience string = ''
 ### 5. Test Configuration Changes
 
 Always run tests after changes:
+
 ```bash
 pwsh infra/Test-ConfigurationPropagation.ps1
 ```

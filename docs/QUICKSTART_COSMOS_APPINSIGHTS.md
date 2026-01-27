@@ -49,6 +49,7 @@ Or in GitHub: **Actions** → **Build and deploy Azure Functions and Infrastruct
 ### Expected Output
 
 **Success:**
+
 ```
 ✓ Checking if Cosmos DB Account exists...
 ✓ Resource group exists: rg-data-prod
@@ -57,12 +58,14 @@ Or in GitHub: **Actions** → **Build and deploy Azure Functions and Infrastruct
 ```
 
 **Already Exists:**
+
 ```
 ✓ Checking if Cosmos DB Account exists...
 ✓ Cosmos DB Account already exists. Skipping deployment.
 ```
 
 **Skipped:**
+
 ```
 ⚠️ Skipping Cosmos DB deployment: Required secrets not configured
 ```
@@ -99,6 +102,7 @@ Update the `COSMOSDB_CONNECTION_STRING` secret in GitHub with the value from Ste
 ## Configuration Examples
 
 ### Development Setup
+
 ```bash
 # Minimal cost, single subscription free tier
 COSMOSDB_RESOURCE_GROUP=rg-dev
@@ -109,6 +113,7 @@ APPINSIGHTS_NAME=myapp-insights-dev
 ```
 
 ### Production Setup
+
 ```bash
 # High availability with zone redundancy
 COSMOSDB_RESOURCE_GROUP=rg-prod
@@ -120,6 +125,7 @@ APPINSIGHTS_NAME=myapp-insights-prod
 ```
 
 ### Staging Setup
+
 ```bash
 # Cost-optimized without zone redundancy
 COSMOSDB_RESOURCE_GROUP=rg-staging
@@ -146,6 +152,7 @@ APPINSIGHTS_NAME=myapp-insights-staging
 ### Issue: "Deployment failed"
 
 **Solution:** Check workflow logs for specific error. Common causes:
+
 - Invalid Azure credentials
 - Insufficient permissions
 - Resource quotas exceeded
@@ -198,6 +205,7 @@ Track costs in Azure Portal:
 3. View daily/monthly costs
 
 **Expected Monthly Costs (Serverless):**
+
 - Cosmos DB (free tier): $0
 - Cosmos DB (low usage): $5-20
 - Application Insights (low usage): $0-5

@@ -172,12 +172,14 @@ Stored in Cosmos DB with the following schema:
 Format: `{baseUrl}/signup?ref={referralCode}`
 
 Examples:
+
 - `https://inkstainedwretches.com/signup?ref=ABC12345`
 - `https://myapp.com/signup?ref=XYZ789WQ`
 
 ### Credit Calculation
 
 Currently, the system tracks:
+
 - 1 month of credit per successful referral (when status = "Converted")
 - Credits are tracked but redemption logic is not yet implemented
 - Future: Separate tracking for pending vs. redeemed credits
@@ -247,6 +249,7 @@ try {
 ### Webhook Integration
 
 Consider adding webhook support to notify external systems when:
+
 - A new referral is created
 - A referral converts to paid
 - Credits are earned or redeemed
@@ -274,14 +277,17 @@ dotnet test --filter "FullyQualifiedName~Referral"
 ### Common Issues
 
 **Issue:** "This email has already been referred by you"
+
 - **Cause:** Attempting to refer the same email twice
 - **Solution:** Use a different email or check existing referrals
 
 **Issue:** "Unable to generate a unique referral code"
+
 - **Cause:** Too many collisions when generating codes (rare)
 - **Solution:** System will retry automatically, if persistent check database
 
 **Issue:** Invalid email format
+
 - **Cause:** Email doesn't match standard email pattern
 - **Solution:** Validate email on frontend before submission
 

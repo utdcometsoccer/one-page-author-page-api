@@ -7,6 +7,7 @@ This document describes the standardized error handling implementation across al
 ## Problem Statement
 
 Prior to this implementation, the platform had inconsistent error formats across different APIs:
+
 - Some functions returned `{ error: "message" }`, others returned plain strings
 - Response structures varied between endpoints
 - No centralized error handling mechanism
@@ -44,6 +45,7 @@ public class ErrorResponse
 ```
 
 **Response Format:**
+
 ```json
 {
   "statusCode": 400,
@@ -178,6 +180,7 @@ public async Task<HttpResponseData> CreateReferral(HttpRequestData req)
 ### For IActionResult-based Functions
 
 **Before:**
+
 ```csharp
 [Function("CreateStripeCustomer")]
 public async Task<IActionResult> Run(HttpRequest req)
@@ -198,6 +201,7 @@ public async Task<IActionResult> Run(HttpRequest req)
 ```
 
 **After:**
+
 ```csharp
 using InkStainedWretch.OnePageAuthorLib.Extensions;
 
@@ -218,6 +222,7 @@ public async Task<IActionResult> Run(HttpRequest req)
 ## Benefits
 
 ### For Developers
+
 1. **Consistency**: All errors follow the same format across all APIs
 2. **Reduced Boilerplate**: No need to write repetitive error handling code
 3. **Automatic Logging**: Exception handling includes automatic logging with trace IDs
@@ -225,6 +230,7 @@ public async Task<IActionResult> Run(HttpRequest req)
 5. **Maintainability**: Centralized error handling logic
 
 ### For Clients
+
 1. **Predictable Structure**: Always know what to expect in error responses
 2. **Trace IDs**: Ability to reference specific errors when reporting issues
 3. **Timestamps**: Know exactly when an error occurred
@@ -291,15 +297,18 @@ All tests pass: **11/11 (100%)**
 The following functions have been updated to use standardized error handling:
 
 ### InkStainedWretchFunctions
+
 - `LocalizedText.cs` - Localization text retrieval
 - `ReferralFunction.cs` - Referral program endpoints
 - `GetTestimonials.cs` - Testimonial retrieval
 
 ### InkStainedWretchStripe
+
 - `CreateStripeCustomer.cs` - Stripe customer creation
 - `CreateStripeCheckoutSession.cs` - Checkout session creation
 
 ### ImageAPI
+
 - `Upload.cs` - Image upload endpoint
 
 ## Future Enhancements
@@ -314,6 +323,7 @@ The following functions have been updated to use standardized error handling:
 ## Performance Impact
 
 The standardized error handling has minimal performance impact:
+
 - Error response creation: < 1ms
 - Exception handling: < 5ms (includes logging)
 - No impact on successful request paths
@@ -338,6 +348,7 @@ The implementation follows a phased approach:
 ## Support
 
 For questions or issues related to standardized error handling:
+
 - File an issue in the repository
 - Include the trace ID from the error response
 - Reference this documentation in your issue description

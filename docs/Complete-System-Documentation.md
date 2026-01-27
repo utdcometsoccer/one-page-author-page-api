@@ -12,7 +12,6 @@ The OnePageAuthor system consists of multiple Azure Functions, core libraries, a
 
 ### Azure Functions (API Layer)
 
-
 - **ImageAPI**: Image upload, management and retrieval
 - **InkStainedWretchFunctions**: Domain registration and external integrations
 - **InkStainedWretchStripe**: Payment processing and subscription management
@@ -20,18 +19,15 @@ The OnePageAuthor system consists of multiple Azure Functions, core libraries, a
 
 ### Libraries (Business Logic Layer)
 
-
 - **OnePageAuthorLib**: Core business logic, entities, and data access services
 
 ### Utilities (Data Management Layer)
-
 
 - **SeedAPIData**: API data initialization
 - **SeedImageStorageTiers**: Storage tier configuration
 - **SeedInkStainedWretchesLocale**: Comprehensive localization for all containers (North America: US, CA, MX in EN, ES, FR, AR, ZH-CN, ZH-TW)
 
 ### Testing (Quality Assurance Layer)
-
 
 - **OnePageAuthor.Test**: Unit and integration tests
 - **IntegrationTestAuthorDataService**: Author data service validation
@@ -189,7 +185,6 @@ Main application functions for author data and localization services
 
   - `IHostBuilder)`: System.Xml.XmlElement
 
-
 ### Libraries
 
 #### OnePageAuthorLib
@@ -299,7 +294,6 @@ Core library containing business logic, entities, and data services
 - `SubscriptionPlanListResponse`: A response model analogous to StripePriceListResponse but containing SubscriptionPlan items.
 - `SubscriptionsResponse`: Represents the result of a request to list Stripe subscriptions.
 
-
 ### Utilities & Tools
 
 #### SeedAPIData
@@ -314,7 +308,6 @@ Utility for seeding image storage tier configurations
 
 Comprehensive, idempotent localization seeding utility for all UI components and containers. Supports North American countries (US, CA, MX) in multiple languages: English (EN), Spanish (ES), French (FR), Arabic (AR), Simplified Chinese (ZH-CN), and Traditional Chinese (ZH-TW). Features automatic container creation, duplicate detection, and support for both standard (en-us) and extended (zh-cn-us) locale codes.
 
-
 ### Testing Projects
 
 #### OnePageAuthor.Test
@@ -324,7 +317,6 @@ Unit and integration tests for the OnePageAuthor application
 #### IntegrationTestAuthorDataService
 
 Integration testing utility for author data service validation
-
 
 ## Development Information
 
@@ -340,7 +332,6 @@ This documentation is automatically generated from source code XML comments and 
 `
 
 ### Project Statistics
-
 
 - **Total Projects**: 11
 - **Azure Functions**: 4

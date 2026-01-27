@@ -13,12 +13,14 @@ does not have permission to perform action 'Microsoft.Authorization/roleAssignme
 Run this script **once** before deploying:
 
 ### Windows (PowerShell)
+
 ```powershell
 cd infra
 ./Grant-ServicePrincipalPermissions.ps1
 ```
 
 ### Linux/macOS (Bash)
+
 ```bash
 cd infra
 ./Grant-ServicePrincipalPermissions.sh
@@ -27,12 +29,14 @@ cd infra
 ## What Does This Do?
 
 Grants your GitHub Actions service principal the **User Access Administrator** role, allowing it to:
+
 - Assign Key Vault roles to Function Apps during deployment
 - Create other role assignments defined in Bicep templates
 
 ## Requirements
 
 Before running the script:
+
 1. ✅ Install Azure CLI: `az version`
 2. ✅ Login to Azure: `az login`
 3. ✅ Have Owner or User Access Administrator permissions
@@ -52,11 +56,13 @@ Before running the script:
 ## Alternative Scopes
 
 **Subscription scope (default, recommended):**
+
 ```bash
 ./Grant-ServicePrincipalPermissions.sh
 ```
 
 **Resource group scope only:**
+
 ```bash
 ./Grant-ServicePrincipalPermissions.sh -S resourcegroup -r YOUR_RESOURCE_GROUP_NAME
 ```

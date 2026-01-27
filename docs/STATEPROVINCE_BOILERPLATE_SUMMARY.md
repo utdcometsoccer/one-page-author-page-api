@@ -111,7 +111,6 @@ ame`
 
 ### Basic Setup in Application
 
-
 ```csharp
 // In Program.cs or Startup.cs
 services
@@ -123,7 +122,6 @@ services
 ```
 
 ### Repository Usage
-
 
 ```csharp
 // Inject IStateProvinceRepository
@@ -145,7 +143,6 @@ public class SomeController
 ```
 
 ### Service Usage (Recommended)
-
 
 ```csharp
 // Inject IStateProvinceService for business logic

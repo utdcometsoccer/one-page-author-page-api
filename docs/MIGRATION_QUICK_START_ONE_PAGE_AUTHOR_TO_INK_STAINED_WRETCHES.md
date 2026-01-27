@@ -7,6 +7,7 @@ This migration renames all "One Page Author" references to "Ink Stained Wretches
 ## Documents in This Migration Package
 
 ### 1. 📋 [Migration Checklist](MIGRATION_CHECKLIST_ONE_PAGE_AUTHOR_TO_INK_STAINED_WRETCHES.md)
+
 **Use this for execution** - Step-by-step checklist with checkboxes for tracking progress during the actual migration.
 
 - 10 phases with detailed tasks
@@ -16,6 +17,7 @@ This migration renames all "One Page Author" references to "Ink Stained Wretches
 - Notes section for tracking issues
 
 ### 2. 📖 [Complete Migration Guide](MIGRATION_ONE_PAGE_AUTHOR_TO_INK_STAINED_WRETCHES.md)
+
 **Reference documentation** - Comprehensive guide explaining the reasoning, scope, and details of every change.
 
 - Detailed analysis of ~1,734 code occurrences
@@ -39,6 +41,7 @@ This migration renames all "One Page Author" references to "Ink Stained Wretches
 ## Critical Decisions Needed
 
 ### 1. Database Naming Strategy
+
 **Choose one approach:**
 
 - ✅ **RECOMMENDED:** Keep database as "OnePageAuthorDb"
@@ -53,7 +56,9 @@ This migration renames all "One Page Author" references to "Ink Stained Wretches
   - More effort
 
 ### 2. Repository Rename
+
 **Decide if GitHub repository should be renamed:**
+
 - Current: `utdcometsoccer/one-page-author-page-api`
 - Proposed: `utdcometsoccer/ink-stained-wretches-api`
 - Impact: URLs, CI/CD, team clones (GitHub provides redirects)
@@ -83,6 +88,7 @@ graph TD
 ## Before You Start
 
 ### Prerequisites
+
 - [ ] Read the complete [Migration Guide](MIGRATION_ONE_PAGE_AUTHOR_TO_INK_STAINED_WRETCHES.md)
 - [ ] Get team approval
 - [ ] Decide on database naming strategy
@@ -92,6 +98,7 @@ graph TD
 - [ ] Print or open the [Migration Checklist](MIGRATION_CHECKLIST_ONE_PAGE_AUTHOR_TO_INK_STAINED_WRETCHES.md)
 
 ### Tools Needed
+
 - IDE with find/replace across solution (VS Code, Visual Studio, or Rider)
 - Git command line or GUI
 - .NET 10 SDK
@@ -101,6 +108,7 @@ graph TD
 ## Major Changes Summary
 
 ### Files and Directories
+
 ```
 OLD                                    NEW
 ───────────────────────────────────   ──────────────────────────────────────
@@ -111,6 +119,7 @@ OnePageAuthor.DataSeeder/             InkStainedWretches.DataSeeder/
 ```
 
 ### Namespaces
+
 ```csharp
 // OLD
 namespace OnePageAuthorLib.Api.Stripe
@@ -122,6 +131,7 @@ using InkStainedWretchesLib.Interfaces.Stripe;
 ```
 
 ### Commands
+
 ```bash
 # OLD
 dotnet build OnePageAuthorAPI.sln
@@ -135,11 +145,13 @@ dotnet test InkStainedWretchesAPI.sln
 ## Risk Mitigation
 
 ### High Priority
+
 1. **Database naming decision** - Make before starting
 2. **Project reference updates** - All 20+ must be correct
 3. **Namespace changes** - Must be complete and consistent
 
 ### Testing Requirements
+
 - ✅ Unit tests must pass
 - ✅ Integration tests must pass
 - ✅ Local build must succeed
@@ -147,6 +159,7 @@ dotnet test InkStainedWretchesAPI.sln
 - ✅ Deployed functions must respond
 
 ### Rollback Plan
+
 - Keep migration on separate branch until fully tested
 - Don't merge to main until all tests pass
 - Have previous deployment ready to restore if needed
@@ -154,6 +167,7 @@ dotnet test InkStainedWretchesAPI.sln
 ## Common Pitfalls to Avoid
 
 ❌ **Don't:**
+
 - Skip testing after each phase
 - Rename files/folders before updating references
 - Commit without verifying build succeeds
@@ -161,6 +175,7 @@ dotnet test InkStainedWretchesAPI.sln
 - Forget to update documentation
 
 ✅ **Do:**
+
 - Follow the checklist order
 - Test after each major change
 - Use find/replace carefully (case-sensitive)
@@ -170,12 +185,14 @@ dotnet test InkStainedWretchesAPI.sln
 ## Getting Help
 
 ### During Migration
+
 1. Reference the [Complete Migration Guide](MIGRATION_ONE_PAGE_AUTHOR_TO_INK_STAINED_WRETCHES.md) for detailed explanations
 2. Check the rollback procedure in the checklist if issues arise
 3. Use the notes section in the checklist to track problems
 4. Don't hesitate to pause and seek team input
 
 ### After Migration
+
 - Monitor Application Insights for errors
 - Check CI/CD pipeline logs
 - Review Azure Function logs
@@ -184,6 +201,7 @@ dotnet test InkStainedWretchesAPI.sln
 ## Success Indicators
 
 ✅ Migration is successful when:
+
 1. Solution builds without errors
 2. All tests pass (unit and integration)
 3. CI/CD pipeline completes successfully

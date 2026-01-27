@@ -13,6 +13,7 @@ This guide will help you get started with the Author Invitation Tool in under 10
 You need these values from your Azure resources:
 
 ### Required: Cosmos DB
+
 1. Go to [Azure Portal](https://portal.azure.com)
 2. Navigate to your Cosmos DB account
 3. Click **Keys** in the left menu
@@ -22,7 +23,9 @@ You need these values from your Azure resources:
    - **Database ID** (typically `OnePageAuthor`)
 
 ### Optional: Email Service
+
 If you want to send emails:
+
 1. Navigate to **Communication Services** in Azure Portal
 2. Click **Keys** in the left menu
 3. Copy **Connection string**
@@ -33,6 +36,7 @@ If you want to send emails:
 Choose one method:
 
 ### Option A: User Secrets (Recommended)
+
 ```bash
 cd AuthorInvitationTool
 
@@ -50,6 +54,7 @@ dotnet user-secrets set "Email:AzureCommunicationServices:SenderAddress" "DoNotR
 ```
 
 ### Option B: Environment Variables
+
 ```bash
 export COSMOSDB_ENDPOINT_URI="https://your-account.documents.azure.com:443/"
 export COSMOSDB_PRIMARY_KEY="your-primary-key-here=="
@@ -68,6 +73,7 @@ dotnet build
 ```
 
 Expected output:
+
 ```
 Build succeeded.
     0 Warning(s)
@@ -81,6 +87,7 @@ dotnet run -- author@example.com example.com
 ```
 
 Expected output:
+
 ```
 ═══════════════════════════════════════════════════════════
    Author Invitation Tool - One Page Author Platform
@@ -135,16 +142,20 @@ dotnet run -- mike@thirdsite.com thirdsite.com
 ## Troubleshooting
 
 ### "COSMOSDB_ENDPOINT_URI is required"
+
 → You forgot to configure Cosmos DB. Go back to Step 2.
 
 ### "Invalid email address format"
+
 → Check email format. Must be: `user@domain.com`
 
 ### Email not sent
+
 → This is OK! The invitation is still created in the database.
    To enable emails, configure Azure Communication Services.
 
 ### "An invitation already exists"
+
 → An invitation was already sent to this email.
    Type `y` to create a new one anyway.
 
@@ -206,6 +217,7 @@ After following this guide, you should be able to:
 ---
 
 **Pro Tip**: Create a shell alias for faster invitations:
+
 ```bash
 alias invite='dotnet run --project /path/to/AuthorInvitationTool/AuthorInvitationTool.csproj --'
 # Then use: invite author@example.com example.com

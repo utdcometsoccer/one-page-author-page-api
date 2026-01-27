@@ -106,44 +106,52 @@ Store the actual values in GitHub Secrets (Settings → Secrets and variables �
 **Where to Find**:
 
 #### Method 1: Azure Portal
+
 1. Navigate to [Azure Portal](https://portal.azure.com)
 2. Search for and select **Microsoft Entra ID**
 3. On the **Overview** page, find **Tenant ID**
 4. Click the copy icon to copy the GUID
 
 #### Method 2: App Registration
+
 1. Navigate to **Microsoft Entra ID** → **App registrations**
 2. Select your API app registration
 3. On the **Overview** page, find **Directory (tenant) ID**
 4. Click the copy icon
 
 #### Method 3: Azure CLI
+
 ```bash
 az account show --query tenantId -o tsv
 ```
 
 #### Method 4: PowerShell
+
 ```powershell
 (Get-AzContext).Tenant.Id
 ```
 
 **Example Configuration**:
+
 ```bash
 AAD_TENANT_ID=12345678-1234-1234-1234-123456789012
 ```
 
 **Used By**:
+
 - All Azure Function apps (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStripe)
 - JwtValidationService
 - Program.cs authentication configuration
 - EntraIdRoleManager (for role management)
 
 **Validation**:
+
 - Must be a valid GUID
 - Must match the tenant where your app registrations exist
 - Tokens from other tenants will be rejected
 
 **Common Mistakes**:
+
 - ❌ Using `common` or `organizations` instead of specific tenant ID
 - ❌ Mixing up tenant IDs from different Entra ID directories
 - ❌ Using tenant name instead of tenant ID
@@ -159,24 +167,28 @@ AAD_TENANT_ID=12345678-1234-1234-1234-123456789012
 **Where to Find**:
 
 #### Method 1: Azure Portal - App Registration
+
 1. Navigate to **Microsoft Entra ID** → **App registrations**
 2. Select your **API app registration** (e.g., "OnePageAuthor API" or "InkStainedWretches API")
 3. On the **Overview** page, find **Application (client) ID**
 4. Click the copy icon to copy the GUID
 
 #### Method 2: Application ID URI (Alternative)
+
 1. In your API app registration, go to **Expose an API**
 2. The **Application ID URI** is shown at the top
 3. This can be used instead of the client ID if you prefer URI format
 4. Common format: `api://{client-id}` or custom like `api://inkstainedwretches-api`
 
 #### Method 3: Azure CLI
+
 ```bash
 # Get by app display name
 az ad app list --display-name "OnePageAuthor API" --query "[0].appId" -o tsv
 ```
 
 #### Method 4: PowerShell
+
 ```powershell
 Get-AzADApplication -DisplayName "OnePageAuthor API" | Select-Object -ExpandProperty AppId
 ```
@@ -184,37 +196,43 @@ Get-AzADApplication -DisplayName "OnePageAuthor API" | Select-Object -ExpandProp
 **Example Configuration**:
 
 Using Client ID (most common):
+
 ```bash
 AAD_AUDIENCE=87654321-4321-4321-4321-210987654321
 ```
 
 Using Application ID URI (alternative):
+
 ```bash
 AAD_AUDIENCE=api://inkstainedwretches-api
 ```
 
 **Used By**:
+
 - All Azure Function apps (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStripe)
 - JwtValidationService for token validation
 - TokenValidationParameters in Program.cs
 
 **Validation**:
+
 - Must match the `aud` claim in JWT tokens
 - If using Application ID URI, ensure it matches what's configured in "Expose an API"
 - Tokens with different audience will be rejected
 
 **Important Notes**:
+
 - ⚠️ Use the **API** app registration client ID, NOT the SPA client ID
 - ⚠️ The audience must match what the SPA requests when acquiring tokens
 - ⚠️ In MSAL, the SPA requests: `api://{audience}/access_as_user`
 
 **Common Mistakes**:
+
 - ❌ Using SPA client ID instead of API client ID
 - ❌ Mismatch between AAD_AUDIENCE and the scope requested by SPA
 - ❌ Using `api://` prefix when expecting just the GUID
 
 **Testing the Audience**:
-Decode a JWT token at https://jwt.ms and verify the `aud` claim matches your `AAD_AUDIENCE`:
+Decode a JWT token at <https://jwt.ms> and verify the `aud` claim matches your `AAD_AUDIENCE`:
 
 ```json
 {
@@ -236,16 +254,19 @@ Decode a JWT token at https://jwt.ms and verify the `aud` claim matches your `AA
 **Where to Find**: Same as `AAD_AUDIENCE` (API app registration client ID)
 
 **When to Use**:
+
 - If your organization prefers `CLIENT_ID` naming convention
 - When migrating from configurations that use `CLIENT_ID`
 - For backwards compatibility
 
 **Example Configuration**:
+
 ```bash
 AAD_CLIENT_ID=87654321-4321-4321-4321-210987654321
 ```
 
 **Code Behavior**:
+
 ```csharp
 // In Program.cs
 var audience = configuration["AAD_AUDIENCE"] ?? configuration["AAD_CLIENT_ID"];
@@ -261,7 +282,8 @@ var audience = configuration["AAD_AUDIENCE"] ?? configuration["AAD_CLIENT_ID"];
 
 **Format**: URL (e.g., `https://custom-identity.com/.well-known/openid-configuration`)
 
-**Default Value**: 
+**Default Value**:
+
 ```
 https://login.microsoftonline.com/{AAD_TENANT_ID}/v2.0/.well-known/openid-configuration
 ```
@@ -269,26 +291,32 @@ https://login.microsoftonline.com/{AAD_TENANT_ID}/v2.0/.well-known/openid-config
 **Where to Find**:
 
 #### For Standard Entra ID
+
 You don't need to set this - the default is automatically constructed using your `AAD_TENANT_ID`.
 
 #### For Custom Identity Providers
+
 If using a non-Microsoft identity provider:
+
 1. Check the provider's documentation for their metadata endpoint
 2. Usually follows format: `{authority}/.well-known/openid-configuration`
 3. Test the URL in a browser - should return JSON with `issuer`, `jwks_uri`, etc.
 
 **Example Configuration**:
+
 ```bash
 OPEN_ID_CONNECT_METADATA_URL=https://custom-identity.example.com/.well-known/openid-configuration
 ```
 
 **When to Use**:
+
 - Testing with a mock identity provider
 - Using a custom or third-party identity provider
 - Special sovereign cloud configurations (government clouds)
 
 **Testing the Metadata URL**:
 Open the URL in a browser - should return JSON like:
+
 ```json
 {
   "issuer": "https://login.microsoftonline.com/{tenant-id}/v2.0",
@@ -300,6 +328,7 @@ Open the URL in a browser - should return JSON like:
 ```
 
 **Common Mistakes**:
+
 - ❌ Forgetting `/v2.0` in the URL for Microsoft Entra ID
 - ❌ Using HTTP instead of HTTPS
 - ❌ URL returns 404 or invalid JSON
@@ -328,11 +357,13 @@ When using the EntraIdRoleManager console application to manage app roles:
 8. **IMMEDIATELY COPY THE SECRET VALUE** - it cannot be retrieved later
 
 **Example Configuration**:
+
 ```bash
 AAD_CLIENT_SECRET=your-secret-value-here-copy-immediately
 ```
 
 **Security Best Practices**:
+
 - ✅ Store in Azure Key Vault for production use
 - ✅ Use user secrets for local development
 - ✅ Rotate secrets before expiration (set calendar reminder)
@@ -340,16 +371,19 @@ AAD_CLIENT_SECRET=your-secret-value-here-copy-immediately
 - ✅ Use minimum required permissions (Application.ReadWrite.All, AppRoleAssignment.ReadWrite.All)
 
 **Used By**:
+
 - EntraIdRoleManager console application only
 - Not needed by Azure Functions (they use user-assigned managed identities or delegated permissions)
 
 **Permissions Required**:
 The service principal needs these Microsoft Graph API permissions:
+
 - `Application.ReadWrite.All` (Application permission)
 - `AppRoleAssignment.ReadWrite.All` (Application permission)
 - `Directory.Read.All` (Application permission)
 
 **Grant Permissions**:
+
 1. In app registration → **API permissions**
 2. Add the permissions above
 3. Click **Grant admin consent for {your tenant}**
@@ -387,6 +421,7 @@ The Function Apps log configuration status at startup:
 ```
 
 If missing:
+
 ```
 [Warning] JWT authentication not configured: AAD_TENANT_ID or AAD_AUDIENCE not set
 ```
@@ -465,6 +500,7 @@ Write-Host "✅ All authentication configuration validated successfully"
 ```
 
 Run the script:
+
 ```powershell
 # Load environment variables (adjust for your config method)
 $env:AAD_TENANT_ID = "your-tenant-id"
@@ -490,11 +526,13 @@ $env:AAD_AUDIENCE = "your-audience"
 ### Issue: "AAD_TENANT_ID or AAD_AUDIENCE not set"
 
 **Symptoms:**
+
 - Warning log at startup
 - JWT authentication disabled
 - All requests succeed without authentication (dangerous!)
 
 **Resolution:**
+
 1. Verify variables are set in Function App configuration
 2. Check for typos in variable names (case-sensitive)
 3. Restart Function App after setting variables
@@ -503,21 +541,25 @@ $env:AAD_AUDIENCE = "your-audience"
 ### Issue: "Invalid issuer"
 
 **Symptoms:**
+
 - Token validation fails
 - Error: "IDX10205: Issuer validation failed"
 
 **Resolution:**
+
 1. Verify `AAD_TENANT_ID` matches the tenant that issued the token
-2. Decode token at https://jwt.ms and check `iss` claim
+2. Decode token at <https://jwt.ms> and check `iss` claim
 3. Ensure `iss` matches: `https://login.microsoftonline.com/{AAD_TENANT_ID}/v2.0`
 
 ### Issue: "Invalid audience"
 
 **Symptoms:**
+
 - Token validation fails
 - Error: "IDX10214: Audience validation failed"
 
 **Resolution:**
+
 1. Verify `AAD_AUDIENCE` matches the `aud` claim in token
 2. Check SPA is requesting correct scope: `api://{AAD_AUDIENCE}/access_as_user`
 3. Verify API app registration has correct Application ID URI
@@ -525,10 +567,12 @@ $env:AAD_AUDIENCE = "your-audience"
 ### Issue: "Metadata endpoint not accessible"
 
 **Symptoms:**
+
 - Cannot validate tokens
 - Timeout or 404 errors
 
 **Resolution:**
+
 1. Check network connectivity from Function App to `login.microsoftonline.com`
 2. Verify firewall rules allow outbound HTTPS
 3. If using custom metadata URL, verify it's correct and accessible
@@ -537,10 +581,12 @@ $env:AAD_AUDIENCE = "your-audience"
 ### Issue: Variables Set But Not Working
 
 **Symptoms:**
+
 - Variables visible in portal
 - Authentication still fails
 
 **Resolution:**
+
 1. Restart the Function App (configuration changes require restart)
 2. Check for application settings with conflicting names
 3. Verify no Azure Key Vault references are failing
@@ -549,6 +595,7 @@ $env:AAD_AUDIENCE = "your-audience"
 ## Best Practices
 
 ### Security
+
 - ✅ Use Azure Key Vault references for production: `@Microsoft.KeyVault(SecretUri=...)`
 - ✅ Use managed identities instead of service principals when possible
 - ✅ Rotate client secrets before expiration
@@ -556,18 +603,21 @@ $env:AAD_AUDIENCE = "your-audience"
 - ✅ Never commit secrets to source control
 
 ### Development
+
 - ✅ Use user secrets for local development
 - ✅ Document required variables in README
 - ✅ Provide example values in comments
 - ✅ Validate configuration at startup
 
 ### Operations
+
 - ✅ Monitor for authentication failures in Application Insights
 - ✅ Set up alerts for configuration issues
 - ✅ Document variable values in secure location (password manager, Key Vault)
 - ✅ Test configuration in staging before production
 
 ### Documentation
+
 - ✅ Keep this guide updated with new variables
 - ✅ Document where to find each value
 - ✅ Include examples and common mistakes

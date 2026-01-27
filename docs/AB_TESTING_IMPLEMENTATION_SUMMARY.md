@@ -7,6 +7,7 @@ This implementation provides a complete A/B testing configuration API for the On
 ## Implemented Components
 
 ### 1. Entity Models (`OnePageAuthorLib/entities/Experiment.cs`)
+
 - **Experiment**: Main experiment entity with id, name, page, active status, and variants
 - **ExperimentVariant**: Variant configuration with traffic percentage and config dictionary
 - **GetExperimentsRequest**: Request model with optional userId and required page
@@ -16,11 +17,13 @@ This implementation provides a complete A/B testing configuration API for the On
 ### 2. Data Layer
 
 #### Container Manager (`OnePageAuthorLib/nosql/ExperimentsContainerManager.cs`)
+
 - Creates and manages the "Experiments" container in Cosmos DB
 - Partition key: `/Page` for efficient queries by page
 - Initial throughput: 400 RU/s
 
 #### Repository Interface (`OnePageAuthorLib/interfaces/IExperimentRepository.cs`)
+
 - `GetActiveExperimentsByPageAsync(string page)` - Get active experiments for a page
 - `GetByIdAsync(string id, string page)` - Get a specific experiment
 - `CreateAsync(Experiment experiment)` - Create a new experiment
@@ -28,6 +31,7 @@ This implementation provides a complete A/B testing configuration API for the On
 - `DeleteAsync(string id, string page)` - Delete an experiment
 
 #### Repository Implementation (`OnePageAuthorLib/nosql/ExperimentRepository.cs`)
+
 - Full CRUD operations with proper error handling
 - Logging support for troubleshooting
 - Partition key-aware queries for optimal performance
@@ -35,16 +39,19 @@ This implementation provides a complete A/B testing configuration API for the On
 ### 3. Business Logic
 
 #### Service Interface (`OnePageAuthorLib/interfaces/IExperimentService.cs`)
+
 - `GetExperimentsAsync(GetExperimentsRequest)` - Get experiment assignments
 - `AssignVariant(Experiment, string bucketingKey)` - Deterministic variant assignment
 
 #### Service Implementation (`OnePageAuthorLib/services/ExperimentService.cs`)
+
 - **Consistent Bucketing**: Uses SHA256 hashing for deterministic variant assignment
 - **Traffic Allocation**: Respects traffic percentage settings for each variant
 - **Session Management**: Generates session IDs for anonymous users
 - **Validation**: Validates traffic percentages and variant configurations
 
 ### 4. API Endpoint (`InkStainedWretchFunctions/GetExperiments.cs`)
+
 - **Route**: `GET /api/experiments`
 - **Query Parameters**: `page` (required), `userId` (optional)
 - **Authorization**: Anonymous (no authentication required)
@@ -52,6 +59,7 @@ This implementation provides a complete A/B testing configuration API for the On
 - **Logging**: Comprehensive logging for monitoring and debugging
 
 ### 5. Dependency Injection (`OnePageAuthorLib/ServiceFactory.cs`)
+
 - `AddExperimentRepository()` - Registers repository and container manager
 - `AddExperimentServices()` - Registers experiment service
 - Integrated into `InkStainedWretchFunctions/Program.cs`
@@ -59,6 +67,7 @@ This implementation provides a complete A/B testing configuration API for the On
 ### 6. Testing
 
 #### Service Tests (`OnePageAuthor.Test/Services/ExperimentServiceTests.cs`)
+
 - 14 unit tests covering:
   - Constructor validation
   - Input validation
@@ -67,6 +76,7 @@ This implementation provides a complete A/B testing configuration API for the On
   - Edge cases (100% traffic, multiple variants, etc.)
 
 #### Function Tests (`OnePageAuthor.Test/InkStainedWretchFunctions/GetExperimentsTests.cs`)
+
 - 9 unit tests covering:
   - Constructor validation
   - Query parameter validation
@@ -77,6 +87,7 @@ This implementation provides a complete A/B testing configuration API for the On
 **All 23 tests passing ✅**
 
 ### 7. Sample Data Seeder (`SeedExperiments/`)
+
 - Console application to seed sample experiments
 - 4 example experiments:
   1. **Landing Page - Hero Button Color Test** (50/50 split)
@@ -86,6 +97,7 @@ This implementation provides a complete A/B testing configuration API for the On
 - Includes README with usage instructions
 
 ### 8. Documentation (`docs/AB_TESTING_API.md`)
+
 - Complete API reference
 - Request/response examples
 - Frontend integration examples (React, Vue.js)
@@ -95,32 +107,42 @@ This implementation provides a complete A/B testing configuration API for the On
 ## Key Features
 
 ### ✅ Consistent Bucketing
+
 Users always receive the same variants using SHA256 hashing of `experimentId:bucketingKey`. This ensures:
+
 - Same user sees same variants across sessions
 - A/B test results are not biased by variant switching
 - User experience remains consistent
 
 ### ✅ Multiple Concurrent Experiments
+
 Support for running multiple experiments on the same page:
+
 - Each experiment is independently bucketed
 - No cross-contamination between experiments
 - Easy to analyze individual experiment impact
 
 ### ✅ Traffic Control
+
 Fine-grained control over traffic allocation:
+
 - Percentage-based allocation per variant
 - Supports 2-way, 3-way, or N-way splits
 - Validation ensures percentages sum to 100
 
 ### ✅ Page-Based Experiments
+
 Experiments are scoped to specific pages:
+
 - Landing page experiments
 - Pricing page experiments
 - Signup page experiments
 - Any custom page identifier
 
 ### ✅ Session Tracking
+
 Automatic session ID generation:
+
 - Generated for anonymous users
 - Uses provided userId for authenticated users
 - Enables cross-session tracking
@@ -135,17 +157,20 @@ The deterministic bucketing algorithm ensures consistent variant assignment:
 4. **Assign Variant**: Map to variant based on cumulative traffic percentages
 
 Example with 50/50 split:
+
 - Hash value 0-49 → Control (50%)
 - Hash value 50-99 → Variant A (50%)
 
 ## API Usage Examples
 
 ### Get Experiments for Landing Page
+
 ```bash
 GET /api/experiments?page=landing
 ```
 
 Response:
+
 ```json
 {
   "experiments": [
@@ -164,11 +189,13 @@ Response:
 ```
 
 ### Get Experiments with User ID
+
 ```bash
 GET /api/experiments?page=pricing&userId=user-12345
 ```
 
 Response:
+
 ```json
 {
   "experiments": [
@@ -214,6 +241,7 @@ analytics.track('Experiment Exposure', {
 ## Testing the Implementation
 
 ### Run Unit Tests
+
 ```bash
 # Test experiment service
 dotnet test --filter "FullyQualifiedName~ExperimentServiceTests"
@@ -226,6 +254,7 @@ dotnet test --filter "FullyQualifiedName~Experiment"
 ```
 
 ### Seed Sample Data
+
 ```bash
 cd SeedExperiments
 export COSMOSDB_ENDPOINT_URI="your-endpoint"
@@ -235,6 +264,7 @@ dotnet run
 ```
 
 ### Test API Endpoint
+
 ```bash
 # Start the function app
 cd InkStainedWretchFunctions
@@ -248,6 +278,7 @@ curl "http://localhost:7071/api/experiments?page=pricing&userId=test-user-123"
 ## Files Created/Modified
 
 ### New Files (15)
+
 1. `OnePageAuthorLib/entities/Experiment.cs` - Entity models
 2. `OnePageAuthorLib/nosql/ExperimentsContainerManager.cs` - Container manager
 3. `OnePageAuthorLib/nosql/ExperimentRepository.cs` - Repository implementation
@@ -263,6 +294,7 @@ curl "http://localhost:7071/api/experiments?page=pricing&userId=test-user-123"
 13. `docs/AB_TESTING_API.md` - API documentation
 
 ### Modified Files (2)
+
 1. `OnePageAuthorLib/ServiceFactory.cs` - Added DI extensions
 2. `InkStainedWretchFunctions/Program.cs` - Registered services
 
@@ -307,6 +339,7 @@ The implementation meets all requirements from the issue:
 ## Conclusion
 
 The A/B Testing Configuration API is production-ready with:
+
 - Robust bucketing algorithm ensuring consistent user experiences
 - Comprehensive test coverage validating core functionality
 - Detailed documentation for frontend teams
@@ -314,6 +347,7 @@ The A/B Testing Configuration API is production-ready with:
 - Scalable architecture supporting future enhancements
 
 The implementation follows best practices from the codebase:
+
 - Repository pattern for data access
 - Service layer for business logic
 - Dependency injection for loose coupling

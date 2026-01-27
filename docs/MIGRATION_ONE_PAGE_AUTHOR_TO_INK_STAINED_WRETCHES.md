@@ -9,6 +9,7 @@ This document outlines the comprehensive changes needed to migrate all naming fr
 ## Scope Summary
 
 Based on code analysis:
+
 - **~1,734 occurrences** of "OnePageAuthor" variants in code
 - **~104 occurrences** of "one-page-author" in various files
 - **~342 occurrences** in documentation files alone
@@ -22,6 +23,7 @@ Based on code analysis:
 ### 1. Solution and Project Files
 
 #### 1.1 Solution File
+
 - **File to Rename:**
   - `OnePageAuthorAPI.sln` → `InkStainedWretches.sln` or `InkStainedWretchesAPI.sln`
 
@@ -31,6 +33,7 @@ Based on code analysis:
   - Update solution configurations
 
 #### 1.2 Project Directories to Rename
+
 1. **OnePageAuthorLib/** → **InkStainedWretchesLib/**
    - Core shared library with entities, repositories, services, orchestrators
    - Referenced by 20+ projects
@@ -42,12 +45,15 @@ Based on code analysis:
    - Comprehensive unit and integration test project
 
 #### 1.3 Project Files to Rename
+
 1. `OnePageAuthorLib/OnePageAuthorLib.csproj` → `InkStainedWretchesLib/InkStainedWretchesLib.csproj`
 2. `OnePageAuthor.DataSeeder/OnePageAuthor.DataSeeder.csproj` → `InkStainedWretches.DataSeeder/InkStainedWretches.DataSeeder.csproj`
 3. `OnePageAuthor.Test/OnePageAuthor.Test.csproj` → `InkStainedWretches.Test/InkStainedWretches.Test.csproj`
 
 #### 1.4 Project Reference Updates
+
 All projects that reference `OnePageAuthorLib` need their `.csproj` updated:
+
 - InkStainedWretchFunctions
 - AuthorInvitationTool
 - EntraIdRoleManager
@@ -70,6 +76,7 @@ All projects that reference `OnePageAuthorLib` need their `.csproj` updated:
 - SeedExperiments
 
 **Update pattern:**
+
 ```xml
 <!-- OLD -->
 <ProjectReference Include="..\OnePageAuthorLib\OnePageAuthorLib.csproj" />
@@ -83,19 +90,24 @@ All projects that reference `OnePageAuthorLib` need their `.csproj` updated:
 #### 2.1 C# Namespace Migrations
 
 **OnePageAuthorLib project namespaces:**
+
 - `OnePageAuthorLib.Api.Stripe` → `InkStainedWretchesLib.Api.Stripe`
 - `OnePageAuthorLib.Interfaces.Stripe` → `InkStainedWretchesLib.Interfaces.Stripe`
 - `OnePageAuthorLib.*` (all namespaces) → `InkStainedWretchesLib.*`
 
 **OnePageAuthor.DataSeeder project:**
+
 - `OnePageAuthorAPI.DataSeeder` → `InkStainedWretchesAPI.DataSeeder`
 
 **OnePageAuthor.Test project:**
+
 - `OnePageAuthor.Test` → `InkStainedWretches.Test`
 - `OnePageAuthor.Test.*` → `InkStainedWretches.Test.*`
 
 #### 2.2 Using Statement Updates
+
 All `using` statements referencing old namespaces need updates:
+
 ```csharp
 // OLD
 using OnePageAuthorLib.Api.Stripe;
@@ -109,7 +121,9 @@ using InkStainedWretchesLib.Services;
 ```
 
 #### 2.3 Assembly References
+
 Update in `OnePageAuthorLib/Properties/AssemblyInfo.cs`:
+
 ```csharp
 // OLD
 [assembly: InternalsVisibleTo("OnePageAuthor.Test")]
@@ -121,15 +135,18 @@ Update in `OnePageAuthorLib/Properties/AssemblyInfo.cs`:
 ### 3. Configuration and Environment Variables
 
 #### 3.1 Cosmos DB Database Name
+
 **⚠️ CRITICAL - Database Migration Decision Required**
 
 Current references to `"OnePageAuthor"` or `"OnePageAuthorDb"` in:
+
 - Environment variable: `COSMOSDB_DATABASE_ID`
 - Local settings files
 - Documentation examples
 - Infrastructure templates
 
 **Options:**
+
 1. **Keep existing database name** (recommended for production):
    - Update documentation to reflect that database retains "OnePageAuthor" name
    - Only update variable names and code references
@@ -144,7 +161,9 @@ Current references to `"OnePageAuthor"` or `"OnePageAuthorDb"` in:
 **Recommended Approach:** Keep database name as "OnePageAuthorDb" but update all code references and documentation to clarify this is historical naming.
 
 #### 3.2 Local Settings Files
+
 Update these files (if they reference project names):
+
 - `local.settings.json`
 - `InkStainedWretchFunctions/Testing/scenario*.local.settings.json`
 - Any project-specific settings files
@@ -152,19 +171,23 @@ Update these files (if they reference project names):
 ### 4. GitHub and Repository Configuration
 
 #### 4.1 GitHub Workflow Files
+
 **File:** `.github/workflows/main_onepageauthorapi.yml`
 
 **Changes needed:**
+
 - Workflow file name: `main_onepageauthorapi.yml` → `main_inkstainedwretches.yml` or `main_inkstainedwretchesapi.yml`
 - Update test command: `dotnet test OnePageAuthorAPI.sln` → `dotnet test InkStainedWretchesAPI.sln`
 - Update any references to old project names
 
 #### 4.2 Repository Name
+
 **Current:** `utdcometsoccer/one-page-author-page-api`
 
 **Proposed:** `utdcometsoccer/ink-stained-wretches-api` or similar
 
 **⚠️ Note:** Changing the repository name on GitHub will:
+
 - Update all issue and PR URLs
 - Require updating all local clones
 - Require updating CI/CD configurations
@@ -172,12 +195,14 @@ Update these files (if they reference project names):
 - GitHub provides automatic redirects, but explicit updates are better
 
 **Files containing repository URLs:**
+
 - README.md
 - Multiple documentation files in `docs/`
 - Project-specific README files
 - .github/workflows/*.yml files
 
 **Update pattern:**
+
 ```markdown
 <!-- OLD -->
 https://github.com/utdcometsoccer/one-page-author-page-api
@@ -189,9 +214,11 @@ https://github.com/utdcometsoccer/ink-stained-wretches-api
 ### 5. NPM and Package Configuration
 
 #### 5.1 package.json
+
 **File:** `package.json`
 
 **Changes:**
+
 ```json
 {
   "name": "ink-stained-wretches-api",  // OLD: "one-page-author-api"
@@ -204,9 +231,11 @@ https://github.com/utdcometsoccer/ink-stained-wretches-api
 ### 6. Visual Studio Code Configuration
 
 #### 6.1 Workspace File
+
 **File:** `.code-workspace`
 
 **Changes:**
+
 ```json
 {
   "folders": [
@@ -227,7 +256,9 @@ https://github.com/utdcometsoccer/ink-stained-wretches-api
 ### 7. Documentation Updates
 
 #### 7.1 Main README.md
+
 **Changes needed:**
+
 - Title: "OnePageAuthor API Platform" → "Ink Stained Wretches API Platform"
 - All references to OnePageAuthor projects and libraries
 - Build/test commands referencing solution file
@@ -236,16 +267,20 @@ https://github.com/utdcometsoccer/ink-stained-wretches-api
 - Repository URLs and badges
 
 #### 7.2 Copilot Instructions
+
 **File:** `.github/copilot-instructions.md`
 
 **Changes:**
+
 - Update project overview title
 - Update all project structure references
 - Update coding guideline examples
 - Update command examples
 
 #### 7.3 Project-Specific READMEs
+
 Files to update:
+
 - `OnePageAuthorLib/README.md` → `InkStainedWretchesLib/README.md`
 - `InkStainedWretchFunctions/README.md`
 - `IntegrationTestAuthorDataService/README.md`
@@ -254,7 +289,9 @@ Files to update:
 - Any other project README files
 
 #### 7.4 Documentation Directory (docs/)
+
 **~342 references** to update across documentation files including:
+
 - API-Documentation.md
 - Complete-System-Documentation.md
 - IMPLEMENTATION_SUMMARY*.md files
@@ -265,6 +302,7 @@ Files to update:
 - All other markdown files in `docs/`
 
 **Search and replace patterns:**
+
 - "OnePageAuthor API" → "Ink Stained Wretches API"
 - "OnePageAuthorLib" → "InkStainedWretchesLib"
 - "OnePageAuthor.Test" → "InkStainedWretches.Test"
@@ -275,13 +313,16 @@ Files to update:
 ### 8. PowerShell Scripts
 
 #### 8.1 Scripts Directory
+
 **Files to update:**
+
 - `Scripts/Generate-ApiDocumentation.ps1`
   - Update project names and paths
   - Update XML documentation paths
 - Any other scripts referencing project names
 
 **Example updates in Generate-ApiDocumentation.ps1:**
+
 ```powershell
 # OLD
 Name = "OnePageAuthorLib"
@@ -297,7 +338,9 @@ XmlPath = "./InkStainedWretchesLib/bin/Debug/net9.0/InkStainedWretchesLib.xml"
 ### 9. Infrastructure and Deployment
 
 #### 9.1 Azure Function App Names
+
 Current naming pattern already uses "InkStainedWretch*" for deployed resources:
+
 - `${ISW_BASE_NAME}-imageapi`
 - `${ISW_BASE_NAME}-functions`
 - `${ISW_BASE_NAME}-stripe`
@@ -305,13 +348,16 @@ Current naming pattern already uses "InkStainedWretch*" for deployed resources:
 - `function-app` (legacy, may need review)
 
 **Review needed:**
+
 - Decide if `function-app` should be renamed to fit new naming pattern
 - Ensure all infrastructure references are consistent
 
 #### 9.2 Bicep Templates
+
 **Directory:** `infra/`
 
 **Files to review:**
+
 - Check if any templates have hardcoded "OnePageAuthor" references
 - Review parameter names and descriptions
 - Update any comments or documentation
@@ -319,7 +365,9 @@ Current naming pattern already uses "InkStainedWretch*" for deployed resources:
 ### 10. Build and Test Configuration
 
 #### 10.1 Build Commands
+
 All build/test commands need solution name update:
+
 ```bash
 # OLD
 dotnet build OnePageAuthorAPI.sln -c Debug
@@ -333,11 +381,13 @@ dotnet test InkStainedWretchesAPI.sln --collect:"XPlat Code Coverage"
 ```
 
 #### 10.2 Directory.Build.props and Directory.Build.targets
+
 Check these files for any project-specific references that need updating.
 
 ## Migration Execution Plan
 
 ### Phase 1: Planning and Preparation (Non-Breaking)
+
 1. ✅ Create this migration documentation
 2. Review and approve migration approach
 3. Decide on database naming strategy
@@ -346,10 +396,12 @@ Check these files for any project-specific references that need updating.
 6. Notify team of upcoming changes
 
 ### Phase 2: Code Changes (Breaking Changes Begin)
+
 1. **Rename solution file**
    - Rename `OnePageAuthorAPI.sln` → `InkStainedWretchesAPI.sln`
 
 2. **Rename project directories** (in order to minimize broken references):
+
    ```bash
    # Rename main library first
    git mv OnePageAuthorLib InkStainedWretchesLib
@@ -362,6 +414,7 @@ Check these files for any project-specific references that need updating.
    ```
 
 3. **Rename project files within directories**
+
    ```bash
    # In each renamed directory
    git mv InkStainedWretchesLib/OnePageAuthorLib.csproj InkStainedWretchesLib/InkStainedWretchesLib.csproj
@@ -382,6 +435,7 @@ Check these files for any project-specific references that need updating.
 7. **Update project file properties** (RootNamespace, AssemblyName, DocumentationFile paths)
 
 ### Phase 3: Configuration and Scripts
+
 1. Update package.json
 2. Update .code-workspace
 3. Update PowerShell scripts
@@ -390,6 +444,7 @@ Check these files for any project-specific references that need updating.
 6. Review and update environment variable documentation
 
 ### Phase 4: Documentation
+
 1. Update README.md
 2. Update copilot-instructions.md
 3. Update all project-specific README files
@@ -397,6 +452,7 @@ Check these files for any project-specific references that need updating.
 5. Update any inline code comments referencing old names
 
 ### Phase 5: Build and Test
+
 1. Clean solution: `dotnet clean InkStainedWretchesAPI.sln`
 2. Restore packages: `dotnet restore InkStainedWretchesAPI.sln`
 3. Build solution: `dotnet build InkStainedWretchesAPI.sln -c Debug`
@@ -405,6 +461,7 @@ Check these files for any project-specific references that need updating.
 6. Run integration tests if available
 
 ### Phase 6: Repository and Deployment
+
 1. Commit all changes with clear commit message
 2. Push to migration branch
 3. Create pull request with comprehensive description
@@ -418,6 +475,7 @@ Check these files for any project-specific references that need updating.
 ## Risk Assessment and Mitigation
 
 ### High-Risk Areas
+
 1. **Database Name Changes**
    - **Risk:** Data loss, service outage
    - **Mitigation:** Keep existing database name, only update code references
@@ -431,6 +489,7 @@ Check these files for any project-specific references that need updating.
    - **Mitigation:** GitHub provides redirects, update all known references explicitly
 
 ### Medium-Risk Areas
+
 1. **Namespace Changes**
    - **Risk:** Compilation failures, missing references
    - **Mitigation:** Comprehensive testing, ensure all using statements updated
@@ -440,6 +499,7 @@ Check these files for any project-specific references that need updating.
    - **Mitigation:** Update solution file and all .csproj files systematically
 
 ### Testing Requirements
+
 1. Unit tests must pass after all changes
 2. Integration tests must pass
 3. Local development environment must build and run
@@ -449,6 +509,7 @@ Check these files for any project-specific references that need updating.
 ## Rollback Plan
 
 If critical issues are discovered:
+
 1. Keep migration branch separate from main
 2. Do not merge until fully tested
 3. If merged and issues found:
@@ -459,18 +520,21 @@ If critical issues are discovered:
 ## Post-Migration Tasks
 
 ### Immediate (Day 1)
+
 - [ ] Verify all CI/CD pipelines run successfully
 - [ ] Verify deployed Azure Functions work correctly
 - [ ] Check all documentation links work
 - [ ] Verify local development setup for team members
 
 ### Short-term (Week 1)
+
 - [ ] Monitor application logs for any unexpected errors
 - [ ] Verify external integrations (Stripe, APIs) still work
 - [ ] Update any external documentation or wikis
 - [ ] Notify users of any URL changes
 
 ### Medium-term (Month 1)
+
 - [ ] Review and close migration-related issues
 - [ ] Archive old documentation if needed
 - [ ] Update any training materials
@@ -479,12 +543,14 @@ If critical issues are discovered:
 ## Checklist Summary
 
 ### Pre-Migration
+
 - [ ] Review and approve migration plan
 - [ ] Decide on database naming strategy
 - [ ] Create migration branch
 - [ ] Notify team
 
 ### Code Changes
+
 - [ ] Rename solution file
 - [ ] Rename 3 project directories
 - [ ] Rename 3 project files
@@ -494,6 +560,7 @@ If critical issues are discovered:
 - [ ] Update AssemblyInfo.cs
 
 ### Configuration
+
 - [ ] Update package.json
 - [ ] Update .code-workspace
 - [ ] Update PowerShell scripts
@@ -501,6 +568,7 @@ If critical issues are discovered:
 - [ ] Update local.settings.json examples
 
 ### Documentation
+
 - [ ] Update README.md
 - [ ] Update copilot-instructions.md
 - [ ] Update project READMEs
@@ -508,6 +576,7 @@ If critical issues are discovered:
 - [ ] Update repository URLs
 
 ### Testing
+
 - [ ] Clean and rebuild solution
 - [ ] Run all unit tests
 - [ ] Run integration tests
@@ -515,6 +584,7 @@ If critical issues are discovered:
 - [ ] Test CI/CD pipeline
 
 ### Deployment
+
 - [ ] Commit changes
 - [ ] Create pull request
 - [ ] Code review
@@ -523,6 +593,7 @@ If critical issues are discovered:
 - [ ] Monitor deployments
 
 ### Post-Migration
+
 - [ ] Verify production functionality
 - [ ] Update team development environments
 - [ ] Monitor for issues
@@ -544,6 +615,7 @@ If critical issues are discovered:
 ## Conclusion
 
 This migration is substantial but straightforward if executed systematically. The key to success is:
+
 1. Thorough planning and team coordination
 2. Systematic execution following the phases outlined
 3. Comprehensive testing at each stage

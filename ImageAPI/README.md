@@ -22,13 +22,11 @@ The ImageAPI provides a comprehensive image management system for the OnePageAut
 
 ### Subscription Tier Support
 
-
 - **Starter (Free)**: 5MB max file size, 20 files max, 5GB storage
 - **Pro ($9.99/month)**: 10MB max file size, 500 files max, 250GB storage
 - **Elite ($19.99/month)**: 25MB max file size, 2000 files max, 2TB storage
 
 ### Security Features
-
 
 - JWT token authentication on all endpoints
 - User ownership validation for image operations
@@ -269,13 +267,11 @@ curl -X GET "https://your-api.azurewebsites.net/api/whoami" \
 
 ### Prerequisites
 
-
 - .NET 10.0 SDK
 - Azure Storage Account
 - Azure Functions Core Tools v4
 
 ### Local Development
-
 
 ```bash
 # Clone the repository
@@ -361,6 +357,7 @@ dotnet user-secrets list
 | `COSMOSDB_DATABASE_ID` | Identifies the application database | Your database name (e.g., "OnePageAuthorDb") |
 
 **Why It's Needed**: The ImageAPI uses Cosmos DB to:
+
 - Store image metadata (ID, URL, size, upload timestamp)
 - Track user image counts for subscription tier limits
 - Look up user subscription tiers for upload validation
@@ -377,18 +374,21 @@ dotnet user-secrets list
 | `AZURE_STORAGE_CONNECTION_STRING` | Full connection string for Blob Storage | Azure Portal → Storage Account → Access keys → Connection string |
 
 **How to Obtain**:
+
 1. Go to [Azure Portal](https://portal.azure.com)
 2. Navigate to your Storage Account
 3. Click **Access keys** in the left menu
 4. Click **Show** next to the connection string
 5. Copy the full connection string
 
-**Format**: 
+**Format**:
+
 ```
 DefaultEndpointsProtocol=https;AccountName=your-account;AccountKey=your-key;EndpointSuffix=core.windows.net
 ```
 
-**Why It's Needed**: 
+**Why It's Needed**:
+
 - Images are uploaded directly to Blob Storage containers
 - Provides persistent, scalable storage for user images
 - Enables CDN integration for fast image delivery
@@ -407,6 +407,7 @@ DefaultEndpointsProtocol=https;AccountName=your-account;AccountKey=your-key;Endp
 | `AAD_AUTHORITY` | Token issuer URL | `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/` for CIAM, or `https://login.microsoftonline.com/{tenant-id}/v2.0` for standard Entra ID tenants |
 
 **Why It's Needed**:
+
 - All ImageAPI endpoints require authentication
 - JWT tokens identify users and their subscription tiers
 - Ensures users can only access and delete their own images
@@ -426,6 +427,7 @@ If you have an existing `local.settings.json` file:
 ### Production Deployment
 
 For Azure deployment, configure these values in:
+
 - Azure Portal → Function App → Configuration → Application Settings
 
 ## 🧪 Testing

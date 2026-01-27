@@ -74,6 +74,7 @@ The Author Invitation System enables administrators to invite authors with exist
 ### 1. Core Entities
 
 #### AuthorInvitation Entity
+
 Located: `OnePageAuthorLib/entities/AuthorInvitation.cs`
 
 ```csharp
@@ -94,9 +95,11 @@ public class AuthorInvitation
 ### 2. Repository Layer
 
 #### IAuthorInvitationRepository
+
 Located: `OnePageAuthorLib/interfaces/IAuthorInvitationRepository.cs`
 
 Methods:
+
 - `GetByIdAsync(string id)` - Get invitation by ID
 - `GetByEmailAsync(string emailAddress)` - Get invitation by email
 - `GetByDomainAsync(string domainName)` - Get invitations for domain
@@ -106,15 +109,18 @@ Methods:
 - `DeleteAsync(string id)` - Delete invitation
 
 #### AuthorInvitationRepository
+
 Located: `OnePageAuthorLib/nosql/AuthorInvitationRepository.cs`
 
 Cosmos DB implementation using:
+
 - Container: `AuthorInvitations`
 - Partition Key: `/EmailAddress`
 
 ### 3. Email Service
 
 #### IEmailService
+
 Located: `OnePageAuthorLib/interfaces/IEmailService.cs`
 
 ```csharp
@@ -128,9 +134,11 @@ public interface IEmailService
 ```
 
 #### AzureCommunicationEmailService
+
 Located: `OnePageAuthorLib/services/AzureCommunicationEmailService.cs`
 
 Features:
+
 - HTML and plain text email templates
 - Professional formatting with branding
 - Error handling and logging
@@ -139,9 +147,11 @@ Features:
 ### 4. Command-Line Tool
 
 #### AuthorInvitationTool
+
 Located: `AuthorInvitationTool/`
 
 Features:
+
 - Command-line argument parsing
 - Configuration via appsettings.json, user secrets, or environment variables
 - Input validation
@@ -154,12 +164,14 @@ Features:
 #### Bicep Templates
 
 **communication-services.bicep**
+
 - Azure Communication Services resource
 - Email Service with Azure Managed Domain
 - Sender username configuration
 - Outputs for connection string retrieval
 
 **inkstainedwretches.bicep** (updated)
+
 - Optional Communication Services deployment
 - Integration with existing infrastructure
 - Conditional deployment based on parameter
@@ -332,6 +344,7 @@ export ACS_SENDER_ADDRESS="DoNotReply@domain.com"
 ## Email Service Setup
 
 For detailed email service configuration, see:
+
 - [Azure Communication Services Setup Guide](./AZURE_COMMUNICATION_SERVICES_SETUP.md)
 
 Quick steps:
@@ -398,22 +411,27 @@ dotnet run -- test@example.com testdomain.com
 ### Common Issues
 
 #### Issue: "COSMOSDB_ENDPOINT_URI is required"
+
 **Cause**: Missing Cosmos DB configuration
 **Solution**: Configure via user secrets or environment variables
 
 #### Issue: "Invalid email address format"
+
 **Cause**: Malformed email address
-**Solution**: Verify email format (user@domain.com)
+**Solution**: Verify email format (<user@domain.com>)
 
 #### Issue: Email not received
+
 **Cause**: ACS not configured or domain not verified
-**Solution**: 
+**Solution**:
+
 1. Check ACS configuration
 2. Verify domain in Azure Portal
 3. Check spam folder
 4. Review email service logs
 
 #### Issue: "An invitation already exists"
+
 **Cause**: Duplicate invitation for same email
 **Solution**: Choose to create duplicate or update existing
 
@@ -522,6 +540,7 @@ Before deploying to production:
 ### Contributing
 
 See CONTRIBUTING.md for guidelines on:
+
 - Code style and conventions
 - Pull request process
 - Testing requirements
@@ -543,6 +562,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ### Version 1.0.0 (2024-12-08)
 
 **Added:**
+
 - AuthorInvitation entity with full CRUD operations
 - Command-line tool for sending invitations
 - Azure Communication Services integration for email
@@ -551,6 +571,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - GitHub Actions workflow integration
 
 **Features:**
+
 - Cosmos DB storage with 30-day expiration
 - Email notifications with HTML templates
 - Input validation (email, domain)

@@ -37,6 +37,7 @@ The workflow also references an existing `COSMOSDB_CONNECTION_STRING` secret tha
 2. **For new deployments**: After deploying a new Cosmos DB Account using this workflow, you should update the `COSMOSDB_CONNECTION_STRING` secret with the connection string from the newly deployed account
 
 **To retrieve the connection string after deployment:**
+
 ```bash
 az cosmosdb keys list --name <COSMOSDB_ACCOUNT_NAME> --resource-group <COSMOSDB_RESOURCE_GROUP> --type connection-strings --query "connectionStrings[0].connectionString" -o tsv
 ```
@@ -66,6 +67,7 @@ The workflow will:
    - If it exists, skip deployment
 
 **Cosmos DB Configuration**:
+
 - **Capacity Mode**: Serverless (no pre-provisioned throughput required)
 - **API**: Core (SQL) API
 - **Consistency Level**: Session (default)
@@ -87,6 +89,7 @@ The workflow will:
    - If it exists, skip deployment
 
 **Application Insights Configuration**:
+
 - **Application Type**: Web
 - **Retention**: 90 days
 - **Public Access**: Enabled for ingestion and query
@@ -98,11 +101,13 @@ The workflow will:
 Location: `infra/cosmosdb.bicep`
 
 This template creates:
+
 - Azure Cosmos DB Account with serverless capacity
 - Configured for Core (SQL) API
 - Optimized for development and production workloads
 
 Key outputs:
+
 - `cosmosDbAccountName` - Account name
 - `cosmosDbAccountId` - Resource ID
 - `cosmosDbEndpoint` - Endpoint URI
@@ -114,11 +119,13 @@ Key outputs:
 Location: `infra/applicationinsights.bicep`
 
 This template creates:
+
 - Application Insights resource for monitoring
 - Configured for web application monitoring
 - 90-day retention period
 
 Key outputs:
+
 - `appInsightsName` - Resource name
 - `appInsightsId` - Resource ID
 - `appInsightsInstrumentationKey` - Instrumentation key (sensitive)
@@ -199,6 +206,7 @@ ISW_BASE_NAME=onepageauthor-dev
 ### Deployment Fails with "Free tier already used"
 
 Only one Cosmos DB account per subscription can use the free tier. Either:
+
 - Set `COSMOSDB_ENABLE_FREE_TIER=false`
 - Or use a different subscription
 
@@ -212,19 +220,19 @@ Ensure your Azure credentials (`AZURE_CREDENTIALS` secret) have permission to cr
 
 ## Security Considerations
 
-1. **Sensitive Outputs Protection**: 
+1. **Sensitive Outputs Protection**:
    - Connection strings and keys are NOT displayed in workflow logs to prevent exposure
    - Sensitive values can be retrieved securely using Azure CLI or Azure Portal after deployment
    - For Cosmos DB: `az cosmosdb keys list --name <account-name> --resource-group <rg-name>`
    - For Application Insights: `az monitor app-insights component show --app <app-name> --resource-group <rg-name>`
-   
+
 2. **Secrets Protection**: The Bicep templates output sensitive information which is only accessible to authorized users with proper Azure permissions
 
 3. **Public Network Access**: Both resources are configured with public network access enabled. For production, consider:
    - Implementing private endpoints
    - Configuring IP firewall rules
    - Using managed identities instead of connection strings
-   
+
 4. **TLS Version**: Minimum TLS 1.2 is enforced for Cosmos DB
 
 5. **Access Control**: Ensure GitHub Actions secrets are properly secured and only accessible to authorized repository collaborators
@@ -232,11 +240,13 @@ Ensure your Azure credentials (`AZURE_CREDENTIALS` secret) have permission to cr
 ## Cost Considerations
 
 ### Cosmos DB
+
 - **Serverless mode**: Pay only for Request Units (RUs) consumed
 - **Free tier**: 1000 RU/s and 25 GB storage (one per subscription)
 - **Estimated cost**: $0.25 per million RUs for serverless mode
 
 ### Application Insights
+
 - **First 5 GB/month**: Free
 - **Additional data**: ~$2.30/GB
 - **Estimated cost**: Minimal for typical development/testing workloads
@@ -244,6 +254,7 @@ Ensure your Azure credentials (`AZURE_CREDENTIALS` secret) have permission to cr
 ## Support
 
 For issues or questions:
+
 - Review workflow run logs in GitHub Actions
 - Check Azure Portal for resource deployment status
 - Consult Azure documentation for service-specific issues

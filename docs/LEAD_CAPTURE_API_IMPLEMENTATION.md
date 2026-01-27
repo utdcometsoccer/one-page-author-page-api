@@ -1,12 +1,15 @@
 # Lead Capture API - Implementation Summary
 
 ## Overview
+
 This document summarizes the implementation of the Lead Capture API, a public endpoint for capturing email leads from landing pages, blogs, and other marketing sources.
 
 ## Endpoint
+
 **POST** `/api/leads` - Public endpoint (no authentication required)
 
 ## Request Format
+
 ```json
 {
   "email": "user@example.com",
@@ -23,12 +26,14 @@ This document summarizes the implementation of the Lead Capture API, a public en
 ```
 
 ### Valid Sources
+
 - `landing_page`
 - `blog`
 - `exit_intent`
 - `newsletter`
 
 ## Response Format
+
 ```json
 {
   "id": "lead-123",
@@ -38,10 +43,12 @@ This document summarizes the implementation of the Lead Capture API, a public en
 ```
 
 Status can be:
+
 - `created` - New lead was created (HTTP 201)
 - `existing` - Email already registered (HTTP 200)
 
 ## Error Codes
+
 - **400 Bad Request** - Invalid email format, missing required fields, or invalid source
 - **429 Too Many Requests** - Rate limit exceeded (10 requests per IP per minute)
 - **500 Internal Server Error** - Server-side error
@@ -49,6 +56,7 @@ Status can be:
 ## Implementation Details
 
 ### Entity Model (`Lead.cs`)
+
 - Comprehensive lead tracking with all required fields
 - Email normalization to lowercase for consistency
 - Email domain extraction for efficient partitioning
@@ -58,6 +66,7 @@ Status can be:
 - Email service status tracking
 
 ### Repository (`LeadRepository.cs`)
+
 - Implements `ILeadRepository` interface
 - Cosmos DB storage with `emailDomain` partition key
 - Duplicate detection based on email address
@@ -65,6 +74,7 @@ Status can be:
 - Thread-safe operations
 
 ### Service (`LeadService.cs`)
+
 - Implements `ILeadService` interface
 - Email validation using multiple methods:
   - DataAnnotations EmailAddressAttribute
@@ -75,6 +85,7 @@ Status can be:
 - Placeholder for email service integration (Mailchimp/ConvertKit)
 
 ### Rate Limiting (`RateLimitService.cs`)
+
 - In-memory rate limiting (10 requests per IP per minute)
 - Thread-safe implementation using `ConcurrentBag` and locking
 - Per-IP and per-endpoint tracking
@@ -83,6 +94,7 @@ Status can be:
 - **Note**: For production at scale, consider using Redis or Azure Cache for Redis
 
 ### Azure Function (`LeadCaptureFunction.cs`)
+
 - Public HTTP endpoint (AuthorizationLevel.Anonymous)
 - Comprehensive error handling with appropriate status codes
 - Rate limit enforcement before processing
@@ -93,6 +105,7 @@ Status can be:
 ## Data Storage
 
 ### Cosmos DB Container
+
 - Container Name: `Leads`
 - Partition Key: `/emailDomain`
 - Benefits:
@@ -103,6 +116,7 @@ Status can be:
 ## Testing
 
 ### Test Coverage (42 tests, all passing)
+
 1. **LeadServiceTests** (21 tests)
    - Lead creation with valid and invalid data
    - Email validation (multiple test cases)
@@ -128,6 +142,7 @@ Status can be:
 ## Security Considerations
 
 ### Implemented
+
 ✅ Email validation to prevent injection attacks
 ✅ Input validation using DataAnnotations
 ✅ Rate limiting to prevent abuse
@@ -137,6 +152,7 @@ Status can be:
 ✅ IP address tracking for analytics and rate limiting
 
 ### Recommendations for Production
+
 1. **Rate Limiting**: Move to distributed cache (Redis) for multi-instance scenarios
 2. **DDoS Protection**: Use Azure Front Door or Application Gateway with WAF rules
 3. **Monitoring**: Set up Application Insights alerts for:
@@ -158,6 +174,7 @@ The code includes a placeholder for email service integration. To complete:
 6. Implement retry logic for failed syncs
 
 ### Example Integration Points
+
 ```csharp
 // In LeadService.CreateLeadAsync after lead creation:
 // await _emailService.SyncLeadAsync(createdLead);
@@ -169,11 +186,13 @@ The code includes a placeholder for email service integration. To complete:
 ## Configuration
 
 ### Required Environment Variables
+
 - `COSMOSDB_ENDPOINT_URI` - Cosmos DB endpoint
 - `COSMOSDB_PRIMARY_KEY` - Cosmos DB key
 - `COSMOSDB_DATABASE_ID` - Database name
 
 ### Optional Configuration
+
 - Rate limit max requests per minute (default: 10)
 
 ## Deployment Notes

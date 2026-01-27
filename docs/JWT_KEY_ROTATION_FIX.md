@@ -207,6 +207,7 @@ This reduces the likelihood of reactive refreshes during validation.
 | `RefreshInterval` | 30 minutes | Rate limit to prevent hammering the metadata endpoint |
 
 These settings match the configuration used in:
+
 - `ImageAPI/Program.cs`
 - `InkStainedWretchFunctions/Program.cs`
 - `InkStainedWretchStripe/Program.cs`
@@ -246,17 +247,20 @@ All existing tests continue to pass with the new implementation.
 The implementation includes comprehensive logging:
 
 ### Initialization
+
 ```
 [Information] Initializing ConfigurationManager with metadata URL: https://login.microsoftonline.com/{tenant}/v2.0/.well-known/openid-configuration
 ```
 
 ### Normal Validation
+
 ```
 [Debug] Attempting to validate JWT token with 3 segments
 [Information] JWT token validated successfully for user: {UserId}
 ```
 
 ### Key Rotation Detected
+
 ```
 [Warning] Signing key not found in current configuration. Attempting to refresh metadata and retry validation.
 [Debug] Retrying JWT token validation with refreshed signing keys
@@ -266,6 +270,7 @@ The implementation includes comprehensive logging:
 ### Monitor These Logs
 
 Set up Application Insights alerts for:
+
 - Frequency of "refresh metadata and retry validation" messages
 - Any repeated failures after retry
 - Unusual patterns in key refresh timing
@@ -286,6 +291,7 @@ Set up Application Insights alerts for:
 ### Mitigation
 
 The 6-hour automatic refresh interval means:
+
 - Most key rotations are handled proactively
 - Reactive refreshes (during validation) are rare
 - Impact is limited to a single request per instance
@@ -325,6 +331,7 @@ catch (SecurityTokenSignatureKeyNotFoundException)
 ```
 
 Both approaches achieve the same result:
+
 - ✅ Automatic key refresh on rotation
 - ✅ Retry validation after refresh
 - ✅ Configurable refresh intervals
@@ -334,11 +341,13 @@ Both approaches achieve the same result:
 ### Issue: Still seeing SecurityTokenSignatureKeyNotFoundException
 
 **Possible Causes:**
+
 1. Network connectivity issues preventing metadata refresh
 2. Metadata endpoint unavailable
 3. Incorrect tenant ID or metadata URL
 
 **Resolution:**
+
 1. Check Application Insights for metadata fetch errors
 2. Verify `AAD_TENANT_ID` or `OPEN_ID_CONNECT_METADATA_URL` configuration
 3. Test connectivity to `https://login.microsoftonline.com`
@@ -346,10 +355,12 @@ Both approaches achieve the same result:
 ### Issue: High frequency of metadata refreshes
 
 **Possible Causes:**
+
 1. Multiple application instances independently refreshing
 2. Azure AD rotating keys more frequently than expected
 
 **Resolution:**
+
 1. This is expected behavior - each instance maintains its own cache
 2. The 30-minute `RefreshInterval` provides rate limiting
 3. Consider implementing distributed caching if this becomes a concern
@@ -357,10 +368,12 @@ Both approaches achieve the same result:
 ### Issue: Intermittent authentication failures
 
 **Possible Causes:**
+
 1. Race condition during first initialization
 2. Transient network issues during metadata fetch
 
 **Resolution:**
+
 1. Check for lock contention in logs
 2. Verify `SemaphoreSlim` is working correctly
 3. Consider increasing timeout for metadata requests

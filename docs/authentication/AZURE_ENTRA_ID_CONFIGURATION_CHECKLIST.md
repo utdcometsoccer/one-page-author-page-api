@@ -168,9 +168,11 @@ For each Function App (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStri
 
 - [ ] Navigate to Function App → Log stream
 - [ ] Look for startup log:
+
   ```
   JWT authentication configured with tenant: {tenant-id}, audience: {audience}
   ```
+
 - [ ] If warning appears, verify environment variables are set correctly
 
 ## Phase 5: Configure Local Development
@@ -180,6 +182,7 @@ For each Function App (ImageAPI, InkStainedWretchFunctions, InkStainedWretchStri
 For each project:
 
 - [ ] ImageAPI:
+
   ```bash
   cd ImageAPI
   dotnet user-secrets set "AAD_TENANT_ID" "your-tenant-id"
@@ -188,6 +191,7 @@ For each project:
   ```
 
 - [ ] InkStainedWretchFunctions:
+
   ```bash
   cd InkStainedWretchFunctions
   dotnet user-secrets set "AAD_TENANT_ID" "your-tenant-id"
@@ -196,6 +200,7 @@ For each project:
   ```
 
 - [ ] InkStainedWretchStripe:
+
   ```bash
   cd InkStainedWretchStripe
   dotnet user-secrets set "AAD_TENANT_ID" "your-tenant-id"
@@ -213,6 +218,7 @@ For each project:
 ### Install MSAL Package
 
 - [ ] Install MSAL library:
+
   ```bash
   npm install @azure/msal-browser @azure/msal-react
   ```
@@ -220,6 +226,7 @@ For each project:
 ### Create MSAL Configuration
 
 - [ ] Create `src/authConfig.js` (or equivalent):
+
   ```javascript
   export const msalConfig = {
     auth: {
@@ -255,12 +262,14 @@ For each Function App project:
 
 - [ ] Open `Program.cs`
 - [ ] Verify configuration reads environment variables:
+
   ```csharp
   var tenantId = configuration["AAD_TENANT_ID"];
   var audience = configuration["AAD_AUDIENCE"] ?? configuration["AAD_CLIENT_ID"];
   ```
 
 - [ ] Verify JWT Bearer authentication is configured:
+
   ```csharp
   builder.Services
       .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -268,11 +277,13 @@ For each Function App project:
   ```
 
 - [ ] Verify RefreshOnIssuerKeyNotFound is enabled:
+
   ```csharp
   options.RefreshOnIssuerKeyNotFound = true;
   ```
 
 - [ ] Verify ConfigurationManager with refresh intervals:
+
   ```csharp
   options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
       metadataAddress,
@@ -307,31 +318,37 @@ For each Function App project:
 
 - [ ] Obtain access token from SPA
 - [ ] Test authenticated endpoint:
+
   ```bash
   curl -X GET "https://your-function.azurewebsites.net/api/domain-registrations" \
     -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
   ```
+
 - [ ] Expected: HTTP 200 OK with data
 
 #### Test Authentication Failures
 
 - [ ] Test without token:
+
   ```bash
   curl -X GET "https://your-function.azurewebsites.net/api/domain-registrations"
   ```
+
   - [ ] Expected: HTTP 401 Unauthorized
 
 - [ ] Test with invalid token:
+
   ```bash
   curl -X GET "https://your-function.azurewebsites.net/api/domain-registrations" \
     -H "Authorization: Bearer invalid-token"
   ```
+
   - [ ] Expected: HTTP 401 Unauthorized
 
 ### Validate JWT Token
 
 - [ ] Copy access token from browser (local storage or network tab)
-- [ ] Go to https://jwt.ms
+- [ ] Go to <https://jwt.ms>
 - [ ] Paste token
 - [ ] Verify claims:
   - [ ] `aud` matches `AAD_AUDIENCE`
@@ -485,9 +502,10 @@ If you encounter issues during configuration:
 ## Support
 
 For additional help:
+
 - Review complete documentation in `docs/authentication/`
 - Check Application Insights logs
-- Consult Microsoft Entra ID documentation: https://learn.microsoft.com/en-us/entra/
+- Consult Microsoft Entra ID documentation: <https://learn.microsoft.com/en-us/entra/>
 
 ## Version History
 

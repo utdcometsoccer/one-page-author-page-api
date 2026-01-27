@@ -15,6 +15,7 @@ This is a sample Azure Monitor Workbook configuration for monitoring authenticat
 ### Section 1: Authenticated Function Activity Overview
 
 **Query:**
+
 ```kql
 let timeRange = {TimeRange};
 customEvents
@@ -38,6 +39,7 @@ customEvents
 ### Section 2: User Activity Timeline
 
 **Query:**
+
 ```kql
 let timeRange = {TimeRange};
 customEvents
@@ -58,6 +60,7 @@ customEvents
 ### Section 3: Error Rate Analysis
 
 **Query:**
+
 ```kql
 let timeRange = {TimeRange};
 let calls = customEvents
@@ -87,6 +90,7 @@ calls
 ### Section 4: Top Active Users
 
 **Query:**
+
 ```kql
 let timeRange = {TimeRange};
 customEvents
@@ -113,6 +117,7 @@ customEvents
 ### Section 5: Recent Errors (Detailed)
 
 **Query:**
+
 ```kql
 let timeRange = {TimeRange};
 customEvents
@@ -143,6 +148,7 @@ customEvents
 ### Section 6: Subscription Management Activity
 
 **Query:**
+
 ```kql
 let timeRange = {TimeRange};
 customEvents
@@ -167,6 +173,7 @@ customEvents
 ### Section 7: Testimonial Operations
 
 **Query:**
+
 ```kql
 let timeRange = {TimeRange};
 let operations = customEvents
@@ -200,15 +207,18 @@ operations
 Add these parameters to your workbook for dynamic filtering:
 
 ### Time Range Parameter
+
 - **Name:** TimeRange
 - **Type:** Time Range Picker
 - **Default:** Last 24 hours
 - **Available Ranges:** Last hour, Last 24 hours, Last 7 days, Last 30 days, Custom
 
 ### Function Name Filter (Optional)
+
 - **Name:** FunctionFilter
 - **Type:** Dropdown (Multi-select)
 - **Query:**
+
 ```kql
 customEvents
 | where name == 'AuthenticatedFunctionCall'
@@ -216,9 +226,11 @@ customEvents
 | distinct FunctionName
 | order by FunctionName asc
 ```
+
 - **Default:** All
 
 ### User Filter (Optional)
+
 - **Name:** UserFilter
 - **Type:** Text Input
 - **Label:** Filter by User ID
@@ -229,8 +241,10 @@ customEvents
 Consider setting up these alerts based on the queries:
 
 ### High Error Rate Alert
+
 - **Condition:** Error rate > 10% over 5 minutes
 - **Query:**
+
 ```kql
 let errors = customEvents
 | where name == 'AuthenticatedFunctionError'
@@ -244,8 +258,10 @@ errors
 ```
 
 ### Low Activity Alert
+
 - **Condition:** No activity for 1 hour
 - **Query:**
+
 ```kql
 customEvents
 | where name == 'AuthenticatedFunctionCall'
@@ -255,8 +271,10 @@ customEvents
 ```
 
 ### Suspicious Activity Alert
+
 - **Condition:** User makes > 100 calls in 5 minutes
 - **Query:**
+
 ```kql
 customEvents
 | where name == 'AuthenticatedFunctionCall'
@@ -277,19 +295,25 @@ customEvents
 ## Advanced Customization
 
 ### Adding User-Specific Views
+
 Modify queries to filter by specific user:
+
 ```kql
 | where UserId == "{UserFilter}"
 ```
 
 ### Adding Email Domain Filtering
+
 Filter by organization:
+
 ```kql
 | where UserEmailDomain == "example.com"
 ```
 
 ### Performance Metrics
+
 Add custom metrics to track operation duration (if instrumented):
+
 ```kql
 | extend Duration = todouble(customMeasurements["Duration"])
 | summarize AvgDuration = avg(Duration), P95Duration = percentile(Duration, 95)

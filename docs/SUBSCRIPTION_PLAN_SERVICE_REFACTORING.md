@@ -8,7 +8,6 @@ This document describes the refactoring of the static `MapToSubscriptionPlan` me
 
 ### 1. Created New Service Interface
 
-
 - **File**: `OnePageAuthorLib/interfaces/Stripe/ISubscriptionPlanService.cs`
 - **Purpose**: Defines the contract for mapping Stripe prices to subscription plans with feature retrieval
 - **Methods**:
@@ -17,7 +16,6 @@ This document describes the refactoring of the static `MapToSubscriptionPlan` me
   - `MapToSubscriptionPlansAsync(IEnumerable<PriceDto> priceDtos)`: Maps multiple prices to subscription plans
 
 ### 2. Created Service Implementation
-
 
 - **File**: `OnePageAuthorLib/api/Stripe/SubscriptionPlanService.cs`
 - **Purpose**: Implements the subscription plan mapping service with Stripe integration
@@ -33,13 +31,11 @@ This document describes the refactoring of the static `MapToSubscriptionPlan` me
 
 ### 3. Updated Service Registration
 
-
 - **File**: `OnePageAuthorLib/ServiceFactory.cs`
 - **Change**: Added `ISubscriptionPlanService` registration in `AddStripeServices()` method
 - **Scope**: Registered as Scoped for proper dependency injection lifecycle
 
 ### 4. Updated PricesServiceWrapper
-
 
 - **File**: `OnePageAuthorLib/api/Stripe/PricesServiceWrapper.cs`
 - **Changes**:
@@ -51,13 +47,11 @@ This document describes the refactoring of the static `MapToSubscriptionPlan` me
 
 ### 5. Marked Legacy Method as Obsolete
 
-
 - **File**: `OnePageAuthorLib/Utility.cs`
 - **Change**: Added `[Obsolete]` attribute to `MapToSubscriptionPlan` static method
 - **Message**: Directs users to use the new `ISubscriptionPlanService.MapToSubscriptionPlanAsync` instead
 
 ### 6. Comprehensive Test Coverage
-
 
 - **File**: `OnePageAuthor.Test/API/Stripe/SubscriptionPlanServiceTests.cs`
 - **Tests**: 11 comprehensive tests covering:
@@ -81,7 +75,6 @@ This document describes the refactoring of the static `MapToSubscriptionPlan` me
 
 ### Before (Static Method)
 
-
 - ❌ No dependency injection support
 - ❌ Empty features list (hardcoded)
 - ❌ No access to Stripe Product API
@@ -89,7 +82,6 @@ This document describes the refactoring of the static `MapToSubscriptionPlan` me
 - ❌ Tight coupling
 
 ### After (Dependency Injection Service)
-
 
 - ✅ Full dependency injection support
 - ✅ Real features retrieved from Stripe Product API
@@ -114,14 +106,12 @@ When metadata is unavailable, the service provides intelligent defaults based on
 
 #### Basic/Starter Plans
 
-
 - Basic author profile
 - Single book listing
 - Contact form
 - Basic social media links
 
 #### Professional/Pro Plans
-
 
 - Professional author profile
 - Unlimited book listings
@@ -132,7 +122,6 @@ When metadata is unavailable, the service provides intelligent defaults based on
 - Priority support
 
 #### Enterprise/Business Plans
-
 
 - Enterprise author profile
 - Unlimited everything
@@ -146,7 +135,6 @@ When metadata is unavailable, the service provides intelligent defaults based on
 
 #### Default Plans
 
-
 - Author profile
 - Book listings
 - Contact information
@@ -156,7 +144,6 @@ When metadata is unavailable, the service provides intelligent defaults based on
 
 ### Before (Static Method)
 
-
 ```csharp
 var subscriptionPlan = Utility.MapToSubscriptionPlan(priceDto);
 // Features would always be empty
@@ -164,7 +151,6 @@ var subscriptionPlan = Utility.MapToSubscriptionPlan(priceDto);
 ```
 
 ### After (Dependency Injection)
-
 
 ```csharp
 public class MyService
@@ -190,14 +176,12 @@ public class MyService
 
 ### For Existing Code
 
-
 1. Replace static method calls with injected service
 2. Add `ISubscriptionPlanService` to constructor dependencies
 3. Change synchronous calls to async/await pattern
 4. Update return type handling from synchronous to async
 
 ### For New Code
-
 
 - Always use `ISubscriptionPlanService` for subscription plan mapping
 - Features will be automatically populated from Stripe
@@ -213,7 +197,6 @@ The service includes robust error handling:
 - All errors are properly logged for debugging
 
 ## Performance Considerations
-
 
 - Async/await pattern for non-blocking I/O
 - Stripe API calls are cached by Stripe's SDK
