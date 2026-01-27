@@ -14,12 +14,14 @@ This document contains the GitHub issues that should be created to track the pro
 Implement consistent error handling middleware and standardized error response format across all Azure Function apps to improve client integration and debugging.
 
 **Current State:**
+
 - Inconsistent error response formats across different APIs
 - Some endpoints return error strings, others return objects
 - No standard correlation IDs for request tracking
 - Difficult for clients to handle errors consistently
 
 **Proposed Solution:**
+
 1. Create standard error response DTO with:
    - Error code
    - Error message
@@ -32,6 +34,7 @@ Implement consistent error handling middleware and standardized error response f
 5. Document error responses in OpenAPI specs
 
 **Success Criteria:**
+
 - [ ] All endpoints return consistent error format
 - [ ] Correlation IDs present in all responses
 - [ ] Error handling middleware implemented in all Function apps
@@ -53,12 +56,14 @@ Implement consistent error handling middleware and standardized error response f
 Add Redis caching layer to reduce Cosmos DB queries and improve API response times for frequently accessed data.
 
 **Current State:**
+
 - Every request hits Cosmos DB directly
 - High latency for read-heavy endpoints
 - Increased Cosmos DB costs
 - No caching strategy in place
 
 **Proposed Solution:**
+
 1. Provision Azure Redis Cache
 2. Implement caching abstraction layer
 3. Add cache-aside pattern for read operations
@@ -67,6 +72,7 @@ Add Redis caching layer to reduce Cosmos DB queries and improve API response tim
 6. Document caching patterns and best practices
 
 **Target Endpoints:**
+
 - Localization text (high read frequency)
 - Author profiles (read-heavy)
 - Subscription plans (rarely changes)
@@ -74,6 +80,7 @@ Add Redis caching layer to reduce Cosmos DB queries and improve API response tim
 - Image storage tiers (rarely changes)
 
 **Success Criteria:**
+
 - [ ] Redis Cache provisioned and configured
 - [ ] Caching abstraction implemented
 - [ ] Top 5 read-heavy endpoints cached
@@ -96,6 +103,7 @@ Add Redis caching layer to reduce Cosmos DB queries and improve API response tim
 Expand unit and integration test coverage across all projects to achieve 85% code coverage target.
 
 **Current State:**
+
 - Overall test coverage: ~70%
 - OnePageAuthorLib: ~75%
 - Function apps: 55-60%
@@ -104,6 +112,7 @@ Expand unit and integration test coverage across all projects to achieve 85% cod
 - No end-to-end tests
 
 **Proposed Solution:**
+
 1. Audit current test coverage per component
 2. Identify untested code paths
 3. Add unit tests for business logic gaps
@@ -117,6 +126,7 @@ Expand unit and integration test coverage across all projects to achieve 85% cod
 7. Set up code coverage reporting in CI/CD
 
 **Success Criteria:**
+
 - [ ] OnePageAuthorLib: 85%+ coverage
 - [ ] All Function apps: 75%+ coverage
 - [ ] Critical workflows have integration tests
@@ -139,6 +149,7 @@ Expand unit and integration test coverage across all projects to achieve 85% cod
 Finish the A/B testing framework by implementing frontend variant rendering and analytics integration.
 
 **Current State:**
+
 - Backend API for experiment management completed
 - Experiment data model and seeding implemented
 - Frontend variant rendering not implemented
@@ -146,6 +157,7 @@ Finish the A/B testing framework by implementing frontend variant rendering and 
 - No dashboard for experiment results
 
 **Proposed Solution:**
+
 1. Implement frontend variant assignment logic
 2. Create React/JavaScript SDK for variant rendering
 3. Add analytics tracking for experiment events
@@ -155,6 +167,7 @@ Finish the A/B testing framework by implementing frontend variant rendering and 
 7. Create example experiments
 
 **Success Criteria:**
+
 - [ ] Frontend SDK can assign and track variants
 - [ ] Variants render correctly based on assignment
 - [ ] Analytics events tracked in Application Insights
@@ -178,6 +191,7 @@ Finish the A/B testing framework by implementing frontend variant rendering and 
 Create comprehensive integration test suite for all Stripe payment processing workflows to ensure reliability and prevent regressions.
 
 **Current State:**
+
 - Basic unit tests exist for payment calculations
 - Limited integration tests with Stripe
 - Webhook handling not fully tested
@@ -185,6 +199,7 @@ Create comprehensive integration test suite for all Stripe payment processing wo
 - No tests for subscription lifecycle
 
 **Proposed Solution:**
+
 1. Create Stripe webhook simulator for testing
 2. Add integration tests for:
    - Customer creation workflow
@@ -202,6 +217,7 @@ Create comprehensive integration test suite for all Stripe payment processing wo
 5. Add test data factories for Stripe entities
 
 **Success Criteria:**
+
 - [ ] All payment workflows have integration tests
 - [ ] Webhook event handling tested comprehensively
 - [ ] Edge cases and error scenarios covered
@@ -226,6 +242,7 @@ Create comprehensive integration test suite for all Stripe payment processing wo
 Implement Azure API Management or custom gateway to centralize API routing, authentication, and rate limiting.
 
 **Current State:**
+
 - Each Function app handles routing independently
 - No centralized rate limiting
 - Authentication duplicated across apps
@@ -233,6 +250,7 @@ Implement Azure API Management or custom gateway to centralize API routing, auth
 - Difficult to apply cross-cutting concerns
 
 **Proposed Solution:**
+
 1. Evaluate Azure API Management vs. custom gateway
 2. Design gateway architecture
 3. Provision and configure API Management
@@ -244,6 +262,7 @@ Implement Azure API Management or custom gateway to centralize API routing, auth
 9. Update client applications to use gateway
 
 **Success Criteria:**
+
 - [ ] API Gateway deployed and configured
 - [ ] All APIs routed through gateway
 - [ ] Rate limiting working per tier
@@ -267,6 +286,7 @@ Implement Azure API Management or custom gateway to centralize API routing, auth
 Implement automatic OpenAPI specification generation from code to improve API documentation and client integration.
 
 **Current State:**
+
 - API documentation is manual markdown files
 - No machine-readable API specs
 - Difficult for clients to generate SDKs
@@ -274,6 +294,7 @@ Implement automatic OpenAPI specification generation from code to improve API do
 - No interactive API explorer
 
 **Proposed Solution:**
+
 1. Add Swashbuckle or NSwag to all Function apps
 2. Annotate all endpoints with OpenAPI attributes
 3. Generate OpenAPI 3.0 specifications
@@ -283,6 +304,7 @@ Implement automatic OpenAPI specification generation from code to improve API do
 7. Update documentation to reference OpenAPI specs
 
 **Success Criteria:**
+
 - [ ] OpenAPI specs generated for all APIs
 - [ ] Swagger UI hosted and accessible
 - [ ] All endpoints documented with examples
@@ -306,12 +328,14 @@ Implement automatic OpenAPI specification generation from code to improve API do
 Reduce code duplication in repository implementations by extracting common operations to base repository classes.
 
 **Current State:**
+
 - Similar CRUD operations repeated across repositories
 - Code duplication makes maintenance difficult
 - Inconsistent implementations of common patterns
 - Difficult to add cross-cutting concerns
 
 **Proposed Solution:**
+
 1. Analyze existing repositories for common patterns
 2. Create generic base repository with:
    - CRUD operations
@@ -324,6 +348,7 @@ Reduce code duplication in repository implementations by extracting common opera
 6. Document repository patterns
 
 **Success Criteria:**
+
 - [ ] Base repository class created
 - [ ] All repositories refactored to use base
 - [ ] Code duplication reduced by 50%+
@@ -346,6 +371,7 @@ Reduce code duplication in repository implementations by extracting common opera
 Analyze and optimize expensive Cosmos DB queries to improve performance and reduce costs.
 
 **Current State:**
+
 - Some queries have high RU consumption
 - Not all queries use optimal indexing
 - Missing composite indexes for common queries
@@ -353,6 +379,7 @@ Analyze and optimize expensive Cosmos DB queries to improve performance and redu
 - Pagination could be more efficient
 
 **Proposed Solution:**
+
 1. Enable query metrics collection
 2. Analyze top queries by RU consumption
 3. Review and optimize indexing policy:
@@ -365,6 +392,7 @@ Analyze and optimize expensive Cosmos DB queries to improve performance and redu
 7. Create query optimization guidelines
 
 **Success Criteria:**
+
 - [ ] Query metrics collection enabled
 - [ ] Top 10 queries optimized
 - [ ] RU consumption reduced by 30%+
@@ -388,12 +416,14 @@ Analyze and optimize expensive Cosmos DB queries to improve performance and redu
 Implement comprehensive end-to-end testing framework to validate complete user workflows.
 
 **Current State:**
+
 - No automated E2E tests
 - Manual testing required for workflows
 - Risk of regression in critical paths
 - Difficult to test integration points
 
 **Proposed Solution:**
+
 1. Evaluate E2E testing frameworks (Playwright, Selenium)
 2. Set up test infrastructure and environment
 3. Implement tests for critical workflows:
@@ -408,6 +438,7 @@ Implement comprehensive end-to-end testing framework to validate complete user w
 6. Document E2E testing practices
 
 **Success Criteria:**
+
 - [ ] E2E testing framework set up
 - [ ] Critical workflows tested end-to-end
 - [ ] Tests run in CI/CD pipeline
@@ -433,6 +464,7 @@ Implement comprehensive end-to-end testing framework to validate complete user w
 Create detailed onboarding guide with step-by-step instructions, videos, and troubleshooting for new developers.
 
 **Current State:**
+
 - Basic README exists
 - Setup instructions incomplete
 - No video tutorials
@@ -440,6 +472,7 @@ Create detailed onboarding guide with step-by-step instructions, videos, and tro
 - New developers take 2-3 days to get started
 
 **Proposed Solution:**
+
 1. Create comprehensive setup guide:
    - Prerequisites and dependencies
    - Step-by-step local environment setup
@@ -456,6 +489,7 @@ Create detailed onboarding guide with step-by-step instructions, videos, and tro
 5. Document coding standards and patterns
 
 **Success Criteria:**
+
 - [ ] Comprehensive written guide created
 - [ ] Video tutorials recorded and published
 - [ ] Quick reference guide available
@@ -477,12 +511,14 @@ Create detailed onboarding guide with step-by-step instructions, videos, and tro
 Create Architecture Decision Records to document key architectural decisions and their rationale.
 
 **Current State:**
+
 - Architectural decisions are tribal knowledge
 - No historical record of why decisions were made
 - Difficult for new team members to understand context
 - Decisions sometimes revisited without full context
 
 **Proposed Solution:**
+
 1. Set up ADR structure in docs/ADR/
 2. Create template for ADR documents
 3. Document historical decisions:
@@ -495,6 +531,7 @@ Create Architecture Decision Records to document key architectural decisions and
 5. Integrate ADR creation into architecture review process
 
 **Success Criteria:**
+
 - [ ] ADR structure created
 - [ ] Template available
 - [ ] At least 10 key decisions documented
@@ -516,12 +553,14 @@ Create Architecture Decision Records to document key architectural decisions and
 Set up automated dependency update system with testing to keep packages current and secure.
 
 **Current State:**
+
 - Dependencies updated manually
 - Updates often delayed
 - Security vulnerabilities may go unnoticed
 - No systematic approach to updates
 
 **Proposed Solution:**
+
 1. Enable Dependabot or Renovate
 2. Configure update policies:
    - Security updates: immediate
@@ -533,6 +572,7 @@ Set up automated dependency update system with testing to keep packages current 
 6. Document dependency management process
 
 **Success Criteria:**
+
 - [ ] Dependency automation enabled
 - [ ] Update policies configured
 - [ ] Automated testing working
@@ -555,6 +595,7 @@ Set up automated dependency update system with testing to keep packages current 
 Standardize logging across all components with structured logging and correlation ID tracking.
 
 **Current State:**
+
 - Logging format inconsistent
 - Difficult to correlate logs across services
 - Missing contextual information
@@ -562,6 +603,7 @@ Standardize logging across all components with structured logging and correlatio
 - Difficult to query logs
 
 **Proposed Solution:**
+
 1. Implement Serilog for structured logging
 2. Define standard log message templates
 3. Add correlation ID middleware
@@ -575,6 +617,7 @@ Standardize logging across all components with structured logging and correlatio
 7. Create log query examples
 
 **Success Criteria:**
+
 - [ ] Serilog implemented in all apps
 - [ ] Correlation IDs in all requests
 - [ ] Standard context in all logs
@@ -597,6 +640,7 @@ Standardize logging across all components with structured logging and correlatio
 Implement automated load testing to establish performance baselines and detect regressions.
 
 **Current State:**
+
 - No load testing
 - Unknown performance limits
 - No baseline metrics
@@ -604,6 +648,7 @@ Implement automated load testing to establish performance baselines and detect r
 - Capacity planning difficult
 
 **Proposed Solution:**
+
 1. Select load testing tool (Azure Load Testing, k6, JMeter)
 2. Create load test scenarios:
    - Normal load (expected traffic)
@@ -619,6 +664,7 @@ Implement automated load testing to establish performance baselines and detect r
 6. Create performance dashboard
 
 **Success Criteria:**
+
 - [ ] Load testing tool configured
 - [ ] Test scenarios created for critical endpoints
 - [ ] Performance baselines established
@@ -639,6 +685,7 @@ Implement automated load testing to establish performance baselines and detect r
 The following labels should be created in GitHub for categorizing issues:
 
 ### Type Labels
+
 - `feature` - New feature or functionality
 - `enhancement` - Improvement to existing functionality
 - `bug` - Something isn't working
@@ -647,12 +694,14 @@ The following labels should be created in GitHub for categorizing issues:
 - `testing` - Testing improvements
 
 ### Priority Labels
+
 - `priority: critical` - Must be fixed immediately
 - `priority: high` - Should be addressed soon
 - `priority: medium` - Important but not urgent
 - `priority: low` - Nice to have
 
 ### Component Labels
+
 - `api` - API-related issues
 - `frontend` - Frontend-related issues
 - `infrastructure` - Infrastructure and DevOps
@@ -662,12 +711,14 @@ The following labels should be created in GitHub for categorizing issues:
 - `localization` - Internationalization and localization
 
 ### Technology Labels
+
 - `azure-functions` - Azure Functions specific
 - `cosmos-db` - Cosmos DB specific
 - `stripe` - Stripe integration
 - `entra-id` - Microsoft Entra ID
 
 ### Process Labels
+
 - `breaking-change` - Requires migration or breaking change
 - `security` - Security-related issue
 - `performance` - Performance optimization
@@ -701,11 +752,13 @@ gh issue create --title "Implement Distributed Caching Layer for Performance Opt
 ## Summary
 
 **Total Issues:** 15
+
 - **High Priority:** 5 issues (~12 weeks effort)
 - **Medium Priority:** 5 issues (~15 weeks effort)
 - **Low Priority:** 5 issues (~6 weeks effort)
 
 **Focus Areas:**
+
 1. **Stability** - Error handling, testing, monitoring
 2. **Performance** - Caching, query optimization, load testing
 3. **Developer Experience** - Documentation, tooling, onboarding
@@ -713,6 +766,7 @@ gh issue create --title "Implement Distributed Caching Layer for Performance Opt
 5. **Infrastructure** - API gateway, logging, automation
 
 **Recommended Approach:**
+
 1. Start with high priority issues in parallel
 2. Focus on quick wins (documentation, automation)
 3. Allocate 20% time for technical debt

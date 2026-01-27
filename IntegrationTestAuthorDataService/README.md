@@ -2,7 +2,7 @@
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
 [![Build Status](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml/badge.svg)](https://github.com/utdcometsoccer/one-page-author-page-api/actions/workflows/main_onepageauthorapi.yml)
-[![Tests](https://img.shields.io/badge/Test%20Type-Integration-blue.svg)](#)
+![Tests](https://img.shields.io/badge/Test%20Type-Integration-blue.svg)
 
 Specialized integration test suite for validating AuthorDataService functionality and Azure Cosmos DB data access operations.
 
@@ -20,7 +20,6 @@ This project provides comprehensive integration testing specifically for:
 
 ### Data Access Tests
 
-
 - Author creation, retrieval, update, and deletion
 - Complex query scenarios and filtering operations
 - Bulk operations and batch processing
@@ -28,14 +27,12 @@ This project provides comprehensive integration testing specifically for:
 
 ### Integration Validation
 
-
 - Database connectivity and authentication
 - Container and partition key validation
 - Index utilization and query optimization
 - Cross-container relationship integrity
 
 ### Error Handling Tests
-
 
 - Network connectivity issues simulation
 - Invalid data validation and error responses
@@ -53,13 +50,11 @@ This project provides comprehensive integration testing specifically for:
 
 ### Prerequisites
 
-
 - .NET 9.0 SDK
 - Azure Cosmos DB Emulator OR test instance
 - Valid connection strings and configuration
 
 ### Running Integration Tests
-
 
 ```bash
 # Navigate to project directory
@@ -116,13 +111,12 @@ dotnet user-secrets list
    - For local emulator, use the well-known emulator connection string shown above
 
 2. **DatabaseId**:
-   - Use a dedicated test database (e.g., "OnePageAuthorTest") 
+   - Use a dedicated test database (e.g., "OnePageAuthorTest")
    - Keep separate from production to avoid data contamination
 
 ## 🔧 Test Features
 
 ### Comprehensive Coverage
-
 
 - **Author Entity Tests**: Full CRUD lifecycle validation
 - **Query Performance**: Response time benchmarking
@@ -131,14 +125,12 @@ dotnet user-secrets list
 
 ### Automated Validation
 
-
 - Database schema verification
 - Index effectiveness analysis
 - Query cost optimization checks
 - Memory usage and resource monitoring
 
 ### Sample Test Output
-
 
 ```
 Starting Author Data Service Integration Tests...
@@ -174,7 +166,6 @@ Total execution time: 2.3 seconds
 
 ### Adding Integration Tests
 
-
 1. Create test scenarios in the appropriate test category
 2. Use proper setup and teardown for database operations
 3. Include performance benchmarks where applicable
@@ -182,7 +173,6 @@ Total execution time: 2.3 seconds
 5. Document test expectations and success criteria
 
 ### Test Guidelines
-
 
 - **Isolated Tests**: Each test should be independent and repeatable
 - **Real Data**: Use realistic test data that mirrors production scenarios

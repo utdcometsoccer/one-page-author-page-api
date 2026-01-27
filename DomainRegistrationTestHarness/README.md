@@ -126,6 +126,7 @@ If you see "COSMOSDB_ENDPOINT_URI is required", ensure your user secrets or envi
 ### Connection Errors
 
 Verify that:
+
 1. The Cosmos DB endpoint is accessible
 2. The primary key is correct
 3. The database exists
@@ -134,6 +135,7 @@ Verify that:
 ### JSON Parsing Errors
 
 Ensure your JSON file:
+
 1. Is valid JSON (use a JSON validator)
 2. Contains an array of objects
 3. Has required fields (upn, domain.topLevelDomain, domain.secondLevelDomain)

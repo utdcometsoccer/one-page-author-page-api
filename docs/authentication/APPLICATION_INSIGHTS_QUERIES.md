@@ -615,6 +615,7 @@ customEvents
 Create a comprehensive authentication monitoring workbook in Azure Portal:
 
 **Step 1: Create Workbook**
+
 1. Navigate to Application Insights
 2. Select **Workbooks** from the left menu
 3. Click **New** to create a new workbook
@@ -624,6 +625,7 @@ Create a comprehensive authentication monitoring workbook in Azure Portal:
 Add these sections in order:
 
 #### Section 1: Overview Metrics
+
 - Add **Metrics** tile
 - Add 4 KPI tiles:
   - Total Requests (last 24h)
@@ -632,37 +634,44 @@ Add these sections in order:
   - Unique Active Users
 
 #### Section 2: Authentication Success Rate
+
 - Add **Query** tile
 - Use "Authentication Success Rate" query above
 - Visualization: Line chart
 - Time range: Last 24 hours
 
 #### Section 3: Recent Failures
+
 - Add **Query** tile
 - Use "Recent 401 Unauthorized Responses" query
 - Visualization: Table
 - Add refresh button
 
 #### Section 4: Error Analysis
+
 - Add **Query** tile
 - Use "JWT Validation Errors" query
 - Visualization: Pie chart (by ErrorType)
 
 #### Section 5: User Activity
+
 - Add **Query** tile
 - Use "Most Active Users" query
 - Visualization: Table
 
 #### Section 6: Geographic Distribution
+
 - Add **Query** tile
 - Use "Geographic Distribution of Authentication" query
 - Visualization: Map
 
 **Step 3: Configure Auto-Refresh**
+
 - Set workbook to auto-refresh every 5 minutes
 - Pin important tiles to Azure Dashboard
 
 **Step 4: Share Workbook**
+
 - Save workbook with descriptive name: "Authentication Monitoring Dashboard"
 - Share with team members
 - Set default time range to 24 hours
@@ -676,6 +685,7 @@ Add these sections in order:
 **Purpose**: Alert when authentication failure rate exceeds threshold
 
 **Configuration**:
+
 ```kql
 // Alert query: High authentication failure rate
 let timeRange = 5m;
@@ -698,6 +708,7 @@ print FailureRate = failureRate, Threshold = threshold
 ```
 
 **Alert Settings**:
+
 - Severity: 2 (Warning)
 - Frequency: Every 5 minutes
 - Time window: 5 minutes
@@ -711,6 +722,7 @@ print FailureRate = failureRate, Threshold = threshold
 **Purpose**: Alert when signing key rotation causes repeated failures
 
 **Configuration**:
+
 ```kql
 // Alert query: Signing key rotation issues
 traces
@@ -722,6 +734,7 @@ traces
 ```
 
 **Alert Settings**:
+
 - Severity: 1 (Error)
 - Frequency: Every 5 minutes
 - Time window: 10 minutes
@@ -735,6 +748,7 @@ traces
 **Purpose**: Detect potential brute force attempts
 
 **Configuration**:
+
 ```kql
 // Alert query: Brute force detection
 requests
@@ -745,6 +759,7 @@ requests
 ```
 
 **Alert Settings**:
+
 - Severity: 1 (Error)
 - Frequency: Every 5 minutes
 - Time window: 5 minutes
@@ -758,6 +773,7 @@ requests
 **Purpose**: Alert if no authenticated traffic detected (potential outage)
 
 **Configuration**:
+
 ```kql
 // Alert query: No authenticated traffic
 customEvents
@@ -768,6 +784,7 @@ customEvents
 ```
 
 **Alert Settings**:
+
 - Severity: 1 (Error)
 - Frequency: Every 15 minutes
 - Time window: 15 minutes
@@ -781,6 +798,7 @@ customEvents
 ### Performance Optimization
 
 1. **Use time filters early**:
+
    ```kql
    // Good
    requests
@@ -794,6 +812,7 @@ customEvents
    ```
 
 2. **Use summarize for aggregations**:
+
    ```kql
    // Good
    requests
@@ -808,6 +827,7 @@ customEvents
    ```
 
 3. **Limit result sets**:
+
    ```kql
    // Always use take for large result sets
    requests
@@ -818,6 +838,7 @@ customEvents
 ### Readability
 
 1. **Use comments**:
+
    ```kql
    // Authentication failure analysis
    // Purpose: Identify endpoints with high failure rates
@@ -828,6 +849,7 @@ customEvents
    ```
 
 2. **Format for clarity**:
+
    ```kql
    requests
    | where timestamp > ago(24h)
@@ -840,6 +862,7 @@ customEvents
    ```
 
 3. **Use meaningful variable names**:
+
    ```kql
    let timeRange = 24h;
    let failureThreshold = 100;

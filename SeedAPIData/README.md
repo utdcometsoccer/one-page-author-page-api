@@ -26,13 +26,11 @@ SeedAPIData provides a reliable way to initialize your OnePageAuthor system with
 
 ### Prerequisites
 
-
 - .NET 9.0 SDK
 - Access to OnePageAuthor Azure Cosmos DB
 - Proper connection string configuration
 
 ### Running the Seeder
-
 
 ```bash
 # Navigate to project directory
@@ -88,7 +86,6 @@ The seeder creates the following sample entities:
 
 ### Authors
 
-
 - Multiple author profiles with biographical information
 - Professional headshots and cover images
 - Social media profiles and website links
@@ -96,14 +93,12 @@ The seeder creates the following sample entities:
 
 ### Books
 
-
 - Fiction and non-fiction titles
 - Complete metadata (ISBN, publication dates, descriptions)
 - Cover images and promotional materials
 - Author-book relationships
 
 ### Articles
-
 
 - Blog posts and articles
 - Various content categories and tags
@@ -113,7 +108,6 @@ The seeder creates the following sample entities:
 ## 🔧 Usage
 
 ### Safe Operation
-
 
 - The seeder can be run multiple times safely
 - Existing records will be updated rather than duplicated
@@ -130,7 +124,6 @@ After running the seeder:
 4. Review logs for any errors or warnings
 
 ### Sample Output
-
 
 ```
 Starting API Data Seeding...

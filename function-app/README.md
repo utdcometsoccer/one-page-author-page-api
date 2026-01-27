@@ -32,7 +32,6 @@ The function-app is the primary Azure Functions application that provides:
 
 ## Quickstart
 
-
 ```pwsh
 dotnet build function-app.csproj
 func start

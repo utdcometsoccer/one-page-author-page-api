@@ -1,6 +1,7 @@
 # GitHub Secrets Script Update Summary
 
 ## Overview
+
 Updated the `Initialize-GitHubSecrets.ps1` script to cover recent platform changes and added robust guards to prevent erroneous insertion of quotes.
 
 **Date**: December 2025  
@@ -14,7 +15,8 @@ Updated the `Initialize-GitHubSecrets.ps1` script to cover recent platform chang
 
 Added intelligent quote removal logic to the `Set-GitHubSecret` function to prevent erroneous quotes from being included in secret values.
 
-#### Features:
+#### Features
+
 - **Length check**: Only processes quote removal if value has at least 2 characters (prevents Substring errors)
 - **Single quote removal**: Automatically removes surrounding single quotes (e.g., `'myvalue'` → `myvalue`)
 - **Smart double quote removal**:
@@ -24,7 +26,8 @@ Added intelligent quote removal logic to the `Set-GitHubSecret` function to prev
   - Preserves quotes for JSON arrays (e.g., `["item1","item2"]` remains unchanged)
 - **Warnings logged**: Users are alerted when quotes are removed
 
-#### Implementation:
+#### Implementation
+
 ```powershell
 # Uses ConvertFrom-Json to parse and detect JSON objects/arrays
 # Type checking: PSCustomObject (objects) or Array (arrays)
@@ -36,26 +39,31 @@ Added intelligent quote removal logic to the `Set-GitHubSecret` function to prev
 Added **18 new environment variables** to support recent platform features. Total secrets increased from **26 to 43**.
 
 #### Azure AD Authentication (1 new)
+
 - `OPEN_ID_CONNECT_METADATA_URL` - OpenID Connect metadata URL for JWT validation
   - Example: `https://login.microsoftonline.com/{tenant-id}/v2.0/.well-known/openid-configuration`
 
 #### Domain Management - Azure Front Door (2 new)
+
 - `AZURE_RESOURCE_GROUP_NAME` - Resource group name for Azure Front Door
   - Example: `rg-onepageauthor-prod`
 - `AZURE_FRONTDOOR_PROFILE_NAME` - Azure Front Door profile name
   - Example: `afd-onepageauthor`
 
 #### Azure Key Vault (2 new)
+
 - `KEY_VAULT_URL` - Azure Key Vault URL for secure secret management
   - Example: `https://your-keyvault.vault.azure.net/`
 - `USE_KEY_VAULT` - Feature flag to enable Key Vault
   - Example: `false`
 
 #### Referral Program (1 new)
+
 - `REFERRAL_BASE_URL` - Base URL for generating referral links
   - Example: `https://inkstainedwretches.com`
 
 #### Testing Configuration (11 new)
+
 - `TESTING_MODE` - Enable testing mode (true/false)
 - `MOCK_AZURE_INFRASTRUCTURE` - Mock Azure infrastructure operations (true/false)
 - `MOCK_GOOGLE_DOMAINS` - Mock Google Domains API calls (true/false)
@@ -71,11 +79,13 @@ Added **18 new environment variables** to support recent platform features. Tota
 ### 3. Documentation Updates
 
 #### `secrets-template.json`
+
 - Added all 18 new environment variables with appropriate default values
 - Organized into new categories: "Azure Key Vault", "Referral Program", "Testing Configuration"
 - Maintained JSON validity
 
 #### `GITHUB_SECRETS_SETUP.md`
+
 - Added comprehensive documentation for all new variables
 - Included examples and use cases
 - Updated category structure to match new secret definitions
@@ -85,11 +95,13 @@ Added **18 new environment variables** to support recent platform features. Tota
 ## Testing Performed
 
 ### ✅ PowerShell Syntax Validation
+
 - Script executes without errors
 - Help system (`-Help`) works correctly
 - All functions properly defined
 
 ### ✅ JSON Template Validation
+
 - Template is valid JSON
 - All new variables included
 - Proper structure maintained
@@ -112,6 +124,7 @@ Added **18 new environment variables** to support recent platform features. Tota
 | Azure credentials | `{"clientId":"xxx",...}` | Preserved | ✅ Pass |
 
 ### ✅ Secret Definitions Verification
+
 - All 8 core new secrets found in definitions
 - All 11 testing configuration secrets found
 - Total: 43 secrets properly categorized
@@ -143,6 +156,7 @@ Added **18 new environment variables** to support recent platform features. Tota
 ## Usage Examples
 
 ### Example 1: Interactive Mode (with quote guards)
+
 ```powershell
 .\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
 
@@ -152,6 +166,7 @@ Added **18 new environment variables** to support recent platform features. Tota
 ```
 
 ### Example 2: Config File (JSON preserved)
+
 ```json
 {
   "AZURE_CREDENTIALS": "{\"clientId\":\"xxx\",\"clientSecret\":\"xxx\"}",
@@ -204,33 +219,40 @@ The updated script now supports configuration for:
 ## Migration Notes
 
 ### For Existing Users
+
 No breaking changes. The script remains backward compatible:
+
 - All existing secrets still work
 - New secrets are optional
 - Quote removal only affects values with erroneous quotes
 - JSON values (like AZURE_CREDENTIALS) are properly preserved
 
 ### For New Features
+
 To use the new features, add the corresponding secrets:
 
 **Front Door Integration:**
+
 ```
 AZURE_RESOURCE_GROUP_NAME=rg-onepageauthor-prod
 AZURE_FRONTDOOR_PROFILE_NAME=afd-onepageauthor
 ```
 
 **Key Vault Integration:**
+
 ```
 KEY_VAULT_URL=https://your-kv.vault.azure.net/
 USE_KEY_VAULT=true
 ```
 
 **Referral Program:**
+
 ```
 REFERRAL_BASE_URL=https://inkstainedwretches.com
 ```
 
 **Testing Mode:**
+
 ```
 TESTING_MODE=true
 MOCK_AZURE_INFRASTRUCTURE=true
@@ -259,6 +281,7 @@ STRIPE_TEST_MODE=true
 ## Next Steps
 
 ### Recommended Actions
+
 1. **Update GitHub secrets** using the updated script
 2. **Configure testing variables** for development/staging environments
 3. **Plan Key Vault migration** if desired for enhanced security
@@ -266,7 +289,9 @@ STRIPE_TEST_MODE=true
 5. **Enable referral program** if using that feature
 
 ### Future Enhancements
+
 Consider adding:
+
 - Environment-specific secret sets (dev/staging/prod)
 - Secret rotation automation
 - Validation of secret formats before setting
@@ -286,6 +311,7 @@ Consider adding:
 ## Conclusion
 
 This update successfully:
+
 - ✅ Added guards to prevent erroneous quote insertion
 - ✅ Covered all recent platform changes (18 new variables)
 - ✅ Maintained backward compatibility

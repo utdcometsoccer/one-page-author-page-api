@@ -29,6 +29,7 @@ Start here if you're new to the project:
 - [**APPLICATION_INSIGHTS_QUERIES**](authentication/APPLICATION_INSIGHTS_QUERIES.md) - KQL queries for monitoring
 
 **Legacy Authentication Docs** (refer to new docs above):
+
 - [MICROSOFT_ENTRA_ID_CONFIG](MICROSOFT_ENTRA_ID_CONFIG.md) - ⚠️ Legacy - See new ENTRA_CIAM_CONFIGURATION_GUIDE
 - [IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES](IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES.md) - Entra ID roles implementation
 - [MIGRATION_GUIDE_ENTRA_ID_ROLES](MIGRATION_GUIDE_ENTRA_ID_ROLES.md) - Roles migration guide
@@ -76,26 +77,31 @@ Comprehensive API reference and guides:
 Detailed implementation documentation for specific features:
 
 #### Core Features
+
 - [**IMPLEMENTATION_SUMMARY**](IMPLEMENTATION_SUMMARY.md) - DNS zone automation
 - [**IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES**](IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES.md) - Entra ID RBAC
 - [**IMPLEMENTATION_SUMMARY_LANGUAGES**](IMPLEMENTATION_SUMMARY_LANGUAGES.md) - Multi-language support
 - [**IMPLEMENTATION_SUMMARY_MULTI_FUNCTION_DEPLOYMENT**](IMPLEMENTATION_SUMMARY_MULTI_FUNCTION_DEPLOYMENT.md) - Multi-function architecture
 
 #### Infrastructure
+
 - [**IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS**](IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS.md) - Monitoring implementation
 - [**IMPLEMENTATION_SUMMARY_CONDITIONAL_ENV_VARS**](IMPLEMENTATION_SUMMARY_CONDITIONAL_ENV_VARS.md) - Configuration patterns
 - [**IMPLEMENTATION_SUMMARY_PERMISSIONS_FIX**](IMPLEMENTATION_SUMMARY_PERMISSIONS_FIX.md) - Permission fixes
 
 #### Data & Geography
+
 - [**COUNTRIES_IMPLEMENTATION_SUMMARY**](COUNTRIES_IMPLEMENTATION_SUMMARY.md) - Country data
 - [**STATEPROVINCE_BOILERPLATE_SUMMARY**](STATEPROVINCE_BOILERPLATE_SUMMARY.md) - Geographic entities
 
 #### Integrations
+
 - [**GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY**](GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY.md) - Domain registration
 - [**KEY_VAULT_IMPLEMENTATION_SUMMARY**](KEY_VAULT_IMPLEMENTATION_SUMMARY.md) - Secrets management
 - [**KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION**](KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION.md) - Key Vault RBAC
 
 #### User Features
+
 - [**AUTHOR_INVITATION_IMPLEMENTATION_SUMMARY**](AUTHOR_INVITATION_IMPLEMENTATION_SUMMARY.md) - Invitation system
 - [**AUTHOR_INVITATION_SYSTEM**](AUTHOR_INVITATION_SYSTEM.md) - Invitation overview
 - [**INK_STAINED_WRETCH_USER_FEATURES**](INK_STAINED_WRETCH_USER_FEATURES.md) - User features
@@ -133,18 +139,21 @@ Guides for utility tools and scripts:
 ## 🎓 Learning Paths
 
 ### New Developer Setup
+
 1. Read [Main README](../README.md)
 2. Follow [LOCAL_SETTINGS_SETUP](LOCAL_SETTINGS_SETUP.md)
 3. Run [DEVELOPMENT_SCRIPTS](DEVELOPMENT_SCRIPTS.md)
 4. Review [API-Documentation](API-Documentation.md)
 
 ### Deployment Engineer Setup
+
 1. Read [DEPLOYMENT_GUIDE](DEPLOYMENT_GUIDE.md)
 2. Configure [GITHUB_SECRETS_REFERENCE](GITHUB_SECRETS_REFERENCE.md)
 3. Review [DEPLOYMENT_ARCHITECTURE](DEPLOYMENT_ARCHITECTURE.md)
 4. Check [COSMOS_APPINSIGHTS_DEPLOYMENT](COSMOS_APPINSIGHTS_DEPLOYMENT.md)
 
 ### Feature Developer
+
 1. Review [Complete-System-Documentation](Complete-System-Documentation.md)
 2. Check relevant implementation summaries
 3. Follow [CONTRIBUTING](CONTRIBUTING.md) guidelines
@@ -171,21 +180,25 @@ Guides for utility tools and scripts:
 ### By Role
 
 **Backend Developer**:
+
 - [API-Documentation](API-Documentation.md)
 - [Complete-System-Documentation](Complete-System-Documentation.md)
 - [DEVELOPMENT_SCRIPTS](DEVELOPMENT_SCRIPTS.md)
 
 **DevOps Engineer**:
+
 - [DEPLOYMENT_GUIDE](DEPLOYMENT_GUIDE.md)
 - [GITHUB_SECRETS_REFERENCE](GITHUB_SECRETS_REFERENCE.md)
 - [DEPLOYMENT_ARCHITECTURE](DEPLOYMENT_ARCHITECTURE.md)
 
 **Security Specialist**:
+
 - [SECURITY](SECURITY.md)
 - [KEY_VAULT_IMPLEMENTATION_SUMMARY](KEY_VAULT_IMPLEMENTATION_SUMMARY.md)
 - [SECURITY_AUDIT_REPORT](SECURITY_AUDIT_REPORT.md)
 
 **QA Engineer**:
+
 - [TESTING_SCENARIOS_GUIDE](TESTING_SCENARIOS_GUIDE.md)
 - [API-Documentation](API-Documentation.md)
 

@@ -5,6 +5,7 @@ A console application for testing Google Cloud Platform domain registration func
 ## Purpose
 
 This test application is designed to:
+
 1. Verify Google Cloud Platform domain registration API integration
 2. Test domain availability checking functionality
 3. Validate domain registration parameters and contact information
@@ -14,25 +15,31 @@ This test application is designed to:
 ## Prerequisites
 
 ### Software Requirements
+
 - .NET 10.0 SDK or later
 - Access to Google Cloud Platform with Domains API enabled
 - Azure Cosmos DB instance (for test data validation)
 - Linux, macOS, or Windows environment
 
 ### Google Cloud Platform Setup
+
 1. Create a Google Cloud Platform project
 2. Enable the Cloud Domains API
 3. Set up authentication:
    - **Option A (Recommended)**: Use service account with JSON key file
+
      ```bash
      export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account-key.json"
      ```
+
    - **Option B**: Use Application Default Credentials (ADC)
+
      ```bash
      gcloud auth application-default login
      ```
 
 ### Azure Cosmos DB Setup
+
 - Cosmos DB account with the OnePageAuthor database
 - DomainRegistrations container configured
 - Valid connection credentials
@@ -179,6 +186,7 @@ The test data file should contain an array of domain registration objects:
 | `status` | No | int | Registration status (0=Pending) |
 
 ### Status Values
+
 - `0` - Pending (default for new registrations)
 - `1` - InProgress
 - `2` - Completed
@@ -268,17 +276,20 @@ Total Tests: 3
 ## Interpreting Results
 
 ### Success Indicators (✅ ✓)
+
 - Domain is available for registration
 - All registration parameters are valid
 - Database compatibility confirmed
 - Test passed
 
 ### Warning Indicators (⚠️)
+
 - Domain not available (skipped)
 - Actual registration not performed (expected in dry run mode)
 - Domain already exists in database
 
 ### Failure Indicators (❌ ✗)
+
 - Missing required fields
 - Invalid data format
 - API connection errors
@@ -291,6 +302,7 @@ Total Tests: 3
 **Problem**: "The Application Default Credentials are not available"
 
 **Solution**:
+
 ```bash
 # Option 1: Set service account credentials
 export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account-key.json"
@@ -310,6 +322,7 @@ gcloud auth application-default login
 **Problem**: "Cloud Domains API has not been used in project"
 
 **Solution**:
+
 1. Navigate to Google Cloud Console
 2. Enable the Cloud Domains API for your project
 3. Wait a few minutes for propagation
@@ -319,6 +332,7 @@ gcloud auth application-default login
 **Problem**: "Unable to connect to Cosmos DB"
 
 **Solution**:
+
 1. Verify endpoint URI is correct
 2. Confirm primary key is valid
 3. Check network connectivity to Azure
@@ -329,6 +343,7 @@ gcloud auth application-default login
 **Problem**: All domains show as "Not Available"
 
 **Solution**:
+
 - Use unique domain names for testing
 - Some TLDs have restrictions (use .com, .org, .net for testing)
 - Check if you have proper permissions in Google Cloud
@@ -386,6 +401,7 @@ dotnet run
 ## Production Deployment Notes
 
 To perform actual domain registrations (not covered by this test):
+
 1. Remove dry run mode comments in production code
 2. Ensure billing is enabled in Google Cloud
 3. Verify domain pricing and availability
@@ -396,6 +412,7 @@ To perform actual domain registrations (not covered by this test):
 ## Support
 
 For issues or questions:
+
 1. Check the troubleshooting section above
 2. Review Google Cloud Domains API documentation
 3. Consult the main project README.md

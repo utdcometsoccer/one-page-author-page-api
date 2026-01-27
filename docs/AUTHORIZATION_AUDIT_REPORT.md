@@ -9,6 +9,7 @@
 ## Executive Summary
 
 This report analyzes the authorization configuration of all Azure Functions across the platform to ensure:
+
 1. Consistent use of `AuthorizationLevel` settings
 2. Proper JWT authentication on protected endpoints
 3. No security gaps or misconfigurations
@@ -16,12 +17,14 @@ This report analyzes the authorization configuration of all Azure Functions acro
 ### Key Findings
 
 ✅ **Good Practices Found:**
+
 - Domain registration endpoints correctly use `Anonymous` + JWT validation
 - Stripe webhook properly uses `Anonymous` (webhooks require signature validation, not JWT)
 - Public endpoints appropriately use `Anonymous` without JWT requirements
 - Several endpoints use declarative `[Authorize]` attribute (ASP.NET Core authorization)
 
 ⚠️ **Recommendations:**
+
 - **ImageAPI:** All endpoints use `AuthorizationLevel.Function` with JWT validation - should change to `Anonymous`
 - **InkStainedWretchesConfig:** Config endpoints use `AuthorizationLevel.Function` without JWT - keep as-is for internal use
 - **InkStainedWretchStripe:** Mixed usage - some use `Function` + JWT (should change to `Anonymous`), some correctly use `[Authorize]`
@@ -51,6 +54,7 @@ All four ImageAPI endpoints perform JWT token validation using `JwtAuthenticatio
 **Estimated Effort:** 15 minutes
 
 **Code Changes Required:**
+
 ```csharp
 // Before:
 [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req
@@ -79,6 +83,7 @@ All four ImageAPI endpoints perform JWT token validation using `JwtAuthenticatio
 
 **Recommendation for `GetStripeCheckoutSession`:**  
 Currently uses `AuthorizationLevel.Function` without JWT validation. This endpoint retrieves checkout session details. Options:
+
 1. Add JWT validation for user context
 2. Keep Function-level auth if only called internally
 3. Validate session belongs to requesting user
@@ -207,8 +212,10 @@ These are internal configuration endpoints that should NOT be publicly accessibl
 ### High Priority Changes Required
 
 #### 1. ImageAPI (4 endpoints)
+
 **Change:** `AuthorizationLevel.Function` → `Anonymous`  
 **Affected Functions:**
+
 - `Upload`
 - `Delete`
 - `User`
@@ -219,8 +226,10 @@ These are internal configuration endpoints that should NOT be publicly accessibl
 ---
 
 #### 2. InkStainedWretchStripe (5 endpoints)
+
 **Change:** `AuthorizationLevel.Function` → `Anonymous`  
 **Affected Functions:**
+
 - `CreateStripeCheckoutSession`
 - `CreateStripeCustomer`
 - `CreateSubscription`
@@ -232,9 +241,11 @@ These are internal configuration endpoints that should NOT be publicly accessibl
 ---
 
 #### 3. InkStainedWretchStripe - Review Required (1 endpoint)
+
 **Function:** `GetStripeCheckoutSession`  
 **Current:** `AuthorizationLevel.Function`, no JWT validation  
 **Action:** Review code to determine if:
+
 1. JWT validation should be added
 2. Function-level auth is intentional for internal use
 3. Session ownership validation exists
@@ -255,6 +266,7 @@ These are internal configuration endpoints that should NOT be publicly accessibl
 ## Implementation Checklist
 
 ### Phase 1: ImageAPI (High Priority)
+
 - [ ] Update `Upload.cs` - Change to `AuthorizationLevel.Anonymous`
 - [ ] Update `Delete.cs` - Change to `AuthorizationLevel.Anonymous`
 - [ ] Update `User.cs` - Change to `AuthorizationLevel.Anonymous`
@@ -265,6 +277,7 @@ These are internal configuration endpoints that should NOT be publicly accessibl
 - [ ] Validate production deployment
 
 ### Phase 2: InkStainedWretchStripe (High Priority)
+
 - [ ] Update `CreateStripeCheckoutSession.cs` - Change to `AuthorizationLevel.Anonymous`
 - [ ] Update `CreateStripeCustomer.cs` - Change to `AuthorizationLevel.Anonymous`
 - [ ] Update `CreateSubscription.cs` - Change to `AuthorizationLevel.Anonymous`
@@ -278,6 +291,7 @@ These are internal configuration endpoints that should NOT be publicly accessibl
 - [ ] Validate production deployment
 
 ### Phase 3: Testing & Validation
+
 - [ ] Run comprehensive authentication tests
 - [ ] Verify no regression in existing functionality
 - [ ] Update API documentation
@@ -285,6 +299,7 @@ These are internal configuration endpoints that should NOT be publicly accessibl
 - [ ] Notify client developers of changes (if function keys were being used)
 
 ### Phase 4: Documentation Updates
+
 - [ ] Update `AUTHORIZATION_FIX_DOCUMENTATION.md`
 - [ ] Update API documentation with examples
 - [ ] Create migration guide for any clients using function keys
@@ -305,6 +320,7 @@ These are internal configuration endpoints that should NOT be publicly accessibl
 ### JWT Authentication Pattern
 
 ✅ **Recommended Pattern:**
+
 ```csharp
 [Function("ProtectedEndpoint")]
 public async Task<IActionResult> Run(
@@ -323,6 +339,7 @@ public async Task<IActionResult> Run(
 ```
 
 ✅ **Alternative Pattern (Declarative):**
+
 ```csharp
 [Function("ProtectedEndpoint")]
 [Authorize] // ASP.NET Core authorization
@@ -336,6 +353,7 @@ public async Task<IActionResult> Run(
 ```
 
 ❌ **Anti-Pattern (Double Authentication):**
+
 ```csharp
 // DON'T DO THIS:
 [HttpTrigger(AuthorizationLevel.Function, "get")] // Requires function key
@@ -352,6 +370,7 @@ public async Task<IActionResult> Run(HttpRequest req)
 ## Testing Recommendations
 
 ### Unit Tests
+
 - [ ] Test JWT validation logic
 - [ ] Test expired token rejection
 - [ ] Test invalid signature rejection
@@ -359,12 +378,14 @@ public async Task<IActionResult> Run(HttpRequest req)
 - [ ] Test malformed tokens
 
 ### Integration Tests
+
 - [ ] Test each protected endpoint with valid JWT
 - [ ] Test each protected endpoint without JWT (expect 401)
 - [ ] Test each protected endpoint with invalid JWT (expect 401)
 - [ ] Test public endpoints work without JWT
 
 ### Security Tests
+
 - [ ] Verify tokens from wrong tenant are rejected
 - [ ] Verify tokens with wrong audience are rejected
 - [ ] Verify expired tokens are rejected
@@ -376,6 +397,7 @@ public async Task<IActionResult> Run(HttpRequest req)
 ## Monitoring & Observability
 
 ### Metrics to Track
+
 - Authentication success/failure rate
 - 401 Unauthorized response rate by endpoint
 - Invalid token types (expired, wrong tenant, etc.)
@@ -384,6 +406,7 @@ public async Task<IActionResult> Run(HttpRequest req)
 ### Application Insights Queries
 
 #### Authentication Failure Rate
+
 ```kql
 requests
 | where resultCode == 401
@@ -392,6 +415,7 @@ requests
 ```
 
 #### Token Validation Errors
+
 ```kql
 traces
 | where message contains "JWT" or message contains "token"
@@ -405,8 +429,8 @@ traces
 ## References
 
 - **Authorization Fix Documentation:** `AUTHORIZATION_FIX_DOCUMENTATION.md`
-- **Azure Functions HTTP Authorization:** https://learn.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-trigger#http-auth
-- **Microsoft Entra ID Token Validation:** https://learn.microsoft.com/entra/identity-platform/access-tokens#validate-tokens
+- **Azure Functions HTTP Authorization:** <https://learn.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-trigger#http-auth>
+- **Microsoft Entra ID Token Validation:** <https://learn.microsoft.com/entra/identity-platform/access-tokens#validate-tokens>
 
 ---
 

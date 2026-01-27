@@ -7,6 +7,7 @@ This implementation adds conditional deployment of Azure Cosmos DB Account and A
 ## Files Added
 
 ### 1. `infra/cosmosdb.bicep` (New)
+
 - **Purpose**: Bicep template for deploying Azure Cosmos DB Account
 - **Key Features**:
   - Serverless capacity mode (pay-per-use)
@@ -31,6 +32,7 @@ This implementation adds conditional deployment of Azure Cosmos DB Account and A
   - `cosmosDbConnectionString` - Connection string (sensitive)
 
 ### 2. `infra/applicationinsights.bicep` (New)
+
 - **Purpose**: Bicep template for deploying Application Insights
 - **Key Features**:
   - Web application monitoring configuration
@@ -50,6 +52,7 @@ This implementation adds conditional deployment of Azure Cosmos DB Account and A
   - `appInsightsConnectionString` - Connection string (sensitive)
 
 ### 3. `docs/COSMOS_APPINSIGHTS_DEPLOYMENT.md` (New)
+
 - **Purpose**: Comprehensive documentation for the new deployment features
 - **Contents**:
   - Overview of conditional deployment
@@ -65,11 +68,13 @@ This implementation adds conditional deployment of Azure Cosmos DB Account and A
 ### 1. `.github/workflows/main_onepageauthorapi.yml`
 
 **Changes Made**:
+
 - Added two new deployment steps after Azure authentication:
   1. "Deploy Cosmos DB Account" (lines 112-167)
   2. "Deploy Application Insights" (lines 173-217)
 
 **Cosmos DB Deployment Step**:
+
 - **Environment Variables**:
   - `COSMOSDB_RESOURCE_GROUP` - Resource group name (required)
   - `COSMOSDB_ACCOUNT_NAME` - Account name (required)
@@ -85,6 +90,7 @@ This implementation adds conditional deployment of Azure Cosmos DB Account and A
   6. Skips deployment if account already exists or secrets are missing
 
 **Application Insights Deployment Step**:
+
 - **Environment Variables**:
   - `COSMOSDB_RESOURCE_GROUP` - Same resource group as Cosmos DB (required)
   - `APPINSIGHTS_NAME` - Resource name (required)
@@ -99,6 +105,7 @@ This implementation adds conditional deployment of Azure Cosmos DB Account and A
   6. Skips deployment if resource already exists or secrets are missing
 
 **Error Handling**:
+
 - Both steps use `continue-on-error: true` to prevent workflow failure
 - Graceful degradation when secrets are not configured
 - Clear warning messages when skipping deployment
@@ -124,6 +131,7 @@ The deployment steps are positioned strategically:
 ```
 
 This ordering ensures:
+
 - Infrastructure is deployed before application code
 - Cosmos DB and Application Insights are available for Function Apps
 - Each deployment step is independent and can be skipped if not configured
@@ -133,12 +141,14 @@ This ordering ensures:
 To enable the new deployment features, configure these secrets:
 
 **Cosmos DB** (all required to enable deployment):
+
 - `COSMOSDB_RESOURCE_GROUP`
 - `COSMOSDB_ACCOUNT_NAME`
 - `COSMOSDB_LOCATION`
 - `COSMOSDB_ENABLE_FREE_TIER` (optional, default: false)
 
 **Application Insights** (all required to enable deployment):
+
 - `COSMOSDB_RESOURCE_GROUP` (shared with Cosmos DB)
 - `APPINSIGHTS_NAME`
 - `COSMOSDB_LOCATION` (shared with Cosmos DB)
@@ -148,39 +158,48 @@ To enable the new deployment features, configure these secrets:
 ## Deployment Scenarios
 
 ### Scenario 1: Deploy Everything
+
 Configure all secrets → Both Cosmos DB and Application Insights will deploy
 
 ### Scenario 2: Deploy Only Cosmos DB
+
 Configure only Cosmos DB secrets → Only Cosmos DB will deploy
 
 ### Scenario 3: Deploy Only Application Insights
+
 Configure only Application Insights secrets → Only Application Insights will deploy
 
 ### Scenario 4: Deploy Nothing New
+
 Don't configure any secrets → Workflow skips both deployments with warnings
 
 ### Scenario 5: Resources Already Exist
+
 Configure secrets but resources exist → Workflow detects and skips deployment
 
 ## Testing Performed
 
 ### 1. Bicep Template Validation
+
 - ✅ `az bicep build` successfully compiles both templates
 - ✅ No critical errors, only expected warnings about secrets in outputs
 - ✅ Templates use stable API versions (2023-04-15, 2020-02-02)
 
 ### 2. YAML Syntax Validation
+
 - ✅ Workflow file passes `yaml.safe_load()` validation
 - ✅ All environment variables properly referenced
 - ✅ Conditional logic properly structured
 
 ### 3. Conditional Logic Testing
+
 - ✅ Correctly proceeds when all secrets present
 - ✅ Correctly skips when secrets missing
 - ✅ Properly handles partial configuration
 - ✅ Clear warning messages for skipped deployments
 
 ### 4. Resource Naming Validation
+
 - ✅ Cosmos DB account names follow Azure requirements (lowercase, alphanumeric, hyphens)
 - ✅ Application Insights names follow Azure requirements
 - ✅ Resource group names support standard Azure naming
@@ -207,6 +226,7 @@ Configure secrets but resources exist → Workflow detects and skips deployment
 ## Next Steps
 
 Users should:
+
 1. Review `docs/COSMOS_APPINSIGHTS_DEPLOYMENT.md`
 2. Configure required secrets in GitHub repository settings
 3. Push to main branch or manually trigger workflow
@@ -224,6 +244,7 @@ Users should:
 ## Support
 
 For issues:
+
 - Check workflow run logs in GitHub Actions
 - Review Azure Portal for resource status
 - Consult `docs/COSMOS_APPINSIGHTS_DEPLOYMENT.md`

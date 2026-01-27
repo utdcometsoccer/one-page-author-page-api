@@ -26,17 +26,20 @@ This tool allows administrators to send invitation emails to authors, creating r
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/utdcometsoccer/one-page-author-page-api.git
 cd one-page-author-page-api/AuthorInvitationTool
 ```
 
-2. Restore dependencies:
+1. Restore dependencies:
+
 ```bash
 dotnet restore
 ```
 
-3. Build the project:
+1. Build the project:
+
 ```bash
 dotnet build
 ```
@@ -48,6 +51,7 @@ dotnet build
 You must configure the Cosmos DB connection. You can use any of these methods:
 
 #### Option 1: User Secrets (Recommended for Development)
+
 ```bash
 dotnet user-secrets init
 dotnet user-secrets set "CosmosDb:EndpointUri" "https://your-cosmos-account.documents.azure.com:443/"
@@ -56,6 +60,7 @@ dotnet user-secrets set "CosmosDb:DatabaseId" "OnePageAuthor"
 ```
 
 #### Option 2: Environment Variables
+
 ```bash
 export COSMOSDB_ENDPOINT_URI="https://your-cosmos-account.documents.azure.com:443/"
 export COSMOSDB_PRIMARY_KEY="your-primary-key-here"
@@ -63,7 +68,9 @@ export COSMOSDB_DATABASE_ID="OnePageAuthor"
 ```
 
 #### Option 3: appsettings.json
+
 Edit `appsettings.json` and add your configuration:
+
 ```json
 {
   "CosmosDb": {
@@ -227,6 +234,7 @@ When properly configured, the tool sends professionally formatted HTML emails wi
 ### Email Template Preview
 
 The email includes:
+
 - Header with platform branding
 - Welcome message
 - Domain being linked
@@ -248,15 +256,19 @@ The email includes:
 ### Common Issues
 
 **Problem**: "COSMOSDB_ENDPOINT_URI is required"
+
 - **Solution**: Configure Cosmos DB credentials using one of the methods above
 
 **Problem**: "Invalid email address format"
-- **Solution**: Ensure email follows standard format (user@domain.com)
+
+- **Solution**: Ensure email follows standard format (<user@domain.com>)
 
 **Problem**: "An invitation already exists for this email"
+
 - **Solution**: The tool will prompt you to confirm creating a duplicate invitation
 
 **Problem**: Email not being sent
+
 - **Solution**: Verify Azure Communication Services configuration. The invitation will still be created even if email fails.
 
 ### Debug Mode

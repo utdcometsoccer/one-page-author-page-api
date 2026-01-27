@@ -21,7 +21,6 @@ The utility seeds the following storage tiers:
 
 ### Starter Tier (Free)
 
-
 - **Storage Limit**: 5GB
 - **Bandwidth**: 25GB/month
 - **Max File Size**: 5MB
@@ -30,7 +29,6 @@ The utility seeds the following storage tiers:
 
 ### Pro Tier
 
-
 - **Storage Limit**: 250GB
 - **Bandwidth**: 1TB/month
 - **Max File Size**: 10MB
@@ -38,7 +36,6 @@ The utility seeds the following storage tiers:
 - **Monthly Cost**: $9.99
 
 ### Elite Tier
-
 
 - **Storage Limit**: 2TB
 - **Bandwidth**: 10TB/month
@@ -50,13 +47,11 @@ The utility seeds the following storage tiers:
 
 ### Prerequisites
 
-
 - .NET 9.0 SDK
 - Access to OnePageAuthor Azure Cosmos DB
 - Proper connection string configuration
 
 ### Running the Seeder
-
 
 ```bash
 # Navigate to the project directory
@@ -133,7 +128,6 @@ The seeder will:
 4. Display confirmation messages for each tier created/updated
 
 ### Sample Output
-
 
 ```
 Starting Image Storage Tiers Seeding...

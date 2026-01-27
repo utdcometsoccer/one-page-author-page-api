@@ -4,12 +4,10 @@
 
 ### 1. **Access Amazon Associates Central**
 
-
 ```
 URL: https://affiliate-program.amazon.com/
 
 ```
-
 
 - Sign in with your Amazon Associates account
 - If you don't have one, apply first (approval required)
@@ -18,13 +16,11 @@ URL: https://affiliate-program.amazon.com/
 
 #### Option A: Dashboard Method
 
-
 1. After login, look at your main dashboard
 2. Find "Associate ID" or "Tracking ID"
 3. Copy the value (format: `yourstore-20`)
 
 #### Option B: Account Settings Method
-
 
 1. Go to **"Account & Login Info"**
 2. Click **"Manage Your Tracking IDs"**
@@ -32,7 +28,6 @@ URL: https://affiliate-program.amazon.com/
 4. Copy the one you want to use
 
 #### Option C: Link Generator Method
-
 
 1. Go to **"Product Linking"** → **"Link to Any Page"**
 2. Generate any affiliate link
@@ -44,7 +39,6 @@ URL: https://affiliate-program.amazon.com/
 ❌ **Wrong Format**: `storename`, `20-storename`, `storename_20`
 
 ### 4. **Regional Suffixes**
-
 
 - 🇺🇸 **US**: `-20` (amazon.com)
 - 🇬🇧 **UK**: `-21` (amazon.co.uk)
@@ -61,12 +55,10 @@ You need **separate approval** for Product Advertising API:
 
 ### 1. Apply for PA API Access
 
-
 ```
 URL: https://developer.amazon.com/
 
 ```
-
 
 1. Sign in to Amazon Developer Portal
 2. Navigate to **"Product Advertising API"**

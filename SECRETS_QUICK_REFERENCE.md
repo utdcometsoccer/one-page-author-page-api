@@ -71,25 +71,30 @@ You can also run the scripts directly with PowerShell:
 ## Required Environment Variables
 
 ### Core (All Projects)
+
 - `COSMOSDB_ENDPOINT_URI` - Cosmos DB endpoint
 - `COSMOSDB_PRIMARY_KEY` - Cosmos DB key
 - `COSMOSDB_DATABASE_ID` - Database name (typically "OnePageAuthorDb")
 - `COSMOSDB_CONNECTION_STRING` - Full connection string
 
 ### Authentication (Optional but Recommended)
+
 - `AAD_TENANT_ID` - Azure AD tenant ID
 - `AAD_AUDIENCE` - Application/Client ID
 - `AAD_CLIENT_ID` - Client ID (if different from audience)
 - `AAD_AUTHORITY` - Authority URL (optional, auto-constructed if not provided)
 
 ### ImageAPI
+
 - `AZURE_STORAGE_CONNECTION_STRING` - Azure Blob Storage
 
 ### InkStainedWretchStripe
+
 - `STRIPE_API_KEY` - Stripe secret key (sk_test_... or sk_live_...)
 - `STRIPE_WEBHOOK_SECRET` - Webhook signing secret
 
 ### Optional External APIs
+
 - **Amazon Product API**: ACCESS_KEY, SECRET_KEY, PARTNER_TAG, REGION, MARKETPLACE, API_ENDPOINT
 - **Penguin Random House**: API_URL, API_KEY, API_DOMAIN, SEARCH_API, LIST_TITLES_BY_AUTHOR_API, URL
 - **Google Domains**: PROJECT_ID, LOCATION
@@ -100,11 +105,13 @@ See [secrets-template.json](secrets-template.json) for the complete list.
 ## Troubleshooting
 
 ### GitHub CLI Not Authenticated
+
 ```powershell
 gh auth login
 ```
 
 ### .NET SDK Not Found
+
 ```powershell
 # Windows
 winget install Microsoft.DotNet.SDK.9
@@ -117,6 +124,7 @@ brew install dotnet
 ```
 
 ### View User-Secrets
+
 ```powershell
 # List secrets for a project
 dotnet user-secrets list --project ImageAPI/ImageAPI.csproj
@@ -129,6 +137,7 @@ dotnet user-secrets clear --project ImageAPI/ImageAPI.csproj
 ```
 
 ### PowerShell Execution Policy
+
 ```powershell
 # Run as administrator
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
@@ -168,6 +177,7 @@ Simply replace the first colon with a hyphen. Subcommands still use colons (stan
 ## Support
 
 For issues or questions:
+
 1. Check the comprehensive documentation
 2. Review the troubleshooting section
 3. Open an issue on the repository
@@ -175,6 +185,7 @@ For issues or questions:
 ---
 
 **Quick Links**:
+
 - [GitHub Secrets Documentation](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
 - [.NET User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets)
 - [Azure Functions Configuration](https://learn.microsoft.com/en-us/azure/azure-functions/functions-app-settings)

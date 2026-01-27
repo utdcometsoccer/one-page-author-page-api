@@ -45,7 +45,6 @@ These settings have reasonable defaults or fallback behavior:
 
 ### ✅ Production Applications
 
-
 1. **ImageAPI** (`ImageAPI/Program.cs`)
 
    - ✅ Added validation for `COSMOSDB_ENDPOINT_URI`, `COSMOSDB_PRIMARY_KEY`, `COSMOSDB_DATABASE_ID`
@@ -71,12 +70,11 @@ These settings have reasonable defaults or fallback behavior:
 
 ### ✅ Management/Utility Applications
 
-
-5. **EntraIdRoleManager** (`EntraIdRoleManager/Program.cs`)
+1. **EntraIdRoleManager** (`EntraIdRoleManager/Program.cs`)
 
    - ✅ Already had proper validation - verified consistency
 
-6. **SeedImageStorageTiers** (`SeedImageStorageTiers/Program.cs`)
+2. **SeedImageStorageTiers** (`SeedImageStorageTiers/Program.cs`)
 
    - ✅ Already had proper validation - verified consistency
 
@@ -84,33 +82,33 @@ These settings have reasonable defaults or fallback behavior:
 
 All seeder applications updated to use standardized keys with backward compatibility:
 
-7. **SeedLocalizationData** (`SeedLocalizationData/Program.cs`)
+1. **SeedLocalizationData** (`SeedLocalizationData/Program.cs`)
 
    - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy `EndpointUri`, `PrimaryKey`, `DatabaseId`
    - ✅ Added environment variable support
 
-8. **OnePageAuthor.DataSeeder** (`OnePageAuthor.DataSeeder/Program.cs`)
+2. **OnePageAuthor.DataSeeder** (`OnePageAuthor.DataSeeder/Program.cs`)
 
    - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy keys
    - ✅ Removed unsafe emulator defaults
    - ✅ Added helpful error messages with emulator information
 
-9. **SeedLocales** (`SeedLocales/Program.cs`)
+3. **SeedLocales** (`SeedLocales/Program.cs`)
 
    - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy keys
    - ✅ Added environment variable support
 
-10. **SeedInkStainedWretchesLocale** (`SeedInkStainedWretchesLocale/Program.cs`)
+4. **SeedInkStainedWretchesLocale** (`SeedInkStainedWretchesLocale/Program.cs`)
 
     - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy keys
     - ✅ Added environment variable support
 
-11. **SeedAPIData** (`SeedAPIData/Program.cs`)
+5. **SeedAPIData** (`SeedAPIData/Program.cs`)
 
     - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy keys
     - ✅ Added environment variable support
 
-12. **IntegrationTestAuthorDataService** (`IntegrationTestAuthorDataService/Program.cs`)
+6. **IntegrationTestAuthorDataService** (`IntegrationTestAuthorDataService/Program.cs`)
 
     - ✅ Standardized to `COSMOSDB_*` keys with fallback to legacy keys
     - ✅ Added proper validation (was using empty strings as defaults)
@@ -141,7 +139,6 @@ All error messages are clear and actionable:
 - No sensitive information is logged
 
 ## Benefits
-
 
 1. **Production Safety** - No more silent failures due to missing configuration
 2. **Consistency** - Standardized configuration keys across all applications

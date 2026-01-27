@@ -10,7 +10,6 @@ This implementation adds a durable Azure Function that automatically registers d
 
 #### Interface: IGoogleDomainsService
 
-
 - **Location**: `OnePageAuthorLib/interfaces/IGoogleDomainsService.cs`
 - **Methods**:
 
@@ -18,7 +17,6 @@ This implementation adds a durable Azure Function that automatically registers d
   - `IsDomainAvailableAsync(string)` - Checks domain availability
 
 #### Implementation: GoogleDomainsService
-
 
 - **Location**: `OnePageAuthorLib/api/GoogleDomainsService.cs`
 - **Features**:
@@ -32,14 +30,12 @@ This implementation adds a durable Azure Function that automatically registers d
 
 #### Configuration Requirements
 
-
 - `GOOGLE_CLOUD_PROJECT_ID` - Google Cloud project ID (required)
 - `GOOGLE_DOMAINS_LOCATION` - Location for operations (optional, defaults to "global")
 
 ### 2. Cosmos DB Trigger Function (InkStainedWretchFunctions)
 
 #### GoogleDomainRegistrationFunction
-
 
 - **Location**: `InkStainedWretchFunctions/GoogleDomainRegistrationFunction.cs`
 - **Trigger**: Cosmos DB changes on DomainRegistrations container
@@ -61,13 +57,11 @@ This implementation adds a durable Azure Function that automatically registers d
 
 #### ServiceFactory Extension
 
-
 - **Location**: `OnePageAuthorLib/ServiceFactory.cs`
 - **Added Method**: `AddGoogleDomainsService()`
 - **Registration**: Scoped lifetime for GoogleDomainsService
 
 #### Program.cs Registration
-
 
 - **Location**: `InkStainedWretchFunctions/Program.cs`
 - **Change**: Added `.AddGoogleDomainsService()` to service registration chain
@@ -75,7 +69,6 @@ This implementation adds a durable Azure Function that automatically registers d
 ### 4. NuGet Package Dependencies
 
 #### OnePageAuthorLib
-
 
 - Added: `Google.Cloud.Domains.V1` (v2.4.0)
 
@@ -86,7 +79,6 @@ This implementation adds a durable Azure Function that automatically registers d
 ### 5. Tests
 
 #### GoogleDomainsServiceTests
-
 
 - **Location**: `OnePageAuthor.Test/GoogleDomainsServiceTests.cs`
 - **Test Coverage**:
@@ -102,7 +94,6 @@ This implementation adds a durable Azure Function that automatically registers d
 ### 6. Documentation
 
 #### GOOGLE_DOMAIN_REGISTRATION_README.md
-
 
 - **Location**: `InkStainedWretchFunctions/GOOGLE_DOMAIN_REGISTRATION_README.md`
 - **Sections**:
@@ -180,7 +171,6 @@ Each function maintains its own lease state, preventing duplicate processing.
 
 ### Azure Function App Settings
 
-
 ```
 COSMOSDB_DATABASE_ID=<database-name>
 COSMOSDB_CONNECTION_STRING=<connection-string>
@@ -190,7 +180,6 @@ GOOGLE_DOMAINS_LOCATION=global
 ```
 
 ### Google Cloud Setup
-
 
 1. Enable Cloud Domains API in Google Cloud project
 2. Configure authentication:
@@ -204,7 +193,6 @@ GOOGLE_DOMAINS_LOCATION=global
    - `roles/domains.viewer` - For availability checks
 
 ### Azure Managed Identity (Production)
-
 
 1. Enable Managed Identity on Azure Function App
 2. Configure Workload Identity Federation in Google Cloud
@@ -241,7 +229,6 @@ Integration tests are intentionally omitted because:
 
 ### New Files (5)
 
-
 - `OnePageAuthorLib/interfaces/IGoogleDomainsService.cs`
 - `OnePageAuthorLib/api/GoogleDomainsService.cs`
 - `InkStainedWretchFunctions/GoogleDomainRegistrationFunction.cs`
@@ -250,13 +237,11 @@ Integration tests are intentionally omitted because:
 
 ### Modified Files (3)
 
-
 - `OnePageAuthorLib/ServiceFactory.cs` (added extension method, fixed build error)
 - `InkStainedWretchFunctions/Program.cs` (added service registration)
 - `OnePageAuthorLib/OnePageAuthorLib.csproj` (added NuGet package)
 
 ### Lines Added
-
 
 - Production code: ~370 lines
 - Test code: ~140 lines
@@ -325,13 +310,11 @@ Integration tests are intentionally omitted because:
 
 ### Function Not Triggering
 
-
 1. Check Cosmos DB connection string
 2. Verify lease container exists and is accessible
 3. Review Application Insights for errors
 
 ### Authentication Errors
-
 
 1. Verify GOOGLE_CLOUD_PROJECT_ID is set
 2. Check Managed Identity configuration
@@ -339,7 +322,6 @@ Integration tests are intentionally omitted because:
 4. Test authentication locally with service account
 
 ### Registration Failures
-
 
 1. Verify domain is available using IsDomainAvailableAsync
 2. Check contact information is complete and valid

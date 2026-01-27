@@ -108,7 +108,6 @@ export COSMOS_DB_DATABASE="OnePageAuthorDB"
 
 ### Configuration Priority
 
-
 1. User secrets (development environment)
 2. Environment variables
 3. appsettings.json defaults (Cosmos DB Emulator)
@@ -116,7 +115,6 @@ export COSMOS_DB_DATABASE="OnePageAuthorDB"
 ## Usage
 
 ### Prerequisites
-
 
 1. .NET 9.0 SDK installed
 2. **Azure Cosmos DB Emulator** (for local development) OR Azure Cosmos DB account
@@ -213,7 +211,6 @@ Each StateProvince entry contains:
 
 ### Sample Data Examples
 
-
 ```json
 // United States Examples (All 6 Languages)
 { "Code": "CA", "Name": "California", "Country": "US", "Culture": "en-US" }
@@ -242,7 +239,6 @@ Each StateProvince entry contains:
 ```
 
 ## Total Records
-
 
 - **US States**: 54 locations × 6 languages = 324 records
 - **Canadian Provinces**: 13 locations × 6 languages = 78 records
@@ -290,6 +286,7 @@ The seeder was enhanced to implement true idempotent behavior:
 - Dedicated Country field enables efficient country-based queries
 
 **Sample Transformations:**
+
 | Region | Old Code | New Code | Country | Name Example |
 |--------|----------|----------|---------|--------------|
 | California | `US-CA` | `CA` | `US` | California/Californie |
@@ -355,7 +352,6 @@ dotnet user-secrets set "CosmosDb:Database" "OnePageAuthorDB"
 ```
 
 ### Repository and Service Updates
-
 
 - Updated `GetByCountryAsync()` to query by Country field instead of code prefix
 - Updated `GetByCountryAndCultureAsync()` to use Country field

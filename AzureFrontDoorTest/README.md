@@ -5,6 +5,7 @@ A console application for testing Azure Front Door custom domain integration. Th
 ## Purpose
 
 This test application is designed to:
+
 1. Verify Azure Front Door service integration
 2. Test DNS zone existence and configuration
 3. Validate custom domain addition to Front Door profiles
@@ -14,6 +15,7 @@ This test application is designed to:
 ## Prerequisites
 
 ### Software Requirements
+
 - .NET 10.0 SDK or later
 - Azure subscription with Front Door Premium tier
 - Azure DNS zone configured
@@ -33,10 +35,13 @@ This test application is designed to:
 3. **Azure Authentication**
    - **Option A (Recommended)**: Managed Identity (when running in Azure)
    - **Option B**: Azure CLI authentication
+
      ```bash
      az login
      ```
+
    - **Option C**: Service Principal with environment variables
+
      ```bash
      export AZURE_CLIENT_ID="your-client-id"
      export AZURE_CLIENT_SECRET="your-client-secret"
@@ -44,6 +49,7 @@ This test application is designed to:
      ```
 
 ### Permissions Required
+
 - **Front Door**: Contributor or higher on Front Door profile
 - **DNS**: Contributor on DNS zones
 - **Resource Group**: Reader or higher
@@ -178,6 +184,7 @@ The test data file should contain an array of test domain objects:
 ### Domain Naming Rules
 
 Azure Front Door custom domains must follow these rules:
+
 - Valid fully qualified domain name (FQDN)
 - No wildcard domains (e.g., *.example.com) in this test
 - Total length less than 250 characters
@@ -219,6 +226,7 @@ Azure Front Door custom domains must follow these rules:
 ### Front Door Configuration (Production Mode)
 
 In production, the actual integration would configure:
+
 - **Custom Domain**: Added to Front Door profile
 - **TLS Version**: Minimum TLS 1.2
 - **Certificate Type**: Azure-managed certificate
@@ -322,23 +330,27 @@ Skipped: 1
 ## Interpreting Results
 
 ### Success Indicators (✅ ✓)
+
 - Domain format validated successfully
 - DNS zone status confirmed (exists or needs creation)
 - Domain is ready for Front Door integration
 - Test passed
 
 ### Warning Indicators (⚠️)
+
 - DNS zone needs to be created (expected for new domains)
 - Actual configuration not performed (expected in dry run mode)
 - Domain already configured in Front Door (idempotent check)
 
 ### Failure Indicators (❌)
+
 - Invalid domain name format
 - Authentication errors
 - Missing configuration variables
 - Azure API errors
 
 ### Skip Indicators (ℹ️)
+
 - Domain already exists in Front Door
 - No action needed for this domain
 
@@ -349,6 +361,7 @@ Skipped: 1
 **Problem**: "DefaultAzureCredential failed to retrieve a token"
 
 **Solution**:
+
 ```bash
 # Option 1: Azure CLI login
 az login
@@ -371,6 +384,7 @@ export AZURE_CLIENT_SECRET="your-client-secret"
 **Problem**: "The client does not have authorization to perform action"
 
 **Solution**:
+
 1. Verify you have Contributor role on the Front Door profile
 2. Check DNS zone permissions
 3. Confirm subscription access
@@ -381,6 +395,7 @@ export AZURE_CLIENT_SECRET="your-client-secret"
 **Problem**: "Front Door profile not found"
 
 **Solution**:
+
 1. Verify the Front Door profile name is correct
 2. Confirm the resource group name matches
 3. Check the subscription ID
@@ -391,6 +406,7 @@ export AZURE_CLIENT_SECRET="your-client-secret"
 **Problem**: "Unable to check DNS zone"
 
 **Solution**:
+
 1. Verify DNS resource group name is correct
 2. Confirm you have read permissions on DNS zones
 3. Check if DNS zone resource provider is registered
@@ -516,11 +532,13 @@ Domain Active → HTTPS enabled
 ## Cost Considerations
 
 ### This Test (Dry Run)
+
 - **No charges** - Read-only operations only
 - No infrastructure changes
 - No certificate provisioning
 
 ### Production Operations
+
 - Azure Front Door Premium/Standard tier charges
 - DNS zone hosting charges
 - Certificate management (included with managed certificates)
@@ -529,6 +547,7 @@ Domain Active → HTTPS enabled
 ## Production Deployment Notes
 
 To perform actual Front Door configuration (not covered by this test):
+
 1. Remove dry run mode comments in production code
 2. Implement proper error handling and retry logic
 3. Add certificate validation monitoring
@@ -544,6 +563,7 @@ To perform actual Front Door configuration (not covered by this test):
 ### Testing with Existing Infrastructure
 
 If you have a real Front Door profile and want to test against it:
+
 1. Use actual domain names you control
 2. Have DNS zones already created
 3. Set appropriate environment variables
@@ -552,6 +572,7 @@ If you have a real Front Door profile and want to test against it:
 ### Testing DNS Zone Creation
 
 To test DNS zone creation readiness:
+
 1. Use domain names that don't have zones yet
 2. Verify the test reports they need creation
 3. Manually create zones to validate the test detects them
@@ -559,6 +580,7 @@ To test DNS zone creation readiness:
 ### Testing Domain Conflicts
 
 To test duplicate domain detection:
+
 1. Add domains to Front Door manually
 2. Run the test with those domains
 3. Verify the test skips already-configured domains
@@ -566,6 +588,7 @@ To test duplicate domain detection:
 ## Support
 
 For issues or questions:
+
 1. Check the troubleshooting section above
 2. Review Azure Front Door documentation
 3. Consult Azure DNS documentation

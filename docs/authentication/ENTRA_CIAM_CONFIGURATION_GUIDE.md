@@ -60,6 +60,7 @@ Microsoft Entra ID CIAM (Customer Identity Access Management) is purpose-built f
 ## Register Applications
 
 You need TWO app registrations:
+
 1. **API Application** - Represents your Azure Functions backend
 2. **SPA Application** - Represents your Single Page Application (front-end)
 
@@ -73,7 +74,7 @@ This represents your Azure Functions backend API.
 2. Click **New registration**
 3. Configure the registration:
    - **Name**: `InkStainedWretches API`
-   - **Supported account types**: 
+   - **Supported account types**:
      - Choose **Accounts in this organizational directory only (Single tenant)**
      - For CIAM, select **Accounts in this tenant directory**
    - **Redirect URI**: Leave blank (not needed for APIs)
@@ -119,7 +120,7 @@ If using role-based access control (e.g., ImageStorageTier roles):
 | Pro Tier | `ImageStorageTier.Pro` | Access to pro image storage tier | Users/Groups |
 | Enterprise Tier | `ImageStorageTier.Enterprise` | Access to enterprise image storage tier | Users/Groups |
 
-3. Users assigned to roles will receive these in their JWT token's `roles` claim
+1. Users assigned to roles will receive these in their JWT token's `roles` claim
 
 ### Register the SPA Application
 
@@ -131,13 +132,13 @@ This represents your React/Angular/Vue Single Page Application.
 2. Click **New registration**
 3. Configure the registration:
    - **Name**: `Ink Stained Wretches SPA` (or your SPA name)
-   - **Supported account types**: 
+   - **Supported account types**:
      - **Accounts in this organizational directory only**
-   - **Redirect URI**: 
+   - **Redirect URI**:
      - Platform: **Single-page application (SPA)**
      - URI: `https://inkstainedwretches.com/auth-callback/`
      - For local development, add the appropriate localhost URL based on your frontend framework:
-     
+
      | Framework/Platform | Default Port | Redirect URI |
      |-------------------|--------------|--------------|
      | Vite | 5173 | `http://localhost:5173/auth-callback/` |
@@ -146,6 +147,7 @@ This represents your React/Angular/Vue Single Page Application.
      | Angular | 4200 | `http://localhost:4200/auth-callback/` |
      | Vue CLI | 8080 | `http://localhost:8080/auth-callback/` |
      | Custom/Other | varies | `http://localhost:{PORT}/auth-callback/` |
+
 4. Click **Register**
 
 #### Step 2: Record Application Details
@@ -196,6 +198,7 @@ Your SPA needs permission to call your API:
 3. Click **Save**
 
 **Note**: CIAM token lifetimes are managed at the tenant level with sensible defaults optimized for customer-facing applications:
+
 - **Access token**: 60-90 minutes (default)
 - **Refresh token**: 14 days (default)  
 - **ID token**: 60 minutes (default)
@@ -433,6 +436,7 @@ if (!string.IsNullOrWhiteSpace(tenantId) && !string.IsNullOrWhiteSpace(audience)
 ```
 
 **Key Points:**
+
 - ✅ `RefreshOnIssuerKeyNotFound = true` - Essential for handling signing key rotation
 - ✅ `AutomaticRefreshInterval` - Proactively refreshes keys every 6 hours
 - ✅ `RefreshInterval` - Rate limits metadata endpoint requests (30 minutes minimum)
@@ -469,6 +473,7 @@ curl -X GET "$FUNCTION_URL" \
 ```
 
 **Expected Results:**
+
 - ✅ **Valid token**: HTTP 200 OK with data
 - ❌ **Invalid token**: HTTP 401 Unauthorized with error message
 - ❌ **Missing token**: HTTP 401 Unauthorized
@@ -491,7 +496,7 @@ curl -X GET "$FUNCTION_URL" \
 
 ### Step 3: Verify JWT Token Contents
 
-Use https://jwt.ms to decode your access token and verify:
+Use <https://jwt.ms> to decode your access token and verify:
 
 ✅ **Issuer (`iss`)**: `https://login.microsoftonline.com/{tenant-id}/v2.0`
 ✅ **Audience (`aud`)**: Your API client ID
@@ -524,10 +529,12 @@ traces
 ### Issue: SPA Not Redirecting to Sign-In
 
 **Symptoms:**
+
 - Clicking sign-in does nothing
 - No redirect to Microsoft sign-in page
 
 **Resolution:**
+
 1. Check browser console for errors
 2. Verify `msalConfig.auth.clientId` matches SPA app registration
 3. Verify `msalConfig.auth.authority` uses correct tenant ID
@@ -537,10 +544,12 @@ traces
 ### Issue: "AADSTS50011: Invalid redirect URI"
 
 **Symptoms:**
+
 - Error after sign-in
 - Redirect fails
 
 **Resolution:**
+
 1. Go to SPA app registration → Authentication
 2. Verify redirect URI matches exactly (case-sensitive, trailing slashes matter)
 3. Ensure URI is registered under **Single-page application** platform
@@ -549,24 +558,28 @@ traces
 ### Issue: API Returns 401 Unauthorized
 
 **Symptoms:**
+
 - Valid user signed in to SPA
 - API calls return 401
 
 **Resolution:**
+
 1. Verify `AAD_TENANT_ID` and `AAD_AUDIENCE` are set in Function App configuration
 2. Verify token is being sent: `Authorization: Bearer <token>`
-3. Decode token at https://jwt.ms and verify `aud` claim matches `AAD_AUDIENCE`
+3. Decode token at <https://jwt.ms> and verify `aud` claim matches `AAD_AUDIENCE`
 4. Check Application Insights logs for specific error
 5. See [JWT_INVALID_TOKEN_TROUBLESHOOTING.md](JWT_INVALID_TOKEN_TROUBLESHOOTING.md) for detailed troubleshooting
 
 ### Issue: "IDX10503: Signature validation failed"
 
 **Symptoms:**
+
 - `SecurityTokenSignatureKeyNotFoundException`
 - Token signature cannot be validated
 
 **Resolution:**
 This occurs during signing key rotation. Verify:
+
 1. `RefreshOnIssuerKeyNotFound = true` is set in Program.cs
 2. ConfigurationManager is configured with refresh intervals
 3. Function App has internet access to `login.microsoftonline.com`
@@ -575,10 +588,12 @@ This occurs during signing key rotation. Verify:
 ### Issue: Token Contains Wrong Audience
 
 **Symptoms:**
+
 - Token validation fails
 - `aud` claim doesn't match expected value
 
 **Resolution:**
+
 1. In SPA, verify you're requesting correct scope: `api://{api-client-id}/access_as_user`
 2. Verify API app registration Application ID URI is set correctly
 3. Ensure SPA has API permission granted

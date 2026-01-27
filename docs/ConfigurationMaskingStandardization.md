@@ -8,7 +8,6 @@ All applications in the OnePageAuthor API repository have been updated with stan
 
 ### Helper Functions Added to All Applications
 
-
 ```csharp
 // Helper function to mask sensitive configuration values
 static string MaskSensitiveValue(string? value, string notSetText = "(not set)")
@@ -30,7 +29,6 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 ### Masking Rules
 
-
 - **Short values (< 8 chars)**: Show "(set)" to avoid revealing too much
 - **Sensitive values (8+ chars)**: Show first 4 chars + "****" + last 4 chars
 - **URLs (12+ chars)**: Show first 8 chars + "****" + last 4 chars (more context for debugging)
@@ -42,9 +40,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 ### ✅ Production Azure Functions
 
-
 1. **ImageAPI** (`ImageAPI/Program.cs`)
-
 
    ```
 
@@ -60,7 +56,6 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 2. **InkStainedWretchFunctions** (`InkStainedWretchFunctions/Program.cs`)
 
-
    ```
 
    Cosmos DB Endpoint configured: https:****com/
@@ -70,7 +65,6 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
    ```
 
 3. **InkStainedWretchStripe** (`InkStainedWretchStripe/Program.cs`)
-
 
    ```
 
@@ -86,7 +80,6 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 4. **function-app** (`function-app/Program.cs`)
 
-
    ```
 
    Cosmos DB Endpoint configured: https:****com/
@@ -97,9 +90,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 ### ✅ Management/Utility Applications
 
-
-5. **EntraIdRoleManager** (`EntraIdRoleManager/Program.cs`)
-
+1. **EntraIdRoleManager** (`EntraIdRoleManager/Program.cs`)
 
    ```
 
@@ -112,8 +103,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
    ```
 
-6. **SeedImageStorageTiers** (`SeedImageStorageTiers/Program.cs`)
-
+2. **SeedImageStorageTiers** (`SeedImageStorageTiers/Program.cs`)
 
    ```
 
@@ -125,9 +115,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 ### ✅ Data Seeder Applications
 
-
-7. **SeedAPIData** (`SeedAPIData/Program.cs`)
-
+1. **SeedAPIData** (`SeedAPIData/Program.cs`)
 
    ```
 
@@ -137,8 +125,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
    ```
 
-8. **SeedInkStainedWretchesLocale** (`SeedInkStainedWretchesLocale/Program.cs`)
-
+2. **SeedInkStainedWretchesLocale** (`SeedInkStainedWretchesLocale/Program.cs`)
 
    ```
 
@@ -148,8 +135,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
    ```
 
-9. **OnePageAuthor.DataSeeder** (`OnePageAuthor.DataSeeder/Program.cs`)
-
+3. **OnePageAuthor.DataSeeder** (`OnePageAuthor.DataSeeder/Program.cs`)
 
    ```
 
@@ -159,8 +145,7 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
    ```
 
-10. **IntegrationTestAuthorDataService** (`IntegrationTestAuthorDataService/Program.cs`)
-
+4. **IntegrationTestAuthorDataService** (`IntegrationTestAuthorDataService/Program.cs`)
 
     ```
 
@@ -175,7 +160,6 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 ### Always Masked
 
-
 - **Cosmos DB Primary Keys**: `MaskSensitiveValue()` - Shows `C2y6****Jw==`
 - **Azure Storage Connection Strings**: `MaskSensitiveValue()` - Shows connection string secrets masked
 - **Stripe API Keys**: `MaskSensitiveValue()` - Shows `sk_t****_1N2`
@@ -185,12 +169,10 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 ### URL Masked (More Context)
 
-
 - **Cosmos DB Endpoints**: `MaskUrl()` - Shows `https:****com/`
 - **Azure AD Authority URLs**: `MaskUrl()` - Shows `https:****v2.0`
 
 ### Never Masked (Not Sensitive)
-
 
 - **Database IDs**: Shown in full (useful for debugging, not sensitive)
 - **Domain Names**: Shown in full (not sensitive)
@@ -198,12 +180,10 @@ static string MaskUrl(string? value, string notSetText = "(not set)")
 
 ### Optional Values
 
-
 - **Azure AD Settings**: Show "(not set)" when not configured
 - All optional authentication parameters handled gracefully
 
 ## Security Benefits
-
 
 1. **No Secrets in Logs**: All sensitive values are properly masked
 2. **Debugging Friendly**: Enough context to verify configuration without exposing secrets

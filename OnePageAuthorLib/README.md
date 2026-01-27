@@ -42,7 +42,6 @@ OnePageAuthorLib/
 
 ### Entity Models
 
-
 - **Author**: Core author information and metadata
 - **Article**: Blog posts and content management
 - **Book**: Book metadata and publishing information
@@ -50,13 +49,11 @@ OnePageAuthorLib/
 
 ### Data Services
 
-
 - **Cosmos DB Integration**: NoSQL document storage and querying
 - **Repository Pattern**: Abstracted data access with interfaces
 - **Connection Management**: Efficient database connection handling
 
 ### Business Services
-
 
 - **Authentication Services**: JWT token validation and user context
 - **Stripe Integration**: Payment processing and subscription management
@@ -67,13 +64,11 @@ OnePageAuthorLib/
 
 ### Prerequisites
 
-
 - .NET 9.0 SDK
 - Azure Cosmos DB account
 - Visual Studio 2022 or VS Code
 
 ### Building the Library
-
 
 ```bash
 # Restore dependencies

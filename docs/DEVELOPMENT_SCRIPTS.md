@@ -134,7 +134,6 @@ Stops all running Azure Functions background jobs and cleans up completed jobs.
 
 ### Install Prerequisites
 
-
 ```powershell
 # Install Azure Functions Core Tools (if needed)
 npm install -g azure-functions-core-tools@4 --unsafe-perm true
@@ -182,6 +181,7 @@ gh secret list
 ```
 
 **What to configure:**
+
 - ✅ **Core Infrastructure** - Azure credentials, resource group, location (REQUIRED)
 - ✅ **Cosmos DB** - Connection string, endpoint, key, database ID (REQUIRED)
 - ⚙️ **Azure Storage** - Required if using ImageAPI
@@ -189,7 +189,6 @@ gh secret list
 - ⚙️ **External APIs** - Amazon, PRH, Google Domains (optional)
 
 ### 🚀 Start Development Session
-
 
 ```powershell
 # Full update and run (recommended daily)
@@ -204,7 +203,6 @@ gh secret list
 ```
 
 ### 🔧 During Development
-
 
 ```powershell
 # Check function status
@@ -224,7 +222,6 @@ Invoke-RestMethod http://localhost:7002/api/health
 
 ### 🛑 End Development Session
 
-
 ```powershell
 # Stop all functions cleanly
 .\Scripts\StopFunctions.ps1
@@ -239,7 +236,6 @@ Stop-Job -Name "InkStainedWretchStripe"
 ## Job Management Commands
 
 ### View Jobs
-
 
 ```powershell
 # List all background jobs
@@ -257,7 +253,6 @@ Receive-Job -Id <JobId>
 ```
 
 ### Control Jobs
-
 
 ```powershell
 # Stop specific job
@@ -286,7 +281,6 @@ Once started, the Azure Functions will be available at:
 | **InkStainedWretchStripe** | `http://localhost:7002` | Stripe payment processing |
 
 ### Common API Endpoints
-
 
 ```powershell
 # StateProvince endpoints (InkStainedWretchFunctions)
@@ -351,7 +345,6 @@ func start --port 8002  # In InkStainedWretchStripe directory
 ```
 
 ### Performance Tips
-
 
 - Use `-SkipUpdate` flag when packages don't need updating (faster startup)
 - Use `-SkipBuild` when only restarting functions after minor changes

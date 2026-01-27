@@ -28,6 +28,7 @@ Setting up only the required secrets for basic deployment:
 ```
 
 **Sample interaction:**
+
 ```
 ═══════════════════════════════════════════════════════
   Core Infrastructure
@@ -107,6 +108,7 @@ notepad secrets.json  # or code secrets.json for VS Code
 ```
 
 **Output:**
+
 ```
 ═══════════════════════════════════════════════════════
   Loading Secrets from Config File
@@ -173,6 +175,7 @@ npm run init:secrets:help
 ## Example 5: Text File Format (Legacy)
 
 **secrets.txt:**
+
 ```
 ISW_RESOURCE_GROUP=rg-onepageauthor-prod
 ISW_LOCATION=eastus
@@ -210,6 +213,7 @@ To update secrets (e.g., after key rotation):
 For a minimal deployment (no Stripe, no external APIs):
 
 **minimal-secrets.json:**
+
 ```json
 {
   "ISW_RESOURCE_GROUP": "rg-minimal",
@@ -229,6 +233,7 @@ For a minimal deployment (no Stripe, no external APIs):
 Including all optional features:
 
 **full-secrets.json:**
+
 ```json
 {
   "Core Infrastructure": {},
@@ -328,7 +333,8 @@ gh repo view --json name,owner,viewerPermission
 
 ## Security Best Practices
 
-### ✅ DO:
+### ✅ DO
+
 - Use different secrets for dev/staging/prod
 - Rotate secrets regularly
 - Use test/sandbox API keys for non-production
@@ -336,7 +342,8 @@ gh repo view --json name,owner,viewerPermission
 - Use `sk_test_*` for Stripe in development
 - Delete secrets.json after use
 
-### ❌ DON'T:
+### ❌ DON'T
+
 - Commit secrets to git
 - Share secrets via email or chat
 - Use production secrets in development

@@ -3,7 +3,9 @@
 ## Issue: 401 Unauthorized from Ink Stained Wretches APIs
 
 ### Problem Statement
+
 All authenticated APIs in the InkStainedWretchFunctions project were returning `401 Unauthorized` errors in production environments, despite:
+
 - JWT authentication working correctly in development
 - CORS being properly configured
 - Valid JWT tokens being provided by clients
@@ -23,6 +25,7 @@ The issue was caused by **double authentication requirements** in the Azure Func
    - Requires: `Authorization: Bearer <jwt-token>` header
 
 **The Problem**: Clients needed to provide BOTH:
+
 - Azure Functions host key (for `AuthorizationLevel.Function`)
 - JWT Bearer token (for application-level authentication)
 
@@ -31,6 +34,7 @@ In production environments, only JWT tokens were being provided, causing the 401
 ### Solution
 
 Changed `AuthorizationLevel.Function` to `AuthorizationLevel.Anonymous` for all endpoints that implement manual JWT token validation. This ensures:
+
 - ✅ Only JWT Bearer tokens are required for authentication
 - ✅ JWT validation logic remains fully functional and provides security
 - ✅ No Azure Functions host keys needed by clients
@@ -39,19 +43,25 @@ Changed `AuthorizationLevel.Function` to `AuthorizationLevel.Anonymous` for all 
 ### Files Modified
 
 #### InkStainedWretchFunctions/DomainRegistrationFunction.cs
+
 Changed 4 endpoints from `AuthorizationLevel.Function` to `AuthorizationLevel.Anonymous`:
+
 - `CreateDomainRegistration` (POST /api/domain-registrations)
 - `GetDomainRegistrations` (GET /api/domain-registrations)
 - `GetDomainRegistrationById` (GET /api/domain-registrations/{registrationId})
 - `UpdateDomainRegistration` (PUT /api/domain-registrations/{registrationId})
 
 #### InkStainedWretchFunctions/PenguinRandomHouseFunction.cs
+
 Changed 2 endpoints from `AuthorizationLevel.Function` to `AuthorizationLevel.Anonymous`:
+
 - `SearchPenguinAuthors` (GET /api/penguin/authors/{authorName})
 - `GetPenguinTitlesByAuthor` (GET /api/penguin/authors/{authorKey}/titles)
 
 #### InkStainedWretchFunctions/AmazonProductFunction.cs
+
 Changed 1 endpoint from `AuthorizationLevel.Function` to `AuthorizationLevel.Anonymous`:
+
 - `SearchAmazonBooksByAuthor` (GET /api/amazon/books/author/{authorName})
 
 ### Already Correct Configurations
@@ -59,13 +69,17 @@ Changed 1 endpoint from `AuthorizationLevel.Function` to `AuthorizationLevel.Ano
 The following functions were already correctly configured and did NOT require changes:
 
 #### Functions with `[Authorize]` Attribute (ASP.NET Core Authorization)
+
 These use `AuthorizationLevel.Anonymous` with declarative authorization:
+
 - `CreateTestimonial` (POST /api/testimonials)
 - `UpdateTestimonial` (PUT /api/testimonials/{id})
 - `DeleteTestimonial` (DELETE /api/testimonials/{id})
 
 #### Functions with Manual JWT Validation Already Using Anonymous
+
 These already used `AuthorizationLevel.Anonymous`:
+
 - `GetAuthors` (GET /api/authors/{secondLevelDomain}/{topLevelDomain})
 - `GetStateProvinces` (GET /api/stateprovinces/{culture})
 - `GetStateProvincesByCountry` (GET /api/stateprovinces/{countryCode}/{culture})
@@ -75,6 +89,7 @@ These already used `AuthorizationLevel.Anonymous`:
 This change **does not reduce security**:
 
 ✅ **Security is maintained** because:
+
 - JWT token validation is performed by `JwtAuthenticationHelper.ValidateJwtTokenAsync()`
 - JWT tokens are validated against Microsoft Entra ID (Azure AD)
 - Token signature, issuer, audience, and expiration are all verified
@@ -84,6 +99,7 @@ This change **does not reduce security**:
   - `AAD_AUDIENCE` (application client ID)
 
 ⚠️ **What changed**:
+
 - Removed requirement for Azure Functions host keys
 - Functions are now accessible without function keys
 - JWT tokens provide the authentication and authorization
@@ -100,6 +116,7 @@ For JWT authentication to work properly, the following environment variables mus
 | `OPEN_ID_CONNECT_METADATA_URL` | ⚪ Optional | Override default OpenID metadata URL |
 
 **Default metadata URL** (if not specified):
+
 ```
 https://login.microsoftonline.com/{AAD_TENANT_ID}/v2.0/.well-known/openid-configuration
 ```
@@ -109,6 +126,7 @@ https://login.microsoftonline.com/{AAD_TENANT_ID}/v2.0/.well-known/openid-config
 #### Local Development Testing
 
 1. **Start the function app**:
+
    ```bash
    cd InkStainedWretchFunctions
    func start
@@ -117,6 +135,7 @@ https://login.microsoftonline.com/{AAD_TENANT_ID}/v2.0/.well-known/openid-config
 2. **Obtain a JWT token** from Microsoft Entra ID
 
 3. **Test an endpoint**:
+
    ```bash
    curl -X GET "https://localhost:7071/api/domain-registrations" \
      -H "Authorization: Bearer YOUR_JWT_TOKEN"
@@ -141,16 +160,19 @@ curl -X GET "https://your-function-app.azurewebsites.net/api/domain-registration
 If other Azure Functions in the solution have the same issue, follow this pattern:
 
 1. **Identify functions with `AuthorizationLevel.Function`**:
+
    ```bash
    grep -r "AuthorizationLevel.Function" --include="*.cs"
    ```
 
 2. **Check if they manually validate JWT tokens**:
+
    ```csharp
    var (user, errorResult) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, ...);
    ```
 
 3. **If yes, change to `AuthorizationLevel.Anonymous`**:
+
    ```csharp
    // Before:
    [HttpTrigger(AuthorizationLevel.Function, "get", Route = "...")] 

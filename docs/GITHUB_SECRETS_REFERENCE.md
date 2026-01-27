@@ -48,6 +48,7 @@ Use this checklist when setting up the deployment workflow:
 **Format**: JSON object
 **Required**: Yes
 **Example**:
+
 ```json
 {
   "clientId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
@@ -58,6 +59,7 @@ Use this checklist when setting up the deployment workflow:
 ```
 
 **How to obtain**:
+
 ```bash
 az ad sp create-for-rbac --name "github-actions-sp" \
   --role Contributor \
@@ -72,6 +74,7 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 **Example**: `InkStainedWretches-RG`
 **Description**: The Azure resource group where all Ink Stained Wretches resources will be deployed.
 **Notes**:
+
 - Will be created if it doesn't exist
 - Should use a descriptive name
 - Recommended format: `{ProjectName}-RG`
@@ -83,6 +86,7 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 **Example**: `West US 2`, `East US`, `Central US`
 **Description**: The Azure region where resources will be deployed.
 **Common values**:
+
 - `East US`
 - `West US 2`
 - `Central US`
@@ -90,6 +94,7 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 - `Southeast Asia`
 
 **How to list available locations**:
+
 ```bash
 az account list-locations -o table
 ```
@@ -101,12 +106,14 @@ az account list-locations -o table
 **Example**: `inkstainedwretches`, `myapp`, `authorapi`
 **Description**: Base name used to generate all resource names.
 **Constraints**:
+
 - Must be globally unique
 - Use only lowercase letters and numbers
 - Keep it short (recommended: 10-20 characters)
 - Storage account name generated from this must be 3-24 characters
 
 **Generated resource names**:
+
 - Storage Account: `{baseName}storage` (e.g., `inkstainedwretchesstorage`)
 - Key Vault: `{baseName}-kv` (e.g., `inkstainedwretches-kv`)
 - App Insights: `{baseName}-insights`
@@ -123,6 +130,7 @@ az account list-locations -o table
 **Description**: Azure Cosmos DB connection string for database access.
 
 **How to obtain**:
+
 ```bash
 az cosmosdb keys list \
   --name {cosmos-account-name} \
@@ -132,6 +140,7 @@ az cosmosdb keys list \
 ```
 
 **Alternative** (via Azure Portal):
+
 1. Navigate to Azure Cosmos DB account
 2. Go to "Keys" blade
 3. Copy "PRIMARY CONNECTION STRING"
@@ -181,6 +190,7 @@ az cosmosdb keys list \
 **Description**: Stripe secret API key for payment processing.
 
 **How to obtain**:
+
 1. Login to [Stripe Dashboard](https://dashboard.stripe.com)
 2. Go to Developers → API Keys
 3. Copy "Secret key"
@@ -195,11 +205,13 @@ az cosmosdb keys list \
 
 **How to construct**:
 For Entra External ID/CIAM tenants:
+
 ```
 https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/
 ```
 
 For standard Entra ID tenants (default behavior when only `AAD_TENANT_ID` is set):
+
 ```
 https://login.microsoftonline.com/{AAD_TENANT_ID}/v2.0
 ```
@@ -212,12 +224,14 @@ https://login.microsoftonline.com/{AAD_TENANT_ID}/v2.0
 **Description**: Microsoft Entra ID (Azure AD) tenant identifier.
 
 **How to obtain**:
+
 1. Navigate to Azure Portal
 2. Go to "Microsoft Entra ID" (or "Azure Active Directory")
 3. Go to "Overview"
 4. Copy "Tenant ID"
 
 **Alternative** (CLI):
+
 ```bash
 az account show --query tenantId -o tsv
 ```
@@ -230,6 +244,7 @@ az account show --query tenantId -o tsv
 **Description**: The Application (Client) ID of your API app registration.
 
 **How to obtain**:
+
 1. Navigate to Azure Portal
 2. Go to "Microsoft Entra ID" → "App registrations"
 3. Select your API application
@@ -240,13 +255,16 @@ az account show --query tenantId -o tsv
 **Format**: Comma-separated URL list
 **Required**: No (recommended)
 **Example**:
+
 ```
 https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/,
 https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0
 ```
+
 **Description**: Allows multiple JWT issuers for validation. If not set, the apps fall back to a single issuer derived from `AAD_TENANT_ID`/`AAD_AUTHORITY`.
 
 **Guidance**:
+
 - Use v2.0 endpoints.
 - Include your tenant’s issuer and (optionally) Microsoft’s common tenant when needed.
 - Keep this in GitHub Secrets for CI/CD and in user-secrets locally.
@@ -279,6 +297,7 @@ https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0
 **Example**: `yourdomain.com`, `example.org`
 **Description**: Custom domain name for DNS zone creation.
 **Notes**:
+
 - Do not include "https://" or "www"
 - Must be a valid domain name you own
 - Used for custom domain mapping
@@ -290,6 +309,7 @@ https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0
 **Example**: `true`
 **Description**: Flag to enable/disable ImageAPI Function App deployment.
 **Notes**:
+
 - Set to `"true"` to deploy
 - Leave empty or set to `"false"` to skip
 - Infrastructure must be deployed first
@@ -301,6 +321,7 @@ https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0
 **Example**: `true`
 **Description**: Flag to enable/disable InkStainedWretchFunctions deployment.
 **Notes**:
+
 - Set to `"true"` to deploy
 - Leave empty or set to `"false"` to skip
 - Infrastructure must be deployed first
@@ -312,6 +333,7 @@ https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0
 **Example**: `true`
 **Description**: Flag to enable/disable InkStainedWretchStripe deployment.
 **Notes**:
+
 - Set to `"true"` to deploy
 - Leave empty or set to `"false"` to skip
 - Requires `STRIPE_API_KEY` to be configured
@@ -324,6 +346,7 @@ https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0
 **Example**: `true`
 **Description**: Flag to enable/disable InkStainedWretchesConfig deployment.
 **Notes**:
+
 - Set to `"true"` to deploy
 - Leave empty or set to `"false"` to skip
 - Provides configuration management and Key Vault integration endpoints
@@ -336,6 +359,7 @@ https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0
 **Example**: `true`
 **Description**: Enable/disable Azure Communication Services deployment for email notifications.
 **Notes**:
+
 - Set to `"true"` to deploy
 - Leave empty or set to `"false"` to skip
 - When enabled, automatically registers the `Microsoft.Communication` resource provider
@@ -353,6 +377,7 @@ https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2X_1_SignUpSignIn/v2.0
 ### Scenario 1: Full Deployment (All Resources)
 
 Configure all required secrets plus:
+
 - `DEPLOY_IMAGE_API=true`
 - `DEPLOY_ISW_FUNCTIONS=true`
 - `DEPLOY_ISW_STRIPE=true`
@@ -370,6 +395,7 @@ Configure only required secrets, skip deployment control flags.
 ### Scenario 3: Partial Deployment
 
 Configure required secrets plus specific deployment flags:
+
 - `DEPLOY_IMAGE_API=true`
 - Leave others empty
 
@@ -378,6 +404,7 @@ Configure required secrets plus specific deployment flags:
 ### Scenario 4: Existing function-app Only
 
 Configure only:
+
 - `AZURE_CREDENTIALS`
 - `AZURE_FUNCTIONAPP_NAME`
 - `AZURE_RESOURCE_GROUP`
@@ -497,6 +524,7 @@ The deployment workflow (`.github/workflows/main_onepageauthorapi.yml`) reads Gi
 ## 📞 Support
 
 If you need help setting up secrets:
+
 1. Review this document and the [Deployment Guide](DEPLOYMENT_GUIDE.md)
 2. Check the GitHub Actions logs for specific error messages
 3. Verify secret names match exactly (case-sensitive)
@@ -507,7 +535,8 @@ If you need help setting up secrets:
 ---
 
 **Last Updated**: 2024
-**Related Documentation**: 
+**Related Documentation**:
+
 - [Deployment Guide](DEPLOYMENT_GUIDE.md)
 - [Deployment Architecture](DEPLOYMENT_ARCHITECTURE.md)
 - [README.md](../README.md)

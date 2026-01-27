@@ -15,7 +15,6 @@ The image storage tier system has been refactored to use Microsoft Entra ID App 
 
 ### Before
 
-
 ```
 User Authentication → Cosmos DB Lookup (ImageStorageTierMembership) → Tier Determination
                                     ↓
@@ -24,7 +23,6 @@ User Authentication → Cosmos DB Lookup (ImageStorageTierMembership) → Tier D
 ```
 
 ### After
-
 
 ```
 User Authentication → JWT Roles Claim → Tier Determination
@@ -54,7 +52,6 @@ The EntraIdRoleManager console application performs the migration:
 
 1. Configure environment variables or user secrets:
 
-
    ```bash
 
    dotnet user-secrets set "COSMOSDB_ENDPOINT_URI" "<your-endpoint>"
@@ -67,7 +64,6 @@ The EntraIdRoleManager console application performs the migration:
    ```
 
 2. Run the migration:
-
 
    ```bash
 

@@ -24,21 +24,25 @@ The secrets configuration system supports three key workflows:
 ### First Time Setup
 
 1. **Copy the template**
+
    ```powershell
    Copy-Item secrets-template.json secrets.config.json
    ```
 
 2. **Edit with your values**
+
    ```powershell
    code secrets.config.json  # or your preferred editor
    ```
 
 3. **Set GitHub Secrets** (for CI/CD)
+
    ```powershell
    npm run init-secrets -- -ConfigFile secrets.config.json
    ```
 
 4. **Set Local User Secrets** (for development)
+
    ```powershell
    .\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
    ```
@@ -68,6 +72,7 @@ npm run init-secrets -- -ConfigFile secrets.config.json
 **Purpose**: Configure GitHub repository secrets for CI/CD deployment.
 
 **Usage**:
+
 ```powershell
 # Interactive mode (prompts for each secret)
 .\Scripts\Initialize-GitHubSecrets.ps1 -Interactive
@@ -82,6 +87,7 @@ npm run init-secrets:help               # Show help
 ```
 
 **Features**:
+
 - Validates prerequisites (GitHub CLI, authentication)
 - Supports interactive prompts or file-based configuration
 - Automatically handles sensitive value masking
@@ -89,6 +95,7 @@ npm run init-secrets:help               # Show help
 - Provides detailed progress and confirmation
 
 **Prerequisites**:
+
 - GitHub CLI (`gh`) installed and authenticated
 - PowerShell 7+ (Core)
 - Repository access with secrets write permission
@@ -98,6 +105,7 @@ npm run init-secrets:help               # Show help
 **Purpose**: Update an existing secrets configuration file with missing variables from the template.
 
 **Usage**:
+
 ```powershell
 # Update with default files
 .\Scripts\Update-SecretsConfig.ps1
@@ -113,6 +121,7 @@ npm run init-secrets:help               # Show help
 ```
 
 **Features**:
+
 - Compares your secrets file with the latest template
 - Adds missing variables with empty values
 - Preserves existing values (never overwrites)
@@ -120,6 +129,7 @@ npm run init-secrets:help               # Show help
 - Maintains JSON structure and formatting
 
 **Use Cases**:
+
 - New environment variables added to the platform
 - Migrating from an older secrets file format
 - Ensuring your configuration is complete
@@ -129,6 +139,7 @@ npm run init-secrets:help               # Show help
 **Purpose**: Configure dotnet user-secrets for all Azure Function projects from a configuration file.
 
 **Usage**:
+
 ```powershell
 # Set for all projects
 .\Scripts\Set-DotnetUserSecrets.ps1 -ConfigFile secrets.config.json
@@ -144,6 +155,7 @@ npm run init-secrets:help               # Show help
 ```
 
 **Features**:
+
 - Automatically discovers Azure Function projects
 - Initializes user-secrets if not already set up
 - Filters secrets per project (only sets relevant ones)
@@ -164,6 +176,7 @@ The script intelligently sets only relevant secrets for each project:
 **Purpose**: Master template containing all possible configuration variables.
 
 **Structure**:
+
 ```json
 {
   "_comment": "Descriptive comment",
@@ -178,6 +191,7 @@ The script intelligently sets only relevant secrets for each project:
 ```
 
 **Maintenance**:
+
 - Keep this file updated when adding new environment variables
 - Use descriptive comments for each category
 - Provide sensible defaults where applicable
@@ -231,6 +245,7 @@ npm run init-secrets -- -ConfigFile secrets.config.json
 ### Environment-Specific Configuration
 
 **Development**:
+
 ```powershell
 # Use test credentials
 Copy-Item secrets-template.json secrets.dev.json
@@ -239,6 +254,7 @@ Copy-Item secrets-template.json secrets.dev.json
 ```
 
 **Production**:
+
 ```powershell
 # Use production credentials
 Copy-Item secrets-template.json secrets.prod.json
@@ -283,6 +299,7 @@ npm run init-secrets -- -ConfigFile secrets.prod.json
 ### External APIs (Optional)
 
 **Amazon Product API**:
+
 - `AMAZON_PRODUCT_ACCESS_KEY` - AWS access key
 - `AMAZON_PRODUCT_SECRET_KEY` - AWS secret key
 - `AMAZON_PRODUCT_PARTNER_TAG` - Associates tag
@@ -291,6 +308,7 @@ npm run init-secrets -- -ConfigFile secrets.prod.json
 - `AMAZON_PRODUCT_API_ENDPOINT` - API endpoint
 
 **Penguin Random House**:
+
 - `PENGUIN_RANDOM_HOUSE_API_URL` - Base URL
 - `PENGUIN_RANDOM_HOUSE_API_KEY` - API key
 - `PENGUIN_RANDOM_HOUSE_API_DOMAIN` - Domain
@@ -376,12 +394,14 @@ See [secrets-template.json](../secrets-template.json) for complete list.
 ### GitHub CLI Issues
 
 **Error**: "GitHub CLI is not authenticated"
+
 ```powershell
 # Solution: Authenticate
 gh auth login
 ```
 
 **Error**: "Failed to set secret"
+
 - Check repository permissions
 - Verify you have Secrets write access
 - Try refreshing authentication: `gh auth refresh`
@@ -389,6 +409,7 @@ gh auth login
 ### Dotnet User-Secrets Issues
 
 **Error**: ".NET SDK is not installed"
+
 ```powershell
 # Solution: Install .NET SDK
 # Windows: winget install Microsoft.DotNet.SDK.9
@@ -397,12 +418,14 @@ gh auth login
 ```
 
 **Error**: "User-secrets not initialized"
+
 ```powershell
 # Solution: Initialize manually
 dotnet user-secrets init --project ImageAPI/ImageAPI.csproj
 ```
 
 **Verify user-secrets**:
+
 ```powershell
 # List secrets for a project
 dotnet user-secrets list --project ImageAPI/ImageAPI.csproj
@@ -417,16 +440,19 @@ dotnet user-secrets clear --project ImageAPI/ImageAPI.csproj
 ### Configuration Issues
 
 **Error**: "Configuration file not found"
+
 - Verify file path is correct
 - Check file is in the repository root
 - Ensure file extension is `.json`
 
 **Error**: "Failed to parse configuration file"
+
 - Validate JSON syntax
 - Check for missing commas or brackets
 - Use a JSON validator or formatter
 
 **Missing values in application**:
+
 1. Verify secrets are set: `dotnet user-secrets list --project [project]`
 2. Check variable name spelling
 3. Restart the Function App or development environment
@@ -435,12 +461,14 @@ dotnet user-secrets clear --project ImageAPI/ImageAPI.csproj
 ### Script Issues
 
 **Error**: PowerShell execution policy
+
 ```powershell
 # Solution: Set execution policy (run as administrator)
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 **Error**: "Cannot run script"
+
 - Check PowerShell version: `pwsh --version` (need 7+)
 - Verify file path
 - Try running with explicit PowerShell: `pwsh -File .\script.ps1`
@@ -448,12 +476,14 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ## Additional Resources
 
 ### Documentation
+
 - [GITHUB_SECRETS_SETUP.md](GITHUB_SECRETS_SETUP.md) - Initial setup guide
 - [GITHUB_SECRETS_REFERENCE.md](GITHUB_SECRETS_REFERENCE.md) - Complete reference
 - [ConfigurationValidation.md](ConfigurationValidation.md) - Validation patterns
 - [ConfigurationMaskingStandardization.md](ConfigurationMaskingStandardization.md) - Security masking
 
 ### External Resources
+
 - [GitHub Secrets Documentation](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
 - [.NET User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets)
 - [Azure Functions Configuration](https://learn.microsoft.com/en-us/azure/azure-functions/functions-app-settings)
@@ -462,6 +492,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ### Getting Help
 
 For issues or questions:
+
 1. Check this documentation and related guides
 2. Review error messages and troubleshooting section
 3. Verify prerequisites are met

@@ -76,7 +76,6 @@ class ApiClient {
 }
 ```
 
-
 ## Azure Functions API
 
 The following Azure Functions provide the core API endpoints for the OnePageAuthor system:
@@ -554,7 +553,6 @@ System.Xml.XmlElement
 
 ---
 
-
 ## Stripe API
 
 The Stripe API provides payment processing, subscription management, and billing functionality.
@@ -566,6 +564,7 @@ The Stripe API provides payment processing, subscription management, and billing
 **Purpose**: Enables frontend applications to validate Stripe configuration before users attempt payments. Helps detect test/live mode mismatches.
 
 **Response:**
+
 ```json
 {
   "stripeMode": "test" | "live" | "unknown",
@@ -583,6 +582,7 @@ The Stripe API provides payment processing, subscription management, and billing
 | `version` | string | API version number for tracking compatibility |
 
 **Security Notes:**
+
 - No authentication required (anonymous access)
 - Returns only non-sensitive configuration information
 - Never exposes the actual API key value
@@ -591,6 +591,7 @@ The Stripe API provides payment processing, subscription management, and billing
 **Example Responses:**
 
 *Test Mode Connected:*
+
 ```json
 {
   "stripeMode": "test",
@@ -600,6 +601,7 @@ The Stripe API provides payment processing, subscription management, and billing
 ```
 
 *Live Mode Connected:*
+
 ```json
 {
   "stripeMode": "live",
@@ -609,6 +611,7 @@ The Stripe API provides payment processing, subscription management, and billing
 ```
 
 *Not Connected:*
+
 ```json
 {
   "stripeMode": "unknown",
@@ -618,6 +621,7 @@ The Stripe API provides payment processing, subscription management, and billing
 ```
 
 **TypeScript Example:**
+
 ```typescript
 // Check Stripe configuration on app startup
 async function validateStripeConfig() {
@@ -654,6 +658,7 @@ interface StripeHealthResponse {
 ```
 
 **Use Cases:**
+
 - Frontend validation on application startup
 - Detecting test/live mode mismatches between frontend and backend
 - Health monitoring and diagnostics
@@ -668,7 +673,6 @@ The following projects provide comprehensive testing coverage:
 ### OnePageAuthor.Test
 
 Unit and integration tests for the OnePageAuthor application
-
 
 ## Error Handling
 
@@ -697,7 +701,7 @@ All API endpoints return consistent error responses:
 
 ### TypeScript Error Handling
 
-`	ypescript
+` ypescript
 interface ApiError {
   error: string;
   details?: any;
@@ -765,11 +769,13 @@ The Testimonials API provides endpoints for managing and retrieving testimonials
 Note: See the Public Endpoints section for a quick reference to anonymous endpoints.
 
 **Query Parameters:**
+
 - `limit` (optional, number): Maximum number of testimonials to return. Default: 5, Max: 20
 - `featured` (optional, boolean): Filter to only featured testimonials
 - `locale` (optional, string): Filter by locale (e.g., "en-US", "es-ES", "fr-FR")
 
 **Response:**
+
 ```json
 {
   "testimonials": [
@@ -792,6 +798,7 @@ Note: See the Public Endpoints section for a quick reference to anonymous endpoi
 **Cache Control:** 15 minutes (public, max-age=900)
 
 **TypeScript Example:**
+
 ```typescript
     // Get featured testimonials in English
     const response = await fetch('/api/testimonials?featured=true&locale=en-US&limit=3');
@@ -821,6 +828,7 @@ Note: See the Public Endpoints section for a quick reference to anonymous endpoi
 **Protected endpoint** - Creates a new testimonial. Requires authentication.
 
 **Request Body:**
+
 ```json
 {
   "authorName": "Sarah Mitchell",
@@ -834,6 +842,7 @@ Note: See the Public Endpoints section for a quick reference to anonymous endpoi
 ```
 
 **Response:** 201 Created
+
 ```json
 {
   "id": "generated-id",
@@ -849,11 +858,13 @@ Note: See the Public Endpoints section for a quick reference to anonymous endpoi
 ```
 
 **Validation Rules:**
+
 - `authorName` is required
 - `quote` is required
 - `rating` must be between 1-5
 
 **TypeScript Example:**
+
 ```typescript
 const apiClient = new ApiClient(baseUrl, token);
 const newTestimonial = {
@@ -874,6 +885,7 @@ console.log('Created testimonial:', created.id);
 **Protected endpoint** - Updates an existing testimonial. Requires authentication.
 
 **Request Body:**
+
 ```json
 {
   "authorName": "Sarah Mitchell",
@@ -889,10 +901,12 @@ console.log('Created testimonial:', created.id);
 **Response:** 200 OK (returns updated testimonial)
 
 **Error Responses:**
+
 - 404 Not Found - Testimonial with specified ID does not exist
 - 400 Bad Request - Invalid testimonial data or validation failure
 
 **TypeScript Example:**
+
 ```typescript
 const apiClient = new ApiClient(baseUrl, token);
 const updates = {
@@ -915,9 +929,11 @@ const updated = await apiClient.put<Testimonial>('/api/testimonials/sarah-mitche
 **Response:** 204 No Content
 
 **Error Responses:**
+
 - 404 Not Found - Testimonial with specified ID does not exist
 
 **TypeScript Example:**
+
 ```typescript
 const apiClient = new ApiClient(baseUrl, token);
 await apiClient.delete('/api/testimonials/sarah-mitchell-en-us');

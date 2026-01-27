@@ -118,14 +118,16 @@ The deployment creates a managed domain automatically (e.g., `<uniqueid>.azureco
 
 1. Navigate to Azure Portal
 2. Go to Communication Services → Email → Domains
-3. Find the "AzureManagedDomain" 
+3. Find the "AzureManagedDomain"
 4. Copy the "Mail From" address (e.g., `DoNotReply@<uniqueid>.azurecomm.net`)
 
 **Pros:**
+
 - Instant setup, no verification required
 - Good for testing and development
 
 **Cons:**
+
 - Generic domain name
 - May have lower deliverability than custom domain
 
@@ -144,11 +146,13 @@ For production use, add your own verified domain:
 6. Configure sender address (e.g., `DoNotReply@onepageauthor.com`)
 
 **Pros:**
+
 - Professional appearance
 - Better email deliverability
 - Full control over branding
 
 **Cons:**
+
 - Requires domain ownership
 - DNS configuration needed
 - Takes time for verification
@@ -179,6 +183,7 @@ dotnet run -- test@example.com testdomain.com "Test invitation"
 ```
 
 Expected output:
+
 ```
 ✅ Invitation created successfully!
 ✅ Invitation email sent successfully!
@@ -195,12 +200,14 @@ Expected output:
 ### Issue: Email Not Sending
 
 **Check 1: Connection String**
+
 ```bash
 # Verify connection string is configured
 dotnet user-secrets list
 ```
 
 **Check 2: Domain Status**
+
 ```bash
 # Check if domain is verified (for custom domains)
 az communication email domain show \
@@ -210,17 +217,20 @@ az communication email domain show \
 ```
 
 **Check 3: Sender Address**
+
 - Ensure sender address matches the verified domain
 - Format: `DoNotReply@verifieddomain.com`
 
 ### Issue: Resource Provider Not Registered
 
 **Error Message:**
+
 ```
 MissingSubscriptionRegistration: The subscription is not registered to use namespace 'Microsoft.Communication'
 ```
 
 **Solution (Manual):**
+
 ```bash
 # Register the provider
 az provider register --namespace Microsoft.Communication
@@ -234,26 +244,31 @@ az provider show --namespace Microsoft.Communication --query "registrationState"
 ```
 
 **Solution (Automatic - GitHub Actions):**
+
 - The workflow automatically registers the provider when `DEPLOY_COMMUNICATION_SERVICES=true`
 - Check the "Register Microsoft.Communication Resource Provider" step in workflow logs
 - If the step failed, verify Azure credentials have permission to register providers
 
 **Required Permissions:**
+
 - To register a resource provider, you need the `Microsoft.Authorization/roleAssignments/write` permission
 - This is included in Contributor and Owner roles at the subscription level
 
 ### Issue: Emails Going to Spam
 
 **Solution 1: Configure SPF Record**
+
 ```
 v=spf1 include:_spf.azurecomm.net ~all
 ```
 
 **Solution 2: Configure DKIM**
+
 - Azure Portal provides DKIM keys after domain verification
 - Add provided CNAME records to your DNS
 
 **Solution 3: Configure DMARC**
+
 ```
 v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com
 ```
@@ -261,6 +276,7 @@ v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com
 ### Issue: Domain Verification Failing
 
 **Check DNS Propagation:**
+
 ```bash
 # Check TXT record
 nslookup -type=TXT _azurecomm-verification.yourdomain.com
@@ -270,6 +286,7 @@ nslookup -type=TXT _azurecomm-verification.yourdomain.com 8.8.8.8
 ```
 
 **Common Causes:**
+
 - DNS records not propagated (wait 24-48 hours)
 - Incorrect TXT record value
 - DNS caching (clear cache or wait)
@@ -296,7 +313,7 @@ ACSEmailSendOperational
 
 ### Azure Communication Services Pricing (as of 2024)
 
-- **Email Service**: 
+- **Email Service**:
   - First 500 emails/month: Free
   - Additional emails: $0.0025 per email
   
@@ -345,6 +362,7 @@ ISW_DEPLOY_COMMUNICATION_SERVICES=true
 ```
 
 The deployment will:
+
 1. Create Communication Services resource
 2. Create Email Service
 3. Create Azure Managed Domain
@@ -385,6 +403,7 @@ Before going to production:
 ## Support
 
 For issues with Azure Communication Services:
+
 - Azure Portal → Support → New Support Request
 - [Azure Communication Services GitHub](https://github.com/Azure/communication)
 - [Microsoft Q&A](https://learn.microsoft.com/en-us/answers/topics/azure-communication-services.html)

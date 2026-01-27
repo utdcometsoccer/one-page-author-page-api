@@ -19,6 +19,7 @@ Authorization: Bearer <your-jwt-token>
 ## Request
 
 ### Headers
+
 - `Content-Type: application/json`
 - `Authorization: Bearer <token>`
 
@@ -75,6 +76,7 @@ Authorization: Bearer <your-jwt-token>
 #### 400 Bad Request
 
 Returned when:
+
 - Request body is invalid or missing
 - Email address is missing or invalid format
 - Domain name is missing or invalid format
@@ -141,17 +143,19 @@ Invoke-RestMethod -Uri "https://your-function-app.azurewebsites.net/api/author-i
 ### Optional Environment Variables
 
 - `ACS_CONNECTION_STRING`: Azure Communication Services connection string for sending emails
-- `ACS_SENDER_ADDRESS`: Email sender address (defaults to "DoNotReply@onepageauthor.com")
+- `ACS_SENDER_ADDRESS`: Email sender address (defaults to "<DoNotReply@onepageauthor.com>")
 
 **Note**: If `ACS_CONNECTION_STRING` is not configured, invitations will be created in the database but emails will not be sent. The API will log a warning and set `emailSent: false` in the response.
 
 ## Validation Rules
 
 ### Email Validation
+
 - Must be a valid email address format
 - Validated using `System.Net.Mail.MailAddress`
 
 ### Domain Validation
+
 - Must be a valid DNS hostname
 - Validated using `Uri.CheckHostName()`
 - Examples of valid domains: `example.com`, `subdomain.example.com`, `author-site.io`

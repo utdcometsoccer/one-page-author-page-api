@@ -57,6 +57,7 @@ interface AssignedExperiment {
 #### Response Examples
 
 **Landing Page Response (Anonymous User):**
+
 ```json
 {
   "experiments": [
@@ -84,6 +85,7 @@ interface AssignedExperiment {
 ```
 
 **Pricing Page Response (Authenticated User):**
+
 ```json
 {
   "experiments": [
@@ -140,6 +142,7 @@ The API uses SHA256 hashing to ensure consistent variant assignment:
 ### Example
 
 For an experiment with 50/50 traffic split:
+
 - Control: 0-49 (50%)
 - Variant A: 50-99 (50%)
 
@@ -326,6 +329,7 @@ function trackConversion(experimentId: string, variant: string, action: string) 
 ## Best Practices
 
 ### 1. Store Session ID
+
 Store the returned `sessionId` in local storage or session storage for anonymous users:
 
 ```typescript
@@ -334,6 +338,7 @@ localStorage.setItem('experimentSessionId', sessionId);
 ```
 
 ### 2. Use User ID When Available
+
 Always pass the `userId` parameter for authenticated users to ensure consistent experiences across devices:
 
 ```typescript
@@ -342,6 +347,7 @@ const experiments = await fetchExperiments('landing', userId);
 ```
 
 ### 3. Handle Loading States
+
 Show appropriate loading states while fetching experiments to avoid layout shifts:
 
 ```typescript
@@ -351,6 +357,7 @@ if (loading) {
 ```
 
 ### 4. Provide Fallbacks
+
 Always provide fallback values in case experiments fail to load:
 
 ```typescript
@@ -358,6 +365,7 @@ const buttonColor = getConfig('button-test')?.color || '#007bff';
 ```
 
 ### 5. Track Exposures Early
+
 Track experiment exposures as soon as the variant is shown, not just on user interaction:
 
 ```typescript
@@ -443,6 +451,7 @@ function setCachedExperiments(page: string, data: any) {
 ## Support
 
 For issues or questions:
+
 - Check the README in `/SeedExperiments` for seeding sample data
 - Review test files in `/OnePageAuthor.Test/Services/ExperimentServiceTests.cs`
 - Contact the development team

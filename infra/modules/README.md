@@ -165,6 +165,7 @@ resource imageApiFunctionApp 'Microsoft.Web/sites@2024-04-01' = {
 #### Benefits Over Inline Configuration
 
 **Before (Inline):**
+
 ```bicep
 appSettings: concat([
   { name: 'AzureWebJobsStorage', value: storage }
@@ -177,6 +178,7 @@ appSettings: concat([
 ```
 
 **After (Module):**
+
 ```bicep
 module settings 'modules/functionAppSettings.bicep' = {
   name: 'settings'

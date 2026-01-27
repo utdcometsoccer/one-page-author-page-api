@@ -18,27 +18,34 @@ The following `local.settings.json` files have been created with placeholder val
 ### Required Replacements
 
 #### Azure AD / Entra ID Configuration
+
 Replace these placeholders in ALL files:
+
 - `your-tenant-id-here` → Your Azure AD Tenant ID
 - `your-client-id-here` → Your application's Client ID  
 
 #### Cosmos DB Configuration  
+
 The default values use the Cosmos DB Emulator. For production or cloud development:
+
 - `COSMOSDB_ENDPOINT_URI`: Replace with your actual Cosmos DB endpoint
 - `COSMOSDB_PRIMARY_KEY`: Replace with your actual Cosmos DB primary key
 - `COSMOSDB_DATABASE_ID`: Keep as "OnePageAuthor" or change to your database name
 
 #### Stripe Configuration (InkStainedWretchStripe only)
+
 - `sk_test_your-stripe-test-key-here` → Your Stripe test API key
 - `whsec_your-webhook-secret-here` → Your Stripe webhook secret
 
 #### External API Keys (InkStainedWretchFunctions only)
+
 - `your-prh-api-key-here` → Penguin Random House API key (optional)
 - `your-amazon-access-key-here` → Amazon Product API access key (optional)
 - `your-amazon-secret-key-here` → Amazon Product API secret key (optional)
 - `your-amazon-partner-tag-here` → Amazon Associates partner tag (optional)
 
 #### Azure Infrastructure (InkStainedWretchFunctions only)
+
 - `your-azure-subscription-id-here` → Your Azure subscription ID
 - `your-dns-resource-group-here` → Resource group for DNS zones
 - `your-google-project-id-here` → Google Cloud project ID (optional)
@@ -80,15 +87,19 @@ $env:COSMOSDB_ENDPOINT_URI = "your-cosmos-endpoint"
 ## 📋 Configuration by Project
 
 ### ImageAPI
+
 **Purpose**: Image upload and management
 **Required**:
+
 - Azure Storage (default uses emulator)
 - Cosmos DB (default uses emulator)
 - Azure AD for authentication
 
 ### InkStainedWretchFunctions  
+
 **Purpose**: Domain registration and external API integration
 **Required**:
+
 - Cosmos DB (default uses emulator)
 - Azure AD for authentication
 **Optional**:
@@ -98,16 +109,20 @@ $env:COSMOSDB_ENDPOINT_URI = "your-cosmos-endpoint"
 - Azure DNS configuration
 
 ### InkStainedWretchStripe
+
 **Purpose**: Stripe payment processing  
 **Required**:
+
 - Cosmos DB (default uses emulator)
 - Stripe API (test mode by default)
 - Azure AD for authentication
 
 ### function-app
+
 **Purpose**: Core application functions
 **Required**:
-- Cosmos DB (default uses emulator) 
+
+- Cosmos DB (default uses emulator)
 - Azure AD for authentication
 
 ## 🧪 Testing Scenarios
@@ -132,19 +147,23 @@ See [TESTING_SCENARIOS_GUIDE.md](TESTING_SCENARIOS_GUIDE.md) for details.
 ### Common Issues
 
 **"Configuration not found" errors**:
+
 - Check that placeholder values have been replaced
 - Verify Azure AD tenant/client IDs are correct
 - Ensure Cosmos DB emulator is running (if using local setup)
 
 **Authentication failures**:  
+
 - Verify AAD_TENANT_ID and AAD_AUDIENCE are correct
 - Check that your Azure AD app registration is configured properly
 
 **Cosmos DB connection errors**:
+
 - Start the Cosmos DB emulator if using local setup
 - Verify endpoint URI and primary key if using cloud Cosmos DB
 
 **Stripe errors**:
+
 - Ensure you're using test keys (start with `sk_test_`)
 - Verify webhook secret matches your Stripe dashboard
 

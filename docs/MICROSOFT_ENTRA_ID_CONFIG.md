@@ -20,7 +20,7 @@ The authentication documentation has been consolidated and significantly expande
 
 ---
 
-# Azure Static Web Apps + Azure Functions + Microsoft Entra ID Authentication Setup
+## Azure Static Web Apps + Azure Functions + Microsoft Entra ID Authentication Setup
 
 **⚠️ Legacy Document - See above for current documentation**
 
@@ -36,7 +36,7 @@ This document provides a complete, end‑to‑end configuration for:
 
 ---
 
-# 1. Entra ID Configuration Steps
+## 1. Entra ID Configuration Steps
 
 ## 1.1 Create the SPA App Registration
 
@@ -47,8 +47,8 @@ This document provides a complete, end‑to‑end configuration for:
    **Accounts in this organizational directory only**
 4. Redirect URI:  
    Platform: **Single-page application**  
-   URI:  https://inkstainedwretches.com/.auth/login/aad/callback
-   Local development (SWA CLI):  http://localhost:4280/.auth/login/aad/callback
+   URI:  <https://inkstainedwretches.com/.auth/login/aad/callback>
+   Local development (SWA CLI):  <http://localhost:4280/.auth/login/aad/callback>
 5. Save.
 
 ### Add API Permissions
@@ -73,6 +73,7 @@ This document provides a complete, end‑to‑end configuration for:
 2. Click **Set** for Application ID URI  
 It becomes: api://<api-client-id>
 3. Add a scope:
+
 - **Scope name:** `access_as_user`
 - **Who can consent:** Admins and users
 - **Description:**  
@@ -84,7 +85,7 @@ Only if you want role-based authorization.
 
 ---
 
-# 2. MSAL Configuration for the SPA
+## 2. MSAL Configuration for the SPA
 
 ```javascript
 import { PublicClientApplication } from "@azure/msal-browser";
@@ -108,7 +109,8 @@ scopes: ["api://<API-CLIENT-ID>/access_as_user"]
 export const msalInstance = new PublicClientApplication(msalConfig);
 ```
 
-# 3. Azure Functions Configuration
+## 3. Azure Functions Configuration
+
 Azure Static Web Apps automatically injects the authenticated user into your Functions via headers, but for direct JWT validation, configure the following.
 
 ## 3.1 host.json
@@ -125,6 +127,7 @@ Azure Static Web Apps automatically injects the authenticated user into your Fun
 ```
 
 ## 3.2 local.settings.json
+
 ```
 {
   "IsEncrypted": false,
@@ -138,7 +141,7 @@ Azure Static Web Apps automatically injects the authenticated user into your Fun
 }
 ```
 
-# 4. Full Authentication Flow Diagram
+## 4. Full Authentication Flow Diagram
 
 +---------------------------+
 |     User's Browser        |

@@ -9,12 +9,14 @@ This implementation provides the complete infrastructure for transitioning from 
 ### 1. Core Key Vault Service (OnePageAuthorLib)
 
 **Files Added:**
+
 - `OnePageAuthorLib/interfaces/IKeyVaultConfigService.cs` - Service interface
 - `OnePageAuthorLib/services/KeyVaultConfigService.cs` - Service implementation
 - Updated `OnePageAuthorLib/ServiceFactory.cs` - Added DI extension method
 - Updated `OnePageAuthorLib/OnePageAuthorLib.csproj` - Added Azure.Security.KeyVault.Secrets package
 
 **Features:**
+
 - ✅ Feature flag control via `USE_KEY_VAULT` environment variable
 - ✅ Automatic fallback to environment variables when Key Vault is disabled or secrets not found
 - ✅ Secret name conversion (underscores → hyphens for Key Vault compatibility)
@@ -24,6 +26,7 @@ This implementation provides the complete infrastructure for transitioning from 
 ### 2. InkStainedWretchesConfig Function App
 
 **Files Added:**
+
 - `InkStainedWretchesConfig/InkStainedWretchesConfig.csproj` - Project file
 - `InkStainedWretchesConfig/Program.cs` - Application startup
 - `InkStainedWretchesConfig/GetApplicationConfig.cs` - Application Insights configuration endpoint
@@ -32,6 +35,7 @@ This implementation provides the complete infrastructure for transitioning from 
 - `InkStainedWretchesConfig/local.settings.json` - Local development settings
 
 **Endpoints:**
+
 ```
 GET /api/config/applicationinsights?code={function-key}
 Response: { "connectionString": "...", "source": "KeyVault" }
@@ -41,6 +45,7 @@ Response: { "apiKey": "...", "source": "KeyVault" }
 ```
 
 **Configuration:**
+
 - Authorization level: Function (requires function key)
 - System-assigned Managed Identity: Enabled
 - USE_KEY_VAULT: true (enabled by default for this app)
@@ -48,9 +53,11 @@ Response: { "apiKey": "...", "source": "KeyVault" }
 ### 3. Infrastructure as Code (Bicep)
 
 **File Modified:**
+
 - `infra/inkstainedwretches.bicep`
 
 **Changes:**
+
 1. Added `deployInkStainedWretchesConfig` parameter (default: true)
 2. Added `inkStainedWretchesConfigName` variable
 3. Added `keyVaultUri` variable for consistent Key Vault URL reference
@@ -69,9 +76,11 @@ Response: { "apiKey": "...", "source": "KeyVault" }
 ### 4. CI/CD Pipeline (GitHub Actions)
 
 **File Modified:**
+
 - `.github/workflows/main_onepageauthorapi.yml`
 
 **Changes:**
+
 1. Added `INK_STAINED_WRETCHES_CONFIG_PATH` environment variable
 2. Added build and publish steps for InkStainedWretchesConfig
 3. Added deployment step with `DEPLOY_ISW_CONFIG` secret control
@@ -80,6 +89,7 @@ Response: { "apiKey": "...", "source": "KeyVault" }
 ### 5. Documentation
 
 **Files Added:**
+
 - `docs/KEY_VAULT_MIGRATION_GUIDE.md` - Comprehensive migration guide
   - Architecture and components
   - Settings catalog (all secrets documented)
@@ -101,6 +111,7 @@ Response: { "apiKey": "...", "source": "KeyVault" }
   - Troubleshooting guide
 
 **File Modified:**
+
 - `OnePageAuthorAPI.sln` - Added InkStainedWretchesConfig project
 
 ## Configuration Settings
@@ -140,6 +151,7 @@ Function App → Managed Identity → Azure AD → Key Vault
 ### RBAC Permissions
 
 All function apps have "Key Vault Secrets User" role (GUID: `4633458b-17de-408a-b874-0445c86b69e6`):
+
 - **Can**: Read secret values
 - **Cannot**: List secrets, modify secrets, manage Key Vault
 

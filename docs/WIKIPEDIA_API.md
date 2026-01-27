@@ -3,6 +3,7 @@
 ## Overview
 
 The `GetPersonFacts` API endpoint retrieves structured facts about a person from Wikipedia. It combines data from two Wikipedia APIs:
+
 - **REST API v1** - For summary information, descriptions, thumbnails, and canonical URLs
 - **MediaWiki API** - For detailed lead paragraph text
 
@@ -54,16 +55,19 @@ interface WikipediaPersonFacts {
 ### cURL Examples
 
 #### Get facts about Albert Einstein in English
+
 ```bash
 curl "http://localhost:7071/api/wikipedia/en/Albert_Einstein"
 ```
 
 #### Get facts about Marie Curie in French
+
 ```bash
 curl "http://localhost:7071/api/wikipedia/fr/Marie_Curie"
 ```
 
 #### Get facts with spaces in name (URL encoded)
+
 ```bash
 curl "http://localhost:7071/api/wikipedia/en/Stephen%20Hawking"
 ```
@@ -71,6 +75,7 @@ curl "http://localhost:7071/api/wikipedia/en/Stephen%20Hawking"
 ### TypeScript/JavaScript Examples
 
 #### Basic Usage
+
 ```typescript
 interface WikipediaPersonFacts {
   title: string;
@@ -115,11 +120,13 @@ async function getPersonFacts(
 ### Response Example
 
 Request:
+
 ```
 GET /api/wikipedia/en/Albert_Einstein
 ```
 
 Response (200 OK):
+
 ```json
 {
   "title": "Albert Einstein",
@@ -148,7 +155,7 @@ The API supports all Wikipedia language codes, including:
 - **ar** - Arabic
 - And many more...
 
-For a complete list, see: https://meta.wikimedia.org/wiki/List_of_Wikipedias
+For a complete list, see: <https://meta.wikimedia.org/wiki/List_of_Wikipedias>
 
 ## Testing
 
@@ -159,6 +166,7 @@ The implementation includes:
 3. **Integration Tests** - Optional tests for live Wikipedia API
 
 Run tests:
+
 ```bash
 dotnet test --filter "FullyQualifiedName~Wikipedia|FullyQualifiedName~GetPersonFacts"
 ```

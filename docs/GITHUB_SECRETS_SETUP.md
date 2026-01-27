@@ -9,22 +9,26 @@ This guide explains how to use the `Initialize-GitHubSecrets.ps1` script to conf
 ### Prerequisites
 
 **Required:**
+
 1. **GitHub CLI (gh)** - Primary tool for setting secrets
    - Windows: `winget install --id GitHub.cli`
    - macOS: `brew install gh`
    - Linux: See [installation guide](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)
 
 2. **Authenticate with GitHub CLI**
+
    ```bash
    gh auth login
    ```
 
 3. **PowerShell 7+**
+
    ```bash
    pwsh --version
    ```
 
 **Optional:**
+
 - **npm** - Only needed if using NPM script wrappers
 
 ### Method 1: Interactive Mode (Recommended for First-Time Setup)
@@ -40,6 +44,7 @@ npm run init-secrets:interactive
 ```
 
 **What to expect:**
+
 - The script will check prerequisites (GitHub CLI, authentication)
 - You'll be prompted for each secret, organized by category
 - Required secrets are marked as "(Required)"
@@ -53,11 +58,13 @@ npm run init-secrets:interactive
 This mode reads secret values from a JSON file, which is useful for automation or when you have many secrets to configure.
 
 **Step 1: Copy the template**
+
 ```powershell
 Copy-Item secrets-template.json secrets.json
 ```
 
 **Step 2: Edit secrets.json with your values**
+
 ```powershell
 # Using VS Code
 code secrets.json
@@ -68,6 +75,7 @@ vim secrets.json      # Linux/macOS
 ```
 
 **Step 3: Run the script**
+
 ```powershell
 # Direct PowerShell execution (recommended)
 .\Scripts\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
@@ -87,6 +95,7 @@ For simple key=value format files:
 ```
 
 Format of `my-secrets.txt`:
+
 ```
 ISW_RESOURCE_GROUP=rg-onepageauthor-prod
 ISW_LOCATION=eastus
@@ -99,31 +108,37 @@ STRIPE_API_KEY=sk_test_your_key_here
 ### Required for All Deployments
 
 #### Core Infrastructure
+
 - `ISW_RESOURCE_GROUP` - Azure Resource Group name
 - `ISW_LOCATION` - Azure region (e.g., "eastus", "westus2")
 - `ISW_BASE_NAME` - Base name for all resources
 - `AZURE_CREDENTIALS` - Service Principal credentials (JSON format)
 
 #### Cosmos DB
+
 - `COSMOSDB_CONNECTION_STRING` - Full connection string
 - `COSMOSDB_ENDPOINT_URI` - Cosmos DB endpoint URL
 - `COSMOSDB_PRIMARY_KEY` - Cosmos DB primary key
 - `COSMOSDB_DATABASE_ID` - Database name (typically "OnePageAuthorDb")
 
 ### Optional - Azure AD Authentication
+
 - `AAD_TENANT_ID` - Azure AD tenant ID
 - `AAD_AUDIENCE` - Azure AD client ID / audience
 - `AAD_CLIENT_ID` - Azure AD client ID
 - `OPEN_ID_CONNECT_METADATA_URL` - OpenID Connect metadata URL for JWT validation
 
 ### Optional - ImageAPI (if using image features)
+
 - `AZURE_STORAGE_CONNECTION_STRING` - Azure Blob Storage connection
 
 ### Optional - InkStainedWretchStripe (if using payment features)
+
 - `STRIPE_API_KEY` - Stripe secret key (sk_test_... or sk_live_...)
 - `STRIPE_WEBHOOK_SECRET` - Stripe webhook signing secret
 
 ### Optional - Domain Management
+
 - `AZURE_SUBSCRIPTION_ID` - Azure subscription ID
 - `AZURE_DNS_RESOURCE_GROUP` - Resource group for DNS zones
 - `AZURE_RESOURCE_GROUP_NAME` - Resource group name for Azure Front Door
@@ -133,6 +148,7 @@ STRIPE_API_KEY=sk_test_your_key_here
 - `GOOGLE_DOMAINS_LOCATION` - Location for domain operations
 
 ### Optional - External APIs
+
 - `AMAZON_PRODUCT_ACCESS_KEY` - AWS access key ID
 - `AMAZON_PRODUCT_SECRET_KEY` - AWS secret access key
 - `AMAZON_PRODUCT_PARTNER_TAG` - Amazon Associates tracking ID
@@ -142,13 +158,16 @@ STRIPE_API_KEY=sk_test_your_key_here
 - `PENGUIN_RANDOM_HOUSE_API_DOMAIN` - PRH API domain
 
 ### Optional - Azure Key Vault (for secure secret management)
+
 - `KEY_VAULT_URL` - Azure Key Vault URL
 - `USE_KEY_VAULT` - Feature flag to enable Key Vault (true/false)
 
 ### Optional - Referral Program
+
 - `REFERRAL_BASE_URL` - Base URL for generating referral links
 
 ### Optional - Testing Configuration
+
 - `TESTING_MODE` - Enable testing mode (true/false)
 - `MOCK_AZURE_INFRASTRUCTURE` - Mock Azure infrastructure operations (true/false)
 - `MOCK_GOOGLE_DOMAINS` - Mock Google Domains API calls (true/false)
@@ -174,6 +193,7 @@ gh secret list | grep COSMOSDB_ENDPOINT_URI
 ```
 
 You can also view them in the GitHub web interface:
+
 - Navigate to your repository on GitHub
 - Go to **Settings** → **Secrets and variables** → **Actions**
 
@@ -182,6 +202,7 @@ You can also view them in the GitHub web interface:
 ### Azure Portal
 
 **Cosmos DB:**
+
 1. Go to Azure Portal → Cosmos DB → Your account
 2. Navigate to **Keys** section
 3. Copy the required values:
@@ -190,11 +211,13 @@ You can also view them in the GitHub web interface:
    - Primary Connection String (COSMOSDB_CONNECTION_STRING)
 
 **Azure Storage:**
+
 1. Go to Azure Portal → Storage accounts → Your account
 2. Navigate to **Access keys** section
 3. Copy **Connection string**
 
 **Azure AD:**
+
 1. Go to Azure Portal → Microsoft Entra ID
 2. **Overview** → Copy Tenant ID
 3. **App registrations** → Your app → Copy Application (client) ID
@@ -242,6 +265,7 @@ Copy the entire JSON output to use as `AZURE_CREDENTIALS`.
 ### "Failed to set secret"
 
 **Possible causes:**
+
 1. You don't have permission to set secrets in the repository
 2. Secret name contains invalid characters
 3. Network issues connecting to GitHub
@@ -251,6 +275,7 @@ Copy the entire JSON output to use as `AZURE_CREDENTIALS`.
 ### Secret value contains special characters
 
 **Solution:** When using a config file, ensure special characters in JSON are properly escaped:
+
 - `"` → `\"`
 - `\` → `\\`
 - newlines → `\n`

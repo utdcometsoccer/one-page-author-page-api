@@ -15,6 +15,7 @@ December 2024
 A comprehensive Infrastructure as Code template that conditionally deploys:
 
 #### Core Infrastructure
+
 - ✅ **Storage Account** - For Function Apps runtime and blob storage
   - Standard_LRS SKU
   - TLS 1.2 minimum
@@ -64,6 +65,7 @@ Three Azure Functions deployed on a shared Consumption Plan:
 ### 2. Enhanced GitHub Actions Workflow (`.github/workflows/main_onepageauthorapi.yml`)
 
 #### Build Stage
+
 - ✅ Builds all four Function Apps in parallel:
   - function-app (existing)
   - ImageAPI
@@ -74,12 +76,14 @@ Three Azure Functions deployed on a shared Consumption Plan:
 #### Deployment Stage
 
 ##### Existing function-app Deployment
+
 - ✅ Conditional deployment based on secrets availability
 - ✅ Infrastructure creation if needed (using existing functionapp.bicep)
 - ✅ Code deployment using config-zip method
 - ✅ Backward compatible with existing setup
 
 ##### Ink Stained Wretches Infrastructure Deployment
+
 - ✅ Validates required secrets (ISW_RESOURCE_GROUP, ISW_LOCATION, ISW_BASE_NAME)
 - ✅ Creates resource group if it doesn't exist
 - ✅ Deploys all infrastructure using inkstainedwretches.bicep
@@ -87,6 +91,7 @@ Three Azure Functions deployed on a shared Consumption Plan:
 - ✅ Outputs deployment results
 
 ##### Function Apps Deployment
+
 - ✅ ImageAPI - Conditional on DEPLOY_IMAGE_API=true
 - ✅ InkStainedWretchFunctions - Conditional on DEPLOY_ISW_FUNCTIONS=true
 - ✅ InkStainedWretchStripe - Conditional on DEPLOY_ISW_STRIPE=true
@@ -96,6 +101,7 @@ Three Azure Functions deployed on a shared Consumption Plan:
 ### 3. Comprehensive Documentation
 
 #### Deployment Guide (`docs/DEPLOYMENT_GUIDE.md`)
+
 - ✅ Complete workflow overview
 - ✅ Detailed GitHub Secrets documentation
 - ✅ Infrastructure components explanation
@@ -106,6 +112,7 @@ Three Azure Functions deployed on a shared Consumption Plan:
 - ✅ 500+ lines of detailed documentation
 
 #### GitHub Secrets Reference (`docs/GITHUB_SECRETS_REFERENCE.md`)
+
 - ✅ Quick reference checklist
 - ✅ Detailed secret descriptions
 - ✅ How to obtain each secret
@@ -115,6 +122,7 @@ Three Azure Functions deployed on a shared Consumption Plan:
 - ✅ Security best practices
 
 #### README Updates
+
 - ✅ Added deployment section with links to guides
 - ✅ Quick deployment setup instructions
 - ✅ Manual deployment alternatives
@@ -144,12 +152,14 @@ The implementation includes intelligent conditional deployment at multiple level
 ### Security Considerations
 
 ✅ **Secrets Management**
+
 - All sensitive values stored as GitHub Secrets
 - No secrets in code or configuration files
 - Secure parameter passing in Bicep templates
 - @secure() decorator for sensitive parameters
 
 ✅ **Infrastructure Security**
+
 - HTTPS only for all Function Apps
 - TLS 1.2 minimum for Storage and Function Apps
 - FTPS only (no plain FTP)
@@ -158,11 +168,13 @@ The implementation includes intelligent conditional deployment at multiple level
 - Soft delete enabled for Key Vault
 
 ✅ **Authentication**
+
 - Microsoft Entra ID integration
 - JWT token validation
 - Proper audience and tenant configuration
 
 ✅ **Monitoring**
+
 - Application Insights for all Function Apps
 - Comprehensive logging
 - Real-time metrics
@@ -171,11 +183,13 @@ The implementation includes intelligent conditional deployment at multiple level
 ### Error Handling
 
 ✅ **Graceful Degradation**
+
 - `continue-on-error: true` for each deployment step
 - Failures don't block subsequent deployments
 - Clear error messages in logs
 
 ✅ **Validation**
+
 - Checks if resources already exist before creation
 - Validates secret availability before deployment
 - Bicep template validation during build
@@ -183,6 +197,7 @@ The implementation includes intelligent conditional deployment at multiple level
 ### Documentation Quality
 
 ✅ **Comprehensive Coverage**
+
 - 30+ documented GitHub Secrets
 - Multiple deployment scenarios explained
 - Troubleshooting for common issues
@@ -190,6 +205,7 @@ The implementation includes intelligent conditional deployment at multiple level
 - Example commands and values provided
 
 ✅ **User-Friendly**
+
 - Quick reference checklists
 - Step-by-step guides
 - Clear examples
@@ -198,6 +214,7 @@ The implementation includes intelligent conditional deployment at multiple level
 ## GitHub Secrets Required
 
 ### Minimal Required Secrets (for basic deployment)
+
 1. `AZURE_CREDENTIALS` - Service Principal credentials
 2. `ISW_RESOURCE_GROUP` - Resource group name
 3. `ISW_LOCATION` - Azure region
@@ -207,6 +224,7 @@ The implementation includes intelligent conditional deployment at multiple level
 7. `AAD_AUDIENCE` - API client ID
 
 ### Optional Secrets (for additional features)
+
 - `ISW_DNS_ZONE_NAME` - Custom domain
 - `STRIPE_API_KEY` - Payment processing
 - `DEPLOY_IMAGE_API` - Enable ImageAPI deployment
@@ -214,6 +232,7 @@ The implementation includes intelligent conditional deployment at multiple level
 - `DEPLOY_ISW_STRIPE` - Enable InkStainedWretchStripe deployment
 
 ### Existing function-app Secrets (optional, backward compatible)
+
 - `AZURE_FUNCTIONAPP_NAME`
 - `AZURE_RESOURCE_GROUP`
 - `AZURE_LOCATION`
@@ -221,29 +240,37 @@ The implementation includes intelligent conditional deployment at multiple level
 ## Deployment Scenarios
 
 ### Scenario 1: Full Deployment
+
 **Configuration**: All secrets configured
-**Result**: 
+**Result**:
+
 - Complete infrastructure (Storage, Key Vault, App Insights, DNS)
 - All three Function Apps deployed
 - Full monitoring and logging
 
 ### Scenario 2: Infrastructure Only
+
 **Configuration**: Only required infrastructure secrets
 **Result**:
+
 - Infrastructure deployed
 - No Function Apps deployed
 - Can deploy Function Apps later
 
 ### Scenario 3: Partial Function Deployment
+
 **Configuration**: Infrastructure secrets + selected DEPLOY_* flags
 **Result**:
+
 - Infrastructure deployed
 - Only selected Function Apps deployed
 - Cost-effective for development/testing
 
 ### Scenario 4: Backward Compatible
+
 **Configuration**: Only existing function-app secrets
 **Result**:
+
 - Only existing function-app deployed
 - Ink Stained Wretches infrastructure skipped
 - No breaking changes
@@ -251,6 +278,7 @@ The implementation includes intelligent conditional deployment at multiple level
 ## Testing and Validation
 
 ### ✅ Completed
+
 - Bicep template syntax validation using Azure CLI
 - YAML workflow syntax validation using yamllint
 - Trailing spaces removed from workflow file
@@ -258,6 +286,7 @@ The implementation includes intelligent conditional deployment at multiple level
 - Git commit and push successful
 
 ### ⏸️ Pending (Requires Azure subscription and secrets)
+
 - Actual deployment to Azure
 - Function App runtime testing
 - Infrastructure creation validation
@@ -267,12 +296,14 @@ The implementation includes intelligent conditional deployment at multiple level
 ## Benefits
 
 ### For Developers
+
 - ✅ Clear documentation on all required secrets
 - ✅ Easy setup with step-by-step guides
 - ✅ Flexible deployment options
 - ✅ Comprehensive troubleshooting guide
 
 ### For DevOps
+
 - ✅ Infrastructure as Code (Bicep)
 - ✅ Automated deployment pipeline
 - ✅ Conditional deployment logic
@@ -280,6 +311,7 @@ The implementation includes intelligent conditional deployment at multiple level
 - ✅ Monitoring and logging integration
 
 ### For Security
+
 - ✅ No secrets in code
 - ✅ Secure parameter passing
 - ✅ RBAC and managed identities

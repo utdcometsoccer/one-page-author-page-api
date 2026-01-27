@@ -42,7 +42,6 @@ Each top-level section is stored in its own Cosmos DB container. The partition k
 
 ## Seeding Process
 
-
 1. The seeding project enumerates `data/` and matches files with pattern: `inkstainedwretch.{language}-{country}.json`.
 2. For each file:
 
@@ -117,15 +116,12 @@ Response: `200 OK` with `LocalizationText` JSON or `400 Bad Request` if invalid 
 
 ### Sample Request
 
-
 ```
 GET https://localhost:7071/api/localizedtext/en-US
 
 ```
 
-
 ### Sample (truncated) Response
-
 
 ```json
 {
@@ -153,7 +149,6 @@ This registers:
 
 ## Extending Localization
 
-
 1. Add new JSON section to culture files.
 2. Create corresponding POCO inheriting `AuthorManagementBase`.
 3. Register new container manager + DI mapping.
@@ -167,18 +162,17 @@ All navigation and interactive elements include optional ARIA labels for screen 
 - **`navItems.*.ariaLabel`**: Descriptive labels for each navigation item (e.g., "Sign in or create an account")
 
 These labels are:
+
 - Properly translated across all 20 supported locales
 - Optional (nullable) properties in C# entities
 - Automatically handled by the nested JSON processing in the seeder
 
 ## Error Handling
 
-
 - Invalid culture -> `ArgumentException` surfaced as 400.
 - Missing container item -> returns empty object (never null) for resilience.
 
 ## Future Enhancements
-
 
 - Caching layer (Memory / Distributed) per culture.
 - Versioning or last-modified metadata.

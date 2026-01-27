@@ -97,6 +97,7 @@ The platform also uses `ConfigurationManager` with custom refresh intervals:
 - **RefreshInterval**: 30 minutes (minimum time between refreshes)
 
 These settings work together with `RefreshOnIssuerKeyNotFound` to provide:
+
 1. **Proactive refresh**: Keys are automatically refreshed every 6 hours
 2. **Reactive refresh**: Keys are refreshed on-demand when validation fails due to missing key
 3. **Rate limiting**: Minimum 30 minutes between refreshes prevents endpoint overload
@@ -108,6 +109,7 @@ While `RefreshOnIssuerKeyNotFound` addresses the immediate issue, consider these
 ### 1. Monitoring and Alerting
 
 Configure Application Insights alerts for:
+
 - `SecurityTokenSignatureKeyNotFoundException` occurrences
 - JWT validation failure rates
 - Metadata endpoint response times
@@ -131,6 +133,7 @@ options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfigurati
 ### 3. Token Caching Strategy
 
 Review and optimize token caching strategies:
+
 - Implement distributed caching for multi-instance deployments
 - Set appropriate cache expiration times
 - Consider token revocation scenarios
@@ -138,6 +141,7 @@ Review and optimize token caching strategies:
 ### 4. Metadata Endpoint Performance
 
 Monitor the OpenID Connect metadata endpoint:
+
 - Track latency and availability
 - Implement fallback mechanisms if primary endpoint is slow
 - Consider caching metadata responses with appropriate TTL
@@ -210,12 +214,14 @@ To test the configuration:
 ### Issue: Still seeing SecurityTokenSignatureKeyNotFoundException
 
 **Possible Causes:**
+
 1. Network connectivity issues preventing metadata refresh
 2. OpenID Connect metadata endpoint unavailable
 3. Incorrect authority or metadata URL configuration
 4. Certificate trust issues with the metadata endpoint
 
 **Resolution Steps:**
+
 1. Verify `AAD_AUTHORITY` or `AAD_TENANT_ID` configuration is correct
 2. Check network connectivity to `https://login.microsoftonline.com`
 3. Review Application Insights logs for metadata fetch errors
@@ -232,11 +238,13 @@ This is working as designed. Subsequent requests will use the cached updated key
 ### Issue: Too many requests to metadata endpoint
 
 **Possible Causes:**
+
 1. Multiple instances fetching metadata independently
 2. Incorrect `RefreshInterval` configuration
 3. Key rotation happening more frequently than expected
 
 **Resolution Steps:**
+
 1. Verify `RefreshInterval` is set to at least 30 minutes
 2. Review metadata endpoint access logs
 3. Consider implementing distributed caching for metadata across instances
@@ -250,6 +258,7 @@ This is working as designed. Subsequent requests will use the cached updated key
 ## Contact
 
 For questions or issues related to this configuration:
+
 - Review this documentation first
 - Check Application Insights for error details
 - Refer to [Microsoft Entra ID documentation](https://learn.microsoft.com/en-us/entra/identity-platform/)

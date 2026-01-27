@@ -26,6 +26,7 @@ User Action → Stripe API → Service Layer → StripeTelemetryService → Appl
 Location: `OnePageAuthorLib/interfaces/Stripe/IStripeTelemetryService.cs`
 
 The interface defines methods for tracking:
+
 - Customer creation events
 - Checkout session creation and retrieval
 - Subscription lifecycle (create, update, cancel, list)
@@ -38,6 +39,7 @@ The interface defines methods for tracking:
 Location: `OnePageAuthorLib/api/Stripe/StripeTelemetryService.cs`
 
 Custom event names:
+
 - `StripeCustomerCreated` - Customer registration
 - `StripeCheckoutSessionCreated` - Checkout initiation
 - `StripeCheckoutSessionRetrieved` - Checkout status check
@@ -89,9 +91,11 @@ The following services are instrumented with telemetry:
 ### Dashboard Pages
 
 #### 1. Purchase Journey Overview
+
 **Purpose:** Track users from registration through successful payment
 
 **Visualizations:**
+
 - Customer funnel (Created → Checkout → Subscribed)
 - Average journey duration
 - Drop-off points analysis
@@ -99,9 +103,11 @@ The following services are instrumented with telemetry:
 **KQL Query:** `stripe-purchase-journey.kql`
 
 #### 2. Subscription Trends
+
 **Purpose:** Monitor subscription growth and churn
 
 **Visualizations:**
+
 - Daily/weekly subscription creates vs cancels
 - Net subscription growth over time
 - Plan distribution changes
@@ -109,9 +115,11 @@ The following services are instrumented with telemetry:
 **KQL Query:** `stripe-subscription-trends.kql`
 
 #### 3. Payment Analysis
+
 **Purpose:** Track payment success rates and failures
 
 **Visualizations:**
+
 - Payment success/failure ratio (pie chart)
 - Failed payment trends
 - Revenue by payment status
@@ -119,9 +127,11 @@ The following services are instrumented with telemetry:
 **KQL Query:** `stripe-payment-outcomes.kql`
 
 #### 4. Customer Lifecycle
+
 **Purpose:** Understand customer stages distribution
 
 **Visualizations:**
+
 - Funnel chart of lifecycle stages
 - Stage conversion rates
 - Time-in-stage analysis
@@ -129,9 +139,11 @@ The following services are instrumented with telemetry:
 **KQL Query:** `stripe-customer-lifecycle.kql`
 
 #### 5. Plan Popularity
+
 **Purpose:** Identify most popular subscription plans
 
 **Visualizations:**
+
 - Plan selection distribution (pie chart)
 - Plan trends over time
 - Upgrade/downgrade patterns
@@ -139,9 +151,11 @@ The following services are instrumented with telemetry:
 **KQL Query:** `stripe-plan-popularity.kql`
 
 #### 6. System Health
+
 **Purpose:** Monitor API errors and system stability
 
 **Visualizations:**
+
 - Error rate over time
 - Error distribution by operation
 - Most common error codes
@@ -178,6 +192,7 @@ All queries are located in the `/kql` folder:
 ### Application Insights Setup
 
 1. Ensure Application Insights is configured in the Azure Functions host:
+
    ```json
    {
      "logging": {
@@ -195,6 +210,7 @@ All queries are located in the `/kql` folder:
 ### Service Registration
 
 The telemetry service is automatically registered in `ServiceFactory.AddStripeServices()`:
+
 ```csharp
 services.AddScoped<IStripeTelemetryService, StripeTelemetryService>();
 ```
@@ -216,6 +232,7 @@ services.AddScoped<IStripeTelemetryService, StripeTelemetryService>();
 ## Monitoring and Alerts
 
 Consider setting up alerts for:
+
 - High API error rates (> 5% failure rate)
 - Unusual churn spikes
 - Payment failure increases

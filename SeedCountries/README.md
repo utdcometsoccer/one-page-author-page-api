@@ -109,7 +109,6 @@ Countries are stored in the `Countries` container with:
 - **Partition Key**: `/Language`
 - **Document Structure**:
 
-
   ```json
 
   {

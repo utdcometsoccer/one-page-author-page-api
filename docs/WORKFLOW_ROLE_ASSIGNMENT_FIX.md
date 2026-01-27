@@ -28,6 +28,7 @@ The role assignment resources have been **removed** from `infra/inkstainedwretch
 ### 2. Add Documentation and Guidance
 
 Comprehensive documentation has been added explaining:
+
 - Why role assignments were removed
 - How to manually grant access after deployment
 - Three methods for creating role assignments
@@ -35,6 +36,7 @@ Comprehensive documentation has been added explaining:
 ### 3. Enhance Deployment Outputs
 
 The Bicep template now outputs additional information to facilitate manual role assignment:
+
 - `keyVaultId` - Full resource ID of the Key Vault
 - `imageApiFunctionPrincipalId` - Managed identity principal ID
 - `inkStainedWretchFunctionsPrincipalId` - Managed identity principal ID
@@ -73,6 +75,7 @@ cd infra
 ```
 
 The script will automatically:
+
 - Find the service principal or Function App managed identity
 - Check if role assignment already exists
 - Assign "Key Vault Secrets User" role if needed
@@ -119,6 +122,7 @@ An alternative would be to grant the GitHub Actions service principal "User Acce
 ```
 
 This would allow role assignments in the Bicep template, but:
+
 - Requires elevated permissions for the service principal
 - May violate security policies
 - Increases the blast radius of the service principal
@@ -137,16 +141,19 @@ The fix has been validated:
 ## Impact
 
 ### Positive
+
 - ✅ Workflow will no longer fail due to permission errors
 - ✅ Infrastructure deployment completes successfully
 - ✅ Clear post-deployment guidance provided
 - ✅ More secure by default (separation of duties)
 
 ### Neutral
+
 - ℹ️ Requires one-time manual step after deployment
 - ℹ️ Administrators must remember to grant access
 
 ### Mitigations
+
 - 📝 Clear documentation in multiple locations
 - 📝 Deployment outputs include reminder message
 - 📝 Helper scripts make the process easy

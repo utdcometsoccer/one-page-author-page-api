@@ -9,7 +9,8 @@
 
 This document outlines tasks that require human intervention, judgment, or access to external systems that cannot be automated by Copilot AI. Each task includes context, priority, and actionable steps.
 
-**Recent Update (2025-12-30):** 
+**Recent Update (2025-12-30):**
+
 - Standardized error handling completed (PR #203)
 - Authentication validation completed and confirmed satisfactory
 - Immediate focus is now on Domain Registration validation testing. Human intervention is required to configure environments, execute manual tests with real domains, and validate production functionality.
@@ -19,6 +20,7 @@ This document outlines tasks that require human intervention, judgment, or acces
 ## 🟢 RECENT ACCOMPLISHMENTS
 
 ### Authentication System Validation ✅ COMPLETE (2025-12-30)
+
 - ✅ JWT authentication validated and operational
 - ✅ Authorization configurations verified
 - ✅ Microsoft Entra ID integration tested
@@ -27,6 +29,7 @@ This document outlines tasks that require human intervention, judgment, or acces
 **Impact:** Security foundation validated and operational
 
 ### Standardized Error Handling ✅ COMPLETE (2025-12-30)
+
 - ✅ Implemented consistent error response format across all APIs  
 - ✅ Deployed to production successfully
 - ✅ Client integration improved
@@ -50,6 +53,7 @@ This document outlines tasks that require human intervention, judgment, or acces
 End-to-end validation of domain registration workflow with REAL Google Domains API and test domain. **This is the critical validation after automated tests pass.**
 
 **Prerequisites:**
+
 - [ ] Copilot AI domain registration tests are passing (115+ tests)
 - [ ] Google Domains API access configured (see Task 2 below if needed)
 - [ ] Test Stripe subscription is active
@@ -57,13 +61,15 @@ End-to-end validation of domain registration workflow with REAL Google Domains A
 - [ ] Azure DNS and Front Door configured
 
 **Preparation:**
+
 - [ ] Choose test domain (use `.test` or cheap domain for testing like `.xyz`)
 - [ ] Ensure test Stripe subscription is active
 - [ ] Have valid test contact information ready
 - [ ] Budget approved for test domain cost
 
 **Action Items:**
-- [ ] Log into Azure Portal (https://portal.azure.com)
+
+- [ ] Log into Azure Portal (<https://portal.azure.com>)
 - [ ] Navigate to Microsoft Entra ID → App Registrations
 - [ ] Verify/Create application registration for OnePageAuthor API
 - [ ] Configure Redirect URIs for all environments:
@@ -87,6 +93,7 @@ End-to-end validation of domain registration workflow with REAL Google Domains A
   - Client Secret: `________________________________________` (SECURE!)
 
 **Validation:**
+
 - [ ] Verify application shows in App Registrations
 - [ ] Test authentication flow in development environment
 - [ ] Verify tokens are issued correctly
@@ -103,6 +110,7 @@ End-to-end validation of domain registration workflow with REAL Google Domains A
 All Azure Function apps require proper environment variables for authentication to work correctly.
 
 **Function Apps to Configure:**
+
 1. ImageAPI
 2. InkStainedWretchFunctions
 3. InkStainedWretchStripe
@@ -110,10 +118,12 @@ All Azure Function apps require proper environment variables for authentication 
 5. InkStainedWretchesConfig
 
 **Action Items for Each Function App:**
+
 - [ ] Navigate to Azure Portal → Function App → Configuration → Application Settings
 - [ ] Add/Verify the following settings:
 
 #### Authentication Settings (CRITICAL)
+
 ```
 AAD_TENANT_ID = [Your Entra ID Tenant GUID]
 AAD_AUDIENCE = [Your Application/Client ID]
@@ -121,11 +131,13 @@ AAD_CLIENT_ID = [Same as AAD_AUDIENCE or separate if using different client]
 ```
 
 #### Optional OpenID Connect Override
+
 ```
 OPEN_ID_CONNECT_METADATA_URL = https://login.microsoftonline.com/{tenant-id}/v2.0/.well-known/openid-configuration
 ```
 
 #### Cosmos DB Settings
+
 ```
 COSMOSDB_ENDPOINT_URI = https://[your-account].documents.azure.com:443/
 COSMOSDB_PRIMARY_KEY = [Your Cosmos DB Primary Key]
@@ -133,6 +145,7 @@ COSMOSDB_DATABASE_ID = OnePageAuthor
 ```
 
 #### Stripe Settings (for InkStainedWretchStripe)
+
 ```
 STRIPE_API_KEY = sk_live_... or sk_test_...
 STRIPE_WEBHOOK_SECRET = whsec_...
@@ -140,6 +153,7 @@ STRIPE_PUBLISHABLE_KEY = pk_live_... or pk_test_...
 ```
 
 #### Azure Resources (for Domain/DNS functions)
+
 ```
 AZURE_SUBSCRIPTION_ID = [Azure Subscription GUID]
 AZURE_RESOURCE_GROUP_NAME = [Resource Group for Front Door]
@@ -148,12 +162,14 @@ AZURE_FRONTDOOR_PROFILE_NAME = [Front Door Profile Name]
 ```
 
 #### Google Domains (Optional - if using Google Domains)
+
 ```
 GOOGLE_APPLICATION_CREDENTIALS = [Path to service account JSON]
 GOOGLE_CLOUD_PROJECT = [Google Cloud Project ID]
 ```
 
 **Validation:**
+
 - [ ] Click "Save" after adding settings
 - [ ] Restart Function App
 - [ ] Check Application Insights for startup logs
@@ -171,10 +187,12 @@ GOOGLE_CLOUD_PROJECT = [Google Cloud Project ID]
 GitHub Actions workflows need updated secrets for deployment and testing.
 
 **Action Items:**
+
 - [ ] Navigate to GitHub Repository → Settings → Secrets and variables → Actions
 - [ ] Add/Update the following secrets:
 
 #### Azure Deployment
+
 ```
 AZURE_CREDENTIALS = [Service Principal JSON]
 AZURE_SUBSCRIPTION_ID = [Subscription GUID]
@@ -182,6 +200,7 @@ AZURE_RESOURCE_GROUP = [Resource Group Name]
 ```
 
 #### Function App Publishing Profiles (per app)
+
 ```
 IMAGEAPI_PUBLISH_PROFILE = [Download from Azure Portal]
 INKSTAINEDWRETCHFUNCTIONS_PUBLISH_PROFILE = [Download from Azure Portal]
@@ -190,6 +209,7 @@ FUNCTIONAPP_PUBLISH_PROFILE = [Download from Azure Portal]
 ```
 
 #### Entra ID Configuration
+
 ```
 AAD_TENANT_ID = [Tenant GUID]
 AAD_CLIENT_ID = [Application ID]
@@ -197,18 +217,21 @@ AAD_CLIENT_SECRET = [Client Secret]
 ```
 
 #### Cosmos DB
+
 ```
 COSMOSDB_ENDPOINT_URI = [Cosmos DB URI]
 COSMOSDB_PRIMARY_KEY = [Primary Key]
 ```
 
 #### Stripe
+
 ```
 STRIPE_API_KEY = [Secret Key]
 STRIPE_WEBHOOK_SECRET = [Webhook Signing Secret]
 ```
 
 **Validation:**
+
 - [ ] Trigger a GitHub Actions workflow manually
 - [ ] Verify deployment succeeds
 - [ ] Check workflow logs for any secret-related errors
@@ -226,6 +249,7 @@ STRIPE_WEBHOOK_SECRET = [Webhook Signing Secret]
 Comprehensive manual testing of authentication across all endpoints to ensure everything works in REAL production environments. **This is the critical validation step after automated tests pass.**
 
 **Prerequisites:**
+
 - [ ] Copilot AI authentication tests are passing (100+ tests)
 - [ ] Environment variables configured in all Function Apps
 - [ ] GitHub Secrets updated
@@ -234,29 +258,35 @@ Comprehensive manual testing of authentication across all endpoints to ensure ev
 **Test Scenarios:**
 
 #### Scenario 1: Token Acquisition
+
 - [ ] Use Postman or similar tool to obtain JWT token
 - [ ] Method 1: Use OAuth 2.0 Authorization Code Flow
   - Auth URL: `https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize`
   - Token URL: `https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token`
   - Scopes: `api://{client-id}/.default` or custom scopes
 - [ ] Method 2: Use Azure CLI
+
   ```bash
   az login
   az account get-access-token --resource api://{client-id}
   ```
+
 - [ ] Verify token structure using jwt.io
 - [ ] Confirm claims: `aud`, `iss`, `exp`, `upn`/`preferred_username`
 
 #### Scenario 2: Test Protected Endpoints
+
 Test each protected endpoint with valid token:
 
 **ImageAPI:**
+
 - [ ] `POST /api/upload` - Upload an image (with valid JWT)
 - [ ] `GET /api/images/{imageId}` - Retrieve image metadata
 - [ ] `DELETE /api/images/{imageId}` - Delete an image
 - [ ] Expected: 200 OK responses
 
 **InkStainedWretchFunctions:**
+
 - [ ] `POST /api/domain-registrations` - Create domain registration
 - [ ] `GET /api/domain-registrations` - List user's domains
 - [ ] `GET /api/domain-registrations/{id}` - Get specific domain
@@ -264,23 +294,27 @@ Test each protected endpoint with valid token:
 - [ ] Expected: 200/201 OK responses
 
 **InkStainedWretchStripe:**
+
 - [ ] `POST /api/CreateStripeCustomer` - Create customer
 - [ ] `POST /api/CreateStripeCheckoutSession` - Create checkout
 - [ ] `GET /api/ListSubscription/{customerId}` - List subscriptions
 - [ ] Expected: 200 OK responses
 
 #### Scenario 3: Test Unauthorized Access
+
 - [ ] Test same endpoints WITHOUT Authorization header
 - [ ] Expected: 401 Unauthorized
 - [ ] Verify error message is clear and actionable
 
 #### Scenario 4: Test Invalid/Expired Tokens
+
 - [ ] Test with malformed token
 - [ ] Test with token from wrong tenant
 - [ ] Test with expired token
 - [ ] Expected: 401 Unauthorized with appropriate error messages
 
 **Document Results:**
+
 - [ ] Create test report with screenshots
 - [ ] Document any issues or unexpected behavior
 - [ ] Update authentication documentation with findings
@@ -302,7 +336,8 @@ Test each protected endpoint with valid token:
 The system can register domains through Google Domains API. This requires proper GCP setup.
 
 **Action Items:**
-- [ ] Log into Google Cloud Console (https://console.cloud.google.com)
+
+- [ ] Log into Google Cloud Console (<https://console.cloud.google.com>)
 - [ ] Create or select existing project for domain management
 - [ ] Enable Google Domains API:
   - Navigate to APIs & Services → Library
@@ -324,23 +359,27 @@ The system can register domains through Google Domains API. This requires proper
   - Ensure billing is enabled for the project
   - Review pricing for domain registrations
 - [ ] Test API access:
+
   ```bash
   gcloud auth activate-service-account --key-file=service-account-key.json
   gcloud domains registrations list
   ```
 
 **Upload Service Account to Azure:**
+
 - [ ] Option 1: Azure Key Vault
   - Upload JSON as secret
   - Reference in Function App configuration
 - [ ] Option 2: App Configuration
   - Base64 encode the JSON
   - Store as environment variable
+
   ```bash
   base64 service-account-key.json
   ```
 
 **Validation:**
+
 - [ ] Verify API is enabled in GCP Console
 - [ ] Test service account has proper permissions
 - [ ] Function App can authenticate to Google Domains API
@@ -357,6 +396,7 @@ The system can register domains through Google Domains API. This requires proper
 End-to-end validation of domain registration workflow with REAL Google Domains API and test domain. **This is the critical validation after automated tests pass.**
 
 **Prerequisites:**
+
 - [ ] Copilot AI domain registration tests are passing (115+ tests)
 - [ ] Google Domains API access configured (Task 5 - see below if needed)
 - [ ] Test Stripe subscription is active
@@ -364,6 +404,7 @@ End-to-end validation of domain registration workflow with REAL Google Domains A
 - [ ] Azure DNS and Front Door configured
 
 **Preparation:**
+
 - [ ] Choose test domain (use `.test` or cheap domain for testing like `.xyz`)
 - [ ] Ensure test Stripe subscription is active
 - [ ] Have valid test contact information ready
@@ -372,8 +413,10 @@ End-to-end validation of domain registration workflow with REAL Google Domains A
 **Test Scenarios:**
 
 #### Scenario 1: Successful Domain Registration
+
 - [ ] Use Postman to POST to `/api/domain-registrations`
 - [ ] Payload:
+
   ```json
   {
     "DomainName": "test-example.com",
@@ -395,27 +438,32 @@ End-to-end validation of domain registration workflow with REAL Google Domains A
     }
   }
   ```
+
 - [ ] Expected: 201 Created with registration ID
 - [ ] Verify in Cosmos DB: Domain registration record created
 - [ ] Verify in Google Domains Console: Domain registration initiated
 - [ ] Document registration ID for further testing
 
 #### Scenario 2: Retrieve Domain Registration
+
 - [ ] GET `/api/domain-registrations/{registrationId}`
 - [ ] Expected: 200 OK with full registration details
 - [ ] Verify status reflects current state
 
 #### Scenario 3: List User's Domains
+
 - [ ] GET `/api/domain-registrations`
 - [ ] Expected: 200 OK with array of user's domains
 - [ ] Verify pagination works (if implemented)
 
 #### Scenario 4: Update Domain Registration
+
 - [ ] PUT `/api/domain-registrations/{registrationId}`
 - [ ] Update auto-renew or contact information
 - [ ] Expected: 200 OK with updated details
 
 #### Scenario 5: Error Cases
+
 - [ ] Try to register already-registered domain
   - Expected: 409 Conflict
 - [ ] Try to register without subscription
@@ -426,6 +474,7 @@ End-to-end validation of domain registration workflow with REAL Google Domains A
   - Expected: 400 Bad Request with validation errors
 
 **Document Results:**
+
 - [ ] Create comprehensive test report with findings
 - [ ] Screenshot key API responses
 - [ ] Note any issues or improvements needed
@@ -460,6 +509,7 @@ Automated DNS configuration requires proper Azure DNS setup and permissions.
 **Action Items:**
 
 #### Create Resource Group (if not exists)
+
 - [ ] Navigate to Azure Portal → Resource Groups
 - [ ] Click "Create"
 - [ ] Name: `rg-onepageauthor-dns` (or your naming convention)
@@ -467,6 +517,7 @@ Automated DNS configuration requires proper Azure DNS setup and permissions.
 - [ ] Click "Review + Create"
 
 #### Assign Managed Identity Permissions
+
 - [ ] For each Function App that manages DNS:
   1. Navigate to Function App → Identity
   2. Enable System Assigned Managed Identity
@@ -478,6 +529,7 @@ Automated DNS configuration requires proper Azure DNS setup and permissions.
      - Role: `Reader` (for listing zones)
 
 #### Verify DNS Zone Creation Capability
+
 - [ ] Test DNS zone creation manually:
   - Navigate to DNS zones
   - Click "Create DNS zone"
@@ -486,12 +538,14 @@ Automated DNS configuration requires proper Azure DNS setup and permissions.
   - Delete test zone if not needed
 
 **Required Configuration Values:**
+
 ```
 AZURE_SUBSCRIPTION_ID = [Your subscription GUID]
 AZURE_DNS_RESOURCE_GROUP = rg-onepageauthor-dns
 ```
 
 **Validation:**
+
 - [ ] Managed identities are enabled
 - [ ] Permissions are assigned correctly
 - [ ] Can create DNS zones programmatically
@@ -511,6 +565,7 @@ Azure Front Door provides CDN and custom domain management for the platform.
 **Action Items:**
 
 #### Create Azure Front Door Profile (if not exists)
+
 - [ ] Navigate to Azure Portal → Front Door and CDN profiles
 - [ ] Click "Create"
 - [ ] Select "Azure Front Door" (Standard or Premium)
@@ -528,6 +583,7 @@ Azure Front Door provides CDN and custom domain management for the platform.
 - [ ] Click "Review + Create"
 
 #### Assign Managed Identity Permissions
+
 - [ ] For InkStainedWretchFunctions:
   1. Navigate to Function App → Identity
   2. Enable System Assigned Managed Identity
@@ -537,6 +593,7 @@ Azure Front Door provides CDN and custom domain management for the platform.
      - Role: `CDN Endpoint Contributor`
 
 #### Document Configuration
+
 ```
 AZURE_SUBSCRIPTION_ID = [Subscription GUID]
 AZURE_RESOURCE_GROUP_NAME = [Front Door resource group]
@@ -544,6 +601,7 @@ AZURE_FRONTDOOR_PROFILE_NAME = afd-onepageauthor-prod
 ```
 
 **Validation:**
+
 - [ ] Front Door profile is created and running
 - [ ] Can access endpoint through Front Door URL
 - [ ] Managed identity has permissions
@@ -561,12 +619,14 @@ AZURE_FRONTDOOR_PROFILE_NAME = afd-onepageauthor-prod
 Validate that DNS zones are automatically created for domain registrations in REAL Azure environment. **Critical validation after automated tests pass.**
 
 **Prerequisites:**
+
 - [ ] Copilot AI DNS tests are passing (90+ tests)
 - [ ] Azure DNS resources configured (Task 7 - see below if needed)
 - [ ] Test domain from Task 6 available
 - [ ] Azure Front Door configured (Task 8 - see below if needed)
 
 #### Scenario 1: Automatic DNS Zone Creation
+
 - [ ] Create domain registration (from step 6)
 - [ ] Verify DomainRegistrationTriggerFunction is triggered
 - [ ] Check Azure DNS zones - verify new zone created
@@ -575,6 +635,7 @@ Validate that DNS zones are automatically created for domain registrations in RE
 - [ ] Document nameservers provided
 
 #### Scenario 2: Verify DNS Zone Records
+
 - [ ] Navigate to Azure Portal → DNS zones → [your domain]
 - [ ] Verify default records exist:
   - NS records (nameservers)
@@ -582,17 +643,20 @@ Validate that DNS zones are automatically created for domain registrations in RE
 - [ ] Test adding A record manually
 - [ ] Test adding CNAME record manually
 - [ ] Verify records are queryable:
+
   ```bash
   nslookup example.com [azure-nameserver]
   dig @[azure-nameserver] example.com
   ```
 
 #### Scenario 3: Check DNS Zone Existence API
+
 - [ ] Test `DnsZoneExistsAsync` method through test harness
 - [ ] Expected: Returns true for created zones
 - [ ] Expected: Returns false for non-existent domains
 
 #### Scenario 4: DNS Zone Error Handling
+
 - [ ] Try to create zone with invalid domain name
   - Expected: Error logged, graceful failure
 - [ ] Try to create duplicate zone
@@ -601,6 +665,7 @@ Validate that DNS zones are automatically created for domain registrations in RE
   - Expected: Clear error message about permissions
 
 **Document Results:**
+
 - [ ] Screenshot DNS zone in Azure Portal
 - [ ] Document nameservers assigned
 - [ ] Note any issues with zone creation
@@ -628,6 +693,7 @@ Validate that DNS zones are automatically created for domain registrations in RE
 Validate automatic addition of custom domains to Azure Front Door in REAL production environment. **Final critical validation step.**
 
 **Prerequisites:**
+
 - [ ] Copilot AI Front Door tests are passing
 - [ ] DNS zone exists for test domain (Task 9 complete)
 - [ ] Azure Front Door configured (Task 8 - see below if needed)
@@ -636,6 +702,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 **Test Scenarios:**
 
 #### Scenario 1: Add Domain to Front Door
+
 - [ ] Trigger domain registration with DNS zone created
 - [ ] Verify `AddDomainToFrontDoorAsync` is called
 - [ ] Check Azure Portal → Front Door → Domains
@@ -643,6 +710,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 - [ ] Status may be "Pending" initially
 
 #### Scenario 2: Domain Validation
+
 - [ ] Front Door requires domain ownership validation
 - [ ] Navigate to custom domain details
 - [ ] Copy validation TXT record details:
@@ -654,6 +722,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 - [ ] Verify domain status changes to "Approved"
 
 #### Scenario 3: HTTPS Certificate
+
 - [ ] After domain validated, configure HTTPS
 - [ ] Option 1: Front Door Managed Certificate
   - Navigate to domain → HTTPS settings
@@ -668,6 +737,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 - [ ] Verify HTTPS works: `https://example.com`
 
 #### Scenario 4: Test Domain Routing
+
 - [ ] Access custom domain through browser
 - [ ] Verify routes to correct origin (Function App)
 - [ ] Test various endpoints:
@@ -676,6 +746,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 - [ ] Verify response headers include Front Door information
 
 #### Scenario 5: Error Cases
+
 - [ ] Try to add already-added domain
   - Expected: Detects existing, no duplicate
 - [ ] Try to add domain without DNS zone
@@ -684,6 +755,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
   - Expected: Validation error
 
 **Document Results:**
+
 - [ ] Screenshot Front Door configuration
 - [ ] Document validation process and timing
 - [ ] Note certificate provisioning time
@@ -711,6 +783,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 **Estimated Time:** 30-60 minutes
 
 **Action Items:**
+
 - [ ] Verify Application Insights is connected to all Function Apps
 - [ ] Configure alerting rules:
   - 401/403 authentication errors (threshold: 10 in 5 minutes)
@@ -730,6 +803,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 **Estimated Time:** 2-4 hours
 
 **Action Items:**
+
 - [ ] Update `AUTHORIZATION_FIX_DOCUMENTATION.md` with latest findings
 - [ ] Create/update `DOMAIN_REGISTRATION_GUIDE.md`
 - [ ] Create/update `DNS_CONFIGURATION_GUIDE.md`
@@ -746,6 +820,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 **Estimated Time:** 2-3 hours
 
 **Action Items:**
+
 - [ ] Review RBAC permissions on Azure resources
 - [ ] Audit service accounts and their permissions
 - [ ] Review secret expiration dates
@@ -764,6 +839,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 **Estimated Time:** 1-2 hours
 
 **Action Items:**
+
 - [ ] Review Cosmos DB RU consumption
 - [ ] Analyze Azure Functions execution costs
 - [ ] Review Front Door bandwidth usage
@@ -782,6 +858,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 **Estimated Time:** 2-3 hours
 
 **Action Items:**
+
 - [ ] Create Azure Dashboard for system overview
 - [ ] Add key metrics:
   - Authentication success/failure rate
@@ -800,6 +877,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 **Estimated Time:** 2-4 hours
 
 **Action Items:**
+
 - [ ] Document common authentication issues and solutions
 - [ ] Document domain registration troubleshooting
 - [ ] Document DNS configuration issues
@@ -814,6 +892,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 ### 🔴 Critical - Validation Testing (IMMEDIATE - This Week)
 
 **Authentication Validation (January 3-4, 2026):**
+
 1. ✅/⏳ Configure Azure Entra ID Application Registration (Verify)
 2. ✅/⏳ Configure Environment Variables for All Function Apps (Verify)
 3. ✅/⏳ Update GitHub Secrets for CI/CD Pipeline (Verify)
@@ -830,20 +909,23 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 10. ⚠️ Test Front Door Domain Addition Workflow (CRITICAL VALIDATION)
 
 ### Medium Priority (Should Complete After Validation)
-11. Review and Update Application Insights
-12. Update Documentation
-13. Security Review
-14. Cost Optimization Review
+
+1. Review and Update Application Insights
+2. Update Documentation
+3. Security Review
+4. Cost Optimization Review
 
 ### Low Priority (Nice to Have)
-15. Set Up Monitoring Dashboard
-16. Create Runbook for Common Issues
+
+1. Set Up Monitoring Dashboard
+2. Create Runbook for Common Issues
 
 ---
 
 ## Notes for Execution
 
 ### Time Estimates
+
 - **Critical Validation Tasks:** 10-15 hours total (This Week)
   - Authentication validation: 3-4 hours
   - Domain registration validation: 3-4 hours
@@ -853,6 +935,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 - **Total Estimated Time:** 21-34 hours
 
 ### Recommended Approach
+
 1. **Week 1 (Dec 30 - Jan 5):** Focus on critical validation
    - Start with Authentication validation (Tasks 1-4)
    - Parallel: Begin Domain Registration validation (Tasks 5-6)
@@ -861,6 +944,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 3. **Ongoing:** Low priority items as time allows
 
 ### Success Criteria for Validation Phase
+
 - ✅ All automated tests passing (300+ tests from Copilot AI)
 - ✅ Authentication works in production with real Entra ID tokens
 - ✅ Domain registration workflow completes end-to-end with real domain
@@ -872,9 +956,10 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 - ✅ Any issues discovered are documented and prioritized
 
 ### Support Resources
-- Azure Documentation: https://docs.microsoft.com/azure
-- Google Domains API: https://cloud.google.com/domains/docs
-- Microsoft Entra ID: https://learn.microsoft.com/entra
+
+- Azure Documentation: <https://docs.microsoft.com/azure>
+- Google Domains API: <https://cloud.google.com/domains/docs>
+- Microsoft Entra ID: <https://learn.microsoft.com/entra>
 - Internal documentation in `/docs` directory
 
 ---

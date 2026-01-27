@@ -29,6 +29,7 @@ All deployments are **conditional** and only execute when the required GitHub Se
 | `AZURE_CREDENTIALS` | ✅ Yes | Azure Service Principal credentials in JSON format | `{"clientId": "...", "clientSecret": "...", "subscriptionId": "...", "tenantId": "..."}` |
 
 **How to obtain**: Create a Service Principal with Contributor role on your subscription:
+
 ```bash
 az ad sp create-for-rbac --name "github-actions-sp" \
   --role Contributor \
@@ -94,6 +95,7 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 ### Trigger Events
 
 The workflow runs automatically on:
+
 - **Push to `main` branch** - Automatic deployment
 - **Manual trigger** - Use GitHub Actions "Run workflow" button
 
@@ -141,6 +143,7 @@ After the automated deployment completes successfully, you must perform these ma
 The Bicep template no longer creates Key Vault role assignments automatically to avoid permission errors. You must grant access manually using one of these methods:
 
 **Method 1: Use Helper Script (Recommended)**
+
 ```bash
 cd infra
 
@@ -149,11 +152,13 @@ cd infra
 ```
 
 The script will:
+
 - Check if role assignment already exists (idempotent)
 - Assign "Key Vault Secrets User" role to the Function App's managed identity
 - Provide clear success/error messages
 
 **Method 2: Use Azure CLI**
+
 ```bash
 # Get principal IDs from deployment outputs
 az deployment group show \
@@ -169,6 +174,7 @@ az role assignment create \
 ```
 
 **Method 3: Azure Portal**
+
 1. Navigate to Key Vault → Access control (IAM)
 2. Click "Add role assignment"
 3. Select "Key Vault Secrets User" role
@@ -176,6 +182,7 @@ az role assignment create \
 5. Review and assign
 
 **Function Apps that need Key Vault access:**
+
 - ImageAPI
 - InkStainedWretchFunctions
 - InkStainedWretchStripe
@@ -184,6 +191,7 @@ az role assignment create \
 #### 2. Verify Communication Services (If Enabled)
 
 If you deployed Communication Services (`DEPLOY_COMMUNICATION_SERVICES=true`):
+
 1. Navigate to Azure Portal → Communication Services
 2. Go to "Keys" to retrieve the connection string
 3. Store the connection string in Key Vault or update Function App configuration
@@ -191,6 +199,7 @@ If you deployed Communication Services (`DEPLOY_COMMUNICATION_SERVICES=true`):
 #### 3. Test Function Apps
 
 After granting Key Vault access:
+
 1. Navigate to each Function App in Azure Portal
 2. Check the "Functions" tab to verify functions are loaded
 3. Test an HTTP trigger function to ensure everything works
@@ -203,6 +212,7 @@ After granting Key Vault access:
 **Purpose**: Provides blob storage for Azure Functions runtime and application data.
 
 **Configuration**:
+
 - SKU: Standard_LRS
 - TLS: Minimum 1.2
 - Public access: Disabled
@@ -213,6 +223,7 @@ After granting Key Vault access:
 **Purpose**: Secure storage for secrets and certificates.
 
 **Configuration**:
+
 - SKU: Standard
 - RBAC authorization: Enabled
 - Soft delete: Enabled (90 days retention)
@@ -223,11 +234,13 @@ After granting Key Vault access:
 **Purpose**: Monitoring, logging, and diagnostics for all Function Apps.
 
 **Configuration**:
+
 - Type: Web
 - Retention: 90 days
 - Name format: `{baseName}-insights` (e.g., `inkstainedwretches-insights`)
 
 **Key Features**:
+
 - Request tracking
 - Dependency monitoring
 - Exception logging
@@ -238,6 +251,7 @@ After granting Key Vault access:
 **Purpose**: Manage custom domain DNS records.
 
 **Configuration**:
+
 - Zone type: Public
 - Location: Global
 - Deployed only if `ISW_DNS_ZONE_NAME` is provided
@@ -247,9 +261,11 @@ After granting Key Vault access:
 Three Azure Functions are deployed on a shared Consumption Plan (Y1/Dynamic):
 
 #### 1. ImageAPI
+
 **Purpose**: Image upload, management, and retrieval services
 
 **Configuration**:
+
 - Runtime: .NET Isolated
 - Name format: `{baseName}-imageapi`
 - Environment Variables:
@@ -259,14 +275,17 @@ Three Azure Functions are deployed on a shared Consumption Plan (Y1/Dynamic):
   - `APPLICATIONINSIGHTS_CONNECTION_STRING`
 
 **Endpoints**:
+
 - `POST /api/upload` - Upload images
 - `GET /api/images/{imageId}` - Retrieve image metadata
 - `DELETE /api/images/{imageId}` - Delete images
 
 #### 2. InkStainedWretchFunctions
+
 **Purpose**: Domain registration, localization, and external API integrations
 
 **Configuration**:
+
 - Runtime: .NET Isolated
 - Name format: `{baseName}-functions`
 - Environment Variables:
@@ -276,15 +295,18 @@ Three Azure Functions are deployed on a shared Consumption Plan (Y1/Dynamic):
   - `APPLICATIONINSIGHTS_CONNECTION_STRING`
 
 **Endpoints**:
+
 - `GET /api/localizedtext/{culture}` - Get localized UI text
 - `POST /api/domain-registrations` - Register domains
 - `GET /api/domain-registrations` - List user domains
 - External API integrations (Penguin Random House, Amazon)
 
 #### 3. InkStainedWretchStripe
+
 **Purpose**: Stripe payment processing and subscription management
 
 **Configuration**:
+
 - Runtime: .NET Isolated
 - Name format: `{baseName}-stripe`
 - Environment Variables:
@@ -295,6 +317,7 @@ Three Azure Functions are deployed on a shared Consumption Plan (Y1/Dynamic):
   - `APPLICATIONINSIGHTS_CONNECTION_STRING`
 
 **Endpoints**:
+
 - `POST /api/CreateStripeCheckoutSession` - Create checkout sessions
 - `POST /api/CreateStripeCustomer` - Create Stripe customers
 - `POST /api/CreateSubscription` - Create subscriptions
@@ -310,6 +333,7 @@ Three Azure Functions are deployed on a shared Consumption Plan (Y1/Dynamic):
    - Click "Settings" → "Secrets and variables" → "Actions"
 
 2. **Add Azure Service Principal** (Required)
+
    ```bash
    # Create Service Principal and get credentials
    az ad sp create-for-rbac --name "github-actions-sp" \
@@ -317,6 +341,7 @@ Three Azure Functions are deployed on a shared Consumption Plan (Y1/Dynamic):
      --scopes /subscriptions/{subscription-id} \
      --sdk-auth
    ```
+
    - Copy the JSON output
    - Create secret: `AZURE_CREDENTIALS` with the JSON content
 
@@ -334,6 +359,7 @@ Three Azure Functions are deployed on a shared Consumption Plan (Y1/Dynamic):
    - `ISW_DNS_ZONE_NAME`: Your custom domain (e.g., "yourdomain.com")
 
 6. **Add Application Configuration Secrets** (Required)
+
    ```bash
    # Get Cosmos DB connection string
    az cosmosdb keys list --name {cosmos-account-name} \
@@ -341,6 +367,7 @@ Three Azure Functions are deployed on a shared Consumption Plan (Y1/Dynamic):
      --type connection-strings \
      --query "connectionStrings[0].connectionString" -o tsv
    ```
+
    - `COSMOSDB_CONNECTION_STRING`: Cosmos DB connection string
    - `STRIPE_API_KEY`: From Stripe Dashboard → Developers → API Keys
    - `AAD_TENANT_ID`: From Azure Portal → Microsoft Entra ID → Tenant ID
@@ -358,6 +385,7 @@ The workflow uses intelligent conditional deployment:
 ### Resource-Level Conditions
 
 Each resource in the Bicep template has a deployment condition:
+
 ```bicep
 resource storageAccount ... = if (deployStorageAccount) { ... }
 resource keyVault ... = if (deployKeyVault) { ... }
@@ -366,6 +394,7 @@ resource keyVault ... = if (deployKeyVault) { ... }
 ### Workflow-Level Conditions
 
 Each workflow step checks for required secrets:
+
 ```bash
 if [ -z "$REQUIRED_SECRET" ]; then
   echo "⚠️ Skipping deployment: Required secrets not configured"
@@ -391,6 +420,7 @@ fi
 **Error**: `Error: Login failed with Error: ...`
 
 **Solution**:
+
 - Verify `AZURE_CREDENTIALS` secret is correctly formatted JSON
 - Check Service Principal has Contributor role
 - Ensure subscription ID is correct
@@ -400,6 +430,7 @@ fi
 **Error**: `Resource name already exists`
 
 **Solution**:
+
 - Ensure `ISW_BASE_NAME` is globally unique
 - Storage account names must be 3-24 characters, lowercase letters and numbers only
 - Try a different base name or append a unique identifier
@@ -409,6 +440,7 @@ fi
 **Message**: `⚠️ Skipping deployment: Required secrets not configured`
 
 **Solution**:
+
 - Review the specific secret names mentioned in the warning
 - Add the required secrets in GitHub repository settings
 - Verify secret names match exactly (case-sensitive)
@@ -418,6 +450,7 @@ fi
 **Error**: `Error: Failed to deploy function app`
 
 **Solution**:
+
 - Ensure infrastructure deployment completed successfully first
 - Verify the Function App exists in the resource group
 - Check that `ISW_BASE_NAME` matches the infrastructure deployment
@@ -428,6 +461,7 @@ fi
 **Error**: `DNS Zone deployment failed`
 
 **Solution**:
+
 - Verify domain name format (no https://, no trailing slash)
 - Ensure you own the domain
 - Check if DNS Zone already exists in another resource group
@@ -439,16 +473,19 @@ fi
 **Context**: This error occurred in previous versions when the Bicep template attempted to create role assignments for Function App access to Key Vault.
 
 **Solution** (Already Implemented):
+
 - Role assignments have been removed from the Bicep template to avoid this permission error
 - After infrastructure deployment completes successfully, you must manually grant Function Apps access to Key Vault using one of these methods:
 
   **Option 1: Use Helper Script (Recommended)**
+
   ```bash
   cd infra
   ./Assign-KeyVaultRole.sh -k <key-vault-name>
   ```
 
   **Option 2: Manual Azure CLI**
+
   ```bash
   # Get the Function App principal ID from deployment outputs
   az role assignment create \
@@ -483,6 +520,7 @@ fi
 ### Debug Mode
 
 Enable verbose logging by modifying the workflow:
+
 ```yaml
 - name: 'Deploy Ink Stained Wretches Infrastructure'
   shell: bash
@@ -533,12 +571,14 @@ Enable verbose logging by modifying the workflow:
 All Function Apps are automatically configured with Application Insights:
 
 **Key Metrics**:
+
 - Request rate and latency
 - Failed requests
 - Dependency calls
 - Exception rates
 
 **Access Logs**:
+
 1. Navigate to Function App → Application Insights
 2. Go to "Logs" to query telemetry
 3. Use "Live Metrics" for real-time monitoring
@@ -546,6 +586,7 @@ All Function Apps are automatically configured with Application Insights:
 ### Example Queries
 
 **Failed Requests**:
+
 ```kusto
 requests
 | where success == false
@@ -554,6 +595,7 @@ requests
 ```
 
 **Slow Requests**:
+
 ```kusto
 requests
 | where duration > 5000
@@ -566,6 +608,7 @@ requests
 ### Updating Infrastructure
 
 To update infrastructure configuration:
+
 1. Modify `infra/inkstainedwretches.bicep`
 2. Commit and push to `main` branch
 3. Workflow automatically redeploys infrastructure
@@ -574,6 +617,7 @@ To update infrastructure configuration:
 ### Updating Function Apps
 
 To update Function App code:
+
 1. Modify code in respective Function App project
 2. Commit and push to `main` branch
 3. Workflow automatically builds and deploys
@@ -582,6 +626,7 @@ To update Function App code:
 ### Rolling Back
 
 To rollback a deployment:
+
 1. Navigate to Azure Portal → Resource Group → Deployments
 2. Find the previous successful deployment
 3. Click "Redeploy" to rollback infrastructure
@@ -598,6 +643,7 @@ To rollback a deployment:
 ## 🤝 Support
 
 For issues or questions:
+
 1. Check this documentation first
 2. Review GitHub Actions logs
 3. Check Azure Portal deployment logs

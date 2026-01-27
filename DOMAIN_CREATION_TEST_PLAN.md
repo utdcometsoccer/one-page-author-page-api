@@ -47,6 +47,7 @@ Cosmos DB (DomainRegistrations container)
 **Purpose**: Validates Google Cloud Platform domain registration API integration without performing actual registrations (dry run mode).
 
 **Key Features**:
+
 - Domain availability checking
 - Registration parameter validation
 - Contact information verification
@@ -56,6 +57,7 @@ Cosmos DB (DomainRegistrations container)
 - Safe for repeated execution (no charges)
 
 **Test Modes**:
+
 - JSON file input (default or custom file)
 - Interactive database selection (`--interactive`)
 - User-specific testing (`--upn <email>`)
@@ -70,6 +72,7 @@ Cosmos DB (DomainRegistrations container)
 **Purpose**: Validates Azure Front Door custom domain integration without making infrastructure changes (dry run mode).
 
 **Key Features**:
+
 - DNS zone existence checking
 - Front Door domain conflict detection
 - Domain format validation
@@ -79,6 +82,7 @@ Cosmos DB (DomainRegistrations container)
 - Safe for repeated execution (no infrastructure changes)
 
 **Test Modes**:
+
 - JSON file input (default or custom file)
 - Interactive database selection (`--interactive`)
 - User-specific testing (`--upn <email>`)
@@ -106,12 +110,14 @@ Cosmos DB (DomainRegistrations container)
 ### Cloud Resources Required
 
 #### Google Cloud Platform
+
 - Active GCP project with billing enabled
 - Cloud Domains API enabled
 - Service account with Domains API permissions
 - Authentication configured (service account key or ADC)
 
 #### Microsoft Azure
+
 - Active Azure subscription
 - Azure Front Door Premium or Standard profile
 - Azure DNS zones configured
@@ -123,12 +129,14 @@ Cosmos DB (DomainRegistrations container)
 #### Google Cloud Platform
 
 **Option 1: Service Account (Recommended for CI/CD)**
+
 ```bash
 # Download service account key from GCP Console
 export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account-key.json"
 ```
 
 **Option 2: Application Default Credentials (Local Development)**
+
 ```bash
 gcloud auth application-default login
 ```
@@ -136,12 +144,14 @@ gcloud auth application-default login
 #### Microsoft Azure
 
 **Option 1: Azure CLI (Recommended for Local Development)**
+
 ```bash
 az login
 az account set --subscription "your-subscription-id"
 ```
 
 **Option 2: Service Principal (CI/CD)**
+
 ```bash
 export AZURE_TENANT_ID="your-tenant-id"
 export AZURE_CLIENT_ID="your-client-id"
@@ -149,6 +159,7 @@ export AZURE_CLIENT_SECRET="your-client-secret"
 ```
 
 **Option 3: Managed Identity (Azure-hosted)**
+
 - Automatically configured when running in Azure
 - No additional setup required
 
@@ -303,12 +314,14 @@ dotnet run -- /path/to/custom-test-data.json
 ```
 
 **Expected Output**:
+
 - Domain availability checks for each domain
 - Registration parameter validation
 - Database compatibility verification
 - Pass/Skip status for each test case
 
 **Success Criteria**:
+
 - ✅ All available domains pass validation
 - ⚠️ Unavailable domains are skipped (expected)
 - ✅ No authentication or API errors
@@ -330,12 +343,14 @@ dotnet run -- /path/to/custom-test-data.json
 ```
 
 **Expected Output**:
+
 - DNS zone existence checks
 - Front Door domain conflict detection
 - Domain format validation
 - Integration readiness confirmation
 
 **Success Criteria**:
+
 - ✅ DNS zone status correctly reported
 - ✅ Existing domains are detected and skipped
 - ✅ New domains pass format validation
@@ -389,6 +404,7 @@ echo "Azure Front Door Test: $([ $AZURE_TEST_RESULT -eq 0 ] && echo 'PASSED ✅'
 **Objective**: Validate complete domain registration flow for a brand new domain.
 
 **Steps**:
+
 1. Choose a unique, available domain name
 2. Run Google Domain Registration Test
    - Verify domain is available
@@ -400,6 +416,7 @@ echo "Azure Front Door Test: $([ $AZURE_TEST_RESULT -eq 0 ] && echo 'PASSED ✅'
    - Validate TLS configuration readiness
 
 **Expected Results**:
+
 - ✅ Google test: Domain available and ready
 - ✅ Azure test: Domain ready for Front Door
 - ✅ No errors or warnings (except dry run mode notices)
@@ -409,11 +426,13 @@ echo "Azure Front Door Test: $([ $AZURE_TEST_RESULT -eq 0 ] && echo 'PASSED ✅'
 **Objective**: Verify the system correctly detects and handles already-registered domains.
 
 **Steps**:
+
 1. Use a domain name already in your Front Door profile
 2. Run Azure Front Door Test
 3. Verify the test detects the existing configuration
 
 **Expected Results**:
+
 - ℹ️ Domain detected as already existing
 - ⚠️ Test skipped (idempotent behavior)
 - ✅ No errors
@@ -423,11 +442,13 @@ echo "Azure Front Door Test: $([ $AZURE_TEST_RESULT -eq 0 ] && echo 'PASSED ✅'
 **Objective**: Test error handling for invalid or unavailable domains.
 
 **Steps**:
+
 1. Create test data with well-known unavailable domain (e.g., "google.com")
 2. Run Google Domain Registration Test
 3. Verify graceful handling
 
 **Expected Results**:
+
 - ⚠️ Domain reported as unavailable
 - ⚠️ Test skipped
 - ✅ No crashes or unhandled exceptions
@@ -437,11 +458,13 @@ echo "Azure Front Door Test: $([ $AZURE_TEST_RESULT -eq 0 ] && echo 'PASSED ✅'
 **Objective**: Validate error messages when configuration is incomplete.
 
 **Steps**:
+
 1. Unset a required environment variable
 2. Run either test application
 3. Verify clear error message
 
 **Expected Results**:
+
 - ❌ Clear error message indicating missing configuration
 - ❌ Application exits gracefully
 - ℹ️ Error message indicates which variable is missing
@@ -451,11 +474,13 @@ echo "Azure Front Door Test: $([ $AZURE_TEST_RESULT -eq 0 ] && echo 'PASSED ✅'
 **Objective**: Verify domain data can be stored in Cosmos DB correctly.
 
 **Steps**:
+
 1. Run Google Domain Registration Test
 2. Check Cosmos DB for test data compatibility
 3. Query `DomainRegistrations` container
 
 **Expected Results**:
+
 - ✅ Database compatibility confirmed
 - ✅ Partition key (UPN) handled correctly
 - ✅ Data structure matches entity model

@@ -111,6 +111,7 @@ The following environment variables are required for the application to run:
 <summary>💳 Stripe Configuration Details</summary>
 
 **`STRIPE_API_KEY`**
+
 - **Purpose**: Authenticates all API calls to Stripe's servers for payment processing
 - **Why It's Needed**: Required for creating customers, managing subscriptions, processing payments, and retrieving price/product information
 - **Key Types**:
@@ -122,6 +123,7 @@ The following environment variables are required for the application to run:
   3. Copy the **Secret key** (click "Reveal test key" for test mode)
 
 **`STRIPE_WEBHOOK_SECRET`**
+
 - **Purpose**: Validates that incoming webhook events genuinely originate from Stripe
 - **Why It's Needed**: Prevents malicious actors from spoofing payment events and fraudulently triggering business logic (e.g., activating subscriptions without payment)
 - **Security**: Uses HMAC-SHA256 signature verification with a 5-minute timestamp tolerance
@@ -137,6 +139,7 @@ The following environment variables are required for the application to run:
 <summary>🗄️ Cosmos DB Configuration Details</summary>
 
 **`COSMOSDB_ENDPOINT_URI`**
+
 - **Purpose**: Specifies the URL of your Cosmos DB account
 - **Why It's Needed**: Required to establish the database connection for storing user profiles, subscription data, and customer information
 - **Format**: `https://your-account-name.documents.azure.com:443/`
@@ -147,12 +150,14 @@ The following environment variables are required for the application to run:
   4. Copy the **URI** value
 
 **`COSMOSDB_PRIMARY_KEY`**
+
 - **Purpose**: Authentication key for Cosmos DB access
 - **Why It's Needed**: Grants read/write permissions to the database. Without this, the application cannot store or retrieve data.
 - **Security**: This is a sensitive credential - never commit to source control
 - **How to Obtain**: In the same **Keys** section, copy the **Primary Key**
 
 **`COSMOSDB_DATABASE_ID`**
+
 - **Purpose**: Identifies the specific database within your Cosmos DB account
 - **Why It's Needed**: An account can contain multiple databases; this tells the app which one holds the application data
 - **Value**: Typically "OnePageAuthor" or "OnePageAuthorDb"
@@ -163,6 +168,7 @@ The following environment variables are required for the application to run:
 <summary>🔐 Azure AD (Entra ID) Configuration Details</summary>
 
 **`AAD_TENANT_ID`**
+
 - **Purpose**: Identifies your Azure AD tenant (organization)
 - **Why It's Needed**: Used during JWT token validation to ensure tokens were issued by your tenant. Tokens from other tenants will be rejected.
 - **Format**: GUID (e.g., `12345678-1234-1234-1234-123456789abc`)
@@ -172,6 +178,7 @@ The following environment variables are required for the application to run:
   3. Copy the **Tenant ID** from the Overview page
 
 **`AAD_CLIENT_ID` / `AAD_AUDIENCE`**
+
 - **Purpose**: Identifies your API application and validates token audience claims
 - **Why It's Needed**: Ensures tokens were specifically issued for your API, not another application. Provides an additional layer of security.
 - **Note**: These are typically the same value for API applications
@@ -188,12 +195,13 @@ The application reads configuration in this order (later sources override earlie
 
 1. **appsettings.json** (default values)
 2. **Environment Variables** (production)
-3. **User Secrets** (development) 
+3. **User Secrets** (development)
 4. **local.settings.json** (⚠️ **NOT RECOMMENDED** - contains exposed credentials)
 
 ### Security Requirements
 
 **⚠️ IMPORTANT SECURITY NOTICE:**
+
 - **DO NOT** use `local.settings.json` for storing credentials
 - **DO NOT** commit secrets to version control
 - **ALWAYS** use User Secrets for local development
@@ -257,7 +265,6 @@ For Azure deployments:
 
 3. **Enhanced Security**: Use Azure Key Vault integration
 
-
    ```bash
 
    az keyvault secret set --vault-name <vault-name> --name STRIPE-API-KEY --value <key>
@@ -292,13 +299,11 @@ For production webhook handling:
 
 ### "Configuration value not found" errors
 
-
 - Make sure you've run `dotnet user-secrets init`
 - Verify secrets are set with `dotnet user-secrets list`
 - Check that you're in the correct project directory
 
 ### Authentication errors
-
 
 - Verify your Azure AD configuration matches your app registration
 - Check that the tenant ID and client ID are correct
@@ -306,13 +311,11 @@ For production webhook handling:
 
 ### Stripe errors
 
-
 - Verify you're using the correct API key for your environment (test vs live)
 - Check that your Stripe account is active and in good standing
 - Ensure webhook secret matches the endpoint configuration
 
 ### Webhook signature validation failures
-
 
 - Verify `STRIPE_WEBHOOK_SECRET` is set correctly
 - Check system clock synchronization (5-minute tolerance window)
@@ -320,7 +323,6 @@ For production webhook handling:
 - Test with Stripe CLI: `stripe listen --forward-to localhost:7292/api/WebHook`
 
 ## Notes
-
 
 - Program.cs wires Application Insights, Function middleware, and registers Stripe-related services via `.AddStripeServices()`.
 - Handlers live in this folder as C# files named by operation (e.g., CreateStripeCheckoutSession.cs).
@@ -345,6 +347,7 @@ Invoke-RestMethod -Method Get -Uri "https://localhost:7292/api/stripe/health"
 ```
 
 This endpoint is useful for:
+
 - Verifying Stripe configuration before making API calls
 - Frontend validation to detect test/live mode mismatches
 - Health monitoring and diagnostics
