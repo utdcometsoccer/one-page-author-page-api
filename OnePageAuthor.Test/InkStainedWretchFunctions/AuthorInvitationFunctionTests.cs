@@ -534,50 +534,5 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Equal("example.com", invitation.DomainNames[0]);
             Assert.Equal("site.com", invitation.DomainNames[1]);
         }
-
-        [Fact]
-        public async Task EmailService_WhenEmailSentSuccessfully_UpdatesLastEmailSentAt()
-        {
-            // Arrange
-            var testInvitation = new AuthorInvitation("test@example.com", "example.com", "Test");
-            testInvitation.id = "test-123";
-            
-            _mockRepository.Setup(r => r.GetByEmailAsync("test@example.com"))
-                .ReturnsAsync((AuthorInvitation?)null);
-            
-            _mockRepository.Setup(r => r.AddAsync(It.IsAny<AuthorInvitation>()))
-                .ReturnsAsync(testInvitation);
-            
-            _mockEmailService.Setup(e => e.SendInvitationEmailAsync(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<string>()))
-                .ReturnsAsync(true);
-            
-            _mockRepository.Setup(r => r.UpdateAsync(It.IsAny<AuthorInvitation>()))
-                .ReturnsAsync((AuthorInvitation inv) => inv);
-
-            // Act - Verify that when email is sent, LastEmailSentAt gets updated
-            var emailSent = await _mockEmailService.Object.SendInvitationEmailAsync(
-                testInvitation.EmailAddress,
-                testInvitation.DomainName,
-                testInvitation.id);
-            
-            // Simulate the function updating LastEmailSentAt after successful email
-            if (emailSent)
-            {
-                testInvitation.LastEmailSentAt = DateTime.UtcNow;
-                await _mockRepository.Object.UpdateAsync(testInvitation);
-            }
-
-            // Assert
-            Assert.True(emailSent);
-            Assert.NotNull(testInvitation.LastEmailSentAt);
-            _mockEmailService.Verify(e => e.SendInvitationEmailAsync(
-                testInvitation.EmailAddress,
-                testInvitation.DomainName,
-                testInvitation.id), Times.Once);
-            _mockRepository.Verify(r => r.UpdateAsync(It.IsAny<AuthorInvitation>()), Times.Once);
-        }
     }
 }
