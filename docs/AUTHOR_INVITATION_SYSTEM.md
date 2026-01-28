@@ -27,6 +27,10 @@ The Author Invitation System enables administrators to invite authors with exist
 ### Key Features
 
 - ✅ Command-line interface for easy invitation management
+- ✅ Multi-domain support (link multiple domains to a single invitation)
+- ✅ Update pending invitations (modify domains, notes, expiration)
+- ✅ Resend invitation emails
+- ✅ HTTP API endpoints for programmatic access
 - ✅ Cosmos DB storage with automatic expiration (30 days)
 - ✅ Optional email notifications via Azure Communication Services
 - ✅ Input validation (email format, domain format)
@@ -80,15 +84,18 @@ Located: `OnePageAuthorLib/entities/AuthorInvitation.cs`
 ```csharp
 public class AuthorInvitation
 {
-    public string id { get; set; }           // Unique GUID
-    public string EmailAddress { get; set; } // Partition key
-    public string DomainName { get; set; }   // Domain to link
-    public DateTime CreatedAt { get; set; }  // UTC timestamp
-    public string Status { get; set; }       // Pending/Accepted/Expired
+    public string id { get; set; }                  // Unique GUID
+    public string EmailAddress { get; set; }        // Partition key
+    public string DomainName { get; set; }          // Primary domain (first in list, for backward compatibility)
+    public List<string> DomainNames { get; set; }   // All domains linked to invitation
+    public DateTime CreatedAt { get; set; }         // UTC timestamp
+    public string Status { get; set; }              // Pending/Accepted/Expired/Revoked
     public DateTime? AcceptedAt { get; set; }
-    public string? UserOid { get; set; }     // User ID after acceptance
-    public DateTime ExpiresAt { get; set; }  // 30 days from creation
-    public string? Notes { get; set; }       // Optional notes
+    public string? UserOid { get; set; }            // User ID after acceptance
+    public DateTime ExpiresAt { get; set; }         // 30 days from creation (can be updated)
+    public DateTime? LastUpdatedAt { get; set; }    // When invitation was last modified
+    public DateTime? LastEmailSentAt { get; set; }  // When invitation email was last sent
+    public string? Notes { get; set; }              // Optional notes
 }
 ```
 
@@ -272,11 +279,33 @@ dotnet user-secrets set "Email:AzureCommunicationServices:SenderAddress" "DoNotR
 ### Basic Invitation
 
 ```bash
-# Invite an author
+# Invite an author with a single domain
 dotnet run -- author@example.com example.com
+
+# Invite with multiple domains
+dotnet run -- author@example.com example.com author-blog.com personal-site.com
 
 # With notes
 dotnet run -- author@example.com example.com "Premium author invitation"
+```
+
+### Advanced Operations
+
+```bash
+# List all pending invitations
+dotnet run -- list
+
+# Get details of a specific invitation
+dotnet run -- get abc-123-def-456
+
+# Update an invitation's domains
+dotnet run -- update abc-123-def-456 --domains example.com newdomain.com thirddomain.com
+
+# Update invitation notes
+dotnet run -- update abc-123-def-456 --notes "Updated notes for this author"
+
+# Resend invitation email
+dotnet run -- resend abc-123-def-456
 ```
 
 ### Batch Invitations
@@ -301,7 +330,12 @@ done
 ```bash
 # After publishing
 cd publish
-./AuthorInvitationTool author@example.com example.com
+# Create invitation
+./AuthorInvitationTool create author@example.com example.com --notes "Welcome!"
+# List invitations
+./AuthorInvitationTool list
+# Update invitation
+./AuthorInvitationTool update abc-123 --domains example.com newdomain.com
 ```
 
 ## Configuration
@@ -458,13 +492,30 @@ Enable detailed logging:
 
 ## API Reference
 
-### AuthorInvitationRepository
+### HTTP API Endpoints
+
+For complete HTTP API endpoint documentation including request/response formats, authentication, and curl examples, see:
+
+**[Author Invitation API Endpoints Documentation](../InkStainedWretchFunctions/AUTHOR_INVITATION_API.md)**
+
+The HTTP API provides:
+- `POST /api/author-invitations` - Create new invitation with single or multiple domains
+- `GET /api/author-invitations` - List all pending invitations
+- `GET /api/author-invitations/{id}` - Get specific invitation details
+- `PUT /api/author-invitations/{id}` - Update pending invitation (domains, notes, expiration)
+- `POST /api/author-invitations/{id}/resend` - Resend invitation email
+
+All endpoints require JWT authentication and support multi-domain invitations with backward compatibility for single-domain requests.
+
+### C# Repository API
+
+#### AuthorInvitationRepository
 
 ```csharp
 // Get invitation by email
 var invitation = await repository.GetByEmailAsync("author@example.com");
 
-// Create invitation
+// Create invitation with single domain (backward compatible)
 var newInvitation = new AuthorInvitation(
     emailAddress: "author@example.com",
     domainName: "example.com",
@@ -472,10 +523,26 @@ var newInvitation = new AuthorInvitation(
 );
 await repository.AddAsync(newInvitation);
 
+// Create invitation with multiple domains
+var multiDomainInvitation = new AuthorInvitation
+{
+    EmailAddress = "author@example.com",
+    DomainNames = new List<string> { "example.com", "author-blog.com", "personal-site.com" },
+    DomainName = "example.com", // Primary domain
+    Notes = "Multi-domain author"
+};
+await repository.AddAsync(multiDomainInvitation);
+
 // Update invitation
 invitation.Status = "Accepted";
 invitation.AcceptedAt = DateTime.UtcNow;
 invitation.UserOid = "user-oid-from-jwt";
+invitation.LastUpdatedAt = DateTime.UtcNow;
+await repository.UpdateAsync(invitation);
+
+// Update domains
+invitation.DomainNames.Add("newdomain.com");
+invitation.LastUpdatedAt = DateTime.UtcNow;
 await repository.UpdateAsync(invitation);
 
 // Get pending invitations
@@ -548,6 +615,7 @@ See CONTRIBUTING.md for guidelines on:
 
 ## Related Documentation
 
+- **[Author Invitation API Endpoints](../InkStainedWretchFunctions/AUTHOR_INVITATION_API.md)** - Complete HTTP API endpoint reference
 - [AuthorInvitationTool README](../AuthorInvitationTool/README.md) - CLI tool usage
 - [Azure Communication Services Setup](./AZURE_COMMUNICATION_SERVICES_SETUP.md) - Email service configuration
 - [Main README](../README.md) - Platform overview
@@ -559,22 +627,35 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Changelog
 
-### Version 1.0.0 (2024-12-08)
+### Version 2.0.0 (Current)
 
 **Added:**
 
-- AuthorInvitation entity with full CRUD operations
-- Command-line tool for sending invitations
-- Azure Communication Services integration for email
-- Bicep templates for infrastructure deployment
-- Comprehensive documentation
-- GitHub Actions workflow integration
+- Multi-domain support (link multiple domains to a single invitation)
+- HTTP API endpoints with full CRUD operations
+- Update endpoint for modifying pending invitations
+- Resend endpoint for re-sending invitation emails
+- Enhanced AuthorInvitation entity with DomainNames array
+- Backward compatibility for single-domain requests
+- LastUpdatedAt and LastEmailSentAt tracking
 
 **Features:**
 
-- Cosmos DB storage with 30-day expiration
+- Cosmos DB storage with 30-day expiration (configurable)
 - Email notifications with HTML templates
 - Input validation (email, domain)
 - Duplicate invitation detection
 - Configurable via multiple sources
 - Complete error handling and logging
+- JWT authentication on all HTTP endpoints
+
+### Version 1.0.0 (2024-12-08)
+
+**Initial Release:**
+
+- AuthorInvitation entity with basic CRUD operations
+- Command-line tool for sending invitations
+- Azure Communication Services integration for email
+- Bicep templates for infrastructure deployment
+- Comprehensive documentation
+- GitHub Actions workflow integration
