@@ -5,6 +5,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
     /// </summary>
     public class AuthorInvitation
     {
+        private List<string> _domainNames = new List<string>();
+
         /// <summary>
         /// Cosmos DB id (case-sensitive). Unique identifier for the invitation.
         /// </summary>
@@ -23,8 +25,25 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
 
         /// <summary>
         /// The domain names that will be linked to the author's account (e.g., ["example.com", "author-site.com"]).
+        /// Automatically migrates from DomainName if DomainNames is empty.
         /// </summary>
-        public List<string> DomainNames { get; set; } = new List<string>();
+        public List<string> DomainNames 
+        { 
+            get 
+            {
+                // Automatic migration: if DomainNames is empty but DomainName has a value,
+                // populate DomainNames from DomainName (for backward compatibility with existing data)
+                if ((_domainNames == null || _domainNames.Count == 0) && !string.IsNullOrWhiteSpace(DomainName))
+                {
+                    _domainNames = new List<string> { DomainName };
+                }
+                return _domainNames;
+            }
+            set 
+            {
+                _domainNames = value ?? new List<string>();
+            }
+        }
 
         /// <summary>
         /// The date and time when the invitation was created (UTC).
