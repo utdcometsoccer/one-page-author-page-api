@@ -1,3 +1,4 @@
+using System.Net.Mail;
 using Azure;
 using Azure.Communication.Email;
 using InkStainedWretch.OnePageAuthorAPI.API;
@@ -21,15 +22,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             
-            if (connectionString == null)
-                throw new ArgumentNullException(nameof(connectionString));
             if (string.IsNullOrWhiteSpace(connectionString))
-                throw new ArgumentException("Connection string cannot be empty or whitespace.", nameof(connectionString));
+                throw new ArgumentException("Connection string cannot be null, empty, or whitespace.", nameof(connectionString));
             
-            if (senderAddress == null)
-                throw new ArgumentNullException(nameof(senderAddress));
             if (string.IsNullOrWhiteSpace(senderAddress))
-                throw new ArgumentException("Sender address cannot be empty or whitespace.", nameof(senderAddress));
+                throw new ArgumentException("Sender address cannot be null, empty, or whitespace.", nameof(senderAddress));
 
             _senderAddress = senderAddress;
             _emailClient = new EmailClient(connectionString);
@@ -40,6 +37,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             // Validate input parameters
             if (string.IsNullOrWhiteSpace(toEmail))
                 throw new ArgumentException("Recipient email address cannot be null or empty.", nameof(toEmail));
+            
+            // Validate email format
+            if (!IsValidEmail(toEmail))
+                throw new ArgumentException($"Invalid email address format: {toEmail}", nameof(toEmail));
+            
             if (string.IsNullOrWhiteSpace(domainName))
                 throw new ArgumentException("Domain name cannot be null or empty.", nameof(domainName));
             if (string.IsNullOrWhiteSpace(invitationId))
@@ -141,6 +143,27 @@ The One Page Author Team
 </body>
 </html>
 ";
+        }
+
+        /// <summary>
+        /// Validates email address format using MailAddress parsing.
+        /// </summary>
+        /// <param name="email">The email address to validate.</param>
+        /// <returns>True if the email is valid, false otherwise.</returns>
+        private static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            try
+            {
+                var addr = new MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
