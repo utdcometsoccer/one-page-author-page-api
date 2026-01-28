@@ -101,8 +101,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 invitation.id = Guid.NewGuid().ToString();
             }
             var response = await _container.CreateItemAsync(invitation, new PartitionKey(invitation.EmailAddress));
-            // Ensure backward compatibility: migrate DomainName to DomainNames if needed
-            response.Resource.EnsureDomainNamesMigrated();
             return response.Resource;
         }
 
@@ -113,8 +111,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             if (string.IsNullOrWhiteSpace(invitation.EmailAddress))
                 throw new InvalidOperationException("AuthorInvitation.EmailAddress is required for partition key.");
             var response = await _container.ReplaceItemAsync(invitation, invitation.id, new PartitionKey(invitation.EmailAddress));
-            // Ensure backward compatibility: migrate DomainName to DomainNames if needed
-            response.Resource.EnsureDomainNamesMigrated();
             return response.Resource;
         }
 
