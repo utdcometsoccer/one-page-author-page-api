@@ -93,6 +93,11 @@ You can also run the scripts directly with PowerShell:
 - `STRIPE_API_KEY` - Stripe secret key (sk_test_... or sk_live_...)
 - `STRIPE_WEBHOOK_SECRET` - Webhook signing secret
 
+### Azure Communication Services Email (Optional)
+
+- `ACS_CONNECTION_STRING` - Azure Communication Services connection string (Email)
+- `ACS_SENDER_ADDRESS` - Sender email address used by ACS Email
+
 ### Optional External APIs
 
 - **Amazon Product API**: ACCESS_KEY, SECRET_KEY, PARTNER_TAG, REGION, MARKETPLACE, API_ENDPOINT

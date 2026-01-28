@@ -77,6 +77,17 @@ param stripeApiKey string = ''
 param stripeWebhookSecret string = ''
 
 // =========================================
+// Azure Communication Services Email (Optional)
+// =========================================
+
+@description('Azure Communication Services connection string for sending email (optional)')
+@secure()
+param acsConnectionString string = ''
+
+@description('Sender email address for Azure Communication Services email (optional)')
+param acsSenderAddress string = ''
+
+// =========================================
 // Azure AD Authentication (Optional)
 // =========================================
 
@@ -615,6 +626,19 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
         {
           name: 'PENGUIN_RANDOM_HOUSE_API_DOMAIN'
           value: 'PRH.US'
+        }
+      ] : [],
+      // Azure Communication Services Email (optional)
+      !empty(acsConnectionString) ? [
+        {
+          name: 'ACS_CONNECTION_STRING'
+          value: acsConnectionString
+        }
+      ] : [],
+      !empty(acsSenderAddress) ? [
+        {
+          name: 'ACS_SENDER_ADDRESS'
+          value: acsSenderAddress
         }
       ] : [],
       // Key Vault (optional)

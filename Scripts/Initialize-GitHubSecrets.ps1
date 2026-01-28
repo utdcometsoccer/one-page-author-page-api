@@ -295,6 +295,24 @@ $secretDefinitions = @{
             Sensitive = $true
         }
     )
+
+    "Azure Communication Services Email (Optional)" = @(
+        @{
+            Name = "ACS_CONNECTION_STRING"
+            Description = "Azure Communication Services connection string (Email)"
+            Required = $false
+            Example = "endpoint=https://...;accesskey=..."
+            Category = "Email"
+            Sensitive = $true
+        },
+        @{
+            Name = "ACS_SENDER_ADDRESS"
+            Description = "Sender email address for ACS Email"
+            Required = $false
+            Example = "DoNotReply@onepageauthor.com"
+            Category = "Email"
+        }
+    )
     
     "Domain Management (Optional)" = @(
         @{

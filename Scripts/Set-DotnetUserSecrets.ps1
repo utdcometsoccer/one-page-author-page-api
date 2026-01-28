@@ -269,6 +269,8 @@ function Get-RelevantSecretsForProject {
         )
         "InkStainedWretchFunctions" = @(
             "STRIPE_API_KEY",
+            "ACS_CONNECTION_STRING",
+            "ACS_SENDER_ADDRESS",
             "AZURE_SUBSCRIPTION_ID",
             "AZURE_DNS_RESOURCE_GROUP",
             "AZURE_RESOURCE_GROUP_NAME",
