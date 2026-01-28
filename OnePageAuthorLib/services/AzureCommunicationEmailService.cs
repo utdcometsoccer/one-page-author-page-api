@@ -1,3 +1,5 @@
+using Azure;
+using Azure.Communication.Email;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using Microsoft.Extensions.Logging;
 
@@ -9,7 +11,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
     public class AzureCommunicationEmailService : IEmailService
     {
         private readonly ILogger<AzureCommunicationEmailService> _logger;
-        private readonly string _connectionString;
+        private readonly EmailClient _emailClient;
         private readonly string _senderAddress;
 
         public AzureCommunicationEmailService(
@@ -18,8 +20,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             string senderAddress)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-            _senderAddress = senderAddress ?? throw new ArgumentNullException(nameof(senderAddress));
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentNullException(nameof(connectionString));
+            if (string.IsNullOrWhiteSpace(senderAddress))
+                throw new ArgumentNullException(nameof(senderAddress));
+
+            _senderAddress = senderAddress;
+            _emailClient = new EmailClient(connectionString);
         }
 
         public async Task<bool> SendInvitationEmailAsync(string toEmail, string domainName, string invitationId)
@@ -28,26 +35,35 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             {
                 _logger.LogInformation("Sending invitation email to {Email} for domain {Domain}", toEmail, domainName);
 
-                // Note: This implementation will be completed once Azure Communication Services package is added
-                // For now, we'll log the action
-                _logger.LogInformation("Email service called - would send email to {Email} with invitation {InvitationId} for domain {Domain}",
-                    toEmail, invitationId, domainName);
+                var subject = $"You've Been Invited to One Page Author - {domainName}";
+                var emailContent = new EmailContent(subject)
+                {
+                    PlainText = GetEmailPlainText(domainName, invitationId),
+                    Html = GetEmailHtmlContent(domainName, invitationId)
+                };
 
-                // TODO: Implement actual email sending using Azure.Communication.Email package
-                // var emailClient = new EmailClient(_connectionString);
-                // var emailMessage = new EmailMessage(
-                //     senderAddress: _senderAddress,
-                //     recipientAddress: toEmail,
-                //     content: new EmailContent($"Invitation to {domainName}")
-                //     {
-                //         PlainText = GetEmailPlainText(domainName, invitationId),
-                //         Html = GetEmailHtmlContent(domainName, invitationId)
-                //     });
-                // var operation = await emailClient.SendAsync(WaitUntil.Completed, emailMessage);
-                // return operation.HasCompleted;
+                var emailMessage = new EmailMessage(
+                    senderAddress: _senderAddress,
+                    content: emailContent,
+                    recipients: new EmailRecipients(new List<EmailAddress> { new EmailAddress(toEmail) }));
 
-                await Task.CompletedTask;
-                return true;
+                _logger.LogInformation("Sending email via Azure Communication Services to {Email}", toEmail);
+                
+                EmailSendOperation emailSendOperation = await _emailClient.SendAsync(
+                    WaitUntil.Completed,
+                    emailMessage);
+
+                _logger.LogInformation("Email send operation completed with status: {Status}, MessageId: {MessageId}", 
+                    emailSendOperation.HasCompleted ? "Completed" : "InProgress",
+                    emailSendOperation.Id);
+
+                return emailSendOperation.HasCompleted;
+            }
+            catch (RequestFailedException ex)
+            {
+                _logger.LogError(ex, "Azure Communication Services request failed for {Email}. StatusCode: {StatusCode}, ErrorCode: {ErrorCode}", 
+                    toEmail, ex.Status, ex.ErrorCode);
+                return false;
             }
             catch (Exception ex)
             {
