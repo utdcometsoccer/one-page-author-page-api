@@ -186,7 +186,8 @@ public class AuthorInvitationFunction
 
                     if (emailSent)
                     {
-                        _logger.LogInformation("Invitation email sent successfully");
+                        _logger.LogInformation("Invitation email sent successfully to {Email} for InvitationId {InvitationId}", 
+                            savedInvitation.EmailAddress, savedInvitation.id);
                         savedInvitation.LastEmailSentAt = DateTime.UtcNow;
                         await _invitationRepository.UpdateAsync(savedInvitation);
                     }
@@ -542,7 +543,8 @@ public class AuthorInvitationFunction
 
                     if (emailSent)
                     {
-                        _logger.LogInformation("Invitation email resent successfully");
+                        _logger.LogInformation("Invitation email resent successfully to {Email} for InvitationId {InvitationId}", 
+                            invitation.EmailAddress, invitation.id);
                         invitation.LastEmailSentAt = DateTime.UtcNow;
                         await _invitationRepository.UpdateAsync(invitation);
                     }
