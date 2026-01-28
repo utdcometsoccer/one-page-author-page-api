@@ -479,5 +479,60 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.NotNull(method);
             Assert.True(method.IsPublic);
         }
+
+        [Fact]
+        public void AuthorInvitation_NoDuplicateDomains_WhenSerializedAndDeserialized()
+        {
+            // Arrange - Create invitation with exact scenario from GitHub issue
+            var domains = new List<string> { "whoisidaho.com", "edokpayi.com" };
+            var invitation = new AuthorInvitation("idaho@edokpayi.com", domains, "testing");
+
+            // Act - Serialize to JSON (simulating Cosmos DB write)
+            var json = System.Text.Json.JsonSerializer.Serialize(invitation);
+            
+            // Deserialize from JSON (simulating Cosmos DB read)
+            var deserialized = System.Text.Json.JsonSerializer.Deserialize<AuthorInvitation>(json);
+
+            // Assert - No duplication should occur
+            Assert.NotNull(deserialized);
+            Assert.Equal(2, deserialized.DomainNames.Count);
+            Assert.Equal("whoisidaho.com", deserialized.DomainNames[0]);
+            Assert.Equal("edokpayi.com", deserialized.DomainNames[1]);
+            
+            // Verify no duplicates by checking distinct count
+            Assert.Equal(deserialized.DomainNames.Count, deserialized.DomainNames.Distinct().Count());
+        }
+
+        [Fact]
+        public void AuthorInvitation_EnsureDomainNamesMigrated_PopulatesFromDomainName()
+        {
+            // Arrange - Simulate old data with only DomainName set
+            var invitation = new AuthorInvitation();
+            invitation.DomainName = "oldsite.com";
+            invitation.EmailAddress = "old@example.com";
+            
+            // Act - Call migration method (what repository does)
+            invitation.EnsureDomainNamesMigrated();
+            
+            // Assert - DomainNames should be populated from DomainName
+            Assert.Single(invitation.DomainNames);
+            Assert.Equal("oldsite.com", invitation.DomainNames[0]);
+        }
+
+        [Fact]
+        public void AuthorInvitation_EnsureDomainNamesMigrated_DoesNotDuplicate()
+        {
+            // Arrange - Create invitation with domains already set
+            var domains = new List<string> { "example.com", "site.com" };
+            var invitation = new AuthorInvitation("test@example.com", domains, "test");
+            
+            // Act - Call migration method (should not modify existing data)
+            invitation.EnsureDomainNamesMigrated();
+            
+            // Assert - DomainNames should remain unchanged
+            Assert.Equal(2, invitation.DomainNames.Count);
+            Assert.Equal("example.com", invitation.DomainNames[0]);
+            Assert.Equal("site.com", invitation.DomainNames[1]);
+        }
     }
 }
