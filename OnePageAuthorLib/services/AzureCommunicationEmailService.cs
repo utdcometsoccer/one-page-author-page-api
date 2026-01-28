@@ -1,3 +1,6 @@
+using System.Net.Mail;
+using Azure;
+using Azure.Communication.Email;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using Microsoft.Extensions.Logging;
 
@@ -9,7 +12,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
     public class AzureCommunicationEmailService : IEmailService
     {
         private readonly ILogger<AzureCommunicationEmailService> _logger;
-        private readonly string _connectionString;
+        private readonly EmailClient _emailClient;
         private readonly string _senderAddress;
 
         public AzureCommunicationEmailService(
@@ -18,36 +21,63 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             string senderAddress)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-            _senderAddress = senderAddress ?? throw new ArgumentNullException(nameof(senderAddress));
+            
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentException("Connection string cannot be null, empty, or whitespace.", nameof(connectionString));
+            
+            if (string.IsNullOrWhiteSpace(senderAddress))
+                throw new ArgumentException("Sender address cannot be null, empty, or whitespace.", nameof(senderAddress));
+
+            _senderAddress = senderAddress;
+            _emailClient = new EmailClient(connectionString);
         }
 
         public async Task<bool> SendInvitationEmailAsync(string toEmail, string domainName, string invitationId)
         {
+            // Validate input parameters
+            if (string.IsNullOrWhiteSpace(toEmail))
+                throw new ArgumentException("Recipient email address cannot be null or empty.", nameof(toEmail));
+            
+            // Validate email format
+            if (!IsValidEmail(toEmail))
+                throw new ArgumentException($"Invalid email address format: {toEmail}", nameof(toEmail));
+            
+            if (string.IsNullOrWhiteSpace(domainName))
+                throw new ArgumentException("Domain name cannot be null or empty.", nameof(domainName));
+            if (string.IsNullOrWhiteSpace(invitationId))
+                throw new ArgumentException("Invitation ID cannot be null or empty.", nameof(invitationId));
+
             try
             {
                 _logger.LogInformation("Sending invitation email to {Email} for domain {Domain}", toEmail, domainName);
 
-                // Note: This implementation will be completed once Azure Communication Services package is added
-                // For now, we'll log the action
-                _logger.LogInformation("Email service called - would send email to {Email} with invitation {InvitationId} for domain {Domain}",
-                    toEmail, invitationId, domainName);
+                var subject = $"You've Been Invited to One Page Author - {domainName}";
+                var emailContent = new EmailContent(subject)
+                {
+                    PlainText = GetEmailPlainText(domainName, invitationId),
+                    Html = GetEmailHtmlContent(domainName, invitationId)
+                };
 
-                // TODO: Implement actual email sending using Azure.Communication.Email package
-                // var emailClient = new EmailClient(_connectionString);
-                // var emailMessage = new EmailMessage(
-                //     senderAddress: _senderAddress,
-                //     recipientAddress: toEmail,
-                //     content: new EmailContent($"Invitation to {domainName}")
-                //     {
-                //         PlainText = GetEmailPlainText(domainName, invitationId),
-                //         Html = GetEmailHtmlContent(domainName, invitationId)
-                //     });
-                // var operation = await emailClient.SendAsync(WaitUntil.Completed, emailMessage);
-                // return operation.HasCompleted;
+                var emailMessage = new EmailMessage(
+                    senderAddress: _senderAddress,
+                    content: emailContent,
+                    recipients: new EmailRecipients(new List<EmailAddress> { new EmailAddress(toEmail) }));
 
-                await Task.CompletedTask;
+                _logger.LogInformation("Sending email via Azure Communication Services to {Email}", toEmail);
+                
+                EmailSendOperation emailSendOperation = await _emailClient.SendAsync(
+                    WaitUntil.Completed,
+                    emailMessage);
+
+                _logger.LogInformation("Email sent successfully. MessageId: {MessageId}", emailSendOperation.Id);
+
                 return true;
+            }
+            catch (RequestFailedException ex)
+            {
+                _logger.LogError(ex, "Azure Communication Services request failed for {Email}. StatusCode: {StatusCode}, ErrorCode: {ErrorCode}", 
+                    toEmail, ex.Status, ex.ErrorCode);
+                return false;
             }
             catch (Exception ex)
             {
@@ -113,6 +143,27 @@ The One Page Author Team
 </body>
 </html>
 ";
+        }
+
+        /// <summary>
+        /// Validates email address format using MailAddress parsing.
+        /// </summary>
+        /// <param name="email">The email address to validate.</param>
+        /// <returns>True if the email is valid, false otherwise.</returns>
+        private static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            try
+            {
+                var addr = new MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
