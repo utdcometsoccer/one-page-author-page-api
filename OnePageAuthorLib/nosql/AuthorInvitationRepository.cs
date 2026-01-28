@@ -30,7 +30,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             if (iterator.HasMoreResults)
             {
                 var page = await iterator.ReadNextAsync();
-                return page.Resource.FirstOrDefault();
+                var invitation = page.Resource.FirstOrDefault();
+                // Ensure backward compatibility: migrate DomainName to DomainNames if needed
+                invitation?.EnsureDomainNamesMigrated();
+                return invitation;
             }
             return null;
         }
@@ -43,7 +46,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             if (iterator.HasMoreResults)
             {
                 var page = await iterator.ReadNextAsync();
-                return page.Resource.FirstOrDefault();
+                var invitation = page.Resource.FirstOrDefault();
+                // Ensure backward compatibility: migrate DomainName to DomainNames if needed
+                invitation?.EnsureDomainNamesMigrated();
+                return invitation;
             }
             return null;
         }
@@ -57,7 +63,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             while (iterator.HasMoreResults)
             {
                 var page = await iterator.ReadNextAsync();
-                invitations.AddRange(page.Resource);
+                foreach (var invitation in page.Resource)
+                {
+                    // Ensure backward compatibility: migrate DomainName to DomainNames if needed
+                    invitation.EnsureDomainNamesMigrated();
+                    invitations.Add(invitation);
+                }
             }
             return invitations;
         }
@@ -71,7 +82,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             while (iterator.HasMoreResults)
             {
                 var page = await iterator.ReadNextAsync();
-                invitations.AddRange(page.Resource);
+                foreach (var invitation in page.Resource)
+                {
+                    // Ensure backward compatibility: migrate DomainName to DomainNames if needed
+                    invitation.EnsureDomainNamesMigrated();
+                    invitations.Add(invitation);
+                }
             }
             return invitations;
         }
