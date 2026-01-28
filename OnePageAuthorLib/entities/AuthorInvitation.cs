@@ -1,10 +1,12 @@
 namespace InkStainedWretch.OnePageAuthorAPI.Entities
 {
     /// <summary>
-    /// Represents an invitation sent to an author to create a Microsoft account linked to their domain.
+    /// Represents an invitation sent to an author to create a Microsoft account linked to their domain(s).
     /// </summary>
     public class AuthorInvitation
     {
+        private List<string> _domainNames = new List<string>();
+
         /// <summary>
         /// Cosmos DB id (case-sensitive). Unique identifier for the invitation.
         /// </summary>
@@ -18,7 +20,30 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         /// <summary>
         /// The domain name that will be linked to the author's account (e.g., "example.com").
         /// </summary>
+        [Obsolete("Use DomainNames instead. This property is kept for backward compatibility.")]
         public string DomainName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The domain names that will be linked to the author's account (e.g., ["example.com", "author-site.com"]).
+        /// Automatically migrates from DomainName if DomainNames is empty.
+        /// </summary>
+        public List<string> DomainNames 
+        { 
+            get 
+            {
+                // Automatic migration: if DomainNames is empty but DomainName has a value,
+                // populate DomainNames from DomainName (for backward compatibility with existing data)
+                if ((_domainNames == null || _domainNames.Count == 0) && !string.IsNullOrWhiteSpace(DomainName))
+                {
+                    _domainNames = new List<string> { DomainName };
+                }
+                return _domainNames;
+            }
+            set 
+            {
+                _domainNames = value ?? new List<string>();
+            }
+        }
 
         /// <summary>
         /// The date and time when the invitation was created (UTC).
@@ -51,18 +76,45 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         public string? Notes { get; set; }
 
         /// <summary>
+        /// The date and time when the invitation was last updated (UTC).
+        /// </summary>
+        public DateTime? LastUpdatedAt { get; set; }
+
+        /// <summary>
+        /// The date and time when the invitation email was last sent (UTC).
+        /// </summary>
+        public DateTime? LastEmailSentAt { get; set; }
+
+        /// <summary>
         /// Default constructor.
         /// </summary>
         public AuthorInvitation() { }
 
         /// <summary>
-        /// Constructor that initializes the invitation with required properties.
+        /// Constructor that initializes the invitation with required properties (single domain - backward compatibility).
         /// </summary>
         public AuthorInvitation(string emailAddress, string domainName, string? notes = null)
         {
             id = Guid.NewGuid().ToString();
             EmailAddress = emailAddress;
             DomainName = domainName;
+            DomainNames = new List<string> { domainName };
+            Notes = notes;
+            CreatedAt = DateTime.UtcNow;
+            Status = "Pending";
+            ExpiresAt = DateTime.UtcNow.AddDays(30);
+        }
+
+        /// <summary>
+        /// Constructor that initializes the invitation with required properties (multiple domains).
+        /// </summary>
+        public AuthorInvitation(string emailAddress, List<string> domainNames, string? notes = null)
+        {
+            id = Guid.NewGuid().ToString();
+            EmailAddress = emailAddress;
+            DomainNames = domainNames ?? new List<string>();
+            // For backward compatibility, set DomainName to first domain
+            DomainName = domainNames?.FirstOrDefault() ?? string.Empty;
             Notes = notes;
             CreatedAt = DateTime.UtcNow;
             Status = "Pending";

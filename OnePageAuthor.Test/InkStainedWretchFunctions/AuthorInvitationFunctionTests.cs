@@ -295,5 +295,189 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     "invite-123");
             });
         }
+
+        [Fact]
+        public void AuthorInvitation_SupportsMultipleDomains()
+        {
+            // Arrange & Act
+            var domains = new List<string> { "example.com", "author-site.com" };
+            var invitation = new AuthorInvitation("test@example.com", domains, "Multi-domain test");
+
+            // Assert
+            Assert.Equal(2, invitation.DomainNames.Count);
+            Assert.Contains("example.com", invitation.DomainNames);
+            Assert.Contains("author-site.com", invitation.DomainNames);
+            Assert.Equal("example.com", invitation.DomainName); // Backward compatibility
+        }
+
+        [Fact]
+        public void AuthorInvitation_BackwardCompatibility_SingleDomain()
+        {
+            // Arrange & Act
+            var invitation = new AuthorInvitation("test@example.com", "example.com", "Single domain test");
+
+            // Assert
+            Assert.Single(invitation.DomainNames);
+            Assert.Equal("example.com", invitation.DomainNames.First());
+            Assert.Equal("example.com", invitation.DomainName);
+        }
+
+        [Fact]
+        public void CreateAuthorInvitationRequest_SupportsSingleDomain()
+        {
+            // Arrange & Act
+            var request = new CreateAuthorInvitationRequest
+            {
+                EmailAddress = "test@example.com",
+                DomainName = "example.com",
+                Notes = "Test"
+            };
+
+            // Assert
+            Assert.Equal("test@example.com", request.EmailAddress);
+            Assert.Equal("example.com", request.DomainName);
+        }
+
+        [Fact]
+        public void CreateAuthorInvitationRequest_SupportsMultipleDomains()
+        {
+            // Arrange & Act
+            var request = new CreateAuthorInvitationRequest
+            {
+                EmailAddress = "test@example.com",
+                DomainNames = new List<string> { "example.com", "author-site.com" },
+                Notes = "Test"
+            };
+
+            // Assert
+            Assert.Equal("test@example.com", request.EmailAddress);
+            Assert.NotNull(request.DomainNames);
+            Assert.Equal(2, request.DomainNames.Count);
+        }
+
+        [Fact]
+        public void UpdateAuthorInvitationRequest_HasRequiredProperties()
+        {
+            // Arrange & Act
+            var request = new UpdateAuthorInvitationRequest
+            {
+                DomainNames = new List<string> { "example.com", "newdomain.com" },
+                Notes = "Updated notes",
+                ExpiresAt = DateTime.UtcNow.AddDays(60)
+            };
+
+            // Assert
+            Assert.NotNull(request.DomainNames);
+            Assert.Equal(2, request.DomainNames.Count);
+            Assert.Equal("Updated notes", request.Notes);
+            Assert.NotNull(request.ExpiresAt);
+        }
+
+        [Fact]
+        public void ResendInvitationResponse_HasRequiredProperties()
+        {
+            // Arrange & Act
+            var response = new ResendInvitationResponse
+            {
+                Id = "test-123",
+                EmailAddress = "test@example.com",
+                EmailSent = true,
+                LastEmailSentAt = DateTime.UtcNow
+            };
+
+            // Assert
+            Assert.Equal("test-123", response.Id);
+            Assert.Equal("test@example.com", response.EmailAddress);
+            Assert.True(response.EmailSent);
+            Assert.NotNull(response.LastEmailSentAt);
+        }
+
+        [Fact]
+        public async Task Repository_UpdateAsync_UpdatesInvitation()
+        {
+            // Arrange
+            var invitation = new AuthorInvitation("test@example.com", "example.com");
+            invitation.id = "test-123";
+            invitation.DomainNames = new List<string> { "example.com", "newdomain.com" };
+            invitation.LastUpdatedAt = DateTime.UtcNow;
+
+            _mockRepository.Setup(r => r.UpdateAsync(It.IsAny<AuthorInvitation>()))
+                .ReturnsAsync(invitation);
+
+            // Act
+            var result = await _mockRepository.Object.UpdateAsync(invitation);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("test-123", result.id);
+            Assert.Equal(2, result.DomainNames.Count);
+            Assert.NotNull(result.LastUpdatedAt);
+        }
+
+        [Fact]
+        public async Task Repository_GetPendingInvitationsAsync_ReturnsOnlyPending()
+        {
+            // Arrange
+            var pendingInvitations = new List<AuthorInvitation>
+            {
+                new AuthorInvitation("test1@example.com", "example1.com") { Status = "Pending" },
+                new AuthorInvitation("test2@example.com", "example2.com") { Status = "Pending" }
+            };
+
+            _mockRepository.Setup(r => r.GetPendingInvitationsAsync())
+                .ReturnsAsync(pendingInvitations);
+
+            // Act
+            var result = await _mockRepository.Object.GetPendingInvitationsAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
+            Assert.All(result, invitation => Assert.Equal("Pending", invitation.Status));
+        }
+
+        [Fact]
+        public void AuthorInvitationFunction_HasListAuthorInvitationsMethod()
+        {
+            // Arrange & Act
+            var method = typeof(AuthorInvitationFunction).GetMethod("ListAuthorInvitations");
+
+            // Assert
+            Assert.NotNull(method);
+            Assert.True(method.IsPublic);
+        }
+
+        [Fact]
+        public void AuthorInvitationFunction_HasGetAuthorInvitationMethod()
+        {
+            // Arrange & Act
+            var method = typeof(AuthorInvitationFunction).GetMethod("GetAuthorInvitation");
+
+            // Assert
+            Assert.NotNull(method);
+            Assert.True(method.IsPublic);
+        }
+
+        [Fact]
+        public void AuthorInvitationFunction_HasUpdateAuthorInvitationMethod()
+        {
+            // Arrange & Act
+            var method = typeof(AuthorInvitationFunction).GetMethod("UpdateAuthorInvitation");
+
+            // Assert
+            Assert.NotNull(method);
+            Assert.True(method.IsPublic);
+        }
+
+        [Fact]
+        public void AuthorInvitationFunction_HasResendAuthorInvitationMethod()
+        {
+            // Arrange & Act
+            var method = typeof(AuthorInvitationFunction).GetMethod("ResendAuthorInvitation");
+
+            // Assert
+            Assert.NotNull(method);
+            Assert.True(method.IsPublic);
+        }
     }
 }
