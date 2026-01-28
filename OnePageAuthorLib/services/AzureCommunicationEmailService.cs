@@ -20,10 +20,16 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             string senderAddress)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            if (string.IsNullOrWhiteSpace(connectionString))
+            
+            if (connectionString == null)
                 throw new ArgumentNullException(nameof(connectionString));
-            if (string.IsNullOrWhiteSpace(senderAddress))
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentException("Connection string cannot be empty or whitespace.", nameof(connectionString));
+            
+            if (senderAddress == null)
                 throw new ArgumentNullException(nameof(senderAddress));
+            if (string.IsNullOrWhiteSpace(senderAddress))
+                throw new ArgumentException("Sender address cannot be empty or whitespace.", nameof(senderAddress));
 
             _senderAddress = senderAddress;
             _emailClient = new EmailClient(connectionString);
@@ -31,6 +37,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
         public async Task<bool> SendInvitationEmailAsync(string toEmail, string domainName, string invitationId)
         {
+            // Validate input parameters
+            if (string.IsNullOrWhiteSpace(toEmail))
+                throw new ArgumentException("Recipient email address cannot be null or empty.", nameof(toEmail));
+            if (string.IsNullOrWhiteSpace(domainName))
+                throw new ArgumentException("Domain name cannot be null or empty.", nameof(domainName));
+            if (string.IsNullOrWhiteSpace(invitationId))
+                throw new ArgumentException("Invitation ID cannot be null or empty.", nameof(invitationId));
+
             try
             {
                 _logger.LogInformation("Sending invitation email to {Email} for domain {Domain}", toEmail, domainName);
@@ -53,11 +67,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                     WaitUntil.Completed,
                     emailMessage);
 
-                _logger.LogInformation("Email send operation completed with status: {Status}, MessageId: {MessageId}", 
-                    emailSendOperation.HasCompleted ? "Completed" : "InProgress",
-                    emailSendOperation.Id);
+                _logger.LogInformation("Email sent successfully. MessageId: {MessageId}", emailSendOperation.Id);
 
-                return emailSendOperation.HasCompleted;
+                return true;
             }
             catch (RequestFailedException ex)
             {
