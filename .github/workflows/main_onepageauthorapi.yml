@@ -453,6 +453,10 @@ jobs:
           # Stripe configuration
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+
+          # Azure Communication Services Email (optional)
+          ACS_CONNECTION_STRING: ${{ secrets.ACS_CONNECTION_STRING }}
+          ACS_SENDER_ADDRESS: ${{ secrets.ACS_SENDER_ADDRESS }}
           
           # Azure AD Authentication (optional)
           AAD_TENANT_ID: ${{ secrets.AAD_TENANT_ID }}
@@ -535,6 +539,10 @@ jobs:
           # Add Stripe parameters conditionally
           [ -n "$STRIPE_API_KEY" ] && SECURE_PARAMS_ARRAY+=("stripeApiKey=$STRIPE_API_KEY")
           [ -n "$STRIPE_WEBHOOK_SECRET" ] && SECURE_PARAMS_ARRAY+=("stripeWebhookSecret=$STRIPE_WEBHOOK_SECRET")
+
+          # Add Azure Communication Services Email parameters conditionally
+          [ -n "$ACS_CONNECTION_STRING" ] && SECURE_PARAMS_ARRAY+=("acsConnectionString=$ACS_CONNECTION_STRING")
+          [ -n "$ACS_SENDER_ADDRESS" ] && PARAMS_ARRAY+=("acsSenderAddress=$ACS_SENDER_ADDRESS")
           
           # Add Azure AD parameters conditionally
           [ -n "$AAD_TENANT_ID" ] && PARAMS_ARRAY+=("aadTenantId=$AAD_TENANT_ID")
