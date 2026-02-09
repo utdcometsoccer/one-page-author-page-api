@@ -942,6 +942,15 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
+        /// Registers WHMCS service for domain registration via WHMCS API.
+        /// </summary>
+        public static IServiceCollection AddWhmcsService(this IServiceCollection services)
+        {
+            services.AddHttpClient<Interfaces.IWhmcsService, API.WhmcsService>();
+            return services;
+        }
+
+        /// <summary>
         /// Registers Language repository services for language management.
         /// Call this after registering a singleton Database in DI.
         /// </summary>

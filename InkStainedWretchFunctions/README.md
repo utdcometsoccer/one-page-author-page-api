@@ -119,6 +119,11 @@ dotnet user-secrets set "PENGUIN_RANDOM_HOUSE_API_DOMAIN" "PRH.US"
 dotnet user-secrets set "AZURE_SUBSCRIPTION_ID" "your-subscription-id"
 dotnet user-secrets set "AZURE_DNS_RESOURCE_GROUP" "your-dns-resource-group"
 
+# WHMCS Domain Registration API
+dotnet user-secrets set "WHMCS_API_URL" "https://your-whmcs-instance.com/includes/api.php"
+dotnet user-secrets set "WHMCS_API_IDENTIFIER" "your-api-identifier"
+dotnet user-secrets set "WHMCS_API_SECRET" "your-api-secret"
+
 # Google Domains (Optional)
 dotnet user-secrets set "GOOGLE_CLOUD_PROJECT_ID" "your-google-project-id"
 dotnet user-secrets set "GOOGLE_DOMAINS_LOCATION" "global"
@@ -144,6 +149,9 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 | `CosmosDBConnection` | ✅ Yes | Full Cosmos DB connection string (for triggers) |
 | `AZURE_SUBSCRIPTION_ID` | ⚪ Optional | Azure subscription for DNS/Front Door operations |
 | `AZURE_DNS_RESOURCE_GROUP` | ⚪ Optional | Resource group for DNS zones |
+| `WHMCS_API_URL` | ⚪ Optional | WHMCS API endpoint URL for domain registration |
+| `WHMCS_API_IDENTIFIER` | ⚪ Optional | WHMCS API identifier for authentication |
+| `WHMCS_API_SECRET` | ⚪ Optional | WHMCS API secret for authentication |
 | `GOOGLE_CLOUD_PROJECT_ID` | ⚪ Optional | Google Cloud project for domain registration |
 | `AMAZON_PRODUCT_ACCESS_KEY` | ⚪ Optional | AWS access key for Amazon API |
 | `AMAZON_PRODUCT_SECRET_KEY` | ⚪ Optional | AWS secret key for Amazon API |
@@ -184,6 +192,43 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 
 - DNS Zone Contributor role on the DNS resource group
 - CDN Profile Contributor on the Front Door profile (if using Front Door integration)
+
+</details>
+
+<details>
+<summary>🏢 WHMCS Domain Registration</summary>
+
+**Required for automatic domain registration via WHMCS** - Enables registering domains via WHMCS API.
+
+| Variable | Purpose | How to Obtain |
+|----------|---------|---------------|
+| `WHMCS_API_URL` | WHMCS API endpoint URL | Your WHMCS installation URL + `/includes/api.php` (e.g., `https://whmcs.example.com/includes/api.php`) |
+| `WHMCS_API_IDENTIFIER` | API authentication identifier | WHMCS Admin → Setup → API Credentials → Create API Credential → API Identifier |
+| `WHMCS_API_SECRET` | API authentication secret | WHMCS Admin → Setup → API Credentials → Create API Credential → API Secret |
+
+**Setup Steps**:
+
+1. Log into your WHMCS admin panel
+2. Navigate to **Setup** → **Staff Management** → **API Credentials**
+3. Click **Generate New API Credential**
+4. Configure the following settings:
+   - **Admin Username**: Select an admin user for API operations
+   - **IP Restrictions**: Add your Azure Functions outbound IP addresses (optional but recommended)
+   - **Enable API**: Check this box
+5. Copy the API Identifier and Secret (secret is shown only once)
+6. Ensure your WHMCS installation has a compatible domain registrar module configured
+
+**Important Notes**:
+- WHMCS API calls require proper authentication via API Identifier and Secret
+- The API user must have permissions to register domains
+- Contact information from DomainRegistration entity is mapped to WHMCS API parameters
+- Domain registration via WHMCS is attempted before Azure Front Door integration
+- If WHMCS registration fails, the function continues with Front Door integration (graceful degradation)
+
+**Registrar Module Requirements**:
+- WHMCS must have at least one active domain registrar module configured
+- The registrar module must support the domain TLDs you plan to register
+- Ensure sufficient credit balance with your domain registrar
 
 </details>
 
@@ -453,7 +498,7 @@ Gets a specific domain registration by ID.
 
 ### DomainRegistrationTrigger
 
-**Purpose:** Automatically adds custom domains to Azure Front Door when domain registrations are created.
+**Purpose:** Automatically registers domains via WHMCS API and adds custom domains to Azure Front Door when domain registrations are created.
 
 **Trigger:** New or updated documents in the `DomainRegistrations` container
 
@@ -461,18 +506,30 @@ Gets a specific domain registration by ID.
 
 - **Lease Container**: `leases`
 - **Lease Prefix**: `domainregistration`
-- **Status Filter**: Only processes `Pending` or `InProgress` registrations
+- **Status Filter**: Only processes `Pending` registrations
 
 **Process Flow:**
 
 1. Triggered by Cosmos DB change feed
 2. Validates domain registration data
-3. Checks if domain exists in Front Door
-4. Adds domain with managed TLS certificate if it doesn't exist
-5. Logs success or failure
+3. **Registers domain via WHMCS API** (if configured)
+   - Sends domain registration request to WHMCS
+   - Includes contact information for domain registration
+   - Logs success or failure
+   - Continues to next step even if WHMCS registration fails
+4. Adds domain to Azure Front Door (if configured)
+   - Checks if domain exists in Front Door
+   - Adds domain with managed TLS certificate if it doesn't exist
+5. Logs overall success or failure
 
-**Required RBAC Permissions:**
+**Required Configuration:**
 
+For WHMCS domain registration:
+- `WHMCS_API_URL` - WHMCS API endpoint
+- `WHMCS_API_IDENTIFIER` - API authentication identifier
+- `WHMCS_API_SECRET` - API authentication secret
+
+For Azure Front Door integration:
 - CDN Profile Contributor or CDN Endpoint Contributor role on the Front Door profile
 
 **Assigning Permissions:**

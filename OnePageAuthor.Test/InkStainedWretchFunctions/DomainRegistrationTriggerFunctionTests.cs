@@ -14,24 +14,24 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
     using DomainStatus = InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistrationStatus;
 
     /// <summary>
-    /// Unit tests for DomainRegistrationTriggerFunction (CosmosDB triggered function for Front Door integration).
+    /// Unit tests for DomainRegistrationTriggerFunction (CosmosDB triggered function for WHMCS and Front Door integration).
     /// </summary>
     public class DomainRegistrationTriggerFunctionTests
     {
         private readonly Mock<ILogger<DomainRegistrationTriggerFunction>> _mockLogger;
         private readonly Mock<IFrontDoorService> _mockFrontDoorService;
-        private readonly Mock<IDomainRegistrationService> _mockDomainRegistrationService;
+        private readonly Mock<IWhmcsService> _mockWhmcsService;
         private readonly DomainRegistrationTriggerFunction _function;
 
         public DomainRegistrationTriggerFunctionTests()
         {
             _mockLogger = new Mock<ILogger<DomainRegistrationTriggerFunction>>();
             _mockFrontDoorService = new Mock<IFrontDoorService>();
-            _mockDomainRegistrationService = new Mock<IDomainRegistrationService>();
+            _mockWhmcsService = new Mock<IWhmcsService>();
             _function = new DomainRegistrationTriggerFunction(
                 _mockLogger.Object, 
                 _mockFrontDoorService.Object, 
-                _mockDomainRegistrationService.Object);
+                _mockWhmcsService.Object);
         }
 
         #region Constructor Tests
@@ -43,7 +43,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new DomainRegistrationTriggerFunction(
                 null!,
                 _mockFrontDoorService.Object,
-                _mockDomainRegistrationService.Object));
+                _mockWhmcsService.Object));
         }
 
         [Fact]
@@ -53,11 +53,11 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new DomainRegistrationTriggerFunction(
                 _mockLogger.Object,
                 null!,
-                _mockDomainRegistrationService.Object));
+                _mockWhmcsService.Object));
         }
 
         [Fact]
-        public void Constructor_WithNullDomainRegistrationService_ThrowsArgumentNullException()
+        public void Constructor_WithNullWhmcsService_ThrowsArgumentNullException()
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => new DomainRegistrationTriggerFunction(
@@ -73,7 +73,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var function = new DomainRegistrationTriggerFunction(
                 _mockLogger.Object,
                 _mockFrontDoorService.Object,
-                _mockDomainRegistrationService.Object);
+                _mockWhmcsService.Object);
 
             // Assert
             Assert.NotNull(function);
@@ -132,7 +132,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         #region Successful Processing Tests
 
         [Fact]
-        public async Task Run_WithPendingDomainRegistration_AddsDomainToFrontDoorSuccessfully()
+        public async Task Run_WithPendingDomainRegistration_RegistersDomainViaWhmcsAndAddsToDoorSuccessfully()
         {
             // Arrange
             var domainRegistration = new DomainRegistrationEntity
@@ -147,6 +147,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             };
             var input = new List<DomainRegistrationEntity> { domainRegistration };
 
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
+                .ReturnsAsync(true);
             _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
                 .ReturnsAsync(true);
 
@@ -154,6 +156,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             await _function.Run(input);
 
             // Assert
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(domainRegistration), Times.Once);
             _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
             
             _mockLogger.Verify(
@@ -161,6 +164,15 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     LogLevel.Information,
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Processing domain registration test-id-123 for domain example.com")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Information,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Successfully registered domain example.com via WHMCS API")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
@@ -201,6 +213,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             };
             var input = new List<DomainRegistrationEntity> { domainRegistration1, domainRegistration2 };
 
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()))
+                .ReturnsAsync(true);
             _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(It.IsAny<DomainRegistrationEntity>()))
                 .ReturnsAsync(true);
 
@@ -208,6 +222,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             await _function.Run(input);
 
             // Assert
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(domainRegistration1), Times.Once);
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(domainRegistration2), Times.Once);
             _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration1), Times.Once);
             _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration2), Times.Once);
             
@@ -296,6 +312,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             };
             var input = new List<DomainRegistrationEntity> { pendingRegistration, completedRegistration };
 
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(pendingRegistration))
+                .ReturnsAsync(true);
             _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(pendingRegistration))
                 .ReturnsAsync(true);
 
@@ -303,6 +321,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             await _function.Run(input);
 
             // Assert
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(pendingRegistration), Times.Once);
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(completedRegistration), Times.Never);
             _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(pendingRegistration), Times.Once);
             _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(completedRegistration), Times.Never);
             
@@ -470,6 +490,110 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     LogLevel.Information,
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Successfully processed domain success-example.com for Front Door")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Run_WhenWhmcsRegistrationFails_ContinuesToFrontDoorIntegration()
+        {
+            // Arrange
+            var domainRegistration = new DomainRegistrationEntity
+            {
+                id = "test-id-whmcs-fail",
+                Status = DomainStatus.Pending,
+                Domain = new DomainEntity
+                {
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "whmcs-fail-example"
+                }
+            };
+            var input = new List<DomainRegistrationEntity> { domainRegistration };
+
+            // WHMCS registration fails
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
+                .ReturnsAsync(false);
+            
+            // Front Door should still be called and succeed
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
+                .ReturnsAsync(true);
+
+            // Act
+            await _function.Run(input);
+
+            // Assert - verify both services were called
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(domainRegistration), Times.Once);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
+            
+            // Verify WHMCS failure was logged as warning (not error)
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to register domain whmcs-fail-example.com via WHMCS API")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+
+            // Verify Front Door success was still logged
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Information,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Successfully processed domain whmcs-fail-example.com for Front Door")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Run_WhenWhmcsRegistrationThrows_ContinuesToFrontDoorIntegration()
+        {
+            // Arrange
+            var domainRegistration = new DomainRegistrationEntity
+            {
+                id = "test-id-whmcs-exception",
+                Status = DomainStatus.Pending,
+                Domain = new DomainEntity
+                {
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "whmcs-exception-example"
+                }
+            };
+            var input = new List<DomainRegistrationEntity> { domainRegistration };
+
+            // WHMCS registration throws exception
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
+                .ThrowsAsync(new HttpRequestException("WHMCS API unavailable"));
+            
+            // Front Door should still be called and succeed
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
+                .ReturnsAsync(true);
+
+            // Act
+            await _function.Run(input);
+
+            // Assert - verify WHMCS was called and Front Door was still called despite exception
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(domainRegistration), Times.Once);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
+            
+            // Verify WHMCS exception was caught and logged as error
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Exception while registering domain whmcs-exception-example.com via WHMCS API")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+                
+            // Verify warning was also logged about the failure
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to register domain whmcs-exception-example.com via WHMCS API")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
