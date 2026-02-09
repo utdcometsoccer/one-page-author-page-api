@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using InkStainedWretch.OnePageAuthorAPI.API;
+using InkStainedWretch.OnePageAuthorAPI.Services;
 using DomainRegistrationEntity = InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration;
 using DomainEntity = InkStainedWretch.OnePageAuthorAPI.Entities.Domain;
 using ContactInformationEntity = InkStainedWretch.OnePageAuthorAPI.Entities.ContactInformation;
@@ -17,7 +18,7 @@ namespace OnePageAuthor.Test
             config.Setup(c => c["GOOGLE_CLOUD_PROJECT_ID"]).Returns("test-project");
             config.Setup(c => c["GOOGLE_DOMAINS_LOCATION"]).Returns("global");
 
-            Assert.Throws<ArgumentNullException>(() => new GoogleDomainsService(null!, config.Object));
+            Assert.Throws<ArgumentNullException>(() => new GoogleDomainsService(null!, config.Object, new UsStateCodeService()));
         }
 
         [Fact]
@@ -25,7 +26,7 @@ namespace OnePageAuthor.Test
         {
             var logger = new Mock<ILogger<GoogleDomainsService>>();
 
-            Assert.Throws<ArgumentNullException>(() => new GoogleDomainsService(logger.Object, null!));
+            Assert.Throws<ArgumentNullException>(() => new GoogleDomainsService(logger.Object, null!, new UsStateCodeService()));
         }
 
         [Fact]
@@ -36,7 +37,7 @@ namespace OnePageAuthor.Test
             config.Setup(c => c["GOOGLE_CLOUD_PROJECT_ID"]).Returns((string?)null);
             config.Setup(c => c["GOOGLE_DOMAINS_LOCATION"]).Returns("global");
 
-            Assert.Throws<InvalidOperationException>(() => new GoogleDomainsService(logger.Object, config.Object));
+            Assert.Throws<InvalidOperationException>(() => new GoogleDomainsService(logger.Object, config.Object, new UsStateCodeService()));
         }
 
         [Fact]
@@ -48,7 +49,7 @@ namespace OnePageAuthor.Test
             config.Setup(c => c["GOOGLE_DOMAINS_LOCATION"]).Returns((string?)null);
 
             // Should not throw - default location should be used
-            var service = new GoogleDomainsService(logger.Object, config.Object);
+            var service = new GoogleDomainsService(logger.Object, config.Object, new UsStateCodeService());
             Assert.NotNull(service);
         }
 
@@ -60,7 +61,7 @@ namespace OnePageAuthor.Test
             config.Setup(c => c["GOOGLE_CLOUD_PROJECT_ID"]).Returns("test-project");
             config.Setup(c => c["GOOGLE_DOMAINS_LOCATION"]).Returns("global");
 
-            var service = new GoogleDomainsService(logger.Object, config.Object);
+            var service = new GoogleDomainsService(logger.Object, config.Object, new UsStateCodeService());
             var result = await service.RegisterDomainAsync(null!);
 
             Assert.False(result);
@@ -74,7 +75,7 @@ namespace OnePageAuthor.Test
             config.Setup(c => c["GOOGLE_CLOUD_PROJECT_ID"]).Returns("test-project");
             config.Setup(c => c["GOOGLE_DOMAINS_LOCATION"]).Returns("global");
 
-            var service = new GoogleDomainsService(logger.Object, config.Object);
+            var service = new GoogleDomainsService(logger.Object, config.Object, new UsStateCodeService());
             var domainRegistration = new DomainRegistrationEntity
             {
                 id = "test-id",
@@ -96,7 +97,7 @@ namespace OnePageAuthor.Test
             config.Setup(c => c["GOOGLE_CLOUD_PROJECT_ID"]).Returns("test-project");
             config.Setup(c => c["GOOGLE_DOMAINS_LOCATION"]).Returns("global");
 
-            var service = new GoogleDomainsService(logger.Object, config.Object);
+            var service = new GoogleDomainsService(logger.Object, config.Object, new UsStateCodeService());
             var domainRegistration = new DomainRegistrationEntity
             {
                 id = "test-id",
@@ -122,7 +123,7 @@ namespace OnePageAuthor.Test
             config.Setup(c => c["GOOGLE_CLOUD_PROJECT_ID"]).Returns("test-project");
             config.Setup(c => c["GOOGLE_DOMAINS_LOCATION"]).Returns("global");
 
-            var service = new GoogleDomainsService(logger.Object, config.Object);
+            var service = new GoogleDomainsService(logger.Object, config.Object, new UsStateCodeService());
             var result = await service.IsDomainAvailableAsync("");
 
             Assert.False(result);
@@ -136,7 +137,7 @@ namespace OnePageAuthor.Test
             config.Setup(c => c["GOOGLE_CLOUD_PROJECT_ID"]).Returns("test-project");
             config.Setup(c => c["GOOGLE_DOMAINS_LOCATION"]).Returns("global");
 
-            var service = new GoogleDomainsService(logger.Object, config.Object);
+            var service = new GoogleDomainsService(logger.Object, config.Object, new UsStateCodeService());
             var result = await service.IsDomainAvailableAsync(null!);
 
             Assert.False(result);

@@ -7,6 +7,20 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
     {
         private List<string> _domainNames = new List<string>();
 
+        private void SetLegacyDomainName(string? domainName)
+        {
+    #pragma warning disable CS0618 // 'DomainName' is obsolete
+            DomainName = domainName ?? string.Empty;
+    #pragma warning restore CS0618
+        }
+
+        private string GetLegacyDomainName()
+        {
+    #pragma warning disable CS0618 // 'DomainName' is obsolete
+            return DomainName;
+    #pragma warning restore CS0618
+        }
+
         /// <summary>
         /// Cosmos DB id (case-sensitive). Unique identifier for the invitation.
         /// </summary>
@@ -84,8 +98,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         {
             id = Guid.NewGuid().ToString();
             EmailAddress = emailAddress;
-            DomainName = domainName;
             DomainNames = new List<string> { domainName };
+            SetLegacyDomainName(domainName);
             Notes = notes;
             CreatedAt = DateTime.UtcNow;
             Status = "Pending";
@@ -101,7 +115,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
             EmailAddress = emailAddress;
             DomainNames = domainNames ?? new List<string>();
             // For backward compatibility, set DomainName to first domain
-            DomainName = domainNames?.FirstOrDefault() ?? string.Empty;
+            SetLegacyDomainName(_domainNames.FirstOrDefault());
             Notes = notes;
             CreatedAt = DateTime.UtcNow;
             Status = "Pending";
@@ -114,9 +128,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         /// </summary>
         public void EnsureDomainNamesMigrated()
         {
-            if ((_domainNames == null || _domainNames.Count == 0) && !string.IsNullOrWhiteSpace(DomainName))
+            string legacyDomainName = GetLegacyDomainName();
+            if ((_domainNames == null || _domainNames.Count == 0) && !string.IsNullOrWhiteSpace(legacyDomainName))
             {
-                _domainNames = new List<string> { DomainName };
+                _domainNames = new List<string> { legacyDomainName };
             }
         }
     }

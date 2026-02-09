@@ -937,6 +937,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// </summary>
         public static IServiceCollection AddGoogleDomainsService(this IServiceCollection services)
         {
+            services.AddSingleton<Interfaces.IUsStateCodeService, Services.UsStateCodeService>();
             services.AddScoped<Interfaces.IGoogleDomainsService, API.GoogleDomainsService>();
             return services;
         }
