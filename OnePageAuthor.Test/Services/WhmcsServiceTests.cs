@@ -64,39 +64,29 @@ namespace OnePageAuthor.Test.Services
         }
 
         [Fact]
-        public void Constructor_WithMissingApiUrl_ThrowsInvalidOperationException()
+        public void Constructor_WithMissingConfiguration_CreatesInstanceButDisablesWhmcs()
         {
             // Arrange
             _mockConfiguration.Setup(c => c["WHMCS_API_URL"]).Returns((string?)null);
 
-            // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => 
-                new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object));
-            Assert.Contains("WHMCS_API_URL", exception.Message);
+            // Act
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Assert
+            Assert.NotNull(service);
         }
 
         [Fact]
-        public void Constructor_WithMissingApiIdentifier_ThrowsInvalidOperationException()
+        public void Constructor_WithInvalidHttpsUrl_CreatesInstanceButDisablesWhmcs()
         {
             // Arrange
-            _mockConfiguration.Setup(c => c["WHMCS_API_IDENTIFIER"]).Returns((string?)null);
+            _mockConfiguration.Setup(c => c["WHMCS_API_URL"]).Returns("http://insecure.com/api.php"); // HTTP not HTTPS
 
-            // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => 
-                new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object));
-            Assert.Contains("WHMCS_API_IDENTIFIER", exception.Message);
-        }
+            // Act
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
 
-        [Fact]
-        public void Constructor_WithMissingApiSecret_ThrowsInvalidOperationException()
-        {
-            // Arrange
-            _mockConfiguration.Setup(c => c["WHMCS_API_SECRET"]).Returns((string?)null);
-
-            // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => 
-                new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object));
-            Assert.Contains("WHMCS_API_SECRET", exception.Message);
+            // Assert
+            Assert.NotNull(service);
         }
 
         [Fact]
@@ -107,6 +97,25 @@ namespace OnePageAuthor.Test.Services
 
             // Assert
             Assert.NotNull(service);
+        }
+        
+        [Fact]
+        public async Task RegisterDomainAsync_WithMissingConfiguration_ReturnsFalse()
+        {
+            // Arrange
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(c => c["WHMCS_API_URL"]).Returns((string?)null);
+            mockConfig.Setup(c => c["WHMCS_API_IDENTIFIER"]).Returns((string?)null);
+            mockConfig.Setup(c => c["WHMCS_API_SECRET"]).Returns((string?)null);
+            
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, mockConfig.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            var result = await service.RegisterDomainAsync(registration);
+
+            // Assert
+            Assert.False(result);
         }
 
         #endregion
@@ -216,7 +225,26 @@ namespace OnePageAuthor.Test.Services
         {
             // Arrange
             var responseJson = "{\"result\":\"success\"}";
-            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+            string? capturedFormContent = null;
+            
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Callback<HttpRequestMessage, CancellationToken>(async (req, ct) => 
+                {
+                    // Capture the form content before it's disposed
+                    if (req.Content != null)
+                    {
+                        capturedFormContent = await req.Content.ReadAsStringAsync();
+                    }
+                })
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                });
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
             var registration = CreateTestDomainRegistration();
@@ -226,7 +254,25 @@ namespace OnePageAuthor.Test.Services
 
             // Assert
             Assert.True(result);
-            VerifyHttpRequestMade();
+            Assert.NotNull(capturedFormContent);
+            
+            // Verify form-encoded body contains required WHMCS parameters
+            Assert.Contains("action=DomainRegister", capturedFormContent);
+            Assert.Contains("identifier=test-identifier", capturedFormContent);
+            Assert.Contains("secret=test-secret", capturedFormContent);
+            Assert.Contains("domain=testdomain.com", capturedFormContent);
+            Assert.Contains("responsetype=json", capturedFormContent);
+            
+            // Verify contact information is mapped
+            Assert.Contains("firstname=John", capturedFormContent);
+            Assert.Contains("lastname=Doe", capturedFormContent);
+            Assert.Contains("email=john.doe%40example.com", capturedFormContent);
+            Assert.Contains("address1=123+Test+St", capturedFormContent);
+            Assert.Contains("city=Test+City", capturedFormContent);
+            Assert.Contains("state=CA", capturedFormContent);
+            Assert.Contains("postcode=12345", capturedFormContent);
+            Assert.Contains("country=United+States", capturedFormContent);
+            Assert.Contains("phonenumber=%2B1-555-123-4567", capturedFormContent);
         }
 
         [Fact]

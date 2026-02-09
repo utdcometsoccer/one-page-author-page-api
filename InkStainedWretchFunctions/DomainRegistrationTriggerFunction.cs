@@ -17,18 +17,15 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
     {
         private readonly ILogger<DomainRegistrationTriggerFunction> _logger;
         private readonly IFrontDoorService _frontDoorService;
-        private readonly IDomainRegistrationService _domainRegistrationService;
         private readonly IWhmcsService _whmcsService;
 
         public DomainRegistrationTriggerFunction(
             ILogger<DomainRegistrationTriggerFunction> logger,
             IFrontDoorService frontDoorService,
-            IDomainRegistrationService domainRegistrationService,
             IWhmcsService whmcsService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _frontDoorService = frontDoorService ?? throw new ArgumentNullException(nameof(frontDoorService));
-            _domainRegistrationService = domainRegistrationService ?? throw new ArgumentNullException(nameof(domainRegistrationService));
             _whmcsService = whmcsService ?? throw new ArgumentNullException(nameof(whmcsService));
         }
 
@@ -79,11 +76,20 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 
                     // Step 1: Register domain via WHMCS API
                     _logger.LogInformation("Registering domain {DomainName} via WHMCS API", domainName);
-                    var registrationSuccess = await _whmcsService.RegisterDomainAsync(registration);
+                    bool registrationSuccess = false;
+                    try
+                    {
+                        registrationSuccess = await _whmcsService.RegisterDomainAsync(registration);
+                    }
+                    catch (Exception whmcsEx)
+                    {
+                        _logger.LogError(whmcsEx, "Exception while registering domain {DomainName} via WHMCS API", domainName);
+                        // Continue to Front Door despite WHMCS exception
+                    }
 
                     if (!registrationSuccess)
                     {
-                        _logger.LogError("Failed to register domain {DomainName} via WHMCS API", domainName);
+                        _logger.LogWarning("Failed to register domain {DomainName} via WHMCS API", domainName);
                         // Continue to try Front Door addition even if WHMCS registration fails
                         // as the domain might already be registered externally
                     }
