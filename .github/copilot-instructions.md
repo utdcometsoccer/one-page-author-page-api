@@ -30,7 +30,6 @@ The platform serves as a backend for author profile management, content publishi
 - `Stripe.net` (49.2.0) - Stripe payment processing
 - `Azure.Storage.Blobs` (12.26.0) - Azure Blob Storage for images
 - `Azure.ResourceManager.Cdn` (1.5.0) - Azure Front Door integration
-- `Google.Cloud.Domains.V1` (2.5.0) - Google Domains registration
 - `Microsoft.AspNetCore.Authentication.JwtBearer` (9.0.10) - JWT authentication
 
 ### Azure Services
@@ -268,7 +267,6 @@ Authorization: Bearer <jwt-token-from-entra-id>
 ### Optional External API Variables
 - Penguin Random House: `PENGUIN_RANDOM_HOUSE_API_URL`, `PENGUIN_RANDOM_HOUSE_API_KEY`
 - Amazon Product API: `AMAZON_PRODUCT_ACCESS_KEY`, `AMAZON_PRODUCT_SECRET_KEY`, `AMAZON_PRODUCT_PARTNER_TAG`
-- Google Domains: Configuration via Google Cloud SDK
 
 ## Documentation Resources
 

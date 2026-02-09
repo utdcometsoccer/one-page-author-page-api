@@ -51,7 +51,6 @@ The InkStainedWretchFunctions project provides a comprehensive Azure Functions a
 
 - **DomainRegistrationTrigger** - Automatically adds domains to Azure Front Door
 - **CreateDnsZoneFunction** - Automatically creates Azure DNS zones
-- **GoogleDomainRegistrationFunction** - Automatically registers domains via Google Domains API
 
 ## Quick Start
 
@@ -582,39 +581,6 @@ az role assignment create \
   --resource-group <dns-resource-group>
 
 ```
-
-### GoogleDomainRegistrationFunction
-
-**Purpose:** Automatically registers domains using the Google Domains API.
-
-**Trigger:** New or updated documents in the `DomainRegistrations` container
-
-**Configuration:**
-
-- **Lease Container**: `leases`
-- **Lease Prefix**: `googledomainregistration`
-- **Status Filter**: Only processes `Pending` registrations
-
-**Process Flow:**
-
-1. Triggered by domain registration creation
-2. Validates domain registration data
-3. Calls Google Domains API to register the domain
-4. Initiates long-running operation (returns immediately)
-5. Logs success or failure
-
-**Authentication:**
-Uses Application Default Credentials (ADC):
-
-- Managed Identity in Azure
-- Workload Identity Federation recommended for production
-- Requires Domain Registration Admin permissions in Google Cloud
-
-**Cost Considerations:**
-
-- Domain registration costs vary by TLD
-- Long-running operations may have additional costs
-- Consider implementing domain availability checks before registration
 
 ## External API Integrations
 

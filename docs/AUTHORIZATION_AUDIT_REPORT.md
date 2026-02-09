@@ -162,7 +162,6 @@ Currently uses `AuthorizationLevel.Function` without JWT validation. This endpoi
 | `EndToEndTestFunction` (Scenario 3) | `Function` | Internal testing | ✅ Correct |
 | `TestHarnessFunction` (FrontDoor) | `Function` | Internal testing | ✅ Correct |
 | `TestHarnessFunction` (DNS) | `Function` | Internal testing | ✅ Correct |
-| `TestHarnessFunction` (GoogleDomains) | `Function` | Internal testing | ✅ Correct |
 | `TestCreateDnsZoneFunction` | `Function` | Internal testing | ✅ Correct |
 
 **Impact:** None (already correct)  

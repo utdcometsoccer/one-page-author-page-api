@@ -32,12 +32,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing
                 services.AddScoped<IDnsZoneService, MockDnsZoneService>();
             }
 
-            if (testingConfig.MockGoogleDomains)
-            {
-                // Replace Google Domains service with mock
-                services.AddScoped<IGoogleDomainsService, MockGoogleDomainsService>();
-            }
-
             // Note: For external APIs (Amazon, Penguin), mock implementations would be added here
             // if (testingConfig.MockExternalApis)
             // {

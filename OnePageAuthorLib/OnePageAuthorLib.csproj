@@ -17,7 +17,6 @@
     <PackageReference Include="Azure.ResourceManager.Dns" Version="1.2.0-beta.2" />
     <PackageReference Include="Azure.ResourceManager.Cdn" Version="1.5.1" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
-    <PackageReference Include="Google.Cloud.Domains.V1" Version="2.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.9" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.9" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.57.0" />

@@ -147,69 +147,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
             }
         }
 
-        /// <summary>
-        /// Test harness for Google Domains operations
-        /// POST /api/test/googledomains
-        /// Body: { "domainName": "test.example.com", "operation": "register|available" }
-        /// </summary>
-        [Function("TestGoogleDomains")]
-        public async Task<IActionResult> TestGoogleDomains(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "test/googledomains")] HttpRequest req,
-            [FromBody] TestRequest testRequest)
-        {
-            try
-            {
-                if (testRequest == null || string.IsNullOrEmpty(testRequest.DomainName))
-                {
-                    return new BadRequestObjectResult("Missing domainName in request body");
-                }
-
-                _logger.LogInformation("[TEST HARNESS] Testing Google Domains operation: {Operation} for domain: {DomainName}", 
-                    testRequest.Operation, testRequest.DomainName);
-
-                var result = new TestResult
-                {
-                    TestName = "GoogleDomains",
-                    DomainName = testRequest.DomainName ?? "",
-                    Operation = testRequest.Operation ?? "",
-                    TestScenario = _testConfig.TestScenario,
-                    IsMocked = _testConfig.MockGoogleDomains,
-                    Timestamp = DateTime.UtcNow
-                };
-
-                switch (testRequest.Operation?.ToLower())
-                {
-                    case "register":
-                        if (!_testConfig.SkipDomainPurchase && !_testConfig.MockGoogleDomains)
-                        {
-                            result.EstimatedCost = EstimateDomainCost(testRequest.DomainName ?? "");
-                            if (result.EstimatedCost > _testConfig.MaxTestCostLimit)
-                            {
-                                result.Success = false;
-                                result.Message = $"Domain registration cost ${result.EstimatedCost:F2} exceeds test limit ${_testConfig.MaxTestCostLimit:F2}";
-                                break;
-                            }
-                        }
-                        
-                        result.Success = await SimulateGoogleDomainsRegister(testRequest.DomainName ?? "");
-                        result.Message = result.Success ? "Domain registration initiated" : "Failed to register domain";
-                        break;
-                    case "available":
-                        result.Success = await SimulateGoogleDomainsAvailable(testRequest.DomainName ?? "");
-                        result.Message = result.Success ? "Domain is available" : "Domain is not available";
-                        break;
-                    default:
-                        return new BadRequestObjectResult("Invalid operation. Use: register or available");
-                }
-
-                return new OkObjectResult(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[TEST HARNESS] Error testing Google Domains");
-                return new StatusCodeResult(500);
-            }
-        }
 
         // Private simulation methods
         private async Task<bool> SimulateFrontDoorAdd(string domainName)
@@ -258,18 +195,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
         {
             await Task.Delay(100);
             return new[] { "ns1-test.azure-dns.com", "ns2-test.azure-dns.net" };
-        }
-
-        private async Task<bool> SimulateGoogleDomainsRegister(string domainName)
-        {
-            await Task.Delay(1000);
-            return _testConfig.TestScenario != "domain-registration-failure";
-        }
-
-        private async Task<bool> SimulateGoogleDomainsAvailable(string domainName)
-        {
-            await Task.Delay(200);
-            return _testConfig.TestScenario != "domain-unavailable";
         }
 
         private decimal EstimateDomainCost(string domainName)

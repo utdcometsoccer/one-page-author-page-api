@@ -3190,20 +3190,6 @@ Azure Function triggered by changes to the DomainRegistrations Cosmos DB contain
 
 ---
 
-##### GoogleDomainRegistrationFunction
-
-Azure Function triggered by changes to the DomainRegistrations Cosmos DB container. Registers domains using the Google Domains API when new registrations are created.
-
-###### DomainRegistration})
-
-**Description:** Processes changes to domain registrations and registers domains via Google Domains API.
-
-**Parameters:**
-
-- `input`: List of changed domain registrations from Cosmos DB
-
----
-
 ##### PenguinRandomHouseFunction
 
 Azure Function for calling Penguin Random House API

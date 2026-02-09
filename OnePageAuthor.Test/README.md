@@ -241,24 +241,6 @@ Tests for the `DomainRegistrationTriggerFunction` which adds domains to Azure Fr
 - `Run_WhenFrontDoorAdditionFails_LogsError`
 - `Run_WhenFrontDoorServiceThrowsException_LogsErrorAndContinues`
 
-#### GoogleDomainRegistrationFunctionTests (15 tests)
-
-Tests for the `GoogleDomainRegistrationFunction` which registers domains using the Google Domains API.
-
-**Constructor Tests (3 tests):**
-
-- `Constructor_WithNullLogger_ThrowsArgumentNullException`
-- `Constructor_WithNullGoogleDomainsService_ThrowsArgumentNullException`
-- `Constructor_WithValidParameters_CreatesInstance`
-
-**Run Method Tests (12 tests):**
-
-- Tests for null/empty input handling
-- Tests for successful domain registration
-- Tests for status filtering (only processes Pending registrations)
-- Tests for null domain/registration handling
-- Tests for error handling and exception recovery
-
 #### CreateDnsZoneFunctionTests (16 tests)
 
 Tests for the `CreateDnsZoneFunction` which creates Azure DNS zones when domain registrations are added or modified.
@@ -282,11 +264,10 @@ Tests for the `CreateDnsZoneFunction` which creates Azure DNS zones when domain 
 
 ```powershell
 # Run all CosmosDB triggered function tests
-dotnet test --filter "FullyQualifiedName~DnsZone|FullyQualifiedName~GoogleDomainRegistration|FullyQualifiedName~DomainRegistrationTrigger|FullyQualifiedName~FrontDoor"
+dotnet test --filter "FullyQualifiedName~DnsZone|FullyQualifiedName~DomainRegistrationTrigger|FullyQualifiedName~FrontDoor"
 
 # Run specific test class
 dotnet test --filter "FullyQualifiedName~DomainRegistrationTriggerFunctionTests"
-dotnet test --filter "FullyQualifiedName~GoogleDomainRegistrationFunctionTests"
 dotnet test --filter "FullyQualifiedName~CreateDnsZoneFunctionTests"
 ```
 
