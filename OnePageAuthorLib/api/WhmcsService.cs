@@ -134,7 +134,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogError("WHMCS API returned error status {StatusCode} for domain {DomainName}", 
+                    _logger.LogWarning("WHMCS API returned error status {StatusCode} for domain {DomainName}", 
                         response.StatusCode, domainName);
                     return false;
                 }
