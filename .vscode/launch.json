@@ -2,6 +2,31 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug GoogleDomainRegistrationTest",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-google-domain-registration-test",
+            "program": "${workspaceFolder}/GoogleDomainRegistrationTest/bin/Debug/net10.0/GoogleDomainRegistrationTest.dll",
+            "args": [
+                "--register",
+                "--confirm",
+                "--confirm-domain",
+                "gcptest001.com"
+            ],
+            "cwd": "${workspaceFolder}/GoogleDomainRegistrationTest",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "env": {
+                "GOOGLE_CLOUD_PROJECT_ID": "${env:GOOGLE_CLOUD_PROJECT_ID}",
+                "GOOGLE_DOMAINS_LOCATION": "${env:GOOGLE_DOMAINS_LOCATION}",
+                "COSMOSDB_ENDPOINT_URI": "${env:COSMOSDB_ENDPOINT_URI}",
+                "COSMOSDB_PRIMARY_KEY": "${env:COSMOSDB_PRIMARY_KEY}",
+                "COSMOSDB_DATABASE_ID": "${env:COSMOSDB_DATABASE_ID}",
+                "GOOGLE_APPLICATION_CREDENTIALS": "${env:GOOGLE_APPLICATION_CREDENTIALS}",
+                "SKIP_GOOGLE_ADC_VALIDATION": "${env:SKIP_GOOGLE_ADC_VALIDATION}"
+            }
+        },
+        {
             "name": "Attach to .NET Functions",
             "type": "coreclr",
             "request": "attach",
@@ -72,14 +97,6 @@
             "request": "attach",
             "preLaunchTask": "func-imageapi",
             "processId": "${command:azureFunctions.pickProcess}",
-            "env": {
-                "TESTING_MODE": "true",
-                "MOCK_AZURE_INFRASTRUCTURE": "false",
-                "MOCK_STRIPE_PAYMENTS": "false",
-                "STRIPE_TEST_MODE": "false",
-                "TEST_SCENARIO": "production-test",
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
             "logging": {
                 "moduleLoad": false
             },
@@ -97,15 +114,6 @@
             "request": "attach",
             "preLaunchTask": "func-inkstainedwretchfunctions",
             "processId": "${command:azureFunctions.pickProcess}",
-            "env": {
-                "TESTING_MODE": "true",
-                "MOCK_AZURE_INFRASTRUCTURE": "false",
-                "MOCK_GOOGLE_DOMAINS": "false",
-                "MOCK_EXTERNAL_APIS": "false",
-                "SKIP_DOMAIN_PURCHASE": "false",
-                "TEST_SCENARIO": "production-test",
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
             "logging": {
                 "moduleLoad": false
             },
@@ -123,14 +131,6 @@
             "request": "attach",
             "preLaunchTask": "func-inkstainedwretchstripe",
             "processId": "${command:azureFunctions.pickProcess}",
-            "env": {
-                "TESTING_MODE": "true",
-                "MOCK_STRIPE_PAYMENTS": "false",
-                "STRIPE_TEST_MODE": "false",
-                "MAX_TEST_COST_LIMIT": "50.00",
-                "TEST_SCENARIO": "production-test",
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
             "logging": {
                 "moduleLoad": false
             },
