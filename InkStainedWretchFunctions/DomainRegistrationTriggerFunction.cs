@@ -7,7 +7,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 {
     /// <summary>
     /// Azure Function triggered by changes to the DomainRegistrations Cosmos DB container.
-    /// Processes new domain registrations and adds them to Azure Front Door if they don't already exist.
+    /// Processes new domain registrations by registering them via WHMCS API and adding them to Azure Front Door.
     /// </summary>
     /// <remarks>
     /// This function uses a Cosmos DB trigger with a unique lease collection to allow multiple functions
@@ -17,20 +17,20 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
     {
         private readonly ILogger<DomainRegistrationTriggerFunction> _logger;
         private readonly IFrontDoorService _frontDoorService;
-        private readonly IDomainRegistrationService _domainRegistrationService;
+        private readonly IWhmcsService _whmcsService;
 
         public DomainRegistrationTriggerFunction(
             ILogger<DomainRegistrationTriggerFunction> logger,
             IFrontDoorService frontDoorService,
-            IDomainRegistrationService domainRegistrationService)
+            IWhmcsService whmcsService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _frontDoorService = frontDoorService ?? throw new ArgumentNullException(nameof(frontDoorService));
-            _domainRegistrationService = domainRegistrationService ?? throw new ArgumentNullException(nameof(domainRegistrationService));
+            _whmcsService = whmcsService ?? throw new ArgumentNullException(nameof(whmcsService));
         }
 
         /// <summary>
-        /// Processes changes to domain registrations and adds new domains to Azure Front Door.
+        /// Processes changes to domain registrations by registering domains via WHMCS and adding them to Azure Front Door.
         /// </summary>
         /// <param name="input">List of changed domain registrations from Cosmos DB</param>
         [Function("DomainRegistrationTrigger")]
@@ -74,10 +74,34 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                         continue;
                     }
 
-                    // Attempt to add domain to Front Door
-                    var success = await _frontDoorService.AddDomainToFrontDoorAsync(registration);
+                    // Step 1: Register domain via WHMCS API
+                    _logger.LogInformation("Registering domain {DomainName} via WHMCS API", domainName);
+                    bool registrationSuccess = false;
+                    try
+                    {
+                        registrationSuccess = await _whmcsService.RegisterDomainAsync(registration);
+                    }
+                    catch (Exception whmcsEx)
+                    {
+                        _logger.LogError(whmcsEx, "Exception while registering domain {DomainName} via WHMCS API", domainName);
+                        // Continue to Front Door despite WHMCS exception
+                    }
 
-                    if (success)
+                    if (!registrationSuccess)
+                    {
+                        _logger.LogWarning("Failed to register domain {DomainName} via WHMCS API", domainName);
+                        // Continue to try Front Door addition even if WHMCS registration fails
+                        // as the domain might already be registered externally
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Successfully registered domain {DomainName} via WHMCS API", domainName);
+                    }
+
+                    // Step 2: Add domain to Front Door
+                    var frontDoorSuccess = await _frontDoorService.AddDomainToFrontDoorAsync(registration);
+
+                    if (frontDoorSuccess)
                     {
                         _logger.LogInformation("Successfully processed domain {DomainName} for Front Door", domainName);
                         // Note: Status update would require ClaimsPrincipal, which we don't have in a trigger function
