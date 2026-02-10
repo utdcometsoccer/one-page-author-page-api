@@ -105,7 +105,6 @@ $env:COSMOSDB_ENDPOINT_URI = "your-cosmos-endpoint"
 **Optional**:
 - Penguin Random House API
 - Amazon Product API  
-- Google Domains API
 - Azure DNS configuration
 
 ### InkStainedWretchStripe

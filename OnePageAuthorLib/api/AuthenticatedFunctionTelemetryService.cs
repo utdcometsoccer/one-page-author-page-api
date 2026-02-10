@@ -1,6 +1,7 @@
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace InkStainedWretch.OnePageAuthorLib.API
@@ -186,12 +187,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API
                 }
             }
 
-            // Add any metrics
+            // Application Insights v3 removed EventTelemetry.Metrics; store numeric values as properties.
             if (metrics != null)
             {
                 foreach (var metric in metrics)
                 {
-                    telemetry.Metrics[metric.Key] = metric.Value;
+                    telemetry.Properties[$"Metric.{metric.Key}"] = metric.Value.ToString(CultureInfo.InvariantCulture);
                 }
             }
 

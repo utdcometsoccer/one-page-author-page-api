@@ -101,7 +101,6 @@ dotnet user-secrets set "AMAZON_PRODUCT_ACCESS_KEY" "your-actual-amazon-key"
 dotnet user-secrets set "AMAZON_PRODUCT_SECRET_KEY" "your-actual-amazon-secret"
 dotnet user-secrets set "AAD_TENANT_ID" "your-actual-tenant-id"
 dotnet user-secrets set "AAD_CLIENT_ID" "your-actual-client-id" 
-dotnet user-secrets set "GOOGLE_CLOUD_PROJECT_ID" "your-actual-project-id"
 
 ```
 

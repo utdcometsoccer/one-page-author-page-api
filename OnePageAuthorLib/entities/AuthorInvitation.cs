@@ -134,5 +134,24 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
                 _domainNames = new List<string> { legacyDomainName };
             }
         }
+
+        /// <summary>
+        /// Gets the primary domain name without directly using the obsolete <see cref="DomainName"/> property.
+        /// </summary>
+        public string GetPrimaryDomainName()
+        {
+            EnsureDomainNamesMigrated();
+            return _domainNames.FirstOrDefault() ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Synchronizes the legacy <see cref="DomainName"/> field from the first value in <see cref="DomainNames"/>.
+        /// This preserves backward compatibility for older clients/data without requiring callers to touch the obsolete property.
+        /// </summary>
+        public void SyncLegacyDomainNameFromDomainNames()
+        {
+            EnsureDomainNamesMigrated();
+            SetLegacyDomainName(_domainNames.FirstOrDefault());
+        }
     }
 }

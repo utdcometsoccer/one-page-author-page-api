@@ -134,7 +134,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         {
             var telemetry = new EventTelemetry(SubscriptionsListedEvent);
             telemetry.Properties["CustomerId"] = customerId ?? string.Empty;
-            telemetry.Metrics["SubscriptionCount"] = count;
+            telemetry.Properties["SubscriptionCount"] = count.ToString();
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
             _telemetryClient.TrackEvent(telemetry);

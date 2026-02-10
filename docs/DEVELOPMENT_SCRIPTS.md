@@ -49,7 +49,6 @@ npm run init-secrets:help
 - **Azure Storage** - Connection String for ImageAPI (optional)
 - **Stripe** - API Key, Webhook Secret for InkStainedWretchStripe (optional)
 - **Domain Management** - Azure Subscription, DNS Resource Group, DNS Zone Name (optional)
-- **Google Domains** - Project ID, Location (optional)
 - **Amazon Product API** - Access Key, Secret Key, Partner Tag, Region, Marketplace (optional)
 - **Penguin Random House API** - API Key, Domain (optional)
 
