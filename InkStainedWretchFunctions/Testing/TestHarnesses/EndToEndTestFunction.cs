@@ -141,7 +141,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                 // Step 5: Process real payment (Stripe production)
                 result.Steps.Add(await ExecuteStep("ProcessRealPayment", () => ProcessRealPayment(testRequest)));
 
-                // Step 6: Register domain with Google Domains
+                // Step 6: Register domain with domain provider
                 result.Steps.Add(await ExecuteStep("RegisterDomain", () => RegisterRealDomain(testRequest.DomainName)));
 
                 // Step 7: Create DNS zone
@@ -216,7 +216,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
         private async Task<(bool, string, decimal)> CheckRealDomainAvailability(string domainName)
         {
             await Task.Delay(500);
-            // In real scenario, this would call Google Domains API
+            // In real scenario, this would call domain provider API
             return (true, "Domain availability checked (real API would be called)", 0);
         }
 
@@ -257,8 +257,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
         {
             await Task.Delay(2000);
             var cost = EstimateDomainCost(domainName);
-            // In real scenario, this would call Google Domains API
-            return (true, "Domain registered with Google Domains", cost);
+            // In real scenario, this would call domain provider API
+            return (true, "Domain registered with domain provider", cost);
         }
 
         private async Task<(bool, string, decimal)> CreateRealDnsZone(string domainName)

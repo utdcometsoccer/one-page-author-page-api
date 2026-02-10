@@ -36,10 +36,9 @@ This report addresses the GitHub issue requesting:
 2. Configure Environment Variables for All Function Apps
 3. Update GitHub Secrets for CI/CD Pipeline
 4. Test Authentication Flow End-to-End
-5. Configure Google Domains API Access
-6. Test Domain Registration Flow
-7. Configure Azure DNS Resources
-8. Configure Azure Front Door
+5. Test Domain Registration Flow
+6. Configure Azure DNS Resources
+7. Configure Azure Front Door
 9. Test DNS Zone Creation Workflow
 10. Test Front Door Domain Addition Workflow
 
@@ -237,12 +236,12 @@ Changed `AuthorizationLevel.Function` → `AuthorizationLevel.Anonymous` for all
 - ✅ Implementation in `DomainRegistrationService.cs` is robust
 - ✅ Validation services exist for domain, contact, and subscription
 - ✅ Repository pattern properly implemented
-- ✅ Google Domains integration configured
+- ✅ Domain provider integration configured
 - ✅ Extensive test coverage already exists
 
 **Ready for:**
 
-- Human testing with real Google Domains account
+- Human testing with domain provider account
 - End-to-end workflow validation
 - Production deployment
 
@@ -447,10 +446,9 @@ Document findings in test report format per instructions
 ### Short Term (Next 2 Weeks)
 
 1. Complete authentication testing (Task 4)
-2. Configure Google Domains (Task 5)
-3. Test domain registration (Task 6)
-4. Configure Azure DNS (Task 7)
-5. Configure Front Door (Task 8)
+2. Test domain registration (Task 5)
+3. Configure Azure DNS (Task 6)
+4. Configure Front Door (Task 7)
 
 ### Medium Term (Next Month)
 

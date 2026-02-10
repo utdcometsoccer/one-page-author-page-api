@@ -661,7 +661,6 @@ For detailed documentation on specific features, enhancements, and implementatio
 - [Language Support](docs/IMPLEMENTATION_SUMMARY_LANGUAGES.md) - Multi-language implementation
 - [Country Data](docs/COUNTRIES_IMPLEMENTATION_SUMMARY.md) - Geographic data implementation
 - [StateProvince Boilerplate](docs/STATEPROVINCE_BOILERPLATE_SUMMARY.md) - Geographic entities
-- [Google Domains Integration](docs/GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY.md) - Domain registration
 - [Multi-Function Deployment](docs/IMPLEMENTATION_SUMMARY_MULTI_FUNCTION_DEPLOYMENT.md) - Deployment architecture
 - [Cosmos DB & App Insights](docs/IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS.md) - Monitoring setup
 - [Conditional Environment Variables](docs/IMPLEMENTATION_SUMMARY_CONDITIONAL_ENV_VARS.md) - Configuration patterns
@@ -3168,7 +3167,7 @@ System.Xml.XmlElement
 
 ###### DomainRegistration})
 
-**Description:** Processes changes to domain registrations and registers domains via Google Domains API.
+**Description:** Processes changes to domain registrations and triggers infrastructure provisioning.
 
 **Parameters:**
 
@@ -4316,7 +4315,6 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [IMPLEMENTATION_SUMMARY_PERMISSIONS_FIX.md](docs/IMPLEMENTATION_SUMMARY_PERMISSIONS_FIX.md) | Permissions fixes |
 | [COUNTRIES_IMPLEMENTATION_SUMMARY.md](docs/COUNTRIES_IMPLEMENTATION_SUMMARY.md) | Country data implementation |
 | [STATEPROVINCE_BOILERPLATE_SUMMARY.md](docs/STATEPROVINCE_BOILERPLATE_SUMMARY.md) | Geographic data |
-| [GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY.md](docs/GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY.md) | Google Domains integration |
 | [KEY_VAULT_IMPLEMENTATION_SUMMARY.md](docs/KEY_VAULT_IMPLEMENTATION_SUMMARY.md) | Key Vault implementation |
 | [KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION.md](docs/KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION.md) | Key Vault RBAC |
 | [AUTHOR_INVITATION_IMPLEMENTATION_SUMMARY.md](docs/AUTHOR_INVITATION_IMPLEMENTATION_SUMMARY.md) | Author invitation system |
@@ -4407,13 +4405,6 @@ The following external resources are referenced throughout this project:
 | PA API Documentation | <https://webservices.amazon.com/paapi5/documentation/> | Product Advertising API docs |
 | Amazon Developer Portal | <https://developer.amazon.com/apps-and-games/services/paapi> | Developer services |
 | AWS Console | <https://console.aws.amazon.com> | AWS management console |
-
-### Google Cloud
-
-| Resource | URL | Description |
-|----------|-----|-------------|
-| Google Cloud Domains API | <https://cloud.google.com/domains/docs> | Domain registration API |
-| Workload Identity Federation | <https://cloud.google.com/iam/docs/workload-identity-federation> | Identity federation docs |
 
 ### Development Tools
 

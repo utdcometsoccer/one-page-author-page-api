@@ -278,7 +278,7 @@ System.Xml.XmlElement
 
 ##### DomainRegistration})
 
-**Description:** Processes changes to domain registrations and registers domains via Google Domains API.
+**Description:** Processes changes to domain registrations and triggers infrastructure provisioning.
 
 **Parameters:**
 
