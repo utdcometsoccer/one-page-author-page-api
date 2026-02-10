@@ -262,8 +262,6 @@ Including all optional features:
   "AZURE_SUBSCRIPTION_ID": "...",
   "AZURE_DNS_RESOURCE_GROUP": "...",
   "ISW_DNS_ZONE_NAME": "example.com",
-  "GOOGLE_CLOUD_PROJECT_ID": "my-project-123",
-  "GOOGLE_DOMAINS_LOCATION": "global",
   
   "External APIs": {},
   "AMAZON_PRODUCT_ACCESS_KEY": "AKIA...",

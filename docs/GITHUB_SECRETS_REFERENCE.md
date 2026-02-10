@@ -475,8 +475,6 @@ The deployment workflow (`.github/workflows/main_onepageauthorapi.yml`) reads Gi
 | `AAD_VALID_ISSUERS` | `AAD_VALID_ISSUERS` | Comma-separated list of valid JWT issuers |
 | `AZURE_SUBSCRIPTION_ID` | `AZURE_SUBSCRIPTION_ID` | Azure subscription for DNS/Front Door |
 | `AZURE_DNS_RESOURCE_GROUP` | `AZURE_DNS_RESOURCE_GROUP` | Resource group for DNS zones |
-| `GOOGLE_CLOUD_PROJECT_ID` | `GOOGLE_CLOUD_PROJECT_ID` | Google Cloud project ID |
-| `GOOGLE_DOMAINS_LOCATION` | `GOOGLE_DOMAINS_LOCATION` | Location for domain operations |
 | `AMAZON_PRODUCT_ACCESS_KEY` | `AMAZON_PRODUCT_ACCESS_KEY` | AWS access key ID |
 | `AMAZON_PRODUCT_SECRET_KEY` | `AMAZON_PRODUCT_SECRET_KEY` | AWS secret access key |
 | `AMAZON_PRODUCT_PARTNER_TAG` | `AMAZON_PRODUCT_PARTNER_TAG` | Amazon Associates tracking ID |

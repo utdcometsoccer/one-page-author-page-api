@@ -98,9 +98,8 @@ This PR delivers **everything requested** in the GitHub issue:
 2. ⚠️ Set environment variables in Function Apps (30 min)
 3. ⚠️ Update GitHub Secrets (30 min)
 4. ⚠️ Test authentication end-to-end (2 hours)
-5. ⚠️ Configure Google Domains API (1 hour)
-6. ⚠️ Configure Azure DNS (1 hour)
-7. ⚠️ Configure Azure Front Door (2 hours)
+5. ⚠️ Configure Azure DNS (1 hour)
+6. ⚠️ Configure Azure Front Door (2 hours)
 
 **Total Estimated Time:** ~8 hours for critical path
 

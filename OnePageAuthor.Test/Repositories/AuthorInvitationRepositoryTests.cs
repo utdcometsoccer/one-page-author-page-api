@@ -53,7 +53,7 @@ namespace OnePageAuthor.Test.Repositories
             // Assert
             Assert.NotNull(result);
             Assert.Equal("test@example.com", result.EmailAddress);
-            Assert.Equal("example.com", result.DomainName);
+            Assert.Equal("example.com", result.GetPrimaryDomainName());
             Assert.Equal("Pending", result.Status);
             
             _mockContainer.Verify(c => c.CreateItemAsync(
@@ -69,8 +69,9 @@ namespace OnePageAuthor.Test.Repositories
             var invitation = new AuthorInvitation
             {
                 EmailAddress = string.Empty,
-                DomainName = "example.com"
+                DomainNames = new List<string> { "example.com" }
             };
+            invitation.SyncLegacyDomainNameFromDomainNames();
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(
@@ -87,7 +88,7 @@ namespace OnePageAuthor.Test.Repositories
             Assert.NotNull(invitation.id);
             Assert.NotEmpty(invitation.id);
             Assert.Equal("test@example.com", invitation.EmailAddress);
-            Assert.Equal("example.com", invitation.DomainName);
+            Assert.Equal("example.com", invitation.GetPrimaryDomainName());
             Assert.Equal("Pending", invitation.Status);
             Assert.Null(invitation.AcceptedAt);
             Assert.Null(invitation.UserOid);

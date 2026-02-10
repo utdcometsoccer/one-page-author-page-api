@@ -352,23 +352,6 @@ $secretDefinitions = @{
         }
     )
     
-    "Google Domains (Optional)" = @(
-        @{
-            Name = "GOOGLE_CLOUD_PROJECT_ID"
-            Description = "Google Cloud project ID"
-            Required = $false
-            Example = "my-project-123456"
-            Category = "Domain"
-        },
-        @{
-            Name = "GOOGLE_DOMAINS_LOCATION"
-            Description = "Location for domain operations"
-            Required = $false
-            Example = "global"
-            Category = "Domain"
-        }
-    )
-    
     "Amazon Product API (Optional)" = @(
         @{
             Name = "AMAZON_PRODUCT_ACCESS_KEY"
@@ -500,13 +483,6 @@ $secretDefinitions = @{
         @{
             Name = "MOCK_AZURE_INFRASTRUCTURE"
             Description = "Mock Azure infrastructure operations (true/false)"
-            Required = $false
-            Example = "false"
-            Category = "Testing"
-        },
-        @{
-            Name = "MOCK_GOOGLE_DOMAINS"
-            Description = "Mock Google Domains API calls (true/false)"
             Required = $false
             Example = "false"
             Category = "Testing"

@@ -102,7 +102,6 @@ You can also run the scripts directly with PowerShell:
 
 - **Amazon Product API**: ACCESS_KEY, SECRET_KEY, PARTNER_TAG, REGION, MARKETPLACE, API_ENDPOINT
 - **Penguin Random House**: API_URL, API_KEY, API_DOMAIN, SEARCH_API, LIST_TITLES_BY_AUTHOR_API, URL
-- **Google Domains**: PROJECT_ID, LOCATION
 - **Domain Management**: SUBSCRIPTION_ID, DNS_RESOURCE_GROUP, RESOURCE_GROUP_NAME, FRONTDOOR_PROFILE_NAME
 
 See [secrets-template.json](secrets-template.json) for the complete list.

@@ -213,11 +213,12 @@ public class AuthorInvitationFunction
             }
 
             // Return success response
+            savedInvitation.EnsureDomainNamesMigrated();
             var responseData = new CreateAuthorInvitationResponse
             {
                 Id = savedInvitation.id,
                 EmailAddress = savedInvitation.EmailAddress,
-                DomainName = savedInvitation.DomainName,
+                DomainName = savedInvitation.GetPrimaryDomainName(),
                 DomainNames = savedInvitation.DomainNames,
                 Status = savedInvitation.Status,
                 CreatedAt = savedInvitation.CreatedAt,
@@ -466,7 +467,7 @@ public class AuthorInvitationFunction
                     }
                 }
                 invitation.DomainNames = request.DomainNames;
-                invitation.DomainName = request.DomainNames.First();
+                invitation.SyncLegacyDomainNameFromDomainNames();
             }
 
             if (request.Notes != null)

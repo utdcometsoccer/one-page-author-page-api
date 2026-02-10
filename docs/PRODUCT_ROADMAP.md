@@ -110,7 +110,6 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
 - `Stripe.net` (49.2.0)
 - `Azure.Storage.Blobs` (12.26.0)
 - `Azure.ResourceManager.Cdn` (1.5.0)
-- `Google.Cloud.Domains.V1` (2.5.0)
 
 ### 🔍 Feature Inventory
 
@@ -189,7 +188,6 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
 
 - Penguin Random House API (book catalog)
 - Amazon Product Advertising API (affiliate links)
-- Google Domains API (domain registration)
 - Azure Front Door (CDN and domain management)
 - Azure Communication Services (email notifications)
 
@@ -236,10 +234,10 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
 
 1. **Domain Registration Workflow Validation** ⚠️ **URGENT**
    - **Status:** Implementation complete, end-to-end testing required
-   - **Current State:** Google Domains integration implemented, basic tests exist
+   - **Current State:** Domain integration implemented via WHMCS, basic tests exist
    - **Required Actions:**
      - Create comprehensive domain registration tests
-     - Test full workflow with Google Domains API
+     - Test full workflow with domain provider API
      - Validate DNS zone creation automation
      - Test Front Door domain addition
      - Document registration troubleshooting
@@ -911,7 +909,7 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
 #### Domain Registration
 
 - [ ] Unit tests for validation logic
-- [ ] Integration tests with Google Domains API mocking
+- [ ] Integration tests with domain provider API mocking
 - [ ] E2E tests for registration workflows
 - [ ] Error scenario tests
 - **Priority:** High | **Due:** February 2025
@@ -955,7 +953,7 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
      - [ ] Test domain name validation
      - [ ] Test contact information validation
      - [ ] Test subscription requirements
-     - [ ] Test Google Domains API integration (with test domain)
+     - [ ] Test domain provider API integration (with test domain)
      - [ ] Test DNS zone creation trigger
      - [ ] Test Front Door domain addition
      - [ ] Verify rollback scenarios

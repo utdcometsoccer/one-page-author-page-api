@@ -144,8 +144,6 @@ STRIPE_API_KEY=sk_test_your_key_here
 - `AZURE_RESOURCE_GROUP_NAME` - Resource group name for Azure Front Door
 - `AZURE_FRONTDOOR_PROFILE_NAME` - Azure Front Door profile name
 - `ISW_DNS_ZONE_NAME` - DNS zone name
-- `GOOGLE_CLOUD_PROJECT_ID` - Google Cloud project ID
-- `GOOGLE_DOMAINS_LOCATION` - Location for domain operations
 
 ### Optional - External APIs
 
@@ -170,7 +168,6 @@ STRIPE_API_KEY=sk_test_your_key_here
 
 - `TESTING_MODE` - Enable testing mode (true/false)
 - `MOCK_AZURE_INFRASTRUCTURE` - Mock Azure infrastructure operations (true/false)
-- `MOCK_GOOGLE_DOMAINS` - Mock Google Domains API calls (true/false)
 - `MOCK_STRIPE_PAYMENTS` - Mock Stripe payment operations (true/false)
 - `STRIPE_TEST_MODE` - Use Stripe test mode (true/false)
 - `MOCK_EXTERNAL_APIS` - Mock external API calls (true/false)

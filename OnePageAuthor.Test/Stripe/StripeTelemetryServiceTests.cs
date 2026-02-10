@@ -10,38 +10,45 @@ namespace OnePageAuthor.Test.Stripe
 {
     public class StripeTelemetryServiceTests
     {
-        private class TestTelemetryChannel : ITelemetryChannel
+        private sealed class CapturingTelemetryProcessor : ITelemetryProcessor
         {
-            public List<ITelemetry> SentItems { get; } = new List<ITelemetry>();
-            public bool? DeveloperMode { get; set; }
-            public string EndpointAddress { get; set; } = string.Empty;
-            public void Dispose() { }
-            public void Flush() { }
-            public void Send(ITelemetry item) => SentItems.Add(item);
+            private readonly List<ITelemetry> _sentItems;
+            private readonly ITelemetryProcessor? _next;
+
+            public CapturingTelemetryProcessor(List<ITelemetry> sentItems, ITelemetryProcessor? next)
+            {
+                _sentItems = sentItems;
+                _next = next;
+            }
+
+            public void Process(ITelemetry item)
+            {
+                _sentItems.Add(item);
+                _next?.Process(item);
+            }
         }
 
-        private static (StripeTelemetryService service, TestTelemetryChannel channel) CreateService()
+        private static (StripeTelemetryService service, List<ITelemetry> sentItems) CreateService()
         {
-            var channel = new TestTelemetryChannel();
-            var config = new TelemetryConfiguration
-            {
-                TelemetryChannel = channel,
-                ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000"
-            };
+            var sentItems = new List<ITelemetry>();
+            var config = TelemetryConfiguration.CreateDefault();
+            config.ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000";
+            config.TelemetryProcessorChainBuilder.Use(next => new CapturingTelemetryProcessor(sentItems, next));
+            config.TelemetryProcessorChainBuilder.Build();
             var client = new TelemetryClient(config);
             var service = new StripeTelemetryService(client, new NullLogger<StripeTelemetryService>());
-            return (service, channel);
+            return (service, sentItems);
         }
 
         [Fact]
         public void TrackCustomerCreated_SendsEventWithCorrectProperties()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackCustomerCreated("cus_123", "test@example.com");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeCustomerCreated", eventTelemetry.Name);
             Assert.Equal("cus_123", eventTelemetry.Properties["CustomerId"]);
             Assert.Equal("example.com", eventTelemetry.Properties["EmailDomain"]);
@@ -51,12 +58,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackCustomerCreated_WithoutEmail_DoesNotIncludeEmailDomain()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackCustomerCreated("cus_456", null);
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeCustomerCreated", eventTelemetry.Name);
             Assert.Equal("cus_456", eventTelemetry.Properties["CustomerId"]);
             Assert.False(eventTelemetry.Properties.ContainsKey("EmailDomain"));
@@ -65,12 +72,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackCheckoutSessionCreated_SendsEventWithCorrectProperties()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackCheckoutSessionCreated("cs_test_123", "cus_abc", "price_xyz");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeCheckoutSessionCreated", eventTelemetry.Name);
             Assert.Equal("cs_test_123", eventTelemetry.Properties["CheckoutSessionId"]);
             Assert.Equal("cus_abc", eventTelemetry.Properties["CustomerId"]);
@@ -80,12 +87,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackCheckoutSessionRetrieved_SendsEventWithStatusInfo()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackCheckoutSessionRetrieved("cs_test_456", "cus_def", "complete", "paid");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeCheckoutSessionRetrieved", eventTelemetry.Name);
             Assert.Equal("cs_test_456", eventTelemetry.Properties["CheckoutSessionId"]);
             Assert.Equal("cus_def", eventTelemetry.Properties["CustomerId"]);
@@ -96,12 +103,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackSubscriptionCreated_SendsEventWithCorrectProperties()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackSubscriptionCreated("sub_123", "cus_abc", "price_xyz");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeSubscriptionCreated", eventTelemetry.Name);
             Assert.Equal("sub_123", eventTelemetry.Properties["SubscriptionId"]);
             Assert.Equal("cus_abc", eventTelemetry.Properties["CustomerId"]);
@@ -111,12 +118,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackSubscriptionCancelled_SendsEventWithCorrectProperties()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackSubscriptionCancelled("sub_456", "cus_def");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeSubscriptionCancelled", eventTelemetry.Name);
             Assert.Equal("sub_456", eventTelemetry.Properties["SubscriptionId"]);
             Assert.Equal("cus_def", eventTelemetry.Properties["CustomerId"]);
@@ -125,12 +132,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackSubscriptionUpdated_SendsEventWithCorrectProperties()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackSubscriptionUpdated("sub_789", "cus_ghi", "price_new");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeSubscriptionUpdated", eventTelemetry.Name);
             Assert.Equal("sub_789", eventTelemetry.Properties["SubscriptionId"]);
             Assert.Equal("cus_ghi", eventTelemetry.Properties["CustomerId"]);
@@ -140,21 +147,21 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackSubscriptionsListed_SendsEventWithCountMetric()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackSubscriptionsListed("cus_list", 5);
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeSubscriptionsListed", eventTelemetry.Name);
             Assert.Equal("cus_list", eventTelemetry.Properties["CustomerId"]);
-            Assert.Equal(5, eventTelemetry.Metrics["SubscriptionCount"]);
+            Assert.Equal("5", eventTelemetry.Properties["SubscriptionCount"]);
         }
 
         [Fact]
         public void TrackWebhookEvent_SendsEventWithAllProperties()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackWebhookEvent(
                 eventType: "invoice.paid",
@@ -165,8 +172,8 @@ namespace OnePageAuthor.Test.Stripe
                 paymentIntentId: "pi_456",
                 priceId: "price_789");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeWebhookEvent", eventTelemetry.Name);
             Assert.Equal("invoice.paid", eventTelemetry.Properties["EventType"]);
             Assert.Equal("in_123", eventTelemetry.Properties["ObjectId"]);
@@ -180,14 +187,14 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackWebhookEvent_WithNullOptionalParameters_DoesNotIncludeThem()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackWebhookEvent(
                 eventType: "customer.created",
                 objectId: "cus_new");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeWebhookEvent", eventTelemetry.Name);
             Assert.Equal("customer.created", eventTelemetry.Properties["EventType"]);
             Assert.Equal("cus_new", eventTelemetry.Properties["ObjectId"]);
@@ -201,12 +208,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackInvoicePreview_SendsEventWithCorrectProperties()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackInvoicePreview("cus_preview", "sub_123", "price_new");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeInvoicePreview", eventTelemetry.Name);
             Assert.Equal("cus_preview", eventTelemetry.Properties["CustomerId"]);
             Assert.Equal("sub_123", eventTelemetry.Properties["SubscriptionId"]);
@@ -216,12 +223,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackStripeError_SendsEventWithErrorDetails()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackStripeError("CreateSubscription", "card_declined", "card_error", "cus_error");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeApiError", eventTelemetry.Name);
             Assert.Equal("CreateSubscription", eventTelemetry.Properties["Operation"]);
             Assert.Equal("card_declined", eventTelemetry.Properties["ErrorCode"]);
@@ -232,12 +239,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackStripeError_WithNullOptionalParameters_DoesNotIncludeThem()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackStripeError("UnknownOperation");
 
-            Assert.Single(channel.SentItems);
-            var eventTelemetry = Assert.IsType<EventTelemetry>(channel.SentItems[0]);
+            Assert.Single(sentItems);
+            var eventTelemetry = Assert.IsType<EventTelemetry>(sentItems[0]);
             Assert.Equal("StripeApiError", eventTelemetry.Name);
             Assert.Equal("UnknownOperation", eventTelemetry.Properties["Operation"]);
             Assert.False(eventTelemetry.Properties.ContainsKey("ErrorCode"));
@@ -248,7 +255,7 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void AllEvents_IncludeTimestamp()
         {
-            var (service, channel) = CreateService();
+            var (service, sentItems) = CreateService();
 
             service.TrackCustomerCreated("cus_ts");
             service.TrackCheckoutSessionCreated("cs_ts", "cus_ts");
@@ -256,8 +263,8 @@ namespace OnePageAuthor.Test.Stripe
             service.TrackWebhookEvent("test.event", "obj_ts");
             service.TrackStripeError("TestOp");
 
-            Assert.Equal(5, channel.SentItems.Count);
-            foreach (var item in channel.SentItems)
+            Assert.Equal(5, sentItems.Count);
+            foreach (var item in sentItems)
             {
                 var eventTelemetry = Assert.IsType<EventTelemetry>(item);
                 Assert.True(eventTelemetry.Properties.ContainsKey("Timestamp"));
@@ -276,11 +283,8 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void Constructor_ThrowsOnNullLogger()
         {
-            var config = new TelemetryConfiguration
-            {
-                TelemetryChannel = new TestTelemetryChannel(),
-                ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000"
-            };
+            var config = TelemetryConfiguration.CreateDefault();
+            config.ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000";
             var client = new TelemetryClient(config);
 
             Assert.Throws<ArgumentNullException>(() =>

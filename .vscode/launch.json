@@ -2,31 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug GoogleDomainRegistrationTest",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build-google-domain-registration-test",
-            "program": "${workspaceFolder}/GoogleDomainRegistrationTest/bin/Debug/net10.0/GoogleDomainRegistrationTest.dll",
-            "args": [
-                "--register",
-                "--confirm",
-                "--confirm-domain",
-                "gcptest001.com"
-            ],
-            "cwd": "${workspaceFolder}/GoogleDomainRegistrationTest",
-            "console": "integratedTerminal",
-            "stopAtEntry": false,
-            "env": {
-                "GOOGLE_CLOUD_PROJECT_ID": "${env:GOOGLE_CLOUD_PROJECT_ID}",
-                "GOOGLE_DOMAINS_LOCATION": "${env:GOOGLE_DOMAINS_LOCATION}",
-                "COSMOSDB_ENDPOINT_URI": "${env:COSMOSDB_ENDPOINT_URI}",
-                "COSMOSDB_PRIMARY_KEY": "${env:COSMOSDB_PRIMARY_KEY}",
-                "COSMOSDB_DATABASE_ID": "${env:COSMOSDB_DATABASE_ID}",
-                "GOOGLE_APPLICATION_CREDENTIALS": "${env:GOOGLE_APPLICATION_CREDENTIALS}",
-                "SKIP_GOOGLE_ADC_VALIDATION": "${env:SKIP_GOOGLE_ADC_VALIDATION}"
-            }
-        },
-        {
             "name": "Attach to .NET Functions",
             "type": "coreclr",
             "request": "attach",

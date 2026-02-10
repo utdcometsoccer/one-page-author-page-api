@@ -93,7 +93,6 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 - `OnePageAuthor.Test/DomainRegistration/ContactInformationValidationTests.cs` (NEW - 30+ tests)
 - `OnePageAuthor.Test/DomainRegistration/DomainRegistrationWorkflowTests.cs` (NEW - 25+ tests)
 - `OnePageAuthor.Test/DomainRegistration/DomainRegistrationErrorHandlingTests.cs` (NEW - 20+ tests)
-- `OnePageAuthor.Test/DomainRegistration/TestHelpers/MockGoogleDomainsService.cs` (NEW)
 - `OnePageAuthor.Test/DomainRegistration/TestHelpers/DomainRegistrationTestFixtures.cs` (NEW)
 
 **Success Criteria:**
@@ -102,7 +101,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 - ✅ All validation logic thoroughly tested
 - ✅ All critical workflows covered
 - ✅ All error scenarios handled gracefully
-- ✅ Test with real Google Domains sandbox (if available)
+- ✅ Test with domain provider sandbox (if available)
 - ✅ Documentation updated with testing guide
 
 ---
@@ -135,7 +134,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 - ✅ Repository pattern used: `IDomainRegistrationRepository`
 - ✅ Validation services exist (Domain, ContactInfo, Subscription validation)
 - ✅ HTTP endpoint: `InkStainedWretchFunctions/DomainRegistrationFunction.cs`
-- ✅ Google Domains integration: `OnePageAuthorLib/api/GoogleDomainsService.cs`
+- ✅ Domain provider integration via WHMCS service
 - ✅ Test harness exists: `DomainRegistrationTestHarness/`
 - ✅ Basic tests exist: `OnePageAuthor.Test/DomainRegistration/`
 

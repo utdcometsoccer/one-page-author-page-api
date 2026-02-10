@@ -278,7 +278,7 @@ System.Xml.XmlElement
 
 ##### DomainRegistration})
 
-**Description:** Processes changes to domain registrations and registers domains via Google Domains API.
+**Description:** Processes changes to domain registrations and triggers infrastructure provisioning.
 
 **Parameters:**
 
@@ -293,20 +293,6 @@ Azure Function triggered by changes to the DomainRegistrations Cosmos DB contain
 ##### DomainRegistration})
 
 **Description:** Processes changes to domain registrations and adds new domains to Azure Front Door.
-
-**Parameters:**
-
-- `input`: List of changed domain registrations from Cosmos DB
-
----
-
-#### GoogleDomainRegistrationFunction
-
-Azure Function triggered by changes to the DomainRegistrations Cosmos DB container. Registers domains using the Google Domains API when new registrations are created.
-
-##### DomainRegistration})
-
-**Description:** Processes changes to domain registrations and registers domains via Google Domains API.
 
 **Parameters:**
 

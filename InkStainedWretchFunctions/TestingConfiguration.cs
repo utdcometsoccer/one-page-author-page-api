@@ -25,11 +25,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing
         public bool MockAzureInfrastructure => bool.Parse(_configuration["MOCK_AZURE_INFRASTRUCTURE"] ?? "false");
 
         /// <summary>
-        /// Mock Google Domains API calls
-        /// </summary>
-        public bool MockGoogleDomains => bool.Parse(_configuration["MOCK_GOOGLE_DOMAINS"] ?? "false");
-
-        /// <summary>
         /// Mock Stripe payment operations
         /// </summary>
         public bool MockStripePayments => bool.Parse(_configuration["MOCK_STRIPE_PAYMENTS"] ?? "false");

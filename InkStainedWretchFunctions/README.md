@@ -22,7 +22,7 @@ Azure Functions application providing domain registration management, external A
 
 The InkStainedWretchFunctions project provides a comprehensive Azure Functions application that handles:
 
-- **Domain Registration Management**: Automated provisioning of domain registrations with Azure Front Door, DNS zones, and Google Domains integration
+- **Domain Registration Management**: Automated provisioning of domain registrations with Azure Front Door and DNS zones
 - **Localized Content**: Multi-language UI text services with fallback support
 - **External API Integrations**: Amazon Product Advertising API and Penguin Random House API
 - **Geographic Data**: Countries, languages, and state/province information in multiple languages
@@ -51,7 +51,6 @@ The InkStainedWretchFunctions project provides a comprehensive Azure Functions a
 
 - **DomainRegistrationTrigger** - Automatically adds domains to Azure Front Door
 - **CreateDnsZoneFunction** - Automatically creates Azure DNS zones
-- **GoogleDomainRegistrationFunction** - Automatically registers domains via Google Domains API
 
 ## Quick Start
 
@@ -123,10 +122,6 @@ dotnet user-secrets set "AZURE_DNS_RESOURCE_GROUP" "your-dns-resource-group"
 dotnet user-secrets set "WHMCS_API_URL" "https://your-whmcs-instance.com/includes/api.php"
 dotnet user-secrets set "WHMCS_API_IDENTIFIER" "your-api-identifier"
 dotnet user-secrets set "WHMCS_API_SECRET" "your-api-secret"
-
-# Google Domains (Optional)
-dotnet user-secrets set "GOOGLE_CLOUD_PROJECT_ID" "your-google-project-id"
-dotnet user-secrets set "GOOGLE_DOMAINS_LOCATION" "global"
 ```
 
 #### 5. Testing Configuration (Optional)
@@ -152,7 +147,6 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 | `WHMCS_API_URL` | ⚪ Optional | WHMCS API endpoint URL for domain registration |
 | `WHMCS_API_IDENTIFIER` | ⚪ Optional | WHMCS API identifier for authentication |
 | `WHMCS_API_SECRET` | ⚪ Optional | WHMCS API secret for authentication |
-| `GOOGLE_CLOUD_PROJECT_ID` | ⚪ Optional | Google Cloud project for domain registration |
 | `AMAZON_PRODUCT_ACCESS_KEY` | ⚪ Optional | AWS access key for Amazon API |
 | `AMAZON_PRODUCT_SECRET_KEY` | ⚪ Optional | AWS secret key for Amazon API |
 | `AMAZON_PRODUCT_PARTNER_TAG` | ⚪ Optional | Amazon Associates partner tag |
@@ -229,25 +223,6 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 - WHMCS must have at least one active domain registrar module configured
 - The registrar module must support the domain TLDs you plan to register
 - Ensure sufficient credit balance with your domain registrar
-
-</details>
-
-<details>
-<summary>🌍 Google Domains Integration</summary>
-
-**Required for automatic domain registration** - Enables registering domains via Google Domains API.
-
-| Variable | Purpose | How to Obtain |
-|----------|---------|---------------|
-| `GOOGLE_CLOUD_PROJECT_ID` | Your Google Cloud project identifier | [Google Cloud Console](https://console.cloud.google.com) → Project selector → Project ID |
-| `GOOGLE_DOMAINS_LOCATION` | Regional location for domain operations | Usually "global" |
-
-**Setup Steps**:
-
-1. Create a project in [Google Cloud Console](https://console.cloud.google.com)
-2. Enable the Cloud Domains API
-3. Set up authentication via Workload Identity Federation or service account
-4. Grant Domain Registration Admin permissions
 
 </details>
 
@@ -583,39 +558,6 @@ az role assignment create \
 
 ```
 
-### GoogleDomainRegistrationFunction
-
-**Purpose:** Automatically registers domains using the Google Domains API.
-
-**Trigger:** New or updated documents in the `DomainRegistrations` container
-
-**Configuration:**
-
-- **Lease Container**: `leases`
-- **Lease Prefix**: `googledomainregistration`
-- **Status Filter**: Only processes `Pending` registrations
-
-**Process Flow:**
-
-1. Triggered by domain registration creation
-2. Validates domain registration data
-3. Calls Google Domains API to register the domain
-4. Initiates long-running operation (returns immediately)
-5. Logs success or failure
-
-**Authentication:**
-Uses Application Default Credentials (ADC):
-
-- Managed Identity in Azure
-- Workload Identity Federation recommended for production
-- Requires Domain Registration Admin permissions in Google Cloud
-
-**Cost Considerations:**
-
-- Domain registration costs vary by TLD
-- Long-running operations may have additional costs
-- Consider implementing domain availability checks before registration
-
 ## External API Integrations
 
 ### Amazon Product Advertising API
@@ -788,7 +730,6 @@ The project includes a comprehensive testing framework with three distinct scena
 
 - `POST /api/test/frontdoor` - Test Front Door operations
 - `POST /api/test/dns` - Test DNS zone operations
-- `POST /api/test/googledomains` - Test Google Domains operations
 - `POST /api/test/scenario1` - Safe frontend testing
 - `POST /api/test/scenario3` - Full production testing
 
@@ -834,7 +775,6 @@ dotnet user-secrets list
 - `AMAZON_PRODUCT_SECRET_KEY` - Amazon secret key
 - `AAD_CLIENT_ID` - Azure AD client ID
 - `AAD_TENANT_ID` - Azure AD tenant ID
-- `GOOGLE_CLOUD_PROJECT_ID` - Google Cloud project ID
 
 ### Public Configuration (Remains in local.settings.json)
 
@@ -874,9 +814,8 @@ dotnet user-secrets clear
 2. Azure Cosmos DB account
 3. Azure Front Door profile (for domain management)
 4. Azure DNS zone resource group (for DNS management)
-5. Google Cloud project with Domains API enabled (optional)
-6. Amazon Product Advertising API credentials (optional)
-7. Penguin Random House API credentials (optional)
+5. Amazon Product Advertising API credentials (optional)
+6. Penguin Random House API credentials (optional)
 
 ### Deployment Steps
 

@@ -307,7 +307,11 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Equal(2, invitation.DomainNames.Count);
             Assert.Contains("example.com", invitation.DomainNames);
             Assert.Contains("author-site.com", invitation.DomainNames);
+            Assert.Equal("example.com", invitation.GetPrimaryDomainName());
+
+#pragma warning disable CS0618 // 'DomainName' is obsolete
             Assert.Equal("example.com", invitation.DomainName); // Backward compatibility
+#pragma warning restore CS0618
         }
 
         [Fact]
@@ -319,7 +323,11 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert
             Assert.Single(invitation.DomainNames);
             Assert.Equal("example.com", invitation.DomainNames.First());
+            Assert.Equal("example.com", invitation.GetPrimaryDomainName());
+
+#pragma warning disable CS0618 // 'DomainName' is obsolete
             Assert.Equal("example.com", invitation.DomainName);
+#pragma warning restore CS0618
         }
 
         [Fact]
@@ -508,7 +516,9 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             // Arrange - Simulate old data with only DomainName set
             var invitation = new AuthorInvitation();
+#pragma warning disable CS0618 // 'DomainName' is obsolete
             invitation.DomainName = "oldsite.com";
+#pragma warning restore CS0618
             invitation.EmailAddress = "old@example.com";
             
             // Act - Call migration method (what repository does)

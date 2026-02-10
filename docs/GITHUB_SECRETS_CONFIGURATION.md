@@ -322,14 +322,11 @@ npm run init-secrets -- -ConfigFile secrets.prod.json
 - `AZURE_DNS_RESOURCE_GROUP` - DNS resource group
 - `AZURE_RESOURCE_GROUP_NAME` - Front Door resource group
 - `AZURE_FRONTDOOR_PROFILE_NAME` - Front Door profile
-- `GOOGLE_CLOUD_PROJECT_ID` - Google Cloud project
-- `GOOGLE_DOMAINS_LOCATION` - Domain location
 
 ### Testing (Optional)
 
 - `TESTING_MODE` - Enable testing mode
 - `MOCK_AZURE_INFRASTRUCTURE` - Mock Azure calls
-- `MOCK_GOOGLE_DOMAINS` - Mock Google Domains
 - `MOCK_STRIPE_PAYMENTS` - Mock Stripe
 - `STRIPE_TEST_MODE` - Use Stripe test mode
 - Plus additional testing configuration...
