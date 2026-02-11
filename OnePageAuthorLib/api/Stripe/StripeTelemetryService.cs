@@ -32,7 +32,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        protected virtual void TrackEvent(EventTelemetry telemetry)
+        protected internal virtual void TrackEvent(EventTelemetry telemetry)
         {
             _telemetryClient.TrackEvent(telemetry);
         }
