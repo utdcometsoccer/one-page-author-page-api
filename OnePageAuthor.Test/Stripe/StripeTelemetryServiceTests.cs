@@ -1,5 +1,4 @@
 using InkStainedWretch.OnePageAuthorLib.API.Stripe;
-using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -19,33 +18,44 @@ namespace OnePageAuthor.Test.Stripe
                 _sentItems = sentItems;
             }
 
-            protected override void TrackEvent(EventTelemetry telemetry)
+            protected internal override void TrackEvent(EventTelemetry telemetry)
             {
                 _sentItems.Add(telemetry);
             }
         }
 
-        private static (StripeTelemetryService service, List<EventTelemetry> sentItems) CreateService()
+        private sealed class ServiceHelper : IDisposable
         {
-            var sentItems = new List<EventTelemetry>();
-            var config = new TelemetryConfiguration
+            private readonly TelemetryConfiguration _configuration;
+            public StripeTelemetryService Service { get; }
+            public List<EventTelemetry> SentItems { get; }
+
+            public ServiceHelper()
             {
-                ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000"
-            };
-            var client = new TelemetryClient(config);
-            var service = new TestStripeTelemetryService(client, sentItems);
-            return (service, sentItems);
+                SentItems = new List<EventTelemetry>();
+                _configuration = new TelemetryConfiguration
+                {
+                    ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000"
+                };
+                var client = new TelemetryClient(_configuration);
+                Service = new TestStripeTelemetryService(client, SentItems);
+            }
+
+            public void Dispose()
+            {
+                _configuration?.Dispose();
+            }
         }
 
         [Fact]
         public void TrackCustomerCreated_SendsEventWithCorrectProperties()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackCustomerCreated("cus_123", "test@example.com");
+            helper.Service.TrackCustomerCreated("cus_123", "test@example.com");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeCustomerCreated", eventTelemetry.Name);
             Assert.Equal("cus_123", eventTelemetry.Properties["CustomerId"]);
             Assert.Equal("example.com", eventTelemetry.Properties["EmailDomain"]);
@@ -55,12 +65,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackCustomerCreated_WithoutEmail_DoesNotIncludeEmailDomain()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackCustomerCreated("cus_456", null);
+            helper.Service.TrackCustomerCreated("cus_456", null);
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeCustomerCreated", eventTelemetry.Name);
             Assert.Equal("cus_456", eventTelemetry.Properties["CustomerId"]);
             Assert.False(eventTelemetry.Properties.ContainsKey("EmailDomain"));
@@ -69,12 +79,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackCheckoutSessionCreated_SendsEventWithCorrectProperties()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackCheckoutSessionCreated("cs_test_123", "cus_abc", "price_xyz");
+            helper.Service.TrackCheckoutSessionCreated("cs_test_123", "cus_abc", "price_xyz");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeCheckoutSessionCreated", eventTelemetry.Name);
             Assert.Equal("cs_test_123", eventTelemetry.Properties["CheckoutSessionId"]);
             Assert.Equal("cus_abc", eventTelemetry.Properties["CustomerId"]);
@@ -84,12 +94,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackCheckoutSessionRetrieved_SendsEventWithStatusInfo()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackCheckoutSessionRetrieved("cs_test_456", "cus_def", "complete", "paid");
+            helper.Service.TrackCheckoutSessionRetrieved("cs_test_456", "cus_def", "complete", "paid");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeCheckoutSessionRetrieved", eventTelemetry.Name);
             Assert.Equal("cs_test_456", eventTelemetry.Properties["CheckoutSessionId"]);
             Assert.Equal("cus_def", eventTelemetry.Properties["CustomerId"]);
@@ -100,12 +110,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackSubscriptionCreated_SendsEventWithCorrectProperties()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackSubscriptionCreated("sub_123", "cus_abc", "price_xyz");
+            helper.Service.TrackSubscriptionCreated("sub_123", "cus_abc", "price_xyz");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeSubscriptionCreated", eventTelemetry.Name);
             Assert.Equal("sub_123", eventTelemetry.Properties["SubscriptionId"]);
             Assert.Equal("cus_abc", eventTelemetry.Properties["CustomerId"]);
@@ -115,12 +125,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackSubscriptionCancelled_SendsEventWithCorrectProperties()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackSubscriptionCancelled("sub_456", "cus_def");
+            helper.Service.TrackSubscriptionCancelled("sub_456", "cus_def");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeSubscriptionCancelled", eventTelemetry.Name);
             Assert.Equal("sub_456", eventTelemetry.Properties["SubscriptionId"]);
             Assert.Equal("cus_def", eventTelemetry.Properties["CustomerId"]);
@@ -129,12 +139,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackSubscriptionUpdated_SendsEventWithCorrectProperties()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackSubscriptionUpdated("sub_789", "cus_ghi", "price_new");
+            helper.Service.TrackSubscriptionUpdated("sub_789", "cus_ghi", "price_new");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeSubscriptionUpdated", eventTelemetry.Name);
             Assert.Equal("sub_789", eventTelemetry.Properties["SubscriptionId"]);
             Assert.Equal("cus_ghi", eventTelemetry.Properties["CustomerId"]);
@@ -144,12 +154,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackSubscriptionsListed_SendsEventWithCountMetric()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackSubscriptionsListed("cus_list", 5);
+            helper.Service.TrackSubscriptionsListed("cus_list", 5);
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeSubscriptionsListed", eventTelemetry.Name);
             Assert.Equal("cus_list", eventTelemetry.Properties["CustomerId"]);
             Assert.Equal("5", eventTelemetry.Properties["SubscriptionCount"]);
@@ -158,9 +168,9 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackWebhookEvent_SendsEventWithAllProperties()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackWebhookEvent(
+            helper.Service.TrackWebhookEvent(
                 eventType: "invoice.paid",
                 objectId: "in_123",
                 customerId: "cus_abc",
@@ -169,8 +179,8 @@ namespace OnePageAuthor.Test.Stripe
                 paymentIntentId: "pi_456",
                 priceId: "price_789");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeWebhookEvent", eventTelemetry.Name);
             Assert.Equal("invoice.paid", eventTelemetry.Properties["EventType"]);
             Assert.Equal("in_123", eventTelemetry.Properties["ObjectId"]);
@@ -184,14 +194,14 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackWebhookEvent_WithNullOptionalParameters_DoesNotIncludeThem()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackWebhookEvent(
+            helper.Service.TrackWebhookEvent(
                 eventType: "customer.created",
                 objectId: "cus_new");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeWebhookEvent", eventTelemetry.Name);
             Assert.Equal("customer.created", eventTelemetry.Properties["EventType"]);
             Assert.Equal("cus_new", eventTelemetry.Properties["ObjectId"]);
@@ -205,12 +215,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackInvoicePreview_SendsEventWithCorrectProperties()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackInvoicePreview("cus_preview", "sub_123", "price_new");
+            helper.Service.TrackInvoicePreview("cus_preview", "sub_123", "price_new");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeInvoicePreview", eventTelemetry.Name);
             Assert.Equal("cus_preview", eventTelemetry.Properties["CustomerId"]);
             Assert.Equal("sub_123", eventTelemetry.Properties["SubscriptionId"]);
@@ -220,12 +230,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackStripeError_SendsEventWithErrorDetails()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackStripeError("CreateSubscription", "card_declined", "card_error", "cus_error");
+            helper.Service.TrackStripeError("CreateSubscription", "card_declined", "card_error", "cus_error");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeApiError", eventTelemetry.Name);
             Assert.Equal("CreateSubscription", eventTelemetry.Properties["Operation"]);
             Assert.Equal("card_declined", eventTelemetry.Properties["ErrorCode"]);
@@ -236,12 +246,12 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void TrackStripeError_WithNullOptionalParameters_DoesNotIncludeThem()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackStripeError("UnknownOperation");
+            helper.Service.TrackStripeError("UnknownOperation");
 
-            Assert.Single(sentItems);
-            var eventTelemetry = sentItems[0];
+            Assert.Single(helper.SentItems);
+            var eventTelemetry = helper.SentItems[0];
             Assert.Equal("StripeApiError", eventTelemetry.Name);
             Assert.Equal("UnknownOperation", eventTelemetry.Properties["Operation"]);
             Assert.False(eventTelemetry.Properties.ContainsKey("ErrorCode"));
@@ -252,16 +262,16 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void AllEvents_IncludeTimestamp()
         {
-            var (service, sentItems) = CreateService();
+            using var helper = new ServiceHelper();
 
-            service.TrackCustomerCreated("cus_ts");
-            service.TrackCheckoutSessionCreated("cs_ts", "cus_ts");
-            service.TrackSubscriptionCreated("sub_ts", "cus_ts");
-            service.TrackWebhookEvent("test.event", "obj_ts");
-            service.TrackStripeError("TestOp");
+            helper.Service.TrackCustomerCreated("cus_ts");
+            helper.Service.TrackCheckoutSessionCreated("cs_ts", "cus_ts");
+            helper.Service.TrackSubscriptionCreated("sub_ts", "cus_ts");
+            helper.Service.TrackWebhookEvent("test.event", "obj_ts");
+            helper.Service.TrackStripeError("TestOp");
 
-            Assert.Equal(5, sentItems.Count);
-            foreach (var eventTelemetry in sentItems)
+            Assert.Equal(5, helper.SentItems.Count);
+            foreach (var eventTelemetry in helper.SentItems)
             {
                 Assert.True(eventTelemetry.Properties.ContainsKey("Timestamp"));
                 // Verify timestamp is in ISO 8601 format
@@ -279,13 +289,21 @@ namespace OnePageAuthor.Test.Stripe
         [Fact]
         public void Constructor_ThrowsOnNullLogger()
         {
-            var client = new TelemetryClient(new TelemetryConfiguration
+            var configuration = new TelemetryConfiguration
             {
                 ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000"
-            });
+            };
+            var client = new TelemetryClient(configuration);
 
-            Assert.Throws<ArgumentNullException>(() =>
-                new StripeTelemetryService(client, null!));
+            try
+            {
+                Assert.Throws<ArgumentNullException>(() =>
+                    new StripeTelemetryService(client, null!));
+            }
+            finally
+            {
+                configuration?.Dispose();
+            }
         }
     }
 }
