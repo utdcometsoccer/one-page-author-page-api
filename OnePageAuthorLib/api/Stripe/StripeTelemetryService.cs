@@ -32,6 +32,11 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        protected internal virtual void TrackEvent(EventTelemetry telemetry)
+        {
+            _telemetryClient.TrackEvent(telemetry);
+        }
+
         public void TrackCustomerCreated(string customerId, string? email = null)
         {
             var telemetry = new EventTelemetry(CustomerCreatedEvent);
@@ -44,7 +49,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            _telemetryClient.TrackEvent(telemetry);
+            TrackEvent(telemetry);
             _logger.LogDebug("Tracked {EventName} for customer {CustomerId}", CustomerCreatedEvent, customerId);
         }
 
@@ -59,7 +64,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            _telemetryClient.TrackEvent(telemetry);
+            TrackEvent(telemetry);
             _logger.LogDebug("Tracked {EventName} for checkout {CheckoutSessionId}", CheckoutSessionCreatedEvent, checkoutSessionId);
         }
 
@@ -78,7 +83,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            _telemetryClient.TrackEvent(telemetry);
+            TrackEvent(telemetry);
             _logger.LogDebug("Tracked {EventName} for checkout {CheckoutSessionId} with status {Status}", 
                 CheckoutSessionRetrievedEvent, checkoutSessionId, status);
         }
@@ -94,7 +99,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            _telemetryClient.TrackEvent(telemetry);
+            TrackEvent(telemetry);
             _logger.LogDebug("Tracked {EventName} for subscription {SubscriptionId}", SubscriptionCreatedEvent, subscriptionId);
         }
 
@@ -108,7 +113,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            _telemetryClient.TrackEvent(telemetry);
+            TrackEvent(telemetry);
             _logger.LogDebug("Tracked {EventName} for subscription {SubscriptionId}", SubscriptionCancelledEvent, subscriptionId);
         }
 
@@ -126,7 +131,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            _telemetryClient.TrackEvent(telemetry);
+            TrackEvent(telemetry);
             _logger.LogDebug("Tracked {EventName} for subscription {SubscriptionId}", SubscriptionUpdatedEvent, subscriptionId);
         }
 
@@ -137,7 +142,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             telemetry.Properties["SubscriptionCount"] = count.ToString();
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            _telemetryClient.TrackEvent(telemetry);
+            TrackEvent(telemetry);
             _logger.LogDebug("Tracked {EventName} for customer {CustomerId} with {Count} subscriptions", 
                 SubscriptionsListedEvent, customerId, count);
         }
@@ -177,7 +182,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            _telemetryClient.TrackEvent(telemetry);
+            TrackEvent(telemetry);
             _logger.LogDebug("Tracked {EventName} of type {EventType} for object {ObjectId}", 
                 WebhookEventReceived, eventType, objectId);
         }
@@ -196,7 +201,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            _telemetryClient.TrackEvent(telemetry);
+            TrackEvent(telemetry);
             _logger.LogDebug("Tracked {EventName} for customer {CustomerId}", InvoicePreviewEvent, customerId);
         }
 
@@ -218,7 +223,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
             telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            _telemetryClient.TrackEvent(telemetry);
+            TrackEvent(telemetry);
             _logger.LogDebug("Tracked {EventName} for operation {Operation} with code {ErrorCode}", 
                 StripeErrorEvent, operation, errorCode);
         }
