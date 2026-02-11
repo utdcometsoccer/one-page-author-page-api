@@ -7,9 +7,36 @@
 
 A comprehensive .NET 10 platform providing APIs and utilities for author management, content publishing, and subscription services. Built with Azure Functions (isolated worker), Azure Cosmos DB for persistence, Stripe for billing, and Microsoft Entra ID for authentication.
 
+## 🚀 North America Launch Status
+
+**Platform Readiness:** 95% ✅ | **Target Launch:** Q1 2026 | **Time to Launch:** 1-2 weeks
+
+The OnePageAuthor API platform is ready for North America launch and first customer sale. Core features are production-ready, with domain registration workflow requiring final validation testing.
+
+### Launch Documentation (NEW - 2026-02-11)
+
+- **[Launch Documentation Index](docs/LAUNCH_INDEX.md)** 📋 - Navigation guide to all launch docs
+- **[Executive Summary](docs/NORTH_AMERICA_LAUNCH_EXECUTIVE_SUMMARY.md)** 🎯 - Decision brief for leadership
+- **[Launch Readiness Plan](docs/LAUNCH_READINESS_PLAN.md)** 📊 - Comprehensive preparation guide
+- **[Minimum Viable Launch](docs/MINIMUM_VIABLE_LAUNCH.md)** ✅ - Critical path checklist
+
+### Ready for Launch ✅
+- Payment processing via Stripe (subscriptions, checkout, webhooks)
+- Authentication via Microsoft Entra ID (JWT, validated Dec 2025)
+- Author profile and content management (full CRUD)
+- Image storage with tiered quotas (5GB to 2TB)
+- Multi-language support (EN, ES, FR for North America)
+
+### Final Validation Required ⚠️
+- Domain registration E2E testing with real domains
+- Azure DNS zone creation validation
+- Azure Front Door integration testing
+
+**See [TODO: Human Intervention](docs/TODO_HUMAN_INTERVENTION.md) for launch blocker details.**
+
 ## 📋 Product Roadmap
 
-For strategic planning, feature roadmap, technical debt tracking, and release planning, see the **[Product Roadmap](PRODUCT_ROADMAP.md)**.
+For strategic planning, feature roadmap, technical debt tracking, and release planning, see the **[Product Roadmap](docs/PRODUCT_ROADMAP.md)**.
 
 ## 🚀 Platform Overview
 
