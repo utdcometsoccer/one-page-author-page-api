@@ -47,6 +47,7 @@ Documentation for local development and configuration:
 - [**LOCAL_SETTINGS_SETUP**](LOCAL_SETTINGS_SETUP.md) - Local development configuration
 - [**ConfigurationValidation**](ConfigurationValidation.md) - Configuration validation patterns
 - [**ConfigurationMaskingStandardization**](ConfigurationMaskingStandardization.md) - Sensitive data masking
+- [**ITELEMETRYINITIALIZER_BUG**](ITELEMETRYINITIALIZER_BUG.md) - Application Insights version mismatch fix
 - [**AZURE_STORAGE_EMULATOR_SETUP**](AZURE_STORAGE_EMULATOR_SETUP.md) - Storage emulator configuration
 - [**AZURE_COMMUNICATION_SERVICES_SETUP**](AZURE_COMMUNICATION_SERVICES_SETUP.md) - Email services setup
 - [**DOTNET_10_UPGRADE**](DOTNET_10_UPGRADE.md) - .NET 10 upgrade guide
@@ -61,6 +62,10 @@ Complete deployment workflow documentation:
 - [**COSMOS_APPINSIGHTS_DEPLOYMENT**](COSMOS_APPINSIGHTS_DEPLOYMENT.md) - Monitoring deployment
 - [**QUICKSTART_COSMOS_APPINSIGHTS**](QUICKSTART_COSMOS_APPINSIGHTS.md) - Quick start for monitoring
 - [**GITHUB_ACTIONS_UPDATE**](GITHUB_ACTIONS_UPDATE.md) - CI/CD pipeline updates
+
+### 📈 Monitoring & Telemetry
+
+- [**APPLICATION_INSIGHTS_UPGRADE_MIGRATION_PLAN**](APPLICATION_INSIGHTS_UPGRADE_MIGRATION_PLAN.md) - Plan to move to latest App Insights approach
 
 ### 📖 API Documentation
 
