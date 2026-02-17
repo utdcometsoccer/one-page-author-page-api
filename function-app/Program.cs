@@ -1,5 +1,6 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using InkStainedWretch.OnePageAuthorAPI;
@@ -7,6 +8,23 @@ using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 
 var builder = FunctionsApplication.CreateBuilder(args);
+
+static bool IsDevelopmentEnvironment()
+{
+    var environmentName =
+        Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") ??
+        Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ??
+        Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+    return string.Equals(environmentName, "Development", StringComparison.OrdinalIgnoreCase);
+}
+
+if (IsDevelopmentEnvironment())
+{
+    // Ensure local dev can source settings from `dotnet user-secrets`.
+    // `UserSecretsId` is defined in the project file.
+    builder.Configuration.AddUserSecrets(typeof(Program).Assembly, optional: true);
+}
 
 builder.ConfigureFunctionsWebApplication();
 
@@ -60,6 +78,13 @@ builder.Services
     // (ActivitySource, ILogger, Meter) and remove TelemetryClient/ApplicationInsights usage.
     .AddOpenTelemetry()
     .UseFunctionsWorkerDefaults()
-    .UseAzureMonitorExporter();
+    .UseAzureMonitorExporter(options =>
+    {
+        var connectionString = config["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+        if (!string.IsNullOrWhiteSpace(connectionString))
+        {
+            options.ConnectionString = connectionString;
+        }
+    });
 
 builder.Build().Run();

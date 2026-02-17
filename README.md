@@ -147,8 +147,11 @@ npm run init-secrets -- -ConfigFile secrets.json
 | `STRIPE_API_KEY` | Stripe secret API key | ✅ Yes | [Stripe Dashboard](https://dashboard.stripe.com) → Developers → API Keys → Secret key |
 | `AAD_TENANT_ID` | Microsoft Entra ID tenant GUID | ✅ Yes | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
 | `AAD_AUDIENCE` | API application/client ID | ✅ Yes | Azure Portal → Microsoft Entra ID → App Registrations → Your App → Application (client) ID |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Application Insights connection string for telemetry (OpenTelemetry Azure Monitor exporter) | Optional | Azure Portal → Application Insights → Overview → Connection String |
 | `AAD_VALID_ISSUERS` | Comma-separated v2.0 issuer URLs (multi-issuer JWT support) | Optional | For Entra External ID/CIAM, use issuers like `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/` (and other policies as needed); for standard Entra ID tenants you can also include `https://login.microsoftonline.com/{tenant}/v2.0` |
 | `STRIPE_WEBHOOK_SECRET` | Webhook endpoint secret for verification | For webhooks | [Stripe Dashboard](https://dashboard.stripe.com) → Developers → Webhooks → Select endpoint → Signing secret |
+
+**Note (CI/CD overrides):** The GitHub Actions workflow supports per-app overrides via GitHub secrets `APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP` (for `function-app`) and `APPLICATIONINSIGHTS_CONNECTION_STRING_ISW` (for `ImageAPI`, `InkStainedWretchFunctions`, `InkStainedWretchStripe`, `InkStainedWretchesConfig`). If not set, it falls back to `APPLICATIONINSIGHTS_CONNECTION_STRING`.
 
 ### Why These Settings Are Needed
 

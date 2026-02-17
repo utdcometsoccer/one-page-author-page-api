@@ -1,6 +1,4 @@
 using InkStainedWretch.OnePageAuthorLib.Interfaces.Stripe;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 
 namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
@@ -11,7 +9,6 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
     /// </summary>
     public class StripeTelemetryService : IStripeTelemetryService
     {
-        private readonly TelemetryClient _telemetryClient;
         private readonly ILogger<StripeTelemetryService> _logger;
 
         // Event name constants for consistent event naming
@@ -26,125 +23,146 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         private const string InvoicePreviewEvent = "StripeInvoicePreview";
         private const string StripeErrorEvent = "StripeApiError";
 
-        public StripeTelemetryService(TelemetryClient telemetryClient, ILogger<StripeTelemetryService> logger)
+        public StripeTelemetryService(ILogger<StripeTelemetryService> logger)
         {
-            _telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        protected internal virtual void TrackEvent(EventTelemetry telemetry)
+        protected internal virtual void TrackEvent(string eventName, IReadOnlyDictionary<string, object?> properties)
         {
-            _telemetryClient.TrackEvent(telemetry);
+            using (_logger.BeginScope(properties))
+            {
+                _logger.LogInformation("TelemetryEvent {EventName}", eventName);
+            }
         }
 
         public void TrackCustomerCreated(string customerId, string? email = null)
         {
-            var telemetry = new EventTelemetry(CustomerCreatedEvent);
-            telemetry.Properties["CustomerId"] = customerId ?? string.Empty;
+            var properties = new Dictionary<string, object?>
+            {
+                ["EventName"] = CustomerCreatedEvent,
+                ["CustomerId"] = customerId ?? string.Empty,
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
+
             if (!string.IsNullOrEmpty(email))
             {
-                // Only store domain for privacy
                 var domain = email.Contains('@') ? email.Split('@')[1] : "unknown";
-                telemetry.Properties["EmailDomain"] = domain;
+                properties["EmailDomain"] = domain;
             }
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            TrackEvent(telemetry);
-            _logger.LogDebug("Tracked {EventName} for customer {CustomerId}", CustomerCreatedEvent, customerId);
+            TrackEvent(CustomerCreatedEvent, properties);
         }
 
         public void TrackCheckoutSessionCreated(string checkoutSessionId, string customerId, string? priceId = null)
         {
-            var telemetry = new EventTelemetry(CheckoutSessionCreatedEvent);
-            telemetry.Properties["CheckoutSessionId"] = checkoutSessionId ?? string.Empty;
-            telemetry.Properties["CustomerId"] = customerId ?? string.Empty;
+            var properties = new Dictionary<string, object?>
+            {
+                ["EventName"] = CheckoutSessionCreatedEvent,
+                ["CheckoutSessionId"] = checkoutSessionId ?? string.Empty,
+                ["CustomerId"] = customerId ?? string.Empty,
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
+
             if (!string.IsNullOrEmpty(priceId))
             {
-                telemetry.Properties["PriceId"] = priceId;
+                properties["PriceId"] = priceId;
             }
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            TrackEvent(telemetry);
-            _logger.LogDebug("Tracked {EventName} for checkout {CheckoutSessionId}", CheckoutSessionCreatedEvent, checkoutSessionId);
+            TrackEvent(CheckoutSessionCreatedEvent, properties);
         }
 
         public void TrackCheckoutSessionRetrieved(string checkoutSessionId, string customerId, string? status = null, string? paymentStatus = null)
         {
-            var telemetry = new EventTelemetry(CheckoutSessionRetrievedEvent);
-            telemetry.Properties["CheckoutSessionId"] = checkoutSessionId ?? string.Empty;
-            telemetry.Properties["CustomerId"] = customerId ?? string.Empty;
+            var properties = new Dictionary<string, object?>
+            {
+                ["EventName"] = CheckoutSessionRetrievedEvent,
+                ["CheckoutSessionId"] = checkoutSessionId ?? string.Empty,
+                ["CustomerId"] = customerId ?? string.Empty,
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
+
             if (!string.IsNullOrEmpty(status))
             {
-                telemetry.Properties["Status"] = status;
+                properties["Status"] = status;
             }
+
             if (!string.IsNullOrEmpty(paymentStatus))
             {
-                telemetry.Properties["PaymentStatus"] = paymentStatus;
+                properties["PaymentStatus"] = paymentStatus;
             }
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            TrackEvent(telemetry);
-            _logger.LogDebug("Tracked {EventName} for checkout {CheckoutSessionId} with status {Status}", 
-                CheckoutSessionRetrievedEvent, checkoutSessionId, status);
+            TrackEvent(CheckoutSessionRetrievedEvent, properties);
         }
 
         public void TrackSubscriptionCreated(string subscriptionId, string customerId, string? priceId = null)
         {
-            var telemetry = new EventTelemetry(SubscriptionCreatedEvent);
-            telemetry.Properties["SubscriptionId"] = subscriptionId ?? string.Empty;
-            telemetry.Properties["CustomerId"] = customerId ?? string.Empty;
+            var properties = new Dictionary<string, object?>
+            {
+                ["EventName"] = SubscriptionCreatedEvent,
+                ["SubscriptionId"] = subscriptionId ?? string.Empty,
+                ["CustomerId"] = customerId ?? string.Empty,
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
+
             if (!string.IsNullOrEmpty(priceId))
             {
-                telemetry.Properties["PriceId"] = priceId;
+                properties["PriceId"] = priceId;
             }
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            TrackEvent(telemetry);
-            _logger.LogDebug("Tracked {EventName} for subscription {SubscriptionId}", SubscriptionCreatedEvent, subscriptionId);
+            TrackEvent(SubscriptionCreatedEvent, properties);
         }
 
         public void TrackSubscriptionCancelled(string subscriptionId, string? customerId = null)
         {
-            var telemetry = new EventTelemetry(SubscriptionCancelledEvent);
-            telemetry.Properties["SubscriptionId"] = subscriptionId ?? string.Empty;
+            var properties = new Dictionary<string, object?>
+            {
+                ["EventName"] = SubscriptionCancelledEvent,
+                ["SubscriptionId"] = subscriptionId ?? string.Empty,
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
+
             if (!string.IsNullOrEmpty(customerId))
             {
-                telemetry.Properties["CustomerId"] = customerId;
+                properties["CustomerId"] = customerId;
             }
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            TrackEvent(telemetry);
-            _logger.LogDebug("Tracked {EventName} for subscription {SubscriptionId}", SubscriptionCancelledEvent, subscriptionId);
+            TrackEvent(SubscriptionCancelledEvent, properties);
         }
 
         public void TrackSubscriptionUpdated(string subscriptionId, string? customerId = null, string? newPriceId = null)
         {
-            var telemetry = new EventTelemetry(SubscriptionUpdatedEvent);
-            telemetry.Properties["SubscriptionId"] = subscriptionId ?? string.Empty;
+            var properties = new Dictionary<string, object?>
+            {
+                ["EventName"] = SubscriptionUpdatedEvent,
+                ["SubscriptionId"] = subscriptionId ?? string.Empty,
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
+
             if (!string.IsNullOrEmpty(customerId))
             {
-                telemetry.Properties["CustomerId"] = customerId;
+                properties["CustomerId"] = customerId;
             }
+
             if (!string.IsNullOrEmpty(newPriceId))
             {
-                telemetry.Properties["NewPriceId"] = newPriceId;
+                properties["NewPriceId"] = newPriceId;
             }
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            TrackEvent(telemetry);
-            _logger.LogDebug("Tracked {EventName} for subscription {SubscriptionId}", SubscriptionUpdatedEvent, subscriptionId);
+            TrackEvent(SubscriptionUpdatedEvent, properties);
         }
 
         public void TrackSubscriptionsListed(string customerId, int count)
         {
-            var telemetry = new EventTelemetry(SubscriptionsListedEvent);
-            telemetry.Properties["CustomerId"] = customerId ?? string.Empty;
-            telemetry.Properties["SubscriptionCount"] = count.ToString();
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
+            var properties = new Dictionary<string, object?>
+            {
+                ["EventName"] = SubscriptionsListedEvent,
+                ["CustomerId"] = customerId ?? string.Empty,
+                ["SubscriptionCount"] = count.ToString(),
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
 
-            TrackEvent(telemetry);
-            _logger.LogDebug("Tracked {EventName} for customer {CustomerId} with {Count} subscriptions", 
-                SubscriptionsListedEvent, customerId, count);
+            TrackEvent(SubscriptionsListedEvent, properties);
         }
 
         public void TrackWebhookEvent(
@@ -156,76 +174,89 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             string? paymentIntentId = null,
             string? priceId = null)
         {
-            var telemetry = new EventTelemetry(WebhookEventReceived);
-            telemetry.Properties["EventType"] = eventType ?? string.Empty;
-            telemetry.Properties["ObjectId"] = objectId ?? string.Empty;
-            
+            var properties = new Dictionary<string, object?>
+            {
+                ["EventName"] = WebhookEventReceived,
+                ["EventType"] = eventType ?? string.Empty,
+                ["ObjectId"] = objectId ?? string.Empty,
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
+
             if (!string.IsNullOrEmpty(customerId))
             {
-                telemetry.Properties["CustomerId"] = customerId;
+                properties["CustomerId"] = customerId;
             }
+
             if (!string.IsNullOrEmpty(subscriptionId))
             {
-                telemetry.Properties["SubscriptionId"] = subscriptionId;
+                properties["SubscriptionId"] = subscriptionId;
             }
+
             if (!string.IsNullOrEmpty(invoiceId))
             {
-                telemetry.Properties["InvoiceId"] = invoiceId;
+                properties["InvoiceId"] = invoiceId;
             }
+
             if (!string.IsNullOrEmpty(paymentIntentId))
             {
-                telemetry.Properties["PaymentIntentId"] = paymentIntentId;
+                properties["PaymentIntentId"] = paymentIntentId;
             }
+
             if (!string.IsNullOrEmpty(priceId))
             {
-                telemetry.Properties["PriceId"] = priceId;
+                properties["PriceId"] = priceId;
             }
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            TrackEvent(telemetry);
-            _logger.LogDebug("Tracked {EventName} of type {EventType} for object {ObjectId}", 
-                WebhookEventReceived, eventType, objectId);
+            TrackEvent(WebhookEventReceived, properties);
         }
 
         public void TrackInvoicePreview(string customerId, string? subscriptionId = null, string? newPriceId = null)
         {
-            var telemetry = new EventTelemetry(InvoicePreviewEvent);
-            telemetry.Properties["CustomerId"] = customerId ?? string.Empty;
+            var properties = new Dictionary<string, object?>
+            {
+                ["EventName"] = InvoicePreviewEvent,
+                ["CustomerId"] = customerId ?? string.Empty,
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
+
             if (!string.IsNullOrEmpty(subscriptionId))
             {
-                telemetry.Properties["SubscriptionId"] = subscriptionId;
+                properties["SubscriptionId"] = subscriptionId;
             }
+
             if (!string.IsNullOrEmpty(newPriceId))
             {
-                telemetry.Properties["NewPriceId"] = newPriceId;
+                properties["NewPriceId"] = newPriceId;
             }
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            TrackEvent(telemetry);
-            _logger.LogDebug("Tracked {EventName} for customer {CustomerId}", InvoicePreviewEvent, customerId);
+            TrackEvent(InvoicePreviewEvent, properties);
         }
 
         public void TrackStripeError(string operation, string? errorCode = null, string? errorType = null, string? customerId = null)
         {
-            var telemetry = new EventTelemetry(StripeErrorEvent);
-            telemetry.Properties["Operation"] = operation ?? string.Empty;
+            var properties = new Dictionary<string, object?>
+            {
+                ["EventName"] = StripeErrorEvent,
+                ["Operation"] = operation ?? string.Empty,
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
+
             if (!string.IsNullOrEmpty(errorCode))
             {
-                telemetry.Properties["ErrorCode"] = errorCode;
+                properties["ErrorCode"] = errorCode;
             }
+
             if (!string.IsNullOrEmpty(errorType))
             {
-                telemetry.Properties["ErrorType"] = errorType;
+                properties["ErrorType"] = errorType;
             }
+
             if (!string.IsNullOrEmpty(customerId))
             {
-                telemetry.Properties["CustomerId"] = customerId;
+                properties["CustomerId"] = customerId;
             }
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
 
-            TrackEvent(telemetry);
-            _logger.LogDebug("Tracked {EventName} for operation {Operation} with code {ErrorCode}", 
-                StripeErrorEvent, operation, errorCode);
+            TrackEvent(StripeErrorEvent, properties);
         }
     }
 }

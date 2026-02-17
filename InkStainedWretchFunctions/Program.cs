@@ -186,7 +186,8 @@ if (!string.IsNullOrWhiteSpace(emailConnectionString))
 }
 
 // OpenTelemetry -> Azure Monitor (Application Insights backend)
-services.AddOpenTelemetry()
+services
+    .AddOpenTelemetry()
     .UseFunctionsWorkerDefaults()
     .UseAzureMonitorExporter();
 

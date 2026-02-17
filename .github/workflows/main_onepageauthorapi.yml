@@ -360,6 +360,33 @@ jobs:
             --src '${{ env.FUNCTION_APP_PATH }}/functionapp.zip'
           echo "✓ function-app deployed successfully"
 
+      - name: 'Set function-app Application Insights connection string'
+        continue-on-error: true
+        shell: bash
+        env:
+          FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
+          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP }}
+        run: |
+          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+
+          # Validate required secrets are available
+          if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ] || [ -z "$AI_CONN" ]; then
+            echo "⚠️ Skipping app setting update for function-app (missing required values)"
+            echo "   Required: AZURE_FUNCTIONAPP_NAME, AZURE_RESOURCE_GROUP, APPLICATIONINSIGHTS_CONNECTION_STRING(_FUNCTION_APP)"
+            exit 0
+          fi
+
+          echo "🔧 Setting APPLICATIONINSIGHTS_CONNECTION_STRING on function-app..."
+          az functionapp config appsettings set \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --settings "APPLICATIONINSIGHTS_CONNECTION_STRING=$AI_CONN" \
+            --only-show-errors \
+            --output none
+          echo "✓ App setting applied to function-app"
+
       # =========================================
       # Register Azure Communication Services Provider (if needed)
       # =========================================
@@ -600,6 +627,8 @@ jobs:
           ISW_RESOURCE_GROUP: ${{ secrets.ISW_RESOURCE_GROUP }}
           ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
           DEPLOY_IMAGE_API: ${{ secrets.DEPLOY_IMAGE_API }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING_ISW: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
         run: |
           # Skip if ImageAPI deployment is not enabled
           if [ "$DEPLOY_IMAGE_API" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -618,6 +647,20 @@ jobs:
             --resource-group "$ISW_RESOURCE_GROUP" \
             --src '${{ env.IMAGE_API_PATH }}/imageapi.zip'
 
+          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_ISW:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+          if [ -n "$AI_CONN" ]; then
+            echo "🔧 Setting APPLICATIONINSIGHTS_CONNECTION_STRING on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "APPLICATIONINSIGHTS_CONNECTION_STRING=$AI_CONN" \
+              --only-show-errors \
+              --output none
+            echo "✓ App setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ APPLICATIONINSIGHTS_CONNECTION_STRING not configured; skipping app setting update"
+          fi
+
           echo "✓ ImageAPI deployed successfully"
 
       # =========================================
@@ -631,6 +674,8 @@ jobs:
           ISW_RESOURCE_GROUP: ${{ secrets.ISW_RESOURCE_GROUP }}
           ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
           DEPLOY_ISW_FUNCTIONS: ${{ secrets.DEPLOY_ISW_FUNCTIONS }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING_ISW: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
         run: |
           # Skip if InkStainedWretchFunctions deployment is not enabled
           if [ "$DEPLOY_ISW_FUNCTIONS" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -649,6 +694,20 @@ jobs:
             --resource-group "$ISW_RESOURCE_GROUP" \
             --src '${{ env.INK_STAINED_WRETCH_FUNCTIONS_PATH }}/inkstainedwretchfunctions.zip'
 
+          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_ISW:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+          if [ -n "$AI_CONN" ]; then
+            echo "🔧 Setting APPLICATIONINSIGHTS_CONNECTION_STRING on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "APPLICATIONINSIGHTS_CONNECTION_STRING=$AI_CONN" \
+              --only-show-errors \
+              --output none
+            echo "✓ App setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ APPLICATIONINSIGHTS_CONNECTION_STRING not configured; skipping app setting update"
+          fi
+
           echo "✓ InkStainedWretchFunctions deployed successfully"
 
       # =========================================
@@ -662,6 +721,8 @@ jobs:
           ISW_RESOURCE_GROUP: ${{ secrets.ISW_RESOURCE_GROUP }}
           ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
           DEPLOY_ISW_STRIPE: ${{ secrets.DEPLOY_ISW_STRIPE }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING_ISW: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
         run: |
           # Skip if InkStainedWretchStripe deployment is not enabled
           if [ "$DEPLOY_ISW_STRIPE" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -680,6 +741,20 @@ jobs:
             --resource-group "$ISW_RESOURCE_GROUP" \
             --src '${{ env.INK_STAINED_WRETCH_STRIPE_PATH }}/inkstainedwretchstripe.zip'
 
+          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_ISW:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+          if [ -n "$AI_CONN" ]; then
+            echo "🔧 Setting APPLICATIONINSIGHTS_CONNECTION_STRING on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "APPLICATIONINSIGHTS_CONNECTION_STRING=$AI_CONN" \
+              --only-show-errors \
+              --output none
+            echo "✓ App setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ APPLICATIONINSIGHTS_CONNECTION_STRING not configured; skipping app setting update"
+          fi
+
           echo "✓ InkStainedWretchStripe deployed successfully"
 
       # =========================================
@@ -693,6 +768,8 @@ jobs:
           ISW_RESOURCE_GROUP: ${{ secrets.ISW_RESOURCE_GROUP }}
           ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
           DEPLOY_ISW_CONFIG: ${{ secrets.DEPLOY_ISW_CONFIG }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING_ISW: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
         run: |
           # Skip if InkStainedWretchesConfig deployment is not enabled
           if [ "$DEPLOY_ISW_CONFIG" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -710,5 +787,19 @@ jobs:
             --name "$FUNCTION_APP_NAME" \
             --resource-group "$ISW_RESOURCE_GROUP" \
             --src '${{ env.INK_STAINED_WRETCHES_CONFIG_PATH }}/inkstainedwretchesconfig.zip'
+
+          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_ISW:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+          if [ -n "$AI_CONN" ]; then
+            echo "🔧 Setting APPLICATIONINSIGHTS_CONNECTION_STRING on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "APPLICATIONINSIGHTS_CONNECTION_STRING=$AI_CONN" \
+              --only-show-errors \
+              --output none
+            echo "✓ App setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ APPLICATIONINSIGHTS_CONNECTION_STRING not configured; skipping app setting update"
+          fi
 
           echo "✓ InkStainedWretchesConfig deployed successfully"

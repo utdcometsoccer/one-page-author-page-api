@@ -14,6 +14,13 @@ using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
+// Add User Secrets support for development
+// This allows secrets to be stored securely outside of source code
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
 // Get configuration (includes User Secrets in development)
 var config = builder.Configuration;
 
@@ -133,7 +140,6 @@ builder.Services
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
     .AddUserIdentityServices()
     .AddUserProfileServices()
-    
     // OpenTelemetry -> Azure Monitor (Application Insights backend)
     .AddOpenTelemetry()
     .UseFunctionsWorkerDefaults()
@@ -151,3 +157,6 @@ builder.Services.AddSingleton(sp =>
 });
 
 builder.Build().Run();
+
+// Program class needed for User Secrets generic type parameter
+public partial class Program { }

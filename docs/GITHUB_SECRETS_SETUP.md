@@ -160,6 +160,18 @@ STRIPE_API_KEY=sk_test_your_key_here
 - `KEY_VAULT_URL` - Azure Key Vault URL
 - `USE_KEY_VAULT` - Feature flag to enable Key Vault (true/false)
 
+### Optional - Observability (Application Insights)
+
+All Azure Functions hosts export telemetry via OpenTelemetry using the Azure Monitor exporter, which requires an Application Insights connection string.
+
+You can configure either a single connection string for all apps or provide per-app overrides:
+
+- `APPLICATIONINSIGHTS_CONNECTION_STRING` - Generic fallback (works for all apps)
+- `APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP` - Override for the standalone `function-app`
+- `APPLICATIONINSIGHTS_CONNECTION_STRING_ISW` - Override for the Ink Stained Wretches Function Apps (`ImageAPI`, `InkStainedWretchFunctions`, `InkStainedWretchStripe`, `InkStainedWretchesConfig`)
+
+**Precedence:** `*_FUNCTION_APP`/`*_ISW` override → generic fallback.
+
 ### Optional - Referral Program
 
 - `REFERRAL_BASE_URL` - Base URL for generating referral links

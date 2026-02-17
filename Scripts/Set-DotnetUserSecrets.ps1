@@ -257,6 +257,19 @@ function Get-RelevantSecretsForProject {
         "ENTRA_POLICY",
         "OPEN_ID_CONNECT_METADATA_URL"
     )
+
+    # Resolve Application Insights connection string per project (optional overrides).
+    $aiConnectionString = $AllSecrets["APPLICATIONINSIGHTS_CONNECTION_STRING"]
+    if ($ProjectName -eq "function-app") {
+        if (-not [string]::IsNullOrWhiteSpace($AllSecrets["APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP"])) {
+            $aiConnectionString = $AllSecrets["APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP"]
+        }
+    }
+    else {
+        if (-not [string]::IsNullOrWhiteSpace($AllSecrets["APPLICATIONINSIGHTS_CONNECTION_STRING_ISW"])) {
+            $aiConnectionString = $AllSecrets["APPLICATIONINSIGHTS_CONNECTION_STRING_ISW"]
+        }
+    }
     
     # Project-specific secrets
     $projectSecrets = @{
@@ -324,6 +337,11 @@ function Get-RelevantSecretsForProject {
         if ($key -in $relevantSecrets) {
             $filtered[$key] = $AllSecrets[$key]
         }
+    }
+
+    # Add resolved Application Insights connection string (if present in any form)
+    if (-not [string]::IsNullOrWhiteSpace($aiConnectionString)) {
+        $filtered["APPLICATIONINSIGHTS_CONNECTION_STRING"] = $aiConnectionString
     }
     
     return $filtered

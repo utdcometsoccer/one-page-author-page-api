@@ -60,6 +60,148 @@ If you *must* keep `TelemetryClient` with minimal code change, attempt Track B f
 - **Rationale**: This solution is Azure Functions isolated-worker heavy and has already experienced startup failures from Application Insights major-version mismatches. Track A reduces direct dependency coupling to `Microsoft.ApplicationInsights.*` inside Functions.
 - **When to override**: Choose Track B only if there is a strict requirement to keep `TelemetryClient` APIs with minimal refactor *and* the Track B compatibility spike succeeds for `Microsoft.Azure.Functions.Worker.ApplicationInsights` in this solution.
 
+## Current Implementation Status (Track A)
+
+Track A is now implemented in this repository:
+
+- All Azure Functions isolated-worker hosts have been migrated to OpenTelemetry + Azure Monitor exporter (Application Insights backend):
+  - `function-app`
+  - `ImageAPI`
+  - `InkStainedWretchFunctions`
+  - `InkStainedWretchStripe`
+  - `InkStainedWretchesConfig`
+- The Function host telemetry mode is set to OpenTelemetry via `host.json` (`"telemetryMode": "OpenTelemetry"`).
+- Legacy Application Insights SDK wiring (`AddApplicationInsightsTelemetryWorkerService` / `ConfigureFunctionsApplicationInsights`) and related packages have been removed from those hosts to avoid dual pipelines.
+- Manual “custom event” telemetry previously sent via `TelemetryClient.TrackEvent(...)` in `OnePageAuthorLib` has been migrated to structured `ILogger` events (with an `EventName` dimension plus properties/metrics), so events remain queryable in Application Insights.
+
+### Configuration requirement
+
+To export telemetry to the Application Insights backend, set `APPLICATIONINSIGHTS_CONNECTION_STRING` in the environment (local.settings, User Secrets, or Key Vault/Function App settings).
+
+### Validation queries (KQL)
+
+The manual “custom events” in this repo are now emitted as **structured logs** (message: `TelemetryEvent {EventName}`) with dimensions stored in `customDimensions` (for example: `customDimensions.EventName`, `customDimensions.CustomerId`, `customDimensions.FunctionName`).
+
+Use these queries in **Application Insights Logs** to validate behavior.
+
+#### 1) See recent telemetry events
+
+```kusto
+traces
+| where timestamp > ago(24h)
+| where message startswith "TelemetryEvent"
+| extend EventName = tostring(customDimensions["EventName"])
+| project timestamp, cloud_RoleName, operation_Id, severityLevel, EventName, message, customDimensions
+| order by timestamp desc
+```
+
+#### 2) Count events by name (top N)
+
+```kusto
+traces
+| where timestamp > ago(7d)
+| where message startswith "TelemetryEvent"
+| extend EventName = tostring(customDimensions["EventName"])
+| summarize Count = count() by EventName
+| order by Count desc
+```
+
+#### 3) Stripe telemetry examples
+
+```kusto
+// Example: Stripe customer created
+traces
+| where timestamp > ago(30d)
+| where message startswith "TelemetryEvent"
+| where tostring(customDimensions["EventName"]) == "StripeCustomerCreated"
+| project timestamp,
+      cloud_RoleName,
+      operation_Id,
+      CustomerId = tostring(customDimensions["CustomerId"]),
+      EmailDomain = tostring(customDimensions["EmailDomain"]),
+      customDimensions
+| order by timestamp desc
+```
+
+```kusto
+// Example: Stripe API errors
+traces
+| where timestamp > ago(30d)
+| where message startswith "TelemetryEvent"
+| where tostring(customDimensions["EventName"]) == "StripeApiError"
+| project timestamp,
+      cloud_RoleName,
+      operation_Id,
+      Operation = tostring(customDimensions["Operation"]),
+      ErrorCode = tostring(customDimensions["ErrorCode"]),
+      ErrorType = tostring(customDimensions["ErrorType"]),
+      CustomerId = tostring(customDimensions["CustomerId"])
+| order by timestamp desc
+```
+
+#### 4) Authenticated function telemetry examples
+
+```kusto
+// Authenticated function errors
+traces
+| where timestamp > ago(30d)
+| where message startswith "TelemetryEvent"
+| where tostring(customDimensions["EventName"]) == "AuthenticatedFunctionError"
+| project timestamp,
+      cloud_RoleName,
+      operation_Id,
+      FunctionName = tostring(customDimensions["FunctionName"]),
+      UserId = tostring(customDimensions["UserId"]),
+      UserEmailDomain = tostring(customDimensions["UserEmailDomain"]),
+      ErrorType = tostring(customDimensions["ErrorType"]),
+      ErrorMessage = tostring(customDimensions["ErrorMessage"])
+| order by timestamp desc
+```
+
+#### 5) Correlate a telemetry event to its request/dependencies
+
+Use `operation_Id` from a telemetry event to pivot into request + dependency telemetry.
+
+```kusto
+let operationId = toscalar(
+  traces
+  | where timestamp > ago(24h)
+  | where message startswith "TelemetryEvent"
+  | where tostring(customDimensions["EventName"]) == "StripeWebhookEvent"
+  | top 1 by timestamp desc
+  | project operation_Id
+);
+
+union isfuzzy=true
+(
+  requests
+  | where operation_Id == operationId
+  | project timestamp, ItemType = "request", operation_Id, name, success, resultCode, duration, url
+),
+(
+  dependencies
+  | where operation_Id == operationId
+  | project timestamp, ItemType = "dependency", operation_Id, name, success, resultCode, duration, target, type
+),
+(
+  traces
+  | where operation_Id == operationId
+  | project timestamp, ItemType = "trace", operation_Id, message, severityLevel, customDimensions
+)
+| order by timestamp asc
+```
+
+#### 6) Common troubleshooting queries
+
+```kusto
+// If you see zero events, verify the connection string is present and the host is running in OpenTelemetry mode.
+// This shows the most recent traces regardless of message.
+traces
+| where timestamp > ago(1h)
+| project timestamp, cloud_RoleName, operation_Id, severityLevel, message
+| order by timestamp desc
+```
+
 ---
 
 ## Track B Plan (Spike First): Upgrade `TelemetryClient` Usage to AI .NET SDK 3.x
