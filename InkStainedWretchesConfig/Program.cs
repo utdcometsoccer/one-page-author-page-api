@@ -5,8 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
+using Microsoft.Extensions.Configuration;
 
 var builder = FunctionsApplication.CreateBuilder(args);
+
+// Add User Secrets support for development
+// This allows secrets to be stored securely outside of source code
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 builder.ConfigureFunctionsWebApplication();
 
@@ -28,3 +36,6 @@ builder.Services
     .UseAzureMonitorExporter();
 
 builder.Build().Run();
+
+// Program class needed for User Secrets generic type parameter
+public partial class Program { }

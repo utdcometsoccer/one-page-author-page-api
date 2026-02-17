@@ -180,6 +180,35 @@ $secretDefinitions = @{
             Sensitive = $true
         }
     )
+
+    "Observability (Recommended)" = @(
+        @{
+            Name = "APPLICATIONINSIGHTS_CONNECTION_STRING"
+            Description = "Application Insights / Azure Monitor connection string (used by Azure Monitor OpenTelemetry exporter)"
+            Required = $false
+            Example = "InstrumentationKey=...;IngestionEndpoint=https://...;LiveEndpoint=https://...;ApplicationId=..."
+            Category = "Observability"
+            Sensitive = $true
+        }
+        ,
+        @{
+            Name = "APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP"
+            Description = "Application Insights connection string for the standalone function-app (overrides APPLICATIONINSIGHTS_CONNECTION_STRING)"
+            Required = $false
+            Example = "InstrumentationKey=...;IngestionEndpoint=https://...;LiveEndpoint=https://...;ApplicationId=..."
+            Category = "Observability"
+            Sensitive = $true
+        }
+        ,
+        @{
+            Name = "APPLICATIONINSIGHTS_CONNECTION_STRING_ISW"
+            Description = "Application Insights connection string for Ink Stained Wretches Function Apps (ImageAPI/Functions/Stripe/Config) (overrides APPLICATIONINSIGHTS_CONNECTION_STRING)"
+            Required = $false
+            Example = "InstrumentationKey=...;IngestionEndpoint=https://...;LiveEndpoint=https://...;ApplicationId=..."
+            Category = "Observability"
+            Sensitive = $true
+        }
+    )
     
     "Cosmos DB (Required)" = @(
         @{

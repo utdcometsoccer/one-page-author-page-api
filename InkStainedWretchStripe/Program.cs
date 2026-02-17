@@ -10,8 +10,17 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Stripe;
 using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
+using Microsoft.Extensions.Configuration;
 
 var builder = FunctionsApplication.CreateBuilder(args);
+
+// Add User Secrets support for development
+// This allows secrets to be stored securely outside of source code
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
 var config = builder.Configuration;
 var stripeApiKey = config["STRIPE_API_KEY"] ?? throw new InvalidOperationException("Configuration value 'STRIPE_API_KEY' is missing or empty. Please set it to your Stripe API key.");
 // Configure Stripe client lifetime
@@ -132,3 +141,6 @@ builder.Services
     .UseAzureMonitorExporter();
 
 builder.Build().Run();
+
+// Program class needed for User Secrets generic type parameter
+public partial class Program { }
