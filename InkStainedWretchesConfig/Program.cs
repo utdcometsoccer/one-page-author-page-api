@@ -3,6 +3,8 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Azure.Monitor.OpenTelemetry.Exporter;
+using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -19,7 +21,10 @@ Console.WriteLine($"USE_KEY_VAULT: {useKeyVault ?? "false"}");
 
 builder.Services
     .AddKeyVaultConfigService()
-    .AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights();
+
+    // OpenTelemetry -> Azure Monitor (Application Insights backend)
+    .AddOpenTelemetry()
+    .UseFunctionsWorkerDefaults()
+    .UseAzureMonitorExporter();
 
 builder.Build().Run();
