@@ -3,6 +3,8 @@ using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using InkStainedWretch.OnePageAuthorAPI;
+using Azure.Monitor.OpenTelemetry.Exporter;
+using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -43,13 +45,15 @@ builder.Services
     .AddCosmosClient(endpointUri, primaryKey)
     .AddCosmosDatabase(databaseId);
 
-// Add Application Insights telemetry for Azure Functions Worker
 builder.Services
     .AddAuthorDataService() // Register Author data service via DI extension
     .AddLocaleDataService() // Register Locale data service via DI extension
     .AddDomainRegistrationRepository() // Register Domain Registration repository via DI extension
     .AddUserIdentityServices()
-    .AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights();
+
+    // OpenTelemetry -> Azure Monitor (Application Insights backend)
+    .AddOpenTelemetry()
+    .UseFunctionsWorkerDefaults()
+    .UseAzureMonitorExporter();
 
 builder.Build().Run();
