@@ -140,7 +140,6 @@ builder.Services
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
     .AddUserIdentityServices()
     .AddUserProfileServices()
-
     // OpenTelemetry -> Azure Monitor (Application Insights backend)
     .AddOpenTelemetry()
     .UseFunctionsWorkerDefaults()
