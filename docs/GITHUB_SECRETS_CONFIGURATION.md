@@ -166,10 +166,21 @@ npm run init-secrets:help               # Show help
 The script intelligently sets only relevant secrets for each project:
 
 - **Common** (all projects): Cosmos DB, Azure AD authentication
+- **Common Observability** (all Azure Functions): `APPLICATIONINSIGHTS_CONNECTION_STRING` (used by OpenTelemetry + Azure Monitor exporter)
 - **ImageAPI**: Azure Blob Storage
 - **InkStainedWretchStripe**: Stripe API keys
 - **InkStainedWretchFunctions**: External APIs, domain management, testing
 - **InkStainedWretchesConfig**: Key Vault configuration
+
+**Application Insights Connection String Overrides**:
+
+The configuration system supports both a single connection string for all apps and per-app overrides:
+
+- `APPLICATIONINSIGHTS_CONNECTION_STRING` - Generic fallback (works for all apps)
+- `APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP` - Override for the standalone `function-app` project
+- `APPLICATIONINSIGHTS_CONNECTION_STRING_ISW` - Override for the Ink Stained Wretches Function Apps (`ImageAPI`, `InkStainedWretchFunctions`, `InkStainedWretchStripe`, `InkStainedWretchesConfig`)
+
+`Set-DotnetUserSecrets.ps1` resolves the correct value per project and sets it as `APPLICATIONINSIGHTS_CONNECTION_STRING` in each project's dotnet user-secrets so the runtime configuration stays consistent across all hosts.
 
 ### 4. secrets-template.json
 

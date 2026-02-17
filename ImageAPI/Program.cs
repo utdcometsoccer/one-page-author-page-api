@@ -8,9 +8,18 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Extensions.Configuration;
 using InkStainedWretch.OnePageAuthorAPI;
+using Azure.Monitor.OpenTelemetry.Exporter;
+using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
+
+// Add User Secrets support for development
+// This allows secrets to be stored securely outside of source code
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 // Get configuration (includes User Secrets in development)
 var config = builder.Configuration;
@@ -131,8 +140,10 @@ builder.Services
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
     .AddUserIdentityServices()
     .AddUserProfileServices()
-    .AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights();
+    // OpenTelemetry -> Azure Monitor (Application Insights backend)
+    .AddOpenTelemetry()
+    .UseFunctionsWorkerDefaults()
+    .UseAzureMonitorExporter();
 
 // Azure Blob Storage (reads from User Secrets in development)
 builder.Services.AddSingleton(sp =>
@@ -146,3 +157,6 @@ builder.Services.AddSingleton(sp =>
 });
 
 builder.Build().Run();
+
+// Program class needed for User Secrets generic type parameter
+public partial class Program { }

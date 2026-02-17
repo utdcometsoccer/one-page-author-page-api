@@ -80,6 +80,16 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 | `STRIPE_API_KEY` | ✅ For Stripe | Stripe secret API key | `sk_test_...` or `sk_live_...` |
 | `AAD_TENANT_ID` | ✅ Yes | Microsoft Entra ID tenant GUID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
 | `AAD_AUDIENCE` | ✅ Yes | API application/client ID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Optional | Generic Application Insights connection string (fallback) | `InstrumentationKey=...;IngestionEndpoint=...` |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP` | Optional | Override for the standalone `function-app` | `InstrumentationKey=...;IngestionEndpoint=...` |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING_ISW` | Optional | Override for Ink Stained Wretches Function Apps | `InstrumentationKey=...;IngestionEndpoint=...` |
+
+**How telemetry config is applied:**
+
+- In Azure, each Function App uses the standard app setting `APPLICATIONINSIGHTS_CONNECTION_STRING`.
+- The GitHub Actions workflow sets that app setting after zip deploy using Azure CLI.
+- For `function-app`, it prefers `APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP` (falls back to `APPLICATIONINSIGHTS_CONNECTION_STRING`).
+- For the Ink Stained Wretches apps, it prefers `APPLICATIONINSIGHTS_CONNECTION_STRING_ISW` (falls back to `APPLICATIONINSIGHTS_CONNECTION_STRING`).
 
 ### Deployment Control Flags
 

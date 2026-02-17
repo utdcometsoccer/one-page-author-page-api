@@ -1,7 +1,4 @@
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
 using System.Security.Claims;
 
 namespace InkStainedWretch.OnePageAuthorLib.API
@@ -48,7 +45,6 @@ namespace InkStainedWretch.OnePageAuthorLib.API
     /// </summary>
     public class AuthenticatedFunctionTelemetryService : IAuthenticatedFunctionTelemetryService
     {
-        private readonly TelemetryClient _telemetryClient;
         private readonly ILogger<AuthenticatedFunctionTelemetryService> _logger;
 
         // Event name constants
@@ -57,11 +53,58 @@ namespace InkStainedWretch.OnePageAuthorLib.API
         private const string FunctionSuccessEvent = "AuthenticatedFunctionSuccess";
 
         public AuthenticatedFunctionTelemetryService(
-            TelemetryClient telemetryClient,
             ILogger<AuthenticatedFunctionTelemetryService> logger)
         {
-            _telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        private static string GetEmailDomain(string? userEmail)
+        {
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                return "unknown";
+            }
+
+            return userEmail.Contains('@') ? userEmail.Split('@')[1] : "unknown";
+        }
+
+        private void TrackEvent(
+            string eventName,
+            string functionName,
+            string? userId,
+            string? userEmail,
+            Dictionary<string, string>? additionalProperties,
+            Dictionary<string, double>? metrics = null)
+        {
+            var scope = new Dictionary<string, object?>
+            {
+                ["EventName"] = eventName,
+                ["FunctionName"] = functionName ?? string.Empty,
+                ["UserId"] = userId ?? "Anonymous",
+                ["UserEmailDomain"] = GetEmailDomain(userEmail),
+                ["Timestamp"] = DateTimeOffset.UtcNow.ToString("O")
+            };
+
+            if (additionalProperties != null)
+            {
+                foreach (var prop in additionalProperties)
+                {
+                    scope[prop.Key] = prop.Value;
+                }
+            }
+
+            if (metrics != null)
+            {
+                foreach (var metric in metrics)
+                {
+                    scope[$"Metric.{metric.Key}"] = metric.Value;
+                }
+            }
+
+            using (_logger.BeginScope(scope))
+            {
+                _logger.LogInformation("TelemetryEvent {EventName}", eventName);
+            }
         }
 
         public void TrackAuthenticatedFunctionCall(
@@ -70,38 +113,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API
             string? userEmail,
             Dictionary<string, string>? additionalProperties = null)
         {
-            var telemetry = new EventTelemetry(FunctionCallEvent);
-            telemetry.Properties["FunctionName"] = functionName ?? string.Empty;
-            telemetry.Properties["UserId"] = userId ?? "Anonymous";
-            
-            // Only store email domain for privacy
-            if (!string.IsNullOrEmpty(userEmail))
-            {
-                var domain = userEmail.Contains('@') ? userEmail.Split('@')[1] : "unknown";
-                telemetry.Properties["UserEmailDomain"] = domain;
-            }
-            else
-            {
-                telemetry.Properties["UserEmailDomain"] = "unknown";
-            }
-            
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
-
-            // Add any additional properties
-            if (additionalProperties != null)
-            {
-                foreach (var prop in additionalProperties)
-                {
-                    telemetry.Properties[prop.Key] = prop.Value;
-                }
-            }
-
-            _telemetryClient.TrackEvent(telemetry);
-            _logger.LogDebug(
-                "Tracked {EventName} for function {FunctionName} by user {UserId}",
-                FunctionCallEvent,
-                functionName,
-                userId ?? "Anonymous");
+            TrackEvent(FunctionCallEvent, functionName, userId, userEmail, additionalProperties);
         }
 
         public void TrackAuthenticatedFunctionError(
@@ -112,46 +124,14 @@ namespace InkStainedWretch.OnePageAuthorLib.API
             string? errorType = null,
             Dictionary<string, string>? additionalProperties = null)
         {
-            var telemetry = new EventTelemetry(FunctionErrorEvent);
-            telemetry.Properties["FunctionName"] = functionName ?? string.Empty;
-            telemetry.Properties["UserId"] = userId ?? "Anonymous";
-            
-            // Only store email domain for privacy
-            if (!string.IsNullOrEmpty(userEmail))
+            additionalProperties ??= new Dictionary<string, string>();
+            additionalProperties["ErrorMessage"] = errorMessage ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(errorType))
             {
-                var domain = userEmail.Contains('@') ? userEmail.Split('@')[1] : "unknown";
-                telemetry.Properties["UserEmailDomain"] = domain;
-            }
-            else
-            {
-                telemetry.Properties["UserEmailDomain"] = "unknown";
-            }
-            
-            telemetry.Properties["ErrorMessage"] = errorMessage ?? string.Empty;
-            
-            if (!string.IsNullOrEmpty(errorType))
-            {
-                telemetry.Properties["ErrorType"] = errorType;
-            }
-            
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
-
-            // Add any additional properties
-            if (additionalProperties != null)
-            {
-                foreach (var prop in additionalProperties)
-                {
-                    telemetry.Properties[prop.Key] = prop.Value;
-                }
+                additionalProperties["ErrorType"] = errorType;
             }
 
-            _telemetryClient.TrackEvent(telemetry);
-            _logger.LogDebug(
-                "Tracked {EventName} for function {FunctionName} by user {UserId} with error: {ErrorMessage}",
-                FunctionErrorEvent,
-                functionName,
-                userId ?? "Anonymous",
-                errorMessage);
+            TrackEvent(FunctionErrorEvent, functionName, userId, userEmail, additionalProperties);
         }
 
         public void TrackAuthenticatedFunctionSuccess(
@@ -161,47 +141,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API
             Dictionary<string, string>? additionalProperties = null,
             Dictionary<string, double>? metrics = null)
         {
-            var telemetry = new EventTelemetry(FunctionSuccessEvent);
-            telemetry.Properties["FunctionName"] = functionName ?? string.Empty;
-            telemetry.Properties["UserId"] = userId ?? "Anonymous";
-            
-            // Only store email domain for privacy
-            if (!string.IsNullOrEmpty(userEmail))
-            {
-                var domain = userEmail.Contains('@') ? userEmail.Split('@')[1] : "unknown";
-                telemetry.Properties["UserEmailDomain"] = domain;
-            }
-            else
-            {
-                telemetry.Properties["UserEmailDomain"] = "unknown";
-            }
-            
-            telemetry.Properties["Timestamp"] = DateTimeOffset.UtcNow.ToString("O");
-
-            // Add any additional properties
-            if (additionalProperties != null)
-            {
-                foreach (var prop in additionalProperties)
-                {
-                    telemetry.Properties[prop.Key] = prop.Value;
-                }
-            }
-
-            // Application Insights v3 removed EventTelemetry.Metrics; store numeric values as properties.
-            if (metrics != null)
-            {
-                foreach (var metric in metrics)
-                {
-                    telemetry.Properties[$"Metric.{metric.Key}"] = metric.Value.ToString(CultureInfo.InvariantCulture);
-                }
-            }
-
-            _telemetryClient.TrackEvent(telemetry);
-            _logger.LogDebug(
-                "Tracked {EventName} for function {FunctionName} by user {UserId}",
-                FunctionSuccessEvent,
-                functionName,
-                userId ?? "Anonymous");
+            TrackEvent(FunctionSuccessEvent, functionName, userId, userEmail, additionalProperties, metrics);
         }
 
         /// <summary>

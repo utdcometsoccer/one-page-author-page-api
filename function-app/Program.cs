@@ -1,10 +1,30 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using InkStainedWretch.OnePageAuthorAPI;
+using Azure.Monitor.OpenTelemetry.Exporter;
+using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 
 var builder = FunctionsApplication.CreateBuilder(args);
+
+static bool IsDevelopmentEnvironment()
+{
+    var environmentName =
+        Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") ??
+        Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ??
+        Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+    return string.Equals(environmentName, "Development", StringComparison.OrdinalIgnoreCase);
+}
+
+if (IsDevelopmentEnvironment())
+{
+    // Ensure local dev can source settings from `dotnet user-secrets`.
+    // `UserSecretsId` is defined in the project file.
+    builder.Configuration.AddUserSecrets(typeof(Program).Assembly, optional: true);
+}
 
 builder.ConfigureFunctionsWebApplication();
 
@@ -43,13 +63,28 @@ builder.Services
     .AddCosmosClient(endpointUri, primaryKey)
     .AddCosmosDatabase(databaseId);
 
-// Add Application Insights telemetry for Azure Functions Worker
 builder.Services
     .AddAuthorDataService() // Register Author data service via DI extension
     .AddLocaleDataService() // Register Locale data service via DI extension
     .AddDomainRegistrationRepository() // Register Domain Registration repository via DI extension
     .AddUserIdentityServices()
-    .AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights();
+
+    // OpenTelemetry -> Azure Monitor (Application Insights backend).
+    // NOTE: As of APPLICATION_INSIGHTS_UPGRADE_MIGRATION_PLAN.md (Phase 2),
+    // OnePageAuthorLib still contains TelemetryClient usage (e.g., AuthenticatedFunctionTelemetryService,
+    // StripeTelemetryService) and a Microsoft.ApplicationInsights 2.x reference.
+    // This means there is a temporary dual telemetry pipeline (legacy AI SDK + OpenTelemetry).
+    // Follow-up task: migrate OnePageAuthorLib to OpenTelemetry-native patterns
+    // (ActivitySource, ILogger, Meter) and remove TelemetryClient/ApplicationInsights usage.
+    .AddOpenTelemetry()
+    .UseFunctionsWorkerDefaults()
+    .UseAzureMonitorExporter(options =>
+    {
+        var connectionString = config["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+        if (!string.IsNullOrWhiteSpace(connectionString))
+        {
+            options.ConnectionString = connectionString;
+        }
+    });
 
 builder.Build().Run();
