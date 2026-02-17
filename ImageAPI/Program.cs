@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Extensions.Configuration;
 using InkStainedWretch.OnePageAuthorAPI;
+using Azure.Monitor.OpenTelemetry.Exporter;
+using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
@@ -131,8 +133,11 @@ builder.Services
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
     .AddUserIdentityServices()
     .AddUserProfileServices()
-    .AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights();
+    
+    // OpenTelemetry -> Azure Monitor (Application Insights backend)
+    .AddOpenTelemetry()
+    .UseFunctionsWorkerDefaults()
+    .UseAzureMonitorExporter();
 
 // Azure Blob Storage (reads from User Secrets in development)
 builder.Services.AddSingleton(sp =>

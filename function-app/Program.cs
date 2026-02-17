@@ -51,7 +51,13 @@ builder.Services
     .AddDomainRegistrationRepository() // Register Domain Registration repository via DI extension
     .AddUserIdentityServices()
 
-    // OpenTelemetry -> Azure Monitor (Application Insights backend)
+    // OpenTelemetry -> Azure Monitor (Application Insights backend).
+    // NOTE: As of APPLICATION_INSIGHTS_UPGRADE_MIGRATION_PLAN.md (Phase 2),
+    // OnePageAuthorLib still contains TelemetryClient usage (e.g., AuthenticatedFunctionTelemetryService,
+    // StripeTelemetryService) and a Microsoft.ApplicationInsights 2.x reference.
+    // This means there is a temporary dual telemetry pipeline (legacy AI SDK + OpenTelemetry).
+    // Follow-up task: migrate OnePageAuthorLib to OpenTelemetry-native patterns
+    // (ActivitySource, ILogger, Meter) and remove TelemetryClient/ApplicationInsights usage.
     .AddOpenTelemetry()
     .UseFunctionsWorkerDefaults()
     .UseAzureMonitorExporter();

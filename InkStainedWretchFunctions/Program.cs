@@ -10,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Stripe;
+using Azure.Monitor.OpenTelemetry.Exporter;
+using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -167,9 +169,7 @@ var services = builder.Services
     .AddExperimentServices() // Add Experiment services for A/B testing
     .AddTestimonialRepository() // Add Testimonial repository for testimonials management
     .AddAuthorInvitationRepository() // Add AuthorInvitation repository for managing author invitations
-    .AddApplicationInsightsTelemetryWorkerService()
-    .AddImageApiRepositories()
-    .ConfigureFunctionsApplicationInsights();
+    .AddImageApiRepositories();
 
 // Add Stripe services if API key is configured (needed for subscription validation)
 if (!string.IsNullOrWhiteSpace(stripeApiKey))
@@ -184,6 +184,11 @@ if (!string.IsNullOrWhiteSpace(emailConnectionString))
 {
     services.AddEmailService(emailConnectionString, emailSenderAddress);
 }
+
+// OpenTelemetry -> Azure Monitor (Application Insights backend)
+services.AddOpenTelemetry()
+    .UseFunctionsWorkerDefaults()
+    .UseAzureMonitorExporter();
 
 builder.Build().Run();
 

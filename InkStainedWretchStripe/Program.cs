@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Stripe;
+using Azure.Monitor.OpenTelemetry.Exporter;
+using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -117,12 +119,15 @@ builder.Services
     .AddImageApiRepositories()
     .AddJwtAuthentication() // Add JWT authentication services from OnePageAuthorLib
     .AddUserIdentityServices()
-    .AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights()
     // Register a StripeClient for DI so services can depend on it
     .AddSingleton<StripeClient>(_ => new StripeClient(stripeApiKey))
     .AddStripeServices()
     .AddStripeOrchestrators()
     .AddUserProfileServices();
+
+// OpenTelemetry -> Azure Monitor (Application Insights backend)
+builder.Services.AddOpenTelemetry()
+    .UseFunctionsWorkerDefaults()
+    .UseAzureMonitorExporter();
 
 builder.Build().Run();
