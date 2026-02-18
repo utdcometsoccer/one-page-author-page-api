@@ -219,10 +219,40 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                     { "responsetype", "json" }
                 };
 
-                // Add name servers (ns1, ns2, ns3, ns4, ns5)
+                // Add name servers (ns1, ns2, ns3, ns4, ns5), validating each entry
+                var invalidNameServerIndices = new List<int>();
+                var validNameServerCount = 0;
+
                 for (int i = 0; i < nameServers.Length && i < 5; i++)
                 {
-                    requestData[$"ns{i + 1}"] = nameServers[i];
+                    var rawNameServer = nameServers[i];
+                    var trimmedNameServer = rawNameServer?.Trim();
+
+                    if (string.IsNullOrWhiteSpace(trimmedNameServer))
+                    {
+                        invalidNameServerIndices.Add(i);
+                        continue;
+                    }
+
+                    validNameServerCount++;
+                    requestData[$"ns{validNameServerCount}"] = trimmedNameServer;
+                }
+
+                if (invalidNameServerIndices.Count > 0)
+                {
+                    _logger.LogWarning(
+                        "Ignoring {InvalidCount} invalid name server entries for domain {DomainName}. Invalid indices: {InvalidIndices}",
+                        invalidNameServerIndices.Count,
+                        domainName,
+                        string.Join(",", invalidNameServerIndices));
+                }
+
+                if (validNameServerCount == 0)
+                {
+                    _logger.LogWarning(
+                        "No valid name servers provided for domain {DomainName}. Aborting WHMCS name server update request.",
+                        domainName);
+                    return false;
                 }
 
                 // Create the form content and make the API request

@@ -591,6 +591,50 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
         }
 
+        [Fact]
+        public async Task Run_WithInvalidNameServerCount_SkipsNameServerUpdate()
+        {
+            // Arrange
+            var domainRegistration = new DomainRegistrationEntity
+            {
+                id = "test-id-invalid-count",
+                Status = DomainStatus.Pending,
+                Domain = new DomainEntity
+                {
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "invalid-count-example"
+                }
+            };
+            var input = new List<DomainRegistrationEntity> { domainRegistration };
+            var invalidNameServers = new[] { "ns1.azure.com" }; // Only 1 name server (requires 2-5)
+
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.GetNameServersAsync("invalid-count-example.com"))
+                .ReturnsAsync(invalidNameServers);
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
+                .ReturnsAsync(true);
+
+            // Act
+            await _function.Run(input);
+
+            // Assert
+            _mockDnsZoneService.Verify(x => x.GetNameServersAsync("invalid-count-example.com"), Times.Once);
+            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync(It.IsAny<string>(), It.IsAny<string[]>()), Times.Never);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
+
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Retrieved 1 name servers") && v.ToString()!.Contains("WHMCS requires 2-5 name servers")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
         #endregion
 
         #region Null Domain Tests

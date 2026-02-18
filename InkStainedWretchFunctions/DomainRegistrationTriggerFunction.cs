@@ -110,16 +110,16 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 
                         // Step 2: Ensure DNS zone exists and retrieve name servers
                         _logger.LogInformation("Ensuring DNS zone exists for domain {DomainName}", domainName);
-                        var dnsZoneCreated = await _dnsZoneService.EnsureDnsZoneExistsAsync(registration);
+                        var dnsZoneReady = await _dnsZoneService.EnsureDnsZoneExistsAsync(registration);
                         
-                        if (dnsZoneCreated)
+                        if (dnsZoneReady)
                         {
                             _logger.LogInformation("DNS zone exists for domain {DomainName}, retrieving name servers", domainName);
                             
                             // Retrieve Azure DNS name servers
                             var nameServers = await _dnsZoneService.GetNameServersAsync(domainName);
                             
-                            if (nameServers != null && nameServers.Length > 0)
+                            if (nameServers != null && nameServers.Length >= 2 && nameServers.Length <= 5)
                             {
                                 _logger.LogInformation("Retrieved {Count} name servers for domain {DomainName}, updating WHMCS", 
                                     nameServers.Length, domainName);
@@ -144,9 +144,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                                     _logger.LogWarning("Failed to update name servers for domain {DomainName} in WHMCS", domainName);
                                 }
                             }
-                            else
+                            else if (nameServers == null || nameServers.Length == 0)
                             {
                                 _logger.LogWarning("No name servers retrieved for domain {DomainName}, skipping WHMCS name server update", domainName);
+                            }
+                            else
+                            {
+                                _logger.LogWarning("Retrieved {Count} name servers for domain {DomainName}, but WHMCS requires 2-5 name servers. Skipping name server update.", 
+                                    nameServers.Length, domainName);
                             }
                         }
                         else

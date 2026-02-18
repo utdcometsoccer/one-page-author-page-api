@@ -463,18 +463,19 @@ namespace OnePageAuthor.Test.Services
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .Callback<HttpRequestMessage, CancellationToken>(async (req, ct) => 
+                .Returns<HttpRequestMessage, CancellationToken>(async (req, ct) =>
                 {
                     // Capture the form content before it's disposed
                     if (req.Content != null)
                     {
                         capturedFormContent = await req.Content.ReadAsStringAsync();
                     }
-                })
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+
+                    return new HttpResponseMessage
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                    };
                 });
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
@@ -554,6 +555,54 @@ namespace OnePageAuthor.Test.Services
 
             // Assert
             Assert.True(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithNullNameServerEntries_FiltersAndSucceeds()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1.azure.com", null!, "ns2.azure.net" };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithEmptyNameServerEntries_FiltersAndSucceeds()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1.azure.com", "", "ns2.azure.net", "   " };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithAllInvalidNameServers_ReturnsFalse()
+        {
+            // Arrange
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { null!, "", "   ", null! };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.False(result);
         }
 
         #endregion
