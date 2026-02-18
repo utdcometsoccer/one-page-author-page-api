@@ -531,7 +531,7 @@ curl -X GET "https://your-api.azurewebsites.net/api/whmcs/tld-pricing?clientId=1
 - `WHMCS_API_IDENTIFIER` - API authentication identifier
 - `WHMCS_API_SECRET` - API authentication secret
 
-**Note:** The client ID is retrieved from environment variables via the WHMCS configuration. If WHMCS is not configured, the endpoint will return a 502 Bad Gateway error.
+**Note:** The client ID is supplied by the caller (for example, via a `clientId` query string parameter) and passed through to the WHMCS integration. If WHMCS is not configured, the endpoint will return a 502 Bad Gateway error.
 
 ## Cosmos DB Triggered Functions
 

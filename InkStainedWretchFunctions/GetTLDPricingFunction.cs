@@ -47,11 +47,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// </item>
         /// <item>
         /// <term>500 Internal Server Error</term>
-        /// <description>Error calling WHMCS API</description>
+        /// <description>Unexpected error occurred</description>
         /// </item>
         /// <item>
         /// <term>502 Bad Gateway</term>
-        /// <description>WHMCS API error or configuration issue</description>
+        /// <description>WHMCS API error, configuration issue, or HTTP request failure</description>
         /// </item>
         /// </list>
         /// </returns>
@@ -193,7 +193,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             catch (InvalidOperationException ex)
             {
                 _logger.LogError(ex, "WHMCS service is not configured or returned error");
-                return new ObjectResult(new { error = $"WHMCS API error: {ex.Message}" })
+                return new ObjectResult(new { error = ex.Message })
                 {
                     StatusCode = 502 // Bad Gateway
                 };

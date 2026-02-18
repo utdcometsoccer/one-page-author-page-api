@@ -435,6 +435,20 @@ namespace OnePageAuthor.Test.Services
         }
 
         [Fact]
+        public async Task GetTLDPricingAsync_WithMissingResultField_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var responseJson = @"{""pricing"": {""com"": {""registration"": {""1"": 8.95}}}}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetTLDPricingAsync());
+            Assert.Contains("missing 'result' field", exception.Message);
+        }
+
+        [Fact]
         public async Task GetTLDPricingAsync_WithHttpErrorStatus_ThrowsHttpRequestException()
         {
             // Arrange
@@ -454,17 +468,9 @@ namespace OnePageAuthor.Test.Services
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
 
-            // Act & Assert - Expecting a JSON parsing exception (could be JsonReaderException or JsonException)
-            try
-            {
-                await service.GetTLDPricingAsync();
-                Assert.Fail("Expected JsonException or derived type to be thrown");
-            }
-            catch (JsonException ex)
-            {
-                // Success - caught JsonException or a derived type like JsonReaderException
-                Assert.NotNull(ex);
-            }
+            // Act & Assert - JsonDocument.Parse throws JsonReaderException (derived from JsonException)
+            var exception = await Assert.ThrowsAnyAsync<JsonException>(() => service.GetTLDPricingAsync());
+            Assert.NotNull(exception);
         }
 
         [Fact]

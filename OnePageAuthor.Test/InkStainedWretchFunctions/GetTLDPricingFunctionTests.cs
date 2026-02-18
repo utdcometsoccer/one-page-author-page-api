@@ -2,11 +2,13 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Functions;
+using System.Security.Claims;
 
 namespace OnePageAuthor.Test.InkStainedWretchFunctions
 {
@@ -16,6 +18,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         private readonly Mock<ILogger<GetTLDPricingFunction>> _mockLogger;
         private readonly Mock<IJwtValidationService> _mockJwtValidationService;
         private readonly Mock<IUserProfileService> _mockUserProfileService;
+        private readonly GetTLDPricingFunction _function;
 
         public GetTLDPricingFunctionTests()
         {
@@ -23,6 +26,61 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockLogger = new Mock<ILogger<GetTLDPricingFunction>>();
             _mockJwtValidationService = new Mock<IJwtValidationService>();
             _mockUserProfileService = new Mock<IUserProfileService>();
+            
+            _function = new GetTLDPricingFunction(
+                _mockWhmcsService.Object,
+                _mockLogger.Object,
+                _mockJwtValidationService.Object,
+                _mockUserProfileService.Object);
+        }
+
+        private HttpRequest CreateMockRequest(string? clientId = null, int? currencyId = null, bool addAuthHeader = true)
+        {
+            var mockRequest = new Mock<HttpRequest>();
+            
+            // Setup query parameters
+            var queryDict = new Dictionary<string, StringValues>();
+            if (clientId != null)
+                queryDict["clientId"] = clientId;
+            if (currencyId.HasValue)
+                queryDict["currencyId"] = currencyId.ToString();
+            
+            var queryCollection = new QueryCollection(queryDict);
+            mockRequest.Setup(r => r.Query).Returns(queryCollection);
+            
+            // Setup headers with Authorization
+            var headers = new HeaderDictionary();
+            if (addAuthHeader)
+            {
+                headers["Authorization"] = "Bearer valid-token";
+            }
+            mockRequest.Setup(r => r.Headers).Returns(headers);
+            
+            return mockRequest.Object;
+        }
+
+        private void SetupValidAuthentication()
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, "test-user@example.com"),
+                new Claim("preferred_username", "test-user@example.com")
+            };
+            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth"));
+
+            _mockJwtValidationService
+                .Setup(s => s.ValidateTokenAsync(It.IsAny<string>()))
+                .ReturnsAsync(claimsPrincipal);
+            
+            var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile
+            {
+                id = "test-user@example.com",
+                Upn = "test-user@example.com"
+            };
+            
+            _mockUserProfileService
+                .Setup(s => s.EnsureUserProfileAsync(It.IsAny<ClaimsPrincipal>()))
+                .ReturnsAsync(userProfile);
         }
 
         [Fact]
@@ -88,9 +146,11 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
-        public async Task GetTLDPricingAsync_ServiceReturnsValidData_ReturnsJsonDocument()
+        public async Task GetPricing_WithValidAuthentication_ReturnsOkWithJsonContent()
         {
             // Arrange
+            SetupValidAuthentication();
+            
             var pricingJson = @"{
                 ""result"": ""success"",
                 ""pricing"": {
@@ -103,23 +163,30 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var jsonDocument = JsonDocument.Parse(pricingJson);
 
             _mockWhmcsService
-                .Setup(s => s.GetTLDPricingAsync(It.IsAny<string>(), It.IsAny<int?>()))
+                .Setup(s => s.GetTLDPricingAsync(null, null))
                 .ReturnsAsync(jsonDocument);
 
+            var httpRequest = CreateMockRequest();
+
             // Act
-            var result = await _mockWhmcsService.Object.GetTLDPricingAsync();
+            var result = await _function.GetPricing(httpRequest);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.True(result.RootElement.TryGetProperty("result", out var resultProp));
-            Assert.Equal("success", resultProp.GetString());
+            var contentResult = Assert.IsType<ContentResult>(result);
+            Assert.Equal(200, contentResult.StatusCode);
+            Assert.Equal("application/json", contentResult.ContentType);
+            Assert.Contains("success", contentResult.Content);
+            Assert.Contains("pricing", contentResult.Content);
+            
             _mockWhmcsService.Verify(s => s.GetTLDPricingAsync(null, null), Times.Once);
         }
 
         [Fact]
-        public async Task GetTLDPricingAsync_WithClientId_PassesParameterToService()
+        public async Task GetPricing_WithClientIdParameter_PassesClientIdToService()
         {
             // Arrange
+            SetupValidAuthentication();
+            
             var pricingJson = @"{""result"": ""success"", ""pricing"": {}}";
             var jsonDocument = JsonDocument.Parse(pricingJson);
 
@@ -127,18 +194,22 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 .Setup(s => s.GetTLDPricingAsync("12345", null))
                 .ReturnsAsync(jsonDocument);
 
+            var httpRequest = CreateMockRequest(clientId: "12345");
+
             // Act
-            var result = await _mockWhmcsService.Object.GetTLDPricingAsync("12345", null);
+            var result = await _function.GetPricing(httpRequest);
 
             // Assert
-            Assert.NotNull(result);
+            Assert.IsType<ContentResult>(result);
             _mockWhmcsService.Verify(s => s.GetTLDPricingAsync("12345", null), Times.Once);
         }
 
         [Fact]
-        public async Task GetTLDPricingAsync_WithCurrencyId_PassesParameterToService()
+        public async Task GetPricing_WithCurrencyIdParameter_PassesCurrencyIdToService()
         {
             // Arrange
+            SetupValidAuthentication();
+            
             var pricingJson = @"{""result"": ""success"", ""pricing"": {}}";
             var jsonDocument = JsonDocument.Parse(pricingJson);
 
@@ -146,38 +217,143 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 .Setup(s => s.GetTLDPricingAsync(null, 2))
                 .ReturnsAsync(jsonDocument);
 
+            var httpRequest = CreateMockRequest(currencyId: 2);
+
             // Act
-            var result = await _mockWhmcsService.Object.GetTLDPricingAsync(null, 2);
+            var result = await _function.GetPricing(httpRequest);
 
             // Assert
-            Assert.NotNull(result);
+            Assert.IsType<ContentResult>(result);
             _mockWhmcsService.Verify(s => s.GetTLDPricingAsync(null, 2), Times.Once);
         }
 
         [Fact]
-        public async Task GetTLDPricingAsync_ServiceThrowsInvalidOperationException_CanHandleException()
+        public async Task GetPricing_WithBothParameters_PassesBothToService()
         {
             // Arrange
-            _mockWhmcsService
-                .Setup(s => s.GetTLDPricingAsync(It.IsAny<string>(), It.IsAny<int?>()))
-                .ThrowsAsync(new InvalidOperationException("WHMCS not configured"));
+            SetupValidAuthentication();
+            
+            var pricingJson = @"{""result"": ""success"", ""pricing"": {}}";
+            var jsonDocument = JsonDocument.Parse(pricingJson);
 
-            // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _mockWhmcsService.Object.GetTLDPricingAsync());
+            _mockWhmcsService
+                .Setup(s => s.GetTLDPricingAsync("12345", 2))
+                .ReturnsAsync(jsonDocument);
+
+            var httpRequest = CreateMockRequest(clientId: "12345", currencyId: 2);
+
+            // Act
+            var result = await _function.GetPricing(httpRequest);
+
+            // Assert
+            Assert.IsType<ContentResult>(result);
+            _mockWhmcsService.Verify(s => s.GetTLDPricingAsync("12345", 2), Times.Once);
         }
 
         [Fact]
-        public async Task GetTLDPricingAsync_ServiceThrowsHttpRequestException_CanHandleException()
+        public async Task GetPricing_WithoutAuthentication_ReturnsUnauthorized()
         {
             // Arrange
+            _mockJwtValidationService
+                .Setup(s => s.ValidateTokenAsync(It.IsAny<string>()))
+                .ReturnsAsync((ClaimsPrincipal?)null);
+
+            var httpRequest = CreateMockRequest(addAuthHeader: false);
+
+            // Act
+            var result = await _function.GetPricing(httpRequest);
+
+            // Assert
+            Assert.IsType<UnauthorizedObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task GetPricing_WithInvalidUserProfile_ReturnsUnauthorized()
+        {
+            // Arrange
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, "test-user@example.com")
+            };
+            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth"));
+
+            _mockJwtValidationService
+                .Setup(s => s.ValidateTokenAsync(It.IsAny<string>()))
+                .ReturnsAsync(claimsPrincipal);
+            
+            _mockUserProfileService
+                .Setup(s => s.EnsureUserProfileAsync(It.IsAny<ClaimsPrincipal>()))
+                .ThrowsAsync(new InvalidOperationException("User profile validation failed"));
+
+            var httpRequest = CreateMockRequest();
+
+            // Act
+            var result = await _function.GetPricing(httpRequest);
+
+            // Assert
+            var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+            var errorObj = unauthorizedResult.Value;
+            Assert.NotNull(errorObj);
+        }
+
+        [Fact]
+        public async Task GetPricing_WhenWhmcsNotConfigured_Returns502()
+        {
+            // Arrange
+            SetupValidAuthentication();
+            
+            _mockWhmcsService
+                .Setup(s => s.GetTLDPricingAsync(It.IsAny<string>(), It.IsAny<int?>()))
+                .ThrowsAsync(new InvalidOperationException("WHMCS integration is not configured"));
+
+            var httpRequest = CreateMockRequest();
+
+            // Act
+            var result = await _function.GetPricing(httpRequest);
+
+            // Assert
+            var objectResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(502, objectResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetPricing_WhenHttpRequestFails_Returns502()
+        {
+            // Arrange
+            SetupValidAuthentication();
+            
             _mockWhmcsService
                 .Setup(s => s.GetTLDPricingAsync(It.IsAny<string>(), It.IsAny<int?>()))
                 .ThrowsAsync(new HttpRequestException("Network error"));
 
-            // Act & Assert
-            await Assert.ThrowsAsync<HttpRequestException>(() =>
-                _mockWhmcsService.Object.GetTLDPricingAsync());
+            var httpRequest = CreateMockRequest();
+
+            // Act
+            var result = await _function.GetPricing(httpRequest);
+
+            // Assert
+            var objectResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(502, objectResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetPricing_WhenUnexpectedErrorOccurs_Returns500()
+        {
+            // Arrange
+            SetupValidAuthentication();
+            
+            _mockWhmcsService
+                .Setup(s => s.GetTLDPricingAsync(It.IsAny<string>(), It.IsAny<int?>()))
+                .ThrowsAsync(new Exception("Unexpected error"));
+
+            var httpRequest = CreateMockRequest();
+
+            // Act
+            var result = await _function.GetPricing(httpRequest);
+
+            // Assert
+            var objectResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, objectResult.StatusCode);
         }
     }
 }

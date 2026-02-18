@@ -225,18 +225,27 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 // Parse and validate the response
                 var jsonDocument = JsonDocument.Parse(responseContent);
                 
-                // Check if the result indicates success
-                if (jsonDocument.RootElement.TryGetProperty("result", out var resultElement))
+                // Ensure the result property is present
+                if (!jsonDocument.RootElement.TryGetProperty("result", out var resultElement))
                 {
-                    var result = resultElement.GetString();
-                    if (result != "success")
-                    {
-                        var message = jsonDocument.RootElement.TryGetProperty("message", out var msgElement) 
-                            ? msgElement.GetString() 
-                            : "Unknown error";
-                        _logger.LogError("WHMCS API returned non-success result for GetTLDPricing: {Message}", message);
-                        throw new InvalidOperationException($"WHMCS API error: {message}");
-                    }
+                    _logger.LogError(
+                        "WHMCS API returned an unexpected response for GetTLDPricing: missing 'result' field. Raw response: {ResponseContent}",
+                        responseContent);
+                    throw new InvalidOperationException("Unexpected WHMCS API response: missing 'result' field.");
+                }
+
+                var result = resultElement.GetString();
+                if (!string.Equals(result, "success", StringComparison.OrdinalIgnoreCase))
+                {
+                    var message = jsonDocument.RootElement.TryGetProperty("message", out var msgElement)
+                        ? msgElement.GetString()
+                        : "Unknown error";
+
+                    _logger.LogError(
+                        "WHMCS API returned non-success result for GetTLDPricing: {Message}. Raw response: {ResponseContent}",
+                        message,
+                        responseContent);
+                    throw new InvalidOperationException($"WHMCS API error: {message}");
                 }
 
                 _logger.LogInformation("Successfully retrieved TLD pricing from WHMCS API");
