@@ -173,6 +173,104 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         }
 
         /// <summary>
+        /// Updates the name servers for a registered domain using the WHMCS DomainUpdateNameservers API.
+        /// </summary>
+        /// <param name="domainName">The fully qualified domain name</param>
+        /// <param name="nameServers">Array of name server hostnames</param>
+        /// <returns>True if the update was successful, false otherwise</returns>
+        public async Task<bool> UpdateNameServersAsync(string domainName, string[] nameServers)
+        {
+            if (!_isConfigured)
+            {
+                _logger.LogInformation("WHMCS integration is not configured, skipping name server update");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(domainName))
+            {
+                _logger.LogWarning("Domain name is null or empty");
+                return false;
+            }
+
+            if (nameServers == null || nameServers.Length < 2)
+            {
+                _logger.LogWarning("At least 2 name servers are required for domain {DomainName}", domainName);
+                return false;
+            }
+
+            if (nameServers.Length > 5)
+            {
+                _logger.LogWarning("Maximum 5 name servers allowed for domain {DomainName}, received {Count}", 
+                    domainName, nameServers.Length);
+                return false;
+            }
+
+            _logger.LogInformation("Attempting to update name servers for domain {DomainName} via WHMCS API", domainName);
+
+            try
+            {
+                // Prepare the request parameters
+                var requestData = new Dictionary<string, string>
+                {
+                    { "action", "DomainUpdateNameservers" },
+                    { "identifier", _apiIdentifier! }, // Guaranteed non-null by _isConfigured check
+                    { "secret", _apiSecret! }, // Guaranteed non-null by _isConfigured check
+                    { "domain", domainName },
+                    { "responsetype", "json" }
+                };
+
+                // Add name servers (ns1, ns2, ns3, ns4, ns5)
+                for (int i = 0; i < nameServers.Length && i < 5; i++)
+                {
+                    requestData[$"ns{i + 1}"] = nameServers[i];
+                }
+
+                // Create the form content and make the API request
+                using var content = new FormUrlEncodedContent(requestData);
+                using var response = await _httpClient.PostAsync(_apiUrl!, content); // Guaranteed non-null by _isConfigured check
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("WHMCS API returned error status {StatusCode} for domain {DomainName} name server update", 
+                        response.StatusCode, domainName);
+                    return false;
+                }
+
+                // Parse the response
+                var jsonResponse = JsonSerializer.Deserialize<WhmcsResponse>(responseContent);
+
+                if (jsonResponse?.Result == "success")
+                {
+                    _logger.LogInformation("Successfully updated name servers for domain {DomainName} via WHMCS API", domainName);
+                    return true;
+                }
+                else
+                {
+                    var errorMessage = jsonResponse?.Message ?? "Unknown error";
+                    _logger.LogWarning("WHMCS API returned non-success result for domain {DomainName} name server update: {Message}", 
+                        domainName, errorMessage);
+                    return false;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while updating name servers for domain {DomainName}", domainName);
+                return false;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse WHMCS API response for domain {DomainName} name server update", domainName);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while updating name servers for domain {DomainName}", domainName);
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Represents the WHMCS API response structure.
         /// </summary>
         private class WhmcsResponse

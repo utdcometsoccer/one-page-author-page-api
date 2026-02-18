@@ -7,7 +7,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 {
     /// <summary>
     /// Azure Function triggered by changes to the DomainRegistrations Cosmos DB container.
-    /// Processes new domain registrations by registering them via WHMCS API and adding them to Azure Front Door.
+    /// Processes new domain registrations by:
+    /// 1. Registering domains via WHMCS API
+    /// 2. Ensuring Azure DNS zone exists and retrieving name servers
+    /// 3. Updating WHMCS domain with Azure DNS name servers
+    /// 4. Adding domains to Azure Front Door
     /// </summary>
     /// <remarks>
     /// This function uses a Cosmos DB trigger with a unique lease collection to allow multiple functions
@@ -18,19 +22,26 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         private readonly ILogger<DomainRegistrationTriggerFunction> _logger;
         private readonly IFrontDoorService _frontDoorService;
         private readonly IWhmcsService _whmcsService;
+        private readonly IDnsZoneService _dnsZoneService;
 
         public DomainRegistrationTriggerFunction(
             ILogger<DomainRegistrationTriggerFunction> logger,
             IFrontDoorService frontDoorService,
-            IWhmcsService whmcsService)
+            IWhmcsService whmcsService,
+            IDnsZoneService dnsZoneService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _frontDoorService = frontDoorService ?? throw new ArgumentNullException(nameof(frontDoorService));
             _whmcsService = whmcsService ?? throw new ArgumentNullException(nameof(whmcsService));
+            _dnsZoneService = dnsZoneService ?? throw new ArgumentNullException(nameof(dnsZoneService));
         }
 
         /// <summary>
-        /// Processes changes to domain registrations by registering domains via WHMCS and adding them to Azure Front Door.
+        /// Processes changes to domain registrations by:
+        /// 1. Registering domains via WHMCS
+        /// 2. Ensuring DNS zone exists and retrieving Azure DNS name servers
+        /// 3. Updating WHMCS with Azure DNS name servers
+        /// 4. Adding domains to Azure Front Door
         /// </summary>
         /// <param name="input">List of changed domain registrations from Cosmos DB</param>
         [Function("DomainRegistrationTrigger")]
@@ -96,9 +107,55 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                     else
                     {
                         _logger.LogInformation("Successfully registered domain {DomainName} via WHMCS API", domainName);
+
+                        // Step 2: Ensure DNS zone exists and retrieve name servers
+                        _logger.LogInformation("Ensuring DNS zone exists for domain {DomainName}", domainName);
+                        var dnsZoneCreated = await _dnsZoneService.EnsureDnsZoneExistsAsync(registration);
+                        
+                        if (dnsZoneCreated)
+                        {
+                            _logger.LogInformation("DNS zone exists for domain {DomainName}, retrieving name servers", domainName);
+                            
+                            // Retrieve Azure DNS name servers
+                            var nameServers = await _dnsZoneService.GetNameServersAsync(domainName);
+                            
+                            if (nameServers != null && nameServers.Length > 0)
+                            {
+                                _logger.LogInformation("Retrieved {Count} name servers for domain {DomainName}, updating WHMCS", 
+                                    nameServers.Length, domainName);
+                                
+                                // Step 3: Update WHMCS domain with Azure DNS name servers
+                                bool nameServerUpdateSuccess = false;
+                                try
+                                {
+                                    nameServerUpdateSuccess = await _whmcsService.UpdateNameServersAsync(domainName, nameServers);
+                                }
+                                catch (Exception nsEx)
+                                {
+                                    _logger.LogError(nsEx, "Exception while updating name servers for domain {DomainName} in WHMCS", domainName);
+                                }
+                                
+                                if (nameServerUpdateSuccess)
+                                {
+                                    _logger.LogInformation("Successfully updated name servers for domain {DomainName} in WHMCS", domainName);
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("Failed to update name servers for domain {DomainName} in WHMCS", domainName);
+                                }
+                            }
+                            else
+                            {
+                                _logger.LogWarning("No name servers retrieved for domain {DomainName}, skipping WHMCS name server update", domainName);
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Failed to ensure DNS zone exists for domain {DomainName}, skipping name server update", domainName);
+                        }
                     }
 
-                    // Step 2: Add domain to Front Door
+                    // Step 4: Add domain to Front Door
                     var frontDoorSuccess = await _frontDoorService.AddDomainToFrontDoorAsync(registration);
 
                     if (frontDoorSuccess)
