@@ -1,3 +1,4 @@
+using System.Text.Json;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
@@ -21,5 +22,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="nameServers">Array of name server hostnames (must provide at least 2, maximum 5)</param>
         /// <returns>True if the update was successful, false otherwise</returns>
         Task<bool> UpdateNameServersAsync(string domainName, string[] nameServers);
+
+        /// <summary>
+        /// Gets TLD pricing information from the WHMCS GetTLDPricing API.
+        /// </summary>
+        /// <param name="clientId">The client ID to retrieve pricing for (optional)</param>
+        /// <param name="currencyId">The currency ID to use for pricing (optional)</param>
+        /// <returns>A JsonDocument containing the pricing information</returns>
+        Task<JsonDocument> GetTLDPricingAsync(string? clientId = null, int? currencyId = null);
     }
 }

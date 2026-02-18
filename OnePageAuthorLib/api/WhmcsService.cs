@@ -200,8 +200,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
             if (nameServers.Length > 5)
             {
-                _logger.LogWarning("Maximum 5 name servers allowed for domain {DomainName}, received {Count}", 
-                    domainName, nameServers.Length);
+                _logger.LogWarning(
+                    "Maximum 5 name servers allowed for domain {DomainName}, received {Count}",
+                    domainName,
+                    nameServers.Length);
                 return false;
             }
 
@@ -262,8 +264,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogWarning("WHMCS API returned error status {StatusCode} for domain {DomainName} name server update", 
-                        response.StatusCode, domainName);
+                    _logger.LogWarning(
+                        "WHMCS API returned error status {StatusCode} for domain {DomainName} name server update",
+                        response.StatusCode,
+                        domainName);
                     return false;
                 }
 
@@ -275,13 +279,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                     _logger.LogInformation("Successfully updated name servers for domain {DomainName} via WHMCS API", domainName);
                     return true;
                 }
-                else
-                {
-                    var errorMessage = jsonResponse?.Message ?? "Unknown error";
-                    _logger.LogWarning("WHMCS API returned non-success result for domain {DomainName} name server update: {Message}", 
-                        domainName, errorMessage);
-                    return false;
-                }
+
+                var errorMessage = jsonResponse?.Message ?? "Unknown error";
+                _logger.LogWarning(
+                    "WHMCS API returned non-success result for domain {DomainName} name server update: {Message}",
+                    domainName,
+                    errorMessage);
+                return false;
             }
             catch (HttpRequestException ex)
             {
@@ -297,6 +301,102 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             {
                 _logger.LogError(ex, "Unexpected error while updating name servers for domain {DomainName}", domainName);
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets TLD pricing information from the WHMCS GetTLDPricing API.
+        /// </summary>
+        /// <param name="clientId">The client ID to retrieve pricing for (optional)</param>
+        /// <param name="currencyId">The currency ID to use for pricing (optional)</param>
+        /// <returns>A JsonDocument containing the pricing information</returns>
+        public async Task<JsonDocument> GetTLDPricingAsync(string? clientId = null, int? currencyId = null)
+        {
+            if (!_isConfigured)
+            {
+                _logger.LogWarning("WHMCS integration is not configured, cannot retrieve TLD pricing");
+                throw new InvalidOperationException("WHMCS integration is not configured");
+            }
+
+            _logger.LogInformation("Retrieving TLD pricing from WHMCS API");
+
+            try
+            {
+                // Prepare the request parameters
+                var requestData = new Dictionary<string, string>
+                {
+                    { "action", "GetTLDPricing" },
+                    { "identifier", _apiIdentifier! }, // Guaranteed non-null by _isConfigured check
+                    { "secret", _apiSecret! }, // Guaranteed non-null by _isConfigured check
+                    { "responsetype", "json" }
+                };
+
+                // Add optional parameters if provided
+                if (!string.IsNullOrWhiteSpace(clientId))
+                {
+                    requestData["clientid"] = clientId;
+                }
+
+                if (currencyId.HasValue)
+                {
+                    requestData["currencyid"] = currencyId.Value.ToString();
+                }
+
+                // Create the form content and make the API request
+                using var content = new FormUrlEncodedContent(requestData);
+                using var response = await _httpClient.PostAsync(_apiUrl!, content); // Guaranteed non-null by _isConfigured check
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError("WHMCS API returned error status {StatusCode} for GetTLDPricing", response.StatusCode);
+                    throw new HttpRequestException($"WHMCS API returned status code {response.StatusCode}");
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                // Parse and validate the response
+                var jsonDocument = JsonDocument.Parse(responseContent);
+
+                // Ensure the result property is present
+                if (!jsonDocument.RootElement.TryGetProperty("result", out var resultElement))
+                {
+                    _logger.LogError(
+                        "WHMCS API returned an unexpected response for GetTLDPricing: missing 'result' field. Raw response: {ResponseContent}",
+                        responseContent);
+                    throw new InvalidOperationException("Unexpected WHMCS API response: missing 'result' field.");
+                }
+
+                var result = resultElement.GetString();
+                if (!string.Equals(result, "success", StringComparison.OrdinalIgnoreCase))
+                {
+                    var message = jsonDocument.RootElement.TryGetProperty("message", out var msgElement)
+                        ? msgElement.GetString()
+                        : "Unknown error";
+
+                    _logger.LogError(
+                        "WHMCS API returned non-success result for GetTLDPricing: {Message}. Raw response: {ResponseContent}",
+                        message,
+                        responseContent);
+                    throw new InvalidOperationException($"WHMCS API error: {message}");
+                }
+
+                _logger.LogInformation("Successfully retrieved TLD pricing from WHMCS API");
+                return jsonDocument;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while retrieving TLD pricing");
+                throw;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse WHMCS API response for GetTLDPricing");
+                throw;
+            }
+            catch (Exception ex) when (ex is not InvalidOperationException)
+            {
+                _logger.LogError(ex, "Unexpected error while retrieving TLD pricing");
+                throw;
             }
         }
 
