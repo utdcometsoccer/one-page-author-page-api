@@ -20,5 +20,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="domainName">The fully qualified domain name</param>
         /// <returns>True if the DNS zone exists, false otherwise</returns>
         Task<bool> DnsZoneExistsAsync(string domainName);
+
+        /// <summary>
+        /// Retrieves the Azure DNS name servers for the specified domain.
+        /// </summary>
+        /// <param name="domainName">The fully qualified domain name</param>
+        /// <returns>Array of name server hostnames, or null if DNS zone does not exist</returns>
+        Task<string[]?> GetNameServersAsync(string domainName);
     }
 }

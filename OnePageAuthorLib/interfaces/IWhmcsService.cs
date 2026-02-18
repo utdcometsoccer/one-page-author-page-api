@@ -13,5 +13,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="domainRegistration">The domain registration information</param>
         /// <returns>True if the registration was successful, false otherwise</returns>
         Task<bool> RegisterDomainAsync(DomainRegistration domainRegistration);
+
+        /// <summary>
+        /// Updates the name servers for a registered domain using the WHMCS DomainUpdateNameservers API.
+        /// </summary>
+        /// <param name="domainName">The fully qualified domain name</param>
+        /// <param name="nameServers">Array of name server hostnames (must provide at least 2, maximum 5)</param>
+        /// <returns>True if the update was successful, false otherwise</returns>
+        Task<bool> UpdateNameServersAsync(string domainName, string[] nameServers);
     }
 }

@@ -21,6 +21,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         private readonly Mock<ILogger<DomainRegistrationTriggerFunction>> _mockLogger;
         private readonly Mock<IFrontDoorService> _mockFrontDoorService;
         private readonly Mock<IWhmcsService> _mockWhmcsService;
+        private readonly Mock<IDnsZoneService> _mockDnsZoneService;
         private readonly DomainRegistrationTriggerFunction _function;
 
         public DomainRegistrationTriggerFunctionTests()
@@ -28,10 +29,12 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockLogger = new Mock<ILogger<DomainRegistrationTriggerFunction>>();
             _mockFrontDoorService = new Mock<IFrontDoorService>();
             _mockWhmcsService = new Mock<IWhmcsService>();
+            _mockDnsZoneService = new Mock<IDnsZoneService>();
             _function = new DomainRegistrationTriggerFunction(
                 _mockLogger.Object, 
                 _mockFrontDoorService.Object, 
-                _mockWhmcsService.Object);
+                _mockWhmcsService.Object,
+                _mockDnsZoneService.Object);
         }
 
         #region Constructor Tests
@@ -43,7 +46,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new DomainRegistrationTriggerFunction(
                 null!,
                 _mockFrontDoorService.Object,
-                _mockWhmcsService.Object));
+                _mockWhmcsService.Object,
+                _mockDnsZoneService.Object));
         }
 
         [Fact]
@@ -53,7 +57,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new DomainRegistrationTriggerFunction(
                 _mockLogger.Object,
                 null!,
-                _mockWhmcsService.Object));
+                _mockWhmcsService.Object,
+                _mockDnsZoneService.Object));
         }
 
         [Fact]
@@ -63,6 +68,18 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new DomainRegistrationTriggerFunction(
                 _mockLogger.Object,
                 _mockFrontDoorService.Object,
+                null!,
+                _mockDnsZoneService.Object));
+        }
+
+        [Fact]
+        public void Constructor_WithNullDnsZoneService_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => new DomainRegistrationTriggerFunction(
+                _mockLogger.Object,
+                _mockFrontDoorService.Object,
+                _mockWhmcsService.Object,
                 null!));
         }
 
@@ -73,7 +90,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var function = new DomainRegistrationTriggerFunction(
                 _mockLogger.Object,
                 _mockFrontDoorService.Object,
-                _mockWhmcsService.Object);
+                _mockWhmcsService.Object,
+                _mockDnsZoneService.Object);
 
             // Assert
             Assert.NotNull(function);
@@ -149,6 +167,12 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
                 .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.GetNameServersAsync("example.com"))
+                .ReturnsAsync(new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net", "ns3-04.azure-dns.org", "ns4-04.azure-dns.info" });
+            _mockWhmcsService.Setup(x => x.UpdateNameServersAsync("example.com", It.IsAny<string[]>()))
+                .ReturnsAsync(true);
             _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
                 .ReturnsAsync(true);
 
@@ -157,6 +181,10 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert
             _mockWhmcsService.Verify(x => x.RegisterDomainAsync(domainRegistration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.GetNameServersAsync("example.com"), Times.Once);
+            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync("example.com", 
+                It.Is<string[]>(ns => ns.Length == 4 && ns[0] == "ns1-04.azure-dns.com")), Times.Once);
             _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
             
             _mockLogger.Verify(
@@ -340,6 +368,268 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     LogLevel.Information,
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Skipping domain completed-example.com - status is Completed, expected Pending")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        #endregion
+
+        #region Name Server Update Tests
+
+        [Fact]
+        public async Task Run_AfterSuccessfulWhmcsRegistration_UpdatesNameServers()
+        {
+            // Arrange
+            var domainRegistration = new DomainRegistrationEntity
+            {
+                id = "test-id-nameserver",
+                Status = DomainStatus.Pending,
+                Domain = new DomainEntity
+                {
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "nameserver-example"
+                }
+            };
+            var input = new List<DomainRegistrationEntity> { domainRegistration };
+            var expectedNameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net", "ns3-04.azure-dns.org", "ns4-04.azure-dns.info" };
+
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.GetNameServersAsync("nameserver-example.com"))
+                .ReturnsAsync(expectedNameServers);
+            _mockWhmcsService.Setup(x => x.UpdateNameServersAsync("nameserver-example.com", expectedNameServers))
+                .ReturnsAsync(true);
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
+                .ReturnsAsync(true);
+
+            // Act
+            await _function.Run(input);
+
+            // Assert - verify full flow executed
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(domainRegistration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.GetNameServersAsync("nameserver-example.com"), Times.Once);
+            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync("nameserver-example.com", expectedNameServers), Times.Once);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
+
+            // Verify logging
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Information,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Successfully updated name servers for domain nameserver-example.com in WHMCS")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Run_WhenDnsZoneCreationFails_SkipsNameServerUpdate()
+        {
+            // Arrange
+            var domainRegistration = new DomainRegistrationEntity
+            {
+                id = "test-id-dns-fail",
+                Status = DomainStatus.Pending,
+                Domain = new DomainEntity
+                {
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "dns-fail-example"
+                }
+            };
+            var input = new List<DomainRegistrationEntity> { domainRegistration };
+
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(domainRegistration))
+                .ReturnsAsync(false); // DNS zone creation fails
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
+                .ReturnsAsync(true);
+
+            // Act
+            await _function.Run(input);
+
+            // Assert
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(domainRegistration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.GetNameServersAsync(It.IsAny<string>()), Times.Never);
+            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync(It.IsAny<string>(), It.IsAny<string[]>()), Times.Never);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
+
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to ensure DNS zone exists for domain dns-fail-example.com")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Run_WhenNoNameServersRetrieved_SkipsNameServerUpdate()
+        {
+            // Arrange
+            var domainRegistration = new DomainRegistrationEntity
+            {
+                id = "test-id-no-ns",
+                Status = DomainStatus.Pending,
+                Domain = new DomainEntity
+                {
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "no-ns-example"
+                }
+            };
+            var input = new List<DomainRegistrationEntity> { domainRegistration };
+
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.GetNameServersAsync("no-ns-example.com"))
+                .ReturnsAsync((string[]?)null); // No name servers returned
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
+                .ReturnsAsync(true);
+
+            // Act
+            await _function.Run(input);
+
+            // Assert
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(domainRegistration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.GetNameServersAsync("no-ns-example.com"), Times.Once);
+            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync(It.IsAny<string>(), It.IsAny<string[]>()), Times.Never);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
+
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("No name servers retrieved for domain no-ns-example.com")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Run_WhenNameServerUpdateFails_ContinuesToFrontDoor()
+        {
+            // Arrange
+            var domainRegistration = new DomainRegistrationEntity
+            {
+                id = "test-id-ns-update-fail",
+                Status = DomainStatus.Pending,
+                Domain = new DomainEntity
+                {
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "ns-update-fail-example"
+                }
+            };
+            var input = new List<DomainRegistrationEntity> { domainRegistration };
+            var nameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net" };
+
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.GetNameServersAsync("ns-update-fail-example.com"))
+                .ReturnsAsync(nameServers);
+            _mockWhmcsService.Setup(x => x.UpdateNameServersAsync("ns-update-fail-example.com", nameServers))
+                .ReturnsAsync(false); // Name server update fails
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
+                .ReturnsAsync(true);
+
+            // Act
+            await _function.Run(input);
+
+            // Assert
+            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync("ns-update-fail-example.com", nameServers), Times.Once);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
+
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to update name servers for domain ns-update-fail-example.com in WHMCS")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Run_WhenWhmcsRegistrationFails_SkipsNameServerUpdate()
+        {
+            // Arrange
+            var domainRegistration = new DomainRegistrationEntity
+            {
+                id = "test-id-reg-fail",
+                Status = DomainStatus.Pending,
+                Domain = new DomainEntity
+                {
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "reg-fail-example"
+                }
+            };
+            var input = new List<DomainRegistrationEntity> { domainRegistration };
+
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
+                .ReturnsAsync(false); // WHMCS registration fails
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
+                .ReturnsAsync(true);
+
+            // Act
+            await _function.Run(input);
+
+            // Assert
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(domainRegistration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+            _mockDnsZoneService.Verify(x => x.GetNameServersAsync(It.IsAny<string>()), Times.Never);
+            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync(It.IsAny<string>(), It.IsAny<string[]>()), Times.Never);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
+        }
+
+        [Fact]
+        public async Task Run_WithInvalidNameServerCount_SkipsNameServerUpdate()
+        {
+            // Arrange
+            var domainRegistration = new DomainRegistrationEntity
+            {
+                id = "test-id-invalid-count",
+                Status = DomainStatus.Pending,
+                Domain = new DomainEntity
+                {
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "invalid-count-example"
+                }
+            };
+            var input = new List<DomainRegistrationEntity> { domainRegistration };
+            var invalidNameServers = new[] { "ns1.azure.com" }; // Only 1 name server (requires 2-5)
+
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(domainRegistration))
+                .ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.GetNameServersAsync("invalid-count-example.com"))
+                .ReturnsAsync(invalidNameServers);
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(domainRegistration))
+                .ReturnsAsync(true);
+
+            // Act
+            await _function.Run(input);
+
+            // Assert
+            _mockDnsZoneService.Verify(x => x.GetNameServersAsync("invalid-count-example.com"), Times.Once);
+            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync(It.IsAny<string>(), It.IsAny<string[]>()), Times.Never);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(domainRegistration), Times.Once);
+
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Retrieved 1 name servers") && v.ToString()!.Contains("WHMCS requires 2-5 name servers")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
