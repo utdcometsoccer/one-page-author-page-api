@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 
 namespace OnePageAuthor.Test.Services
 {
@@ -294,6 +295,193 @@ namespace OnePageAuthor.Test.Services
 
             // Assert
             Assert.False(result);
+        }
+
+        #endregion
+
+        #region GetTLDPricingAsync Tests
+
+        [Fact]
+        public async Task GetTLDPricingAsync_WithMissingConfiguration_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(c => c["WHMCS_API_URL"]).Returns((string?)null);
+            mockConfig.Setup(c => c["WHMCS_API_IDENTIFIER"]).Returns((string?)null);
+            mockConfig.Setup(c => c["WHMCS_API_SECRET"]).Returns((string?)null);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, mockConfig.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetTLDPricingAsync());
+        }
+
+        [Fact]
+        public async Task GetTLDPricingAsync_WithSuccessResponse_ReturnsJsonDocument()
+        {
+            // Arrange
+            var responseJson = @"{
+                ""result"": ""success"",
+                ""pricing"": {
+                    ""com"": {
+                        ""registration"": { ""1"": 8.95, ""2"": 8.50 },
+                        ""renewal"": { ""1"": 9.95 },
+                        ""transfer"": { ""1"": 8.95 }
+                    }
+                }
+            }";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            using var result = await service.GetTLDPricingAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.True(result.RootElement.TryGetProperty("result", out var resultProp));
+            Assert.Equal("success", resultProp.GetString());
+            Assert.True(result.RootElement.TryGetProperty("pricing", out var pricingProp));
+            Assert.True(pricingProp.TryGetProperty("com", out _));
+        }
+
+        [Fact]
+        public async Task GetTLDPricingAsync_WithClientId_IncludesInRequest()
+        {
+            // Arrange
+            var responseJson = @"{""result"": ""success"", ""pricing"": {}}";
+            string? capturedFormContent = null;
+
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Callback<HttpRequestMessage, CancellationToken>(async (req, ct) =>
+                {
+                    if (req.Content != null)
+                    {
+                        capturedFormContent = await req.Content.ReadAsStringAsync();
+                    }
+                })
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                });
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            using var result = await service.GetTLDPricingAsync(clientId: "12345");
+
+            // Assert
+            Assert.NotNull(capturedFormContent);
+            Assert.Contains("action=GetTLDPricing", capturedFormContent);
+            Assert.Contains("clientid=12345", capturedFormContent);
+            Assert.Contains("identifier=test-identifier", capturedFormContent);
+            Assert.Contains("secret=test-secret", capturedFormContent);
+            Assert.Contains("responsetype=json", capturedFormContent);
+        }
+
+        [Fact]
+        public async Task GetTLDPricingAsync_WithCurrencyId_IncludesInRequest()
+        {
+            // Arrange
+            var responseJson = @"{""result"": ""success"", ""pricing"": {}}";
+            string? capturedFormContent = null;
+
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Callback<HttpRequestMessage, CancellationToken>(async (req, ct) =>
+                {
+                    if (req.Content != null)
+                    {
+                        capturedFormContent = await req.Content.ReadAsStringAsync();
+                    }
+                })
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                });
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            using var result = await service.GetTLDPricingAsync(currencyId: 2);
+
+            // Assert
+            Assert.NotNull(capturedFormContent);
+            Assert.Contains("action=GetTLDPricing", capturedFormContent);
+            Assert.Contains("currencyid=2", capturedFormContent);
+        }
+
+        [Fact]
+        public async Task GetTLDPricingAsync_WithErrorResponse_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var responseJson = @"{""result"": ""error"", ""message"": ""Invalid credentials""}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetTLDPricingAsync());
+            Assert.Contains("Invalid credentials", exception.Message);
+        }
+
+        [Fact]
+        public async Task GetTLDPricingAsync_WithHttpErrorStatus_ThrowsHttpRequestException()
+        {
+            // Arrange
+            SetupHttpResponse(HttpStatusCode.InternalServerError, "Server error");
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<HttpRequestException>(() => service.GetTLDPricingAsync());
+        }
+
+        [Fact]
+        public async Task GetTLDPricingAsync_WithInvalidJson_ThrowsJsonException()
+        {
+            // Arrange
+            SetupHttpResponse(HttpStatusCode.OK, "invalid-json");
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert - Expecting a JSON parsing exception (could be JsonReaderException or JsonException)
+            try
+            {
+                await service.GetTLDPricingAsync();
+                Assert.Fail("Expected JsonException or derived type to be thrown");
+            }
+            catch (JsonException ex)
+            {
+                // Success - caught JsonException or a derived type like JsonReaderException
+                Assert.NotNull(ex);
+            }
+        }
+
+        [Fact]
+        public async Task GetTLDPricingAsync_WithHttpRequestException_ThrowsHttpRequestException()
+        {
+            // Arrange
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ThrowsAsync(new HttpRequestException("Network error"));
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<HttpRequestException>(() => service.GetTLDPricingAsync());
         }
 
         #endregion
