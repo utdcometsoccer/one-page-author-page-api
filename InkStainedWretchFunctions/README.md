@@ -39,6 +39,7 @@ The InkStainedWretchFunctions project provides a comprehensive Azure Functions a
 - **POST /api/domain-registrations** - Creates new domain registrations
 - **GET /api/domain-registrations** - Gets all domain registrations for user
 - **GET /api/domain-registrations/{registrationId}** - Gets specific domain registration
+- **GET /api/whmcs/tld-pricing** - Gets TLD pricing information from WHMCS (requires auth)
 - **GET /api/countries/{language}** - Gets countries by language
 - **GET /api/languages/{language}** - Gets languages with localized names
 - **GET /api/stateprovinces/{culture}** - Gets all states/provinces by culture
@@ -468,6 +469,69 @@ Gets all domain registrations for the authenticated user.
 **Endpoint:** `GET /api/domain-registrations/{registrationId}`
 
 Gets a specific domain registration by ID.
+
+#### Get TLD Pricing (WHMCS)
+
+**Endpoint:** `GET /api/whmcs/tld-pricing`
+
+Retrieves TLD (Top-Level Domain) pricing information from WHMCS API. Requires authentication.
+
+**Query Parameters (Optional):**
+
+- `clientId` - WHMCS client ID to retrieve pricing for specific client
+- `currencyId` - Currency ID to retrieve pricing in specific currency
+
+**Example Request:**
+
+```bash
+# Get all TLD pricing
+curl -X GET "https://your-api.azurewebsites.net/api/whmcs/tld-pricing" \
+  -H "Authorization: Bearer your-jwt-token"
+
+# Get pricing for specific client and currency
+curl -X GET "https://your-api.azurewebsites.net/api/whmcs/tld-pricing?clientId=12345&currencyId=2" \
+  -H "Authorization: Bearer your-jwt-token"
+```
+
+**Example Response:**
+
+```json
+{
+  "result": "success",
+  "pricing": {
+    "com": {
+      "registration": {
+        "1": 8.95,
+        "2": 8.50,
+        "3": 8.25
+      },
+      "renewal": {
+        "1": 9.95,
+        "2": 9.50
+      },
+      "transfer": {
+        "1": 8.95
+      }
+    },
+    "net": {
+      "registration": {
+        "1": 9.95
+      },
+      "renewal": {
+        "1": 10.95
+      }
+    }
+  }
+}
+```
+
+**Required Configuration:**
+
+- `WHMCS_API_URL` - WHMCS API endpoint
+- `WHMCS_API_IDENTIFIER` - API authentication identifier
+- `WHMCS_API_SECRET` - API authentication secret
+
+**Note:** The client ID is retrieved from environment variables via the WHMCS configuration. If WHMCS is not configured, the endpoint will return a 502 Bad Gateway error.
 
 ## Cosmos DB Triggered Functions
 
