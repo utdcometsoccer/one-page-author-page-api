@@ -298,6 +298,266 @@ namespace OnePageAuthor.Test.Services
 
         #endregion
 
+        #region UpdateNameServersAsync Tests
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithMissingConfiguration_ReturnsFalse()
+        {
+            // Arrange
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(c => c["WHMCS_API_URL"]).Returns((string?)null);
+            mockConfig.Setup(c => c["WHMCS_API_IDENTIFIER"]).Returns((string?)null);
+            mockConfig.Setup(c => c["WHMCS_API_SECRET"]).Returns((string?)null);
+            
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, mockConfig.Object);
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", new[] { "ns1.azure.com", "ns2.azure.net" });
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithNullDomainName_ReturnsFalse()
+        {
+            // Arrange
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            var result = await service.UpdateNameServersAsync(null!, new[] { "ns1.azure.com", "ns2.azure.net" });
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithEmptyDomainName_ReturnsFalse()
+        {
+            // Arrange
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            var result = await service.UpdateNameServersAsync("", new[] { "ns1.azure.com", "ns2.azure.net" });
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithNullNameServers_ReturnsFalse()
+        {
+            // Arrange
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", null!);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithLessThanTwoNameServers_ReturnsFalse()
+        {
+            // Arrange
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", new[] { "ns1.azure.com" });
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithMoreThanFiveNameServers_ReturnsFalse()
+        {
+            // Arrange
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1.azure.com", "ns2.azure.net", "ns3.azure.org", "ns4.azure.info", "ns5.azure.biz", "ns6.azure.co" };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithSuccessResponse_ReturnsTrue()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\",\"message\":\"Name servers updated successfully\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net", "ns3-04.azure-dns.org", "ns4-04.azure-dns.info" };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.True(result);
+            VerifyHttpRequestMade();
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithErrorResponse_ReturnsFalse()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"error\",\"message\":\"Invalid domain\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net" };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithHttpErrorStatus_ReturnsFalse()
+        {
+            // Arrange
+            SetupHttpResponse(HttpStatusCode.InternalServerError, "Server error");
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net" };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithInvalidJson_ReturnsFalse()
+        {
+            // Arrange
+            SetupHttpResponse(HttpStatusCode.OK, "invalid-json");
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net" };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_SendsCorrectFormData()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\"}";
+            string? capturedFormContent = null;
+            
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Callback<HttpRequestMessage, CancellationToken>(async (req, ct) => 
+                {
+                    // Capture the form content before it's disposed
+                    if (req.Content != null)
+                    {
+                        capturedFormContent = await req.Content.ReadAsStringAsync();
+                    }
+                })
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                });
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net", "ns3-04.azure-dns.org", "ns4-04.azure-dns.info" };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.True(result);
+            Assert.NotNull(capturedFormContent);
+            
+            // Verify form-encoded body contains required WHMCS parameters
+            Assert.Contains("action=DomainUpdateNameservers", capturedFormContent);
+            Assert.Contains("identifier=test-identifier", capturedFormContent);
+            Assert.Contains("secret=test-secret", capturedFormContent);
+            Assert.Contains("domain=testdomain.com", capturedFormContent);
+            Assert.Contains("responsetype=json", capturedFormContent);
+            
+            // Verify name servers are mapped correctly
+            Assert.Contains("ns1=ns1-04.azure-dns.com", capturedFormContent);
+            Assert.Contains("ns2=ns2-04.azure-dns.net", capturedFormContent);
+            Assert.Contains("ns3=ns3-04.azure-dns.org", capturedFormContent);
+            Assert.Contains("ns4=ns4-04.azure-dns.info", capturedFormContent);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithHttpRequestException_ReturnsFalse()
+        {
+            // Arrange
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ThrowsAsync(new HttpRequestException("Network error"));
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net" };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithTwoNameServers_ReturnsTrue()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net" };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithFiveNameServers_ReturnsTrue()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1.azure.com", "ns2.azure.net", "ns3.azure.org", "ns4.azure.info", "ns5.azure.biz" };
+
+            // Act
+            var result = await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private DomainRegistrationEntity CreateTestDomainRegistration()
