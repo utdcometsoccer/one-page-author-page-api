@@ -84,6 +84,7 @@ The **Fediverse** is a decentralized network of independently hosted social plat
 #### 1. Actors
 
 Entities that can perform activities (users, bots, organizations):
+
 - **Person**: Individual user account
 - **Group**: Collective account
 - **Service**: Automated bot or system
@@ -92,6 +93,7 @@ Entities that can perform activities (users, bots, organizations):
 #### 2. Objects
 
 Things that activities are performed on:
+
 - **Note**: Short-form post (like a tweet)
 - **Article**: Long-form content
 - **Image**: Image attachment
@@ -101,6 +103,7 @@ Things that activities are performed on:
 #### 3. Activities
 
 Actions performed by actors on objects:
+
 - **Create**: Publishing new content
 - **Update**: Modifying existing content
 - **Delete**: Removing content
@@ -145,6 +148,7 @@ Host: author-server.com
 ```
 
 Response:
+
 ```json
 {
   "subject": "acct:john@author-server.com",
@@ -169,17 +173,20 @@ Response:
 **Implementation Complexity**: ⭐ (Very Low)
 
 **User Experience**:
+
 - Authors provide their Mastodon handle (e.g., @author@mastodon.social)
 - Link appears in social media section of author page
 - Clicking opens their Mastodon profile in new tab
 
 **Pros**:
+
 - ✅ Minimal development effort (uses existing Social entity)
 - ✅ No infrastructure changes required
 - ✅ Zero maintenance overhead
 - ✅ Authors use established, reliable Mastodon instances
 
 **Cons**:
+
 - ❌ No integration with author's custom domain
 - ❌ Authors must create/manage separate Mastodon account
 - ❌ Limited branding control
@@ -195,18 +202,21 @@ Response:
 **Implementation Complexity**: ⭐⭐⭐ (Moderate)
 
 **User Experience**:
+
 - Author's Fediverse handle becomes @authorname@authordomain.com
 - Mastodon users can search and find the profile
 - Profile displays basic info but links to primary Mastodon account for interaction
 - Provides domain verification without full server maintenance
 
 **Pros**:
+
 - ✅ Branded Fediverse identity at author's domain
 - ✅ Domain verification for existing Mastodon accounts
 - ✅ Low infrastructure overhead (static JSON files)
 - ✅ No complex federation logic required
 
 **Cons**:
+
 - ❌ Limited interactivity (no posting/following from author domain)
 - ❌ Requires Azure Functions endpoints for WebFinger and actor profile
 - ❌ Still requires separate Mastodon account for actual posting
@@ -222,18 +232,21 @@ Response:
 **Implementation Complexity**: ⭐⭐⭐⭐⭐ (Very High)
 
 **User Experience**:
+
 - Complete Fediverse integration at author's domain
 - Authors can post updates, reply, follow others
 - Content appears on author page and federates to Fediverse
 - Full-featured social networking experience
 
 **Pros**:
+
 - ✅ Complete control over author's Fediverse presence
 - ✅ Integrated posting workflow (publish once, appears everywhere)
 - ✅ Rich branding and customization options
 - ✅ No reliance on external Mastodon instances
 
 **Cons**:
+
 - ❌ Significant development complexity (3-6 months)
 - ❌ Ongoing infrastructure costs (federation, storage, processing)
 - ❌ Security and moderation responsibilities
@@ -251,16 +264,19 @@ Response:
 Based on complexity, value, and alignment with platform goals, we recommend a **phased approach**:
 
 #### Phase 1: Profile Linking (Q1 2026)
+
 - **Goal**: Enable authors to link to their existing Mastodon/Fediverse profiles
 - **Effort**: 1-2 hours
 - **Priority**: HIGH - Quick win, immediate value
 
 #### Phase 2: Static ActivityPub Profile (Q2-Q3 2026)
+
 - **Goal**: Provide domain-based Fediverse identity for branding
 - **Effort**: 1-2 weeks
 - **Priority**: MEDIUM - Brand enhancement, modern web practices
 
 #### Phase 3: Full ActivityPub Server (Q4 2026+)
+
 - **Goal**: Comprehensive social networking from author domains
 - **Effort**: 3-6 months
 - **Priority**: LOW - Evaluate based on user demand and Fediverse adoption
@@ -302,6 +318,7 @@ Add Fediverse platforms to seed data:
 #### Localization Updates
 
 Add translations for Fediverse platforms in `SeedInkStainedWretchesLocale`:
+
 - English: "Mastodon", "Pixelfed", "Follow me on Mastodon"
 - Spanish: "Mastodon", "Pixelfed", "Sígueme en Mastodon"
 - French: "Mastodon", "Pixelfed", "Suivez-moi sur Mastodon"
@@ -480,6 +497,7 @@ public class ActivityPubActivity
 #### Background Processing
 
 Use **Azure Durable Functions** for:
+
 - Activity delivery to remote servers
 - Retry logic for failed deliveries
 - Scheduled cleanup of old activities
@@ -560,6 +578,7 @@ public class Author
 ### Phase 3: Full ActivityPub Server
 
 **New Containers**:
+
 1. `ActivityPubPosts` - User posts and content
 2. `ActivityPubFollowers` - Follower relationships
 3. `ActivityPubFollowing` - Following relationships
@@ -590,6 +609,7 @@ public class Author
 ### Phase 1: Profile Linking
 
 **Minimal Security Impact**
+
 - Standard URL validation for social links
 - No authentication/authorization changes needed
 - Existing input sanitization sufficient
@@ -600,13 +620,14 @@ public class Author
 
 **Low Security Impact**
 
-#### Considerations:
+#### Considerations
+
 1. **Public Information**: Actor profiles contain only public author data
 2. **Read-Only**: No write operations, minimal attack surface
 3. **DDoS Protection**: Rate limit WebFinger endpoint
 4. **Content-Type Validation**: Prevent content-type confusion attacks
 
-#### Recommended Security Measures:
+#### Recommended Security Measures
 
 ```csharp
 // Rate limiting configuration
@@ -626,7 +647,7 @@ services.AddRateLimiting(options =>
 
 **High Security Impact**
 
-#### Major Security Concerns:
+#### Major Security Concerns
 
 1. **HTTP Signature Verification**
    - MUST verify signatures on all incoming activities
@@ -652,7 +673,7 @@ services.AddRateLimiting(options =>
    - Key rotation procedures
    - Azure Key Vault integration recommended
 
-#### Security Implementation Checklist:
+#### Security Implementation Checklist
 
 - [ ] HTTP signature validation for all inbound activities
 - [ ] HTML/Markdown sanitization library (e.g., HtmlSanitizer)
@@ -682,10 +703,12 @@ services.AddRateLimiting(options =>
 #### Azure Functions
 
 **Estimated Load**: Low
+
 - WebFinger lookups: ~10-100 requests/day per author
 - Actor profile requests: ~5-50 requests/day per author
 
 **Resource Requirements**:
+
 - Function App: Existing instance sufficient
 - Compute: Minimal (< 1 second execution time)
 - Cost Impact: < $1/month per 100 authors
@@ -693,6 +716,7 @@ services.AddRateLimiting(options =>
 #### Cosmos DB
 
 **Container**: Use existing `Authors` container
+
 - No additional containers needed
 - Minimal storage increase (< 1 KB per author)
 - Negligible RU impact
@@ -700,10 +724,12 @@ services.AddRateLimiting(options =>
 #### CDN/Caching
 
 **Recommendation**: Enable Azure Front Door caching for:
+
 - WebFinger responses (30-minute cache)
 - Actor profiles (1-hour cache)
 
 **Benefits**:
+
 - Reduced function invocations
 - Lower latency for Fediverse servers
 - Cost optimization
@@ -715,11 +741,13 @@ services.AddRateLimiting(options =>
 #### Azure Functions
 
 **Estimated Load**: High
+
 - Inbox processing: 100-10,000+ activities/day per active author
 - Outbox delivery: 50-5,000+ deliveries/day per active author
 - Real-time processing requirements
 
 **Resource Requirements**:
+
 - **Dedicated Function App** recommended (separate from main API)
 - **Premium or Dedicated Plan** for consistent performance
 - **Azure Durable Functions** for activity delivery orchestration
@@ -740,6 +768,7 @@ services.AddRateLimiting(options =>
 #### Azure Storage
 
 **Blob Storage** for media federation:
+
 - Federated images and videos
 - Estimated: 1-50 GB per active author
 - Standard tier sufficient
@@ -748,6 +777,7 @@ services.AddRateLimiting(options =>
 #### Azure Service Bus (Recommended)
 
 For reliable activity delivery:
+
 - Queue for outbound activities
 - Dead-letter queue for failed deliveries
 - Cost: ~$10-50/month
@@ -755,6 +785,7 @@ For reliable activity delivery:
 #### Azure Application Insights
 
 Enhanced monitoring for ActivityPub operations:
+
 - Activity processing metrics
 - Federation health monitoring
 - Error tracking and alerting
@@ -782,21 +813,25 @@ Enhanced monitoring for ActivityPub operations:
 #### Week 1: Development
 
 **Day 1-2: Planning and Research**
+
 - ✅ Review this document
 - ✅ Identify top Fediverse platforms for authors
 - ✅ Design UI mockups for social links
 
 **Day 3: Implementation**
+
 - Add "Mastodon", "Pixelfed", "BookWyrm" to seed data
 - Update localization for new platforms
 - Test existing Social entity handling
 
 **Day 4-5: Testing and Documentation**
+
 - Update API documentation
 - Manual testing with sample author profiles
 - Update front-end integration guide
 
-#### Success Criteria:
+#### Success Criteria
+
 - [ ] Authors can add Mastodon links to profiles
 - [ ] Links display correctly on author pages
 - [ ] All supported languages have translations
@@ -816,18 +851,21 @@ Enhanced monitoring for ActivityPub operations:
 #### Week 3-4: Implementation
 
 **WebFinger Endpoint**:
+
 - Create `GetWebFinger` Azure Function
 - Implement resource parsing
 - Add author lookup logic
 - Configure CORS headers
 
 **Actor Profile Endpoint**:
+
 - Create `GetActorProfile` Azure Function
 - Build ActivityPubActor model
 - Map Author entity to Actor
 - Implement Content-Type negotiation
 
 **Integration**:
+
 - Add `PrimaryMastodonAccount` to Author entity
 - Create admin interface for setting primary account
 - Update author management UI
@@ -846,7 +884,8 @@ Enhanced monitoring for ActivityPub operations:
 - Deployment to staging environment
 - Gradual rollout to production
 
-#### Success Criteria:
+#### Success Criteria
+
 - [ ] @author@authordomain.com discoverable in Mastodon search
 - [ ] Actor profile displays correctly
 - [ ] Links to primary Mastodon account work
@@ -858,6 +897,7 @@ Enhanced monitoring for ActivityPub operations:
 ### Phase 3: Full ActivityPub Server (Q4 2026+ - Optional)
 
 **Decision Point**: Evaluate after Phase 2 based on:
+
 - User demand and feedback
 - Fediverse ecosystem maturity
 - Available development resources
@@ -892,7 +932,8 @@ Enhanced monitoring for ActivityPub operations:
 - Monitoring and alerting setup
 - Gradual production rollout
 
-#### Success Criteria:
+#### Success Criteria
+
 - [ ] Full ActivityPub protocol compliance
 - [ ] Successful federation with major Mastodon instances
 - [ ] < 1 second post delivery time
@@ -910,6 +951,7 @@ Enhanced monitoring for ActivityPub operations:
 **Maintenance Cost**: $0/month  
 
 **Benefits**:
+
 - ✅ Quick win for Fediverse-savvy authors
 - ✅ Zero ongoing costs
 - ✅ Modern, forward-thinking feature
@@ -927,6 +969,7 @@ Enhanced monitoring for ActivityPub operations:
 **Maintenance Cost**: $500-1,000/year  
 
 **Benefits**:
+
 - ✅ Branded Fediverse identity
 - ✅ Domain verification
 - ✅ Modern web standards compliance
@@ -945,12 +988,14 @@ Enhanced monitoring for ActivityPub operations:
 **Maintenance Cost**: $10,000-30,000/year  
 
 **Benefits**:
+
 - ✅ Complete social platform integration
 - ✅ Maximum control and customization
 - ✅ No reliance on external services
 - ✅ Potential revenue opportunities (premium social features)
 
 **Risks**:
+
 - ❌ High development complexity
 - ❌ Significant ongoing costs
 - ❌ Security and moderation challenges
@@ -1135,6 +1180,7 @@ Enhanced monitoring for ActivityPub operations:
 Fediverse integration represents a strategic opportunity to provide authors with decentralized, modern social networking capabilities. The phased approach outlined in this document balances immediate value delivery (Phase 1) with long-term strategic positioning (Phases 2-3).
 
 **Immediate Next Steps**:
+
 1. **Approve Phase 1** for immediate implementation (2-4 hours effort)
 2. **Evaluate Phase 2** for Q2-Q3 2026 roadmap
 3. **Monitor Fediverse adoption** to inform Phase 3 decision
