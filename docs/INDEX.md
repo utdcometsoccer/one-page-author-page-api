@@ -76,6 +76,7 @@ Comprehensive API reference and guides:
 - [**README-Documentation**](README-Documentation.md) - Documentation generation system
 - [**LocalizationREADME**](LocalizationREADME.md) - Internationalization and localization guide
 - [**WIKIPEDIA_API**](WIKIPEDIA_API.md) - Wikipedia API integration
+- [**FEDIVERSE_INTEGRATION**](FEDIVERSE_INTEGRATION.md) - Fediverse and ActivityPub integration investigation
 
 ### 🏗️ Implementation Summaries
 
@@ -104,6 +105,7 @@ Detailed implementation documentation for specific features:
 - [**GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY**](GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY.md) - Domain registration
 - [**KEY_VAULT_IMPLEMENTATION_SUMMARY**](KEY_VAULT_IMPLEMENTATION_SUMMARY.md) - Secrets management
 - [**KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION**](KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION.md) - Key Vault RBAC
+- [**FEDIVERSE_INTEGRATION**](FEDIVERSE_INTEGRATION.md) - Fediverse and ActivityPub integration (NEW)
 
 #### User Features
 
