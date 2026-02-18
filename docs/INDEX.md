@@ -77,6 +77,13 @@ Comprehensive API reference and guides:
 - [**LocalizationREADME**](LocalizationREADME.md) - Internationalization and localization guide
 - [**WIKIPEDIA_API**](WIKIPEDIA_API.md) - Wikipedia API integration
 
+### 🌐 Social Media & Decentralized Protocols
+
+Documentation for social media integrations and decentralized protocols:
+
+- [**AT_PROTOCOL_IMPLEMENTATION**](AT_PROTOCOL_IMPLEMENTATION.md) - **Complete AT Protocol guide** - Implementation plan for Bluesky integration
+- [**AT_PROTOCOL_QUICK_REFERENCE**](AT_PROTOCOL_QUICK_REFERENCE.md) - Quick reference for developers working with AT Protocol
+
 ### 🏗️ Implementation Summaries
 
 Detailed implementation documentation for specific features:
