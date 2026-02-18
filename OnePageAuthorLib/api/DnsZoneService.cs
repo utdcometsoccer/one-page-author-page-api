@@ -145,5 +145,53 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
             _logger.LogInformation("DNS zone creation completed for domain: {DomainName}", domainName);
         }
+
+        public async Task<string[]?> GetNameServersAsync(string domainName)
+        {
+            if (string.IsNullOrWhiteSpace(domainName))
+            {
+                _logger.LogWarning("Domain name is empty in GetNameServersAsync");
+                return null;
+            }
+
+            _logger.LogInformation("Retrieving name servers for domain: {DomainName}", domainName);
+
+            try
+            {
+                // Get the subscription
+                var subscription = await _armClient.GetSubscriptionResource(
+                    new ResourceIdentifier($"/subscriptions/{_subscriptionId}")).GetAsync();
+
+                // Get the resource group
+                var resourceGroup = await subscription.Value.GetResourceGroups()
+                    .GetAsync(_resourceGroupName);
+
+                // Get the DNS zone
+                var dnsZones = resourceGroup.Value.GetDnsZones();
+                var dnsZone = await dnsZones.GetAsync(domainName);
+
+                if (dnsZone?.Value?.Data?.NameServers == null || dnsZone.Value.Data.NameServers.Count == 0)
+                {
+                    _logger.LogWarning("No name servers found for domain: {DomainName}", domainName);
+                    return null;
+                }
+
+                var nameServers = dnsZone.Value.Data.NameServers.ToArray();
+                _logger.LogInformation("Retrieved {Count} name servers for domain {DomainName}: {NameServers}", 
+                    nameServers.Length, domainName, string.Join(", ", nameServers));
+
+                return nameServers;
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                _logger.LogWarning("DNS zone not found for domain: {DomainName}", domainName);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving name servers for domain: {DomainName}", domainName);
+                return null;
+            }
+        }
     }
 }

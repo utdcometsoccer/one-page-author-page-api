@@ -84,7 +84,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.Mocks
             }
         }
 
-        public async Task<string[]> GetNameServersAsync(string domainName)
+        public async Task<string[]?> GetNameServersAsync(string domainName)
         {
             if (_testConfig.EnableTestLogging)
             {

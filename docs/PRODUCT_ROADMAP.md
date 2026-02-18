@@ -597,6 +597,10 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
   - Activity streams
   - Content sharing
   - Community engagement tools
+  - **Fediverse Integration** 📋 - See [FEDIVERSE_INTEGRATION.md](FEDIVERSE_INTEGRATION.md)
+    - Phase 1: Mastodon/Fediverse profile linking
+    - Phase 2: Static ActivityPub profiles for domain verification
+    - Phase 3: Full ActivityPub server (long-term)
 
 - **Advanced Media Management** 🆕
   - Video upload and streaming

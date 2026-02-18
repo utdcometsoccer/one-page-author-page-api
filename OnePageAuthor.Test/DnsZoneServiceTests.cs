@@ -139,5 +139,33 @@ namespace OnePageAuthor.Test
 
             Assert.False(result);
         }
+
+        [Fact]
+        public async Task GetNameServersAsync_ReturnsNullForEmptyDomainName()
+        {
+            var logger = new Mock<ILogger<DnsZoneService>>();
+            var config = new Mock<IConfiguration>();
+            config.Setup(c => c["AZURE_SUBSCRIPTION_ID"]).Returns("test-sub-id");
+            config.Setup(c => c["AZURE_DNS_RESOURCE_GROUP"]).Returns("test-rg");
+
+            var service = new DnsZoneService(logger.Object, config.Object);
+            var result = await service.GetNameServersAsync("");
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task GetNameServersAsync_ReturnsNullForNullDomainName()
+        {
+            var logger = new Mock<ILogger<DnsZoneService>>();
+            var config = new Mock<IConfiguration>();
+            config.Setup(c => c["AZURE_SUBSCRIPTION_ID"]).Returns("test-sub-id");
+            config.Setup(c => c["AZURE_DNS_RESOURCE_GROUP"]).Returns("test-rg");
+
+            var service = new DnsZoneService(logger.Object, config.Object);
+            var result = await service.GetNameServersAsync(null!);
+
+            Assert.Null(result);
+        }
     }
 }
