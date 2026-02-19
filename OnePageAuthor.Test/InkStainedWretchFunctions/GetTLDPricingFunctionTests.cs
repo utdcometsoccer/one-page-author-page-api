@@ -425,5 +425,37 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.IsType<ContentResult>(result);
             _mockWhmcsService.Verify(s => s.GetTLDPricingAsync("query-client-42", null), Times.Once);
         }
+
+        [Fact]
+        public async Task GetPricing_WithNoClientIdSourceConfigured_LogsWarningAndProceedsWithNullClientId()
+        {
+            // Arrange
+            SetupValidAuthentication();
+            // _mockConfiguration returns null for WHMCS_CLIENT_ID by default (not set up)
+
+            var pricingJson = @"{""result"": ""success"", ""pricing"": {}}";
+            var jsonDocument = JsonDocument.Parse(pricingJson);
+
+            _mockWhmcsService
+                .Setup(s => s.GetTLDPricingAsync(null, null))
+                .ReturnsAsync(jsonDocument);
+
+            var httpRequest = CreateMockRequest();
+
+            // Act
+            var result = await _function.GetPricing(httpRequest);
+
+            // Assert
+            Assert.IsType<ContentResult>(result);
+            _mockWhmcsService.Verify(s => s.GetTLDPricingAsync(null, null), Times.Once);
+            _mockLogger.Verify(
+                l => l.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("WHMCS_CLIENT_ID")),
+                    null,
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
     }
 }
