@@ -676,6 +676,7 @@ jobs:
           DEPLOY_ISW_FUNCTIONS: ${{ secrets.DEPLOY_ISW_FUNCTIONS }}
           APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
           APPLICATIONINSIGHTS_CONNECTION_STRING_ISW: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
+          WHMCS_CLIENT_ID: ${{ secrets.WHMCS_CLIENT_ID }}
         run: |
           # Skip if InkStainedWretchFunctions deployment is not enabled
           if [ "$DEPLOY_ISW_FUNCTIONS" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -706,6 +707,19 @@ jobs:
             echo "✓ App setting applied to $FUNCTION_APP_NAME"
           else
             echo "⚠️ APPLICATIONINSIGHTS_CONNECTION_STRING not configured; skipping app setting update"
+          fi
+
+          if [ -n "$WHMCS_CLIENT_ID" ]; then
+            echo "🔧 Setting WHMCS_CLIENT_ID on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "WHMCS_CLIENT_ID=$WHMCS_CLIENT_ID" \
+              --only-show-errors \
+              --output none
+            echo "✓ WHMCS_CLIENT_ID app setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ WHMCS_CLIENT_ID not configured; skipping app setting update"
           fi
 
           echo "✓ InkStainedWretchFunctions deployed successfully"

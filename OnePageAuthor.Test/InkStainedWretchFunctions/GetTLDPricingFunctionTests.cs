@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
@@ -18,6 +19,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         private readonly Mock<ILogger<GetTLDPricingFunction>> _mockLogger;
         private readonly Mock<IJwtValidationService> _mockJwtValidationService;
         private readonly Mock<IUserProfileService> _mockUserProfileService;
+        private readonly Mock<IConfiguration> _mockConfiguration;
         private readonly GetTLDPricingFunction _function;
 
         public GetTLDPricingFunctionTests()
@@ -26,12 +28,14 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockLogger = new Mock<ILogger<GetTLDPricingFunction>>();
             _mockJwtValidationService = new Mock<IJwtValidationService>();
             _mockUserProfileService = new Mock<IUserProfileService>();
+            _mockConfiguration = new Mock<IConfiguration>();
             
             _function = new GetTLDPricingFunction(
                 _mockWhmcsService.Object,
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
-                _mockUserProfileService.Object);
+                _mockUserProfileService.Object,
+                _mockConfiguration.Object);
         }
 
         private HttpRequest CreateMockRequest(string? clientId = null, int? currencyId = null, bool addAuthHeader = true)
@@ -92,7 +96,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     null!,
                     _mockLogger.Object,
                     _mockJwtValidationService.Object,
-                    _mockUserProfileService.Object));
+                    _mockUserProfileService.Object,
+                    _mockConfiguration.Object));
         }
 
         [Fact]
@@ -104,7 +109,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     _mockWhmcsService.Object,
                     null!,
                     _mockJwtValidationService.Object,
-                    _mockUserProfileService.Object));
+                    _mockUserProfileService.Object,
+                    _mockConfiguration.Object));
         }
 
         [Fact]
@@ -116,7 +122,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     _mockWhmcsService.Object,
                     _mockLogger.Object,
                     null!,
-                    _mockUserProfileService.Object));
+                    _mockUserProfileService.Object,
+                    _mockConfiguration.Object));
         }
 
         [Fact]
@@ -128,6 +135,20 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     _mockWhmcsService.Object,
                     _mockLogger.Object,
                     _mockJwtValidationService.Object,
+                    null!,
+                    _mockConfiguration.Object));
+        }
+
+        [Fact]
+        public void Constructor_WithNullConfiguration_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() =>
+                new GetTLDPricingFunction(
+                    _mockWhmcsService.Object,
+                    _mockLogger.Object,
+                    _mockJwtValidationService.Object,
+                    _mockUserProfileService.Object,
                     null!));
         }
 
@@ -139,7 +160,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockWhmcsService.Object,
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
-                _mockUserProfileService.Object);
+                _mockUserProfileService.Object,
+                _mockConfiguration.Object);
 
             // Assert
             Assert.NotNull(function);
@@ -354,6 +376,54 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(500, objectResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetPricing_WithConfigClientId_UsesConfigClientIdWhenNoQueryParam()
+        {
+            // Arrange
+            SetupValidAuthentication();
+            _mockConfiguration.Setup(c => c["WHMCS_CLIENT_ID"]).Returns("config-client-99");
+
+            var pricingJson = @"{""result"": ""success"", ""pricing"": {}}";
+            var jsonDocument = JsonDocument.Parse(pricingJson);
+
+            _mockWhmcsService
+                .Setup(s => s.GetTLDPricingAsync("config-client-99", null))
+                .ReturnsAsync(jsonDocument);
+
+            var httpRequest = CreateMockRequest();
+
+            // Act
+            var result = await _function.GetPricing(httpRequest);
+
+            // Assert
+            Assert.IsType<ContentResult>(result);
+            _mockWhmcsService.Verify(s => s.GetTLDPricingAsync("config-client-99", null), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetPricing_WithConfigClientIdAndQueryParam_UsesQueryParamOverride()
+        {
+            // Arrange
+            SetupValidAuthentication();
+            _mockConfiguration.Setup(c => c["WHMCS_CLIENT_ID"]).Returns("config-client-99");
+
+            var pricingJson = @"{""result"": ""success"", ""pricing"": {}}";
+            var jsonDocument = JsonDocument.Parse(pricingJson);
+
+            _mockWhmcsService
+                .Setup(s => s.GetTLDPricingAsync("query-client-42", null))
+                .ReturnsAsync(jsonDocument);
+
+            var httpRequest = CreateMockRequest(clientId: "query-client-42");
+
+            // Act
+            var result = await _function.GetPricing(httpRequest);
+
+            // Assert
+            Assert.IsType<ContentResult>(result);
+            _mockWhmcsService.Verify(s => s.GetTLDPricingAsync("query-client-42", null), Times.Once);
         }
     }
 }

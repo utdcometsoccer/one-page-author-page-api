@@ -5,6 +5,7 @@ using InkStainedWretch.OnePageAuthorAPI.API;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Functions
@@ -18,17 +19,20 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         private readonly ILogger<GetTLDPricingFunction> _logger;
         private readonly IJwtValidationService _jwtValidationService;
         private readonly IUserProfileService _userProfileService;
+        private readonly IConfiguration _configuration;
 
         public GetTLDPricingFunction(
             IWhmcsService whmcsService,
             ILogger<GetTLDPricingFunction> logger,
             IJwtValidationService jwtValidationService,
-            IUserProfileService userProfileService)
+            IUserProfileService userProfileService,
+            IConfiguration configuration)
         {
             _whmcsService = whmcsService ?? throw new ArgumentNullException(nameof(whmcsService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _jwtValidationService = jwtValidationService ?? throw new ArgumentNullException(nameof(jwtValidationService));
             _userProfileService = userProfileService ?? throw new ArgumentNullException(nameof(userProfileService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         /// <summary>
@@ -160,8 +164,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 
             try
             {
-                // Get optional query parameters
-                var clientId = req.Query["clientId"].FirstOrDefault();
+                // Get optional query parameters; load clientId from configuration first,
+                // then override with the request query parameter if provided.
+                var clientId = _configuration["WHMCS_CLIENT_ID"];
+                var clientIdParam = req.Query["clientId"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(clientIdParam))
+                {
+                    clientId = clientIdParam;
+                }
                 var currencyIdParam = req.Query["currencyId"].FirstOrDefault();
 
                 int? currencyId = null;
