@@ -496,6 +496,11 @@ jobs:
           # Azure Infrastructure (optional - for domain management)
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           AZURE_DNS_RESOURCE_GROUP: ${{ secrets.AZURE_DNS_RESOURCE_GROUP }}
+
+          # WHMCS Domain Registration (optional)
+          WHMCS_API_URL: ${{ secrets.WHMCS_API_URL }}
+          WHMCS_API_IDENTIFIER: ${{ secrets.WHMCS_API_IDENTIFIER }}
+          WHMCS_API_SECRET: ${{ secrets.WHMCS_API_SECRET }}
           
           # Google Domains Integration (optional)
           GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
