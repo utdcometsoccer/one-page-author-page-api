@@ -476,5 +476,73 @@ namespace OnePageAuthor.Test.DomainRegistration
             // Assert
             Assert.Null(result);
         }
+
+        [Fact]
+        public async Task GetByIdCrossPartitionAsync_WithNullId_ReturnsNull()
+        {
+            // Act
+            var result = await _repository.GetByIdCrossPartitionAsync(null!);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task GetByIdCrossPartitionAsync_WithEmptyId_ReturnsNull()
+        {
+            // Act
+            var result = await _repository.GetByIdCrossPartitionAsync(string.Empty);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task GetByIdCrossPartitionAsync_WhenFound_ReturnsDomainRegistration()
+        {
+            // Arrange
+            var registration = CreateTestDomainRegistration("target-id");
+
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var mockResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            mockResponse.Setup(r => r.Resource).Returns(new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration> { registration });
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(mockResponse.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetByIdCrossPartitionAsync("target-id");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("target-id", result.id);
+            Assert.Equal("test@example.com", result.Upn);
+        }
+
+        [Fact]
+        public async Task GetByIdCrossPartitionAsync_WhenNoResults_ReturnsNull()
+        {
+            // Arrange
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            mockIterator.Setup(i => i.HasMoreResults).Returns(false);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetByIdCrossPartitionAsync("non-existent-id");
+
+            // Assert
+            Assert.Null(result);
+        }
     }
 }

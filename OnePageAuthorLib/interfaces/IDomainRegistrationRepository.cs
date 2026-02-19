@@ -51,5 +51,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="secondLevelDomain">The second-level domain (e.g., "example")</param>
         /// <returns>The domain registration if found, null otherwise</returns>
         Task<DomainRegistration?> GetByDomainAsync(string topLevelDomain, string secondLevelDomain);
+
+        /// <summary>
+        /// Gets a domain registration by id without requiring the partition key (cross-partition query).
+        /// Use when the owner's UPN is not known (e.g., admin operations).
+        /// </summary>
+        /// <param name="id">The registration id</param>
+        /// <returns>The domain registration if found, null otherwise</returns>
+        Task<DomainRegistration?> GetByIdCrossPartitionAsync(string id);
     }
 }
