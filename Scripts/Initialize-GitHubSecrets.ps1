@@ -381,6 +381,32 @@ $secretDefinitions = @{
         }
     )
     
+    "WHMCS Domain Registration (Optional)" = @(
+        @{
+            Name = "WHMCS_API_URL"
+            Description = "WHMCS API endpoint URL"
+            Required = $false
+            Example = "https://whmcs.example.com/includes/api.php"
+            Category = "Domain"
+        },
+        @{
+            Name = "WHMCS_API_IDENTIFIER"
+            Description = "WHMCS API authentication identifier"
+            Required = $false
+            Example = "abc123def456"
+            Category = "Domain"
+            Sensitive = $true
+        },
+        @{
+            Name = "WHMCS_API_SECRET"
+            Description = "WHMCS API authentication secret"
+            Required = $false
+            Example = "secret123456"
+            Category = "Domain"
+            Sensitive = $true
+        }
+    )
+
     "Amazon Product API (Optional)" = @(
         @{
             Name = "AMAZON_PRODUCT_ACCESS_KEY"
