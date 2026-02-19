@@ -166,7 +166,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             {
                 // Get optional query parameters; load clientId from configuration first,
                 // then override with the request query parameter if provided.
-                var clientId = _configuration["WHMCS_CLIENT_ID"];
+                var clientId = _configuration["WHMCS_CLIENT_ID"] ?? string.Empty;
                 var clientIdParam = req.Query["clientId"].FirstOrDefault();
                 if (!string.IsNullOrEmpty(clientIdParam))
                 {
@@ -186,10 +186,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 }
 
                 _logger.LogInformation("Retrieving TLD pricing from WHMCS API with clientId: {ClientId}, currencyId: {CurrencyId}",
-                    clientId ?? "(none)", currencyId?.ToString() ?? "(none)");
+                    string.IsNullOrEmpty(clientId) ? "(none)" : clientId, currencyId?.ToString() ?? "(none)");
 
-                // Call the WHMCS API
-                using var jsonResult = await _whmcsService.GetTLDPricingAsync(clientId, currencyId);
+                // Call the WHMCS API, passing null when no clientId is available
+                using var jsonResult = await _whmcsService.GetTLDPricingAsync(
+                    string.IsNullOrEmpty(clientId) ? null : clientId, currencyId);
 
                 // Return the JSON result as an OK response
                 var jsonString = JsonSerializer.Serialize(jsonResult, new JsonSerializerOptions
