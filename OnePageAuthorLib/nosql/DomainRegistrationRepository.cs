@@ -133,5 +133,35 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 return null;
             }
         }
+
+        public async Task<DomainRegistration?> GetByIdCrossPartitionAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return null;
+
+            var query = new QueryDefinition("SELECT TOP 1 * FROM c WHERE c.id = @id")
+                .WithParameter("@id", id);
+
+            try
+            {
+                using var iterator = _container.GetItemQueryIterator<DomainRegistration>(query);
+
+                while (iterator.HasMoreResults)
+                {
+                    var page = await iterator.ReadNextAsync();
+                    var registration = page?.Resource?.FirstOrDefault();
+                    if (registration is not null)
+                    {
+                        return registration;
+                    }
+                }
+
+                return null;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+        }
     }
 }

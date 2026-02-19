@@ -71,6 +71,7 @@ Complete deployment workflow documentation:
 
 Comprehensive API reference and guides:
 
+- [**ADMIN_DOMAIN_CREATION_API**](ADMIN_DOMAIN_CREATION_API.md) - **Admin endpoint** — complete domain provisioning without Stripe (JS/TS client guide)
 - [**API-Documentation**](API-Documentation.md) - **Complete API reference** with TypeScript examples
 - [**Complete-System-Documentation**](Complete-System-Documentation.md) - Auto-generated system overview
 - [**README-Documentation**](README-Documentation.md) - Documentation generation system
