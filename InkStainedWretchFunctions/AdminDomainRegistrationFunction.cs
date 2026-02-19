@@ -63,7 +63,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// </item>
         /// <item>
         /// <term>400 Bad Request</term>
-        /// <description>Missing registration ID</description>
+        /// <description>Missing registration ID or missing domain information on the record</description>
         /// </item>
         /// <item>
         /// <term>401 Unauthorized</term>
@@ -76,6 +76,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// <item>
         /// <term>404 Not Found</term>
         /// <description>Domain registration not found</description>
+        /// </item>
+        /// <item>
+        /// <term>409 Conflict</term>
+        /// <description>Domain registration is already Completed or Cancelled</description>
         /// </item>
         /// <item>
         /// <term>500 Internal Server Error</term>
@@ -132,6 +136,26 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 return new NotFoundObjectResult(new { error = $"Domain registration {registrationId} not found" });
             }
 
+            // Guard: do not re-provision registrations that are already in a terminal status
+            if (registration.Status == DomainRegistrationStatus.Completed ||
+                registration.Status == DomainRegistrationStatus.Cancelled)
+            {
+                _logger.LogWarning(
+                    "Attempt to complete domain registration {RegistrationId} which is already in terminal status {Status}",
+                    registrationId,
+                    registration.Status);
+                return new ConflictObjectResult(new
+                {
+                    error = $"Domain registration {registrationId} is already {registration.Status} and cannot be completed again."
+                });
+            }
+
+            if (registration.Domain == null)
+            {
+                _logger.LogWarning("Domain registration {RegistrationId} is missing domain information", registrationId);
+                return new BadRequestObjectResult(new { error = $"Domain information is missing or invalid for registration {registrationId}" });
+            }
+
             var domainName = registration.Domain.FullDomainName;
             _logger.LogInformation("Admin completing domain creation for {DomainName} (registration {RegistrationId})", domainName, registrationId);
 
@@ -155,6 +179,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             }
 
             // Steps 2 & 3: DNS zone creation and name server update (only if WHMCS succeeded)
+            bool dnsSuccess = false;
             if (whmcsSuccess)
             {
                 try
@@ -171,6 +196,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                             if (nsUpdated)
                             {
                                 _logger.LogInformation("Successfully updated name servers for domain {DomainName}", domainName);
+                                dnsSuccess = true;
                             }
                             else
                             {
@@ -213,7 +239,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             }
 
             // Update status: Completed when all steps succeed, InProgress when partial
-            registration.Status = (whmcsSuccess && frontDoorSuccess)
+            registration.Status = (whmcsSuccess && dnsSuccess && frontDoorSuccess)
                 ? DomainRegistrationStatus.Completed
                 : DomainRegistrationStatus.InProgress;
             registration.LastUpdatedAt = DateTime.UtcNow;

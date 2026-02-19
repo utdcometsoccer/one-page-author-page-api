@@ -28,7 +28,6 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         private readonly Mock<IWhmcsService> _mockWhmcsService;
         private readonly Mock<IDnsZoneService> _mockDnsZoneService;
         private readonly AdminDomainRegistrationFunction _function;
-        private readonly Mock<HttpRequest> _mockHttpRequest;
 
         public AdminDomainRegistrationFunctionTests()
         {
@@ -38,7 +37,6 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockFrontDoorService = new Mock<IFrontDoorService>();
             _mockWhmcsService = new Mock<IWhmcsService>();
             _mockDnsZoneService = new Mock<IDnsZoneService>();
-            _mockHttpRequest = new Mock<HttpRequest>();
 
             _function = new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
@@ -47,6 +45,20 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
                 _mockDnsZoneService.Object);
+        }
+
+        // Creates a real HttpRequest with an Authorization Bearer header
+        private static HttpRequest CreateHttpRequestWithAuth(string token = "valid-token")
+        {
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = $"Bearer {token}";
+            return context.Request;
+        }
+
+        // Creates a real HttpRequest with no Authorization header
+        private static HttpRequest CreateHttpRequestWithoutAuth()
+        {
+            return new DefaultHttpContext().Request;
         }
 
         private static ClaimsPrincipal CreateAdminUser(string upn = "admin@example.com")
@@ -68,7 +80,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             }));
         }
 
-        private static DomainRegistrationEntity CreateTestDomainRegistration(string id = "test-reg-123")
+        private static DomainRegistrationEntity CreateTestDomainRegistration(string id = "test-reg-123",
+            DomainRegistrationStatus status = DomainRegistrationStatus.Pending)
         {
             return new DomainRegistrationEntity
             {
@@ -91,7 +104,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     ZipCode = "12345",
                     TelephoneNumber = "+1-555-123-4567"
                 },
-                Status = DomainRegistrationStatus.Pending,
+                Status = status,
                 CreatedAt = DateTime.UtcNow
             };
         }
@@ -189,165 +202,281 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         #region AdminCompleteDomainRegistration Tests
 
         [Fact]
-        public async Task AdminCompleteDomainRegistration_WithNoAuthHeader_ReturnsUnauthorized()
+        public async Task AdminCompleteDomainRegistration_WithNoAuthHeader_Returns401()
         {
-            // Act - no auth header configured on _mockHttpRequest, JWT validation fails
-            var result = await _function.AdminCompleteDomainRegistration(_mockHttpRequest.Object, "test-reg-123");
+            // Arrange - request has no Authorization header
+            var req = CreateHttpRequestWithoutAuth();
 
-            // Assert - JWT validation fails (mock has no Authorization header), returns non-success
-            var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
-            Assert.True(objectResult.StatusCode is 401 or 500, "Should return 401 or 500 when auth fails");
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
+
+            // Assert - JwtAuthenticationHelper returns 401 when Authorization header is absent
+            var objectResult = Assert.IsType<UnauthorizedObjectResult>(result);
+            Assert.Equal(401, objectResult.StatusCode);
         }
 
         [Fact]
-        public void AdminCompleteDomainRegistration_NonAdminUser_ReturnsForbidden()
+        public async Task AdminCompleteDomainRegistration_NonAdminUser_Returns403()
         {
-            // Arrange
+            // Arrange - valid JWT but no Admin role
             var nonAdminUser = CreateNonAdminUser();
-
             _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
                                      .ReturnsAsync(nonAdminUser);
 
-            // Note: This test demonstrates the expected behavior for non-admin users.
-            // Full execution would require JWT authentication header mocking.
-            // The function checks for "Admin" role in JWT claims and returns 403 if absent.
+            var req = CreateHttpRequestWithAuth();
 
-            Assert.True(true, "Test demonstrates expected 403 behavior for non-admin users");
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
+
+            // Assert
+            var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
+            Assert.Equal(403, objectResult.StatusCode);
+
+            // No provisioning calls should have been made
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
         }
 
         [Fact]
-        public void AdminCompleteDomainRegistration_AdminUser_RegistrationNotFound_ReturnsNotFound()
+        public async Task AdminCompleteDomainRegistration_RegistrationNotFound_Returns404()
         {
             // Arrange
             var adminUser = CreateAdminUser();
-            var registrationId = "non-existent-id";
-
             _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
                                      .ReturnsAsync(adminUser);
 
-            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync(registrationId))
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("non-existent-id"))
                                              .ReturnsAsync((DomainRegistrationEntity?)null);
 
-            // Note: This test demonstrates the expected not-found behavior.
-            // Full execution would require JWT authentication header mocking.
+            var req = CreateHttpRequestWithAuth();
 
-            Assert.True(true, "Test demonstrates expected 404 behavior when registration is not found");
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "non-existent-id");
+
+            // Assert
+            var notFound = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal(404, notFound.StatusCode);
         }
 
         [Fact]
-        public void AdminCompleteDomainRegistration_AllStepsSucceed_ReturnsOkWithCompletedStatus()
+        public async Task AdminCompleteDomainRegistration_AlreadyCompleted_Returns409()
         {
             // Arrange
             var adminUser = CreateAdminUser();
-            var registrationId = "test-reg-123";
-            var registration = CreateTestDomainRegistration(registrationId);
-            var completedRegistration = CreateTestDomainRegistration(registrationId);
-            completedRegistration.Status = DomainRegistrationStatus.Completed;
-
             _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
                                      .ReturnsAsync(adminUser);
 
-            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync(registrationId))
+            var completedRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.Completed);
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
+                                             .ReturnsAsync(completedRegistration);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
+
+            // Assert - no re-provisioning should occur
+            var conflict = Assert.IsType<ConflictObjectResult>(result);
+            Assert.Equal(409, conflict.StatusCode);
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task AdminCompleteDomainRegistration_AlreadyCancelled_Returns409()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var cancelledRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.Cancelled);
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
+                                             .ReturnsAsync(cancelledRegistration);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
+
+            // Assert
+            var conflict = Assert.IsType<ConflictObjectResult>(result);
+            Assert.Equal(409, conflict.StatusCode);
+        }
+
+        [Fact]
+        public async Task AdminCompleteDomainRegistration_AllStepsSucceed_Returns200WithCompletedStatus()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var registration = CreateTestDomainRegistration("test-reg-123");
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
                                              .ReturnsAsync(registration);
 
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration))
-                             .ReturnsAsync(true);
-
-            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(registration))
-                               .ReturnsAsync(true);
-
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration)).ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(registration)).ReturnsAsync(true);
             _mockDnsZoneService.Setup(x => x.GetNameServersAsync("mysite.com"))
                                .ReturnsAsync(new[] { "ns1.azure.com", "ns2.azure.com" });
-
             _mockWhmcsService.Setup(x => x.UpdateNameServersAsync("mysite.com", It.IsAny<string[]>()))
                              .ReturnsAsync(true);
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration)).ReturnsAsync(true);
 
-            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration))
-                                 .ReturnsAsync(true);
-
+            var completedRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.Completed);
             _mockDomainRegistrationRepository.Setup(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()))
                                              .ReturnsAsync(completedRegistration);
 
-            // Note: Full execution requires JWT header mocking; this demonstrates the expected success flow.
-            Assert.True(true, "Test demonstrates all steps succeeding returns 200 OK with Completed status");
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
+
+            // Assert
+            var ok = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, ok.StatusCode);
+            var response = Assert.IsType<DomainRegistrationResponse>(ok.Value);
+            Assert.Equal(DomainRegistrationStatus.Completed, response.Status);
+
+            // Verify all provisioning calls were made
+            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(registration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(registration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.GetNameServersAsync("mysite.com"), Times.Once);
+            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync("mysite.com", It.IsAny<string[]>()), Times.Once);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(registration), Times.Once);
+            _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
+                r => r.Status == DomainRegistrationStatus.Completed)), Times.Once);
         }
 
         [Fact]
-        public void AdminCompleteDomainRegistration_WhmcsFails_ReturnsOkWithInProgressStatus()
+        public async Task AdminCompleteDomainRegistration_WhmcsFails_Returns200WithInProgressStatus()
         {
             // Arrange
             var adminUser = CreateAdminUser();
-            var registrationId = "test-reg-123";
-            var registration = CreateTestDomainRegistration(registrationId);
-            var inProgressRegistration = CreateTestDomainRegistration(registrationId);
-            inProgressRegistration.Status = DomainRegistrationStatus.InProgress;
-
             _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
                                      .ReturnsAsync(adminUser);
 
-            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync(registrationId))
+            var registration = CreateTestDomainRegistration("test-reg-123");
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
                                              .ReturnsAsync(registration);
 
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration))
-                             .ReturnsAsync(false); // WHMCS fails
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration)).ReturnsAsync(false);
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration)).ReturnsAsync(true);
 
-            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration))
-                                 .ReturnsAsync(true);
-
+            var inProgressRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.InProgress);
             _mockDomainRegistrationRepository.Setup(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()))
                                              .ReturnsAsync(inProgressRegistration);
 
-            // Note: When WHMCS fails, status is set to InProgress (partial success).
-            Assert.True(true, "Test demonstrates WHMCS failure results in InProgress status");
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
+
+            // Assert
+            var ok = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, ok.StatusCode);
+            var response = Assert.IsType<DomainRegistrationResponse>(ok.Value);
+            Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
+
+            // DNS steps should be skipped when WHMCS fails
+            _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+
+            // Status saved as InProgress
+            _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
+                r => r.Status == DomainRegistrationStatus.InProgress)), Times.Once);
         }
 
         [Fact]
-        public void AdminCompleteDomainRegistration_FrontDoorFails_ReturnsOkWithInProgressStatus()
+        public async Task AdminCompleteDomainRegistration_FrontDoorFails_Returns200WithInProgressStatus()
         {
             // Arrange
             var adminUser = CreateAdminUser();
-            var registrationId = "test-reg-123";
-            var registration = CreateTestDomainRegistration(registrationId);
-            var inProgressRegistration = CreateTestDomainRegistration(registrationId);
-            inProgressRegistration.Status = DomainRegistrationStatus.InProgress;
-
             _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
                                      .ReturnsAsync(adminUser);
 
-            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync(registrationId))
+            var registration = CreateTestDomainRegistration("test-reg-123");
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
                                              .ReturnsAsync(registration);
 
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration))
-                             .ReturnsAsync(true);
-
-            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(registration))
-                               .ReturnsAsync(true);
-
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration)).ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(registration)).ReturnsAsync(true);
             _mockDnsZoneService.Setup(x => x.GetNameServersAsync("mysite.com"))
                                .ReturnsAsync(new[] { "ns1.azure.com", "ns2.azure.com" });
-
             _mockWhmcsService.Setup(x => x.UpdateNameServersAsync("mysite.com", It.IsAny<string[]>()))
                              .ReturnsAsync(true);
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration)).ReturnsAsync(false);
 
-            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration))
-                                 .ReturnsAsync(false); // Front Door fails
-
+            var inProgressRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.InProgress);
             _mockDomainRegistrationRepository.Setup(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()))
                                              .ReturnsAsync(inProgressRegistration);
 
-            // Note: When Front Door fails, status is set to InProgress (partial success).
-            Assert.True(true, "Test demonstrates Front Door failure results in InProgress status");
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
+
+            // Assert
+            var ok = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, ok.StatusCode);
+            var response = Assert.IsType<DomainRegistrationResponse>(ok.Value);
+            Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
+
+            // Status saved as InProgress
+            _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
+                r => r.Status == DomainRegistrationStatus.InProgress)), Times.Once);
         }
 
         [Fact]
-        public async Task AdminCompleteDomainRegistration_WithEmptyRegistrationId_ReturnsServerError()
+        public async Task AdminCompleteDomainRegistration_DnsFails_Returns200WithInProgressStatus()
         {
-            // Act - empty registrationId, JWT auth fails first (no auth header on mock)
-            var result = await _function.AdminCompleteDomainRegistration(_mockHttpRequest.Object, "");
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
 
-            // Assert - JWT validation fails (mock has no Authorization header), returns non-success
-            var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
-            Assert.True(objectResult.StatusCode is 401 or 500, "Should return 401 or 500 when auth fails");
+            var registration = CreateTestDomainRegistration("test-reg-123");
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
+                                             .ReturnsAsync(registration);
+
+            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration)).ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(registration)).ReturnsAsync(false); // DNS zone fails
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration)).ReturnsAsync(true);
+
+            var inProgressRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.InProgress);
+            _mockDomainRegistrationRepository.Setup(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()))
+                                             .ReturnsAsync(inProgressRegistration);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
+
+            // Assert - DNS failure means status is InProgress even if FrontDoor succeeds
+            var ok = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, ok.StatusCode);
+            var response = Assert.IsType<DomainRegistrationResponse>(ok.Value);
+            Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
+
+            _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
+                r => r.Status == DomainRegistrationStatus.InProgress)), Times.Once);
+        }
+
+        [Fact]
+        public async Task AdminCompleteDomainRegistration_WithEmptyRegistrationId_Returns400()
+        {
+            // Arrange - admin user authenticated successfully
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "");
+
+            // Assert
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal(400, badRequest.StatusCode);
         }
 
         #endregion

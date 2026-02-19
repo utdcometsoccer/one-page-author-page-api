@@ -544,5 +544,44 @@ namespace OnePageAuthor.Test.DomainRegistration
             // Assert
             Assert.Null(result);
         }
+
+        [Fact]
+        public async Task GetByIdCrossPartitionAsync_ItemOnSecondPage_ReturnsDomainRegistration()
+        {
+            // Arrange – first page is empty (simulates a cross-partition gap), second page has the item
+            var registration = CreateTestDomainRegistration("target-id");
+
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            var emptyResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            emptyResponse.Setup(r => r.Resource)
+                         .Returns(new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>());
+
+            var itemResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            itemResponse.Setup(r => r.Resource)
+                        .Returns(new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration> { registration });
+
+            // HasMoreResults: true (empty first page), true (second page with item), false (stop)
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(true)
+                       .Returns(false);
+
+            mockIterator.SetupSequence(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(emptyResponse.Object)
+                       .ReturnsAsync(itemResponse.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetByIdCrossPartitionAsync("target-id");
+
+            // Assert – item was found despite being on a subsequent page
+            Assert.NotNull(result);
+            Assert.Equal("target-id", result.id);
+            Assert.Equal("test@example.com", result.Upn);
+        }
     }
 }

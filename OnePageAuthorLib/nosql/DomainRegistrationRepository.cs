@@ -139,17 +139,21 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             if (string.IsNullOrWhiteSpace(id))
                 return null;
 
-            var query = new QueryDefinition("SELECT * FROM c WHERE c.id = @id")
+            var query = new QueryDefinition("SELECT TOP 1 * FROM c WHERE c.id = @id")
                 .WithParameter("@id", id);
 
             try
             {
                 using var iterator = _container.GetItemQueryIterator<DomainRegistration>(query);
 
-                if (iterator.HasMoreResults)
+                while (iterator.HasMoreResults)
                 {
                     var page = await iterator.ReadNextAsync();
-                    return page?.Resource?.FirstOrDefault();
+                    var registration = page?.Resource?.FirstOrDefault();
+                    if (registration is not null)
+                    {
+                        return registration;
+                    }
                 }
 
                 return null;
