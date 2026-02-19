@@ -1,0 +1,18 @@
+### Get TLD Pricing (authenticated)
+GET http://localhost:7071/api/whmcs/tld-pricing
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+###
+
+### Get TLD Pricing with currency filter
+GET http://localhost:7071/api/whmcs/tld-pricing?currencyId=1
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+###
+
+### Get TLD Pricing with client ID
+GET http://localhost:7071/api/whmcs/tld-pricing?clientId={{clientId}}
+Authorization: Bearer {{authToken}}
+Accept: application/json

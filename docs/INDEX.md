@@ -75,6 +75,7 @@ Comprehensive API reference and guides:
 - [**Complete-System-Documentation**](Complete-System-Documentation.md) - Auto-generated system overview
 - [**README-Documentation**](README-Documentation.md) - Documentation generation system
 - [**LocalizationREADME**](LocalizationREADME.md) - Internationalization and localization guide
+- [**GET_TLD_PRICING_API**](GET_TLD_PRICING_API.md) - TLD pricing API reference with TypeScript/JavaScript examples
 - [**WIKIPEDIA_API**](WIKIPEDIA_API.md) - Wikipedia API integration
 - [**FEDIVERSE_INTEGRATION**](FEDIVERSE_INTEGRATION.md) - Fediverse and ActivityPub integration investigation
 
@@ -113,6 +114,8 @@ Detailed implementation documentation for specific features:
 - [**KEY_VAULT_IMPLEMENTATION_SUMMARY**](KEY_VAULT_IMPLEMENTATION_SUMMARY.md) - Secrets management
 - [**KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION**](KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION.md) - Key Vault RBAC
 - [**FEDIVERSE_INTEGRATION**](FEDIVERSE_INTEGRATION.md) - Fediverse and ActivityPub integration (NEW)
+- [**WHMCS_INTEGRATION_SUMMARY**](WHMCS_INTEGRATION_SUMMARY.md) - WHMCS domain registration integration
+- [**GET_TLD_PRICING_API**](GET_TLD_PRICING_API.md) - TLD pricing API for JS/TS developers
 
 #### User Features
 
