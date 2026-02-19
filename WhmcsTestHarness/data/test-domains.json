@@ -1,8 +1,8 @@
 [
   {
-    "upn": "testuser@example.com",
+    "upn": "celaestvisible@proton.me",
     "domain": {
-      "topLevelDomain": "com",
+      "topLevelDomain": "co",
       "secondLevelDomain": "whmcstest001"
     },
     "contactInformation": {
@@ -14,46 +14,8 @@
       "state": "CA",
       "country": "United States",
       "zipCode": "90001",
-      "emailAddress": "testuser@example.com",
+      "emailAddress": "celaestvisible@proton.me",
       "telephoneNumber": "+1-555-200-0001"
-    },
-    "status": 0
-  },
-  {
-    "upn": "testuser@example.com",
-    "domain": {
-      "topLevelDomain": "org",
-      "secondLevelDomain": "whmcstest002"
-    },
-    "contactInformation": {
-      "firstName": "WHMCS",
-      "lastName": "TestUser",
-      "address": "123 Test Street",
-      "city": "Los Angeles",
-      "state": "CA",
-      "country": "United States",
-      "zipCode": "90001",
-      "emailAddress": "testuser@example.com",
-      "telephoneNumber": "+1-555-200-0002"
-    },
-    "status": 0
-  },
-  {
-    "upn": "testuser2@example.com",
-    "domain": {
-      "topLevelDomain": "net",
-      "secondLevelDomain": "whmcstest003"
-    },
-    "contactInformation": {
-      "firstName": "WHMCS",
-      "lastName": "TestUser2",
-      "address": "456 Another Street",
-      "city": "San Diego",
-      "state": "CA",
-      "country": "United States",
-      "zipCode": "92101",
-      "emailAddress": "testuser2@example.com",
-      "telephoneNumber": "+1-555-200-0003"
     },
     "status": 0
   }

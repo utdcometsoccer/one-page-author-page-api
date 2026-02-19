@@ -5,6 +5,7 @@ using InkStainedWretch.OnePageAuthorAPI.API;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Functions
@@ -18,17 +19,20 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         private readonly ILogger<GetTLDPricingFunction> _logger;
         private readonly IJwtValidationService _jwtValidationService;
         private readonly IUserProfileService _userProfileService;
+        private readonly IConfiguration _configuration;
 
         public GetTLDPricingFunction(
             IWhmcsService whmcsService,
             ILogger<GetTLDPricingFunction> logger,
             IJwtValidationService jwtValidationService,
-            IUserProfileService userProfileService)
+            IUserProfileService userProfileService,
+            IConfiguration configuration)
         {
             _whmcsService = whmcsService ?? throw new ArgumentNullException(nameof(whmcsService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _jwtValidationService = jwtValidationService ?? throw new ArgumentNullException(nameof(jwtValidationService));
             _userProfileService = userProfileService ?? throw new ArgumentNullException(nameof(userProfileService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         /// <summary>
@@ -160,8 +164,19 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 
             try
             {
-                // Get optional query parameters
-                var clientId = req.Query["clientId"].FirstOrDefault();
+                // Get optional query parameters; load clientId from configuration first,
+                // then override with the request query parameter if provided.
+                var clientId = _configuration["WHMCS_CLIENT_ID"] ?? string.Empty;
+                var clientIdParam = req.Query["clientId"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(clientIdParam))
+                {
+                    clientId = clientIdParam;
+                }
+
+                if (string.IsNullOrEmpty(clientId))
+                {
+                    _logger.LogWarning("No clientId was provided: WHMCS_CLIENT_ID is not configured and no clientId query parameter was supplied. Proceeding without a client ID.");
+                }
                 var currencyIdParam = req.Query["currencyId"].FirstOrDefault();
 
                 int? currencyId = null;
@@ -171,10 +186,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 }
 
                 _logger.LogInformation("Retrieving TLD pricing from WHMCS API with clientId: {ClientId}, currencyId: {CurrencyId}",
-                    clientId ?? "(none)", currencyId?.ToString() ?? "(none)");
+                    string.IsNullOrEmpty(clientId) ? "(none)" : clientId, currencyId?.ToString() ?? "(none)");
 
-                // Call the WHMCS API
-                using var jsonResult = await _whmcsService.GetTLDPricingAsync(clientId, currencyId);
+                // Call the WHMCS API, passing null when no clientId is available
+                using var jsonResult = await _whmcsService.GetTLDPricingAsync(
+                    string.IsNullOrEmpty(clientId) ? null : clientId, currencyId);
 
                 // Return the JSON result as an OK response
                 var jsonString = JsonSerializer.Serialize(jsonResult, new JsonSerializerOptions
