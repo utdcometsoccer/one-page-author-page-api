@@ -15,13 +15,21 @@ partial class Program
         Console.WriteLine("======================================");
         Console.WriteLine();
 
-        using IHost host = Host.CreateDefaultBuilder()
+        using IHost host = Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((context, config) =>
+            {
+                // Keep config sources consistent between this harness and services
+                // resolved via DI (e.g., WhmcsService).
+                config.AddUserSecrets<Program>(optional: true);
+
+                // Explicitly add env vars (CreateDefaultBuilder also adds this,
+                // but keeping it here makes intent clear and prevents surprises
+                // if defaults change).
+                config.AddEnvironmentVariables();
+            })
             .ConfigureServices((context, services) =>
             {
-                var config = new ConfigurationBuilder()
-                    .AddUserSecrets<Program>()
-                    .AddEnvironmentVariables()
-                    .Build();
+                var config = context.Configuration;
 
                 // WHMCS Configuration
                 string apiUrl = config["WHMCS_API_URL"] ?? throw new InvalidOperationException("WHMCS_API_URL is required");
