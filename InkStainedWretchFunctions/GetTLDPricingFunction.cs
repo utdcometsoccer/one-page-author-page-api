@@ -172,6 +172,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 {
                     clientId = clientIdParam;
                 }
+
+                if (string.IsNullOrEmpty(clientId))
+                {
+                    _logger.LogWarning("No clientId was provided: WHMCS_CLIENT_ID is not configured and no clientId query parameter was supplied. Proceeding without a client ID.");
+                }
                 var currencyIdParam = req.Query["currencyId"].FirstOrDefault();
 
                 int? currencyId = null;
