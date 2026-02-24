@@ -20,6 +20,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         private readonly Mock<IAuthorDataService> _mockAuthorDataService;
         private readonly Mock<IJwtValidationService> _mockJwtValidationService;
         private readonly Mock<IUserIdentityService> _mockUserIdentityService;
+        private readonly Mock<IScopeValidationService> _mockScopeValidationService;
         private readonly GetAuthors _function;
 
         public GetAuthorsTests()
@@ -28,11 +29,17 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockAuthorDataService = new Mock<IAuthorDataService>();
             _mockJwtValidationService = new Mock<IJwtValidationService>();
             _mockUserIdentityService = new Mock<IUserIdentityService>();
+            _mockScopeValidationService = new Mock<IScopeValidationService>();
+            // Default: user has the required scope
+            _mockScopeValidationService
+                .Setup(s => s.HasRequiredScope(It.IsAny<ClaimsPrincipal>(), "Author.Read"))
+                .Returns(true);
             _function = new GetAuthors(
                 _mockLogger.Object,
                 _mockAuthorDataService.Object,
                 _mockJwtValidationService.Object,
-                _mockUserIdentityService.Object);
+                _mockUserIdentityService.Object,
+                _mockScopeValidationService.Object);
         }
 
         private static HttpRequest CreateRequest(string? authToken = null)
@@ -86,6 +93,9 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockJwtValidationService
                 .Setup(s => s.ValidateTokenAsync("valid-token"))
                 .ReturnsAsync(userWithoutScope);
+            _mockScopeValidationService
+                .Setup(s => s.HasRequiredScope(userWithoutScope, "Author.Read"))
+                .Returns(false);
 
             var result = await _function.Run(req, null, null);
 
