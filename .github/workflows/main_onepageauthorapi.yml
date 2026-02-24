@@ -683,6 +683,12 @@ jobs:
           APPLICATIONINSIGHTS_CONNECTION_STRING_ISW: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
           COSMOSDB_CONNECTION_STRING: ${{ secrets.COSMOSDB_CONNECTION_STRING }}
           WHMCS_CLIENT_ID: ${{ secrets.WHMCS_CLIENT_ID }}
+          WHMCS_API_URL: ${{ secrets.WHMCS_API_URL }}
+          WHMCS_API_IDENTIFIER: ${{ secrets.WHMCS_API_IDENTIFIER }}
+          WHMCS_API_SECRET: ${{ secrets.WHMCS_API_SECRET }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_RESOURCE_GROUP_NAME: ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
+          AZURE_FRONTDOOR_PROFILE_NAME: ${{ secrets.AZURE_FRONTDOOR_PROFILE_NAME }}
         run: |
           # Skip if InkStainedWretchFunctions deployment is not enabled
           if [ "$DEPLOY_ISW_FUNCTIONS" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -739,6 +745,84 @@ jobs:
             echo "✓ WHMCS_CLIENT_ID app setting applied to $FUNCTION_APP_NAME"
           else
             echo "⚠️ WHMCS_CLIENT_ID not configured; skipping app setting update"
+          fi
+
+          if [ -n "$WHMCS_API_URL" ]; then
+            echo "🔧 Setting WHMCS_API_URL on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "WHMCS_API_URL=$WHMCS_API_URL" \
+              --only-show-errors \
+              --output none
+            echo "✓ WHMCS_API_URL app setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ WHMCS_API_URL not configured; skipping app setting update"
+          fi
+
+          if [ -n "$WHMCS_API_IDENTIFIER" ]; then
+            echo "🔧 Setting WHMCS_API_IDENTIFIER on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "WHMCS_API_IDENTIFIER=$WHMCS_API_IDENTIFIER" \
+              --only-show-errors \
+              --output none
+            echo "✓ WHMCS_API_IDENTIFIER app setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ WHMCS_API_IDENTIFIER not configured; skipping app setting update"
+          fi
+
+          if [ -n "$WHMCS_API_SECRET" ]; then
+            echo "🔧 Setting WHMCS_API_SECRET on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "WHMCS_API_SECRET=$WHMCS_API_SECRET" \
+              --only-show-errors \
+              --output none
+            echo "✓ WHMCS_API_SECRET app setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ WHMCS_API_SECRET not configured; skipping app setting update"
+          fi
+
+          if [ -n "$AZURE_SUBSCRIPTION_ID" ]; then
+            echo "🔧 Setting AZURE_SUBSCRIPTION_ID on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID" \
+              --only-show-errors \
+              --output none
+            echo "✓ AZURE_SUBSCRIPTION_ID app setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ AZURE_SUBSCRIPTION_ID not configured; skipping app setting update"
+          fi
+
+          if [ -n "$AZURE_RESOURCE_GROUP_NAME" ]; then
+            echo "🔧 Setting AZURE_RESOURCE_GROUP_NAME on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME" \
+              --only-show-errors \
+              --output none
+            echo "✓ AZURE_RESOURCE_GROUP_NAME app setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ AZURE_RESOURCE_GROUP_NAME not configured; skipping app setting update"
+          fi
+
+          if [ -n "$AZURE_FRONTDOOR_PROFILE_NAME" ]; then
+            echo "🔧 Setting AZURE_FRONTDOOR_PROFILE_NAME on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "AZURE_FRONTDOOR_PROFILE_NAME=$AZURE_FRONTDOOR_PROFILE_NAME" \
+              --only-show-errors \
+              --output none
+            echo "✓ AZURE_FRONTDOOR_PROFILE_NAME app setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ AZURE_FRONTDOOR_PROFILE_NAME not configured; skipping app setting update"
           fi
 
           echo "✓ InkStainedWretchFunctions deployed successfully"
