@@ -3,6 +3,7 @@ using Moq;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
 using InkStainedWretch.OnePageAuthorAPI.Functions;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
@@ -10,6 +11,8 @@ using InkStainedWretch.OnePageAuthorAPI.Entities;
 using InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistrations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -725,6 +728,99 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert
             Assert.False(isAdmin, "User with 'Editor' role but not 'Admin' should not be recognized as admin");
+        }
+
+        #endregion
+
+        #region Function Metadata Tests
+
+        [Fact]
+        public void AdminGetIncompleteDomainRegistrations_HasCorrectFunctionName()
+        {
+            // Verify the [Function] attribute carries the name "AdminGetIncompleteDomainRegistrations".
+            // This is a regression test for issue #312 where the metadata in Azure showed
+            // "CreateAuthorInvitation" and "ListAuthorInvitations" instead of the expected name.
+            var method = typeof(AdminDomainRegistrationFunction)
+                .GetMethod("AdminGetIncompleteDomainRegistrations");
+
+            Assert.NotNull(method);
+
+            var functionAttr = method.GetCustomAttribute<FunctionAttribute>();
+            Assert.NotNull(functionAttr);
+            Assert.Equal("AdminGetIncompleteDomainRegistrations", functionAttr.Name);
+        }
+
+        [Fact]
+        public void AdminGetIncompleteDomainRegistrations_HasCorrectHttpRoute()
+        {
+            // Verify the HttpTrigger is bound to GET "management/domain-registrations".
+            // This ensures the function responds to /api/management/domain-registrations as documented.
+            // Note: the "admin/" prefix is reserved by Azure Functions built-in routes; "management/" is used instead.
+            var method = typeof(AdminDomainRegistrationFunction)
+                .GetMethod("AdminGetIncompleteDomainRegistrations");
+
+            Assert.NotNull(method);
+
+            var triggerParam = method.GetParameters()
+                .FirstOrDefault(p => p.GetCustomAttribute<HttpTriggerAttribute>() != null);
+
+            Assert.NotNull(triggerParam);
+
+            var triggerAttr = triggerParam.GetCustomAttribute<HttpTriggerAttribute>();
+            Assert.NotNull(triggerAttr);
+            Assert.Equal("management/domain-registrations", triggerAttr.Route);
+            Assert.Contains("get", triggerAttr.Methods, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void AdminCompleteDomainRegistration_HasCorrectFunctionName()
+        {
+            // Verify the [Function] attribute carries the name "AdminCompleteDomainRegistration".
+            var method = typeof(AdminDomainRegistrationFunction)
+                .GetMethod("AdminCompleteDomainRegistration");
+
+            Assert.NotNull(method);
+
+            var functionAttr = method.GetCustomAttribute<FunctionAttribute>();
+            Assert.NotNull(functionAttr);
+            Assert.Equal("AdminCompleteDomainRegistration", functionAttr.Name);
+        }
+
+        [Fact]
+        public void AdminCompleteDomainRegistration_HasCorrectHttpRoute()
+        {
+            // Verify the HttpTrigger is bound to POST "management/domain-registrations/{registrationId}/complete".
+            var method = typeof(AdminDomainRegistrationFunction)
+                .GetMethod("AdminCompleteDomainRegistration");
+
+            Assert.NotNull(method);
+
+            var triggerParam = method.GetParameters()
+                .FirstOrDefault(p => p.GetCustomAttribute<HttpTriggerAttribute>() != null);
+
+            Assert.NotNull(triggerParam);
+
+            var triggerAttr = triggerParam.GetCustomAttribute<HttpTriggerAttribute>();
+            Assert.NotNull(triggerAttr);
+            Assert.Equal("management/domain-registrations/{registrationId}/complete", triggerAttr.Route);
+            Assert.Contains("post", triggerAttr.Methods, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void AdminDomainRegistrationFunction_DoesNotConflictWithAuthorInvitationFunctionNames()
+        {
+            // Verify that AdminDomainRegistrationFunction does not use function names belonging
+            // to AuthorInvitationFunction. Duplicate [Function] names cause routes to be
+            // unregistered and return 404.
+            var adminMethods = typeof(AdminDomainRegistrationFunction)
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Select(m => m.GetCustomAttribute<FunctionAttribute>())
+                .Where(a => a != null)
+                .Select(a => a!.Name)
+                .ToList();
+
+            Assert.DoesNotContain("CreateAuthorInvitation", adminMethods);
+            Assert.DoesNotContain("ListAuthorInvitations", adminMethods);
         }
 
         #endregion

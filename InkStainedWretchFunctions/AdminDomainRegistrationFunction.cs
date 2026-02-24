@@ -16,13 +16,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
     /// <remarks>
     /// AdminGetIncompleteDomainRegistrations:
     /// - Method: GET
-    /// - Route: /api/admin/domain-registrations
+    /// - Route: /api/management/domain-registrations
     /// - Auth: Bearer JWT with "Admin" role claim
     /// - Returns all incomplete domain registrations (Pending, InProgress, Failed) regardless of UPN
     ///
     /// AdminCompleteDomainRegistration:
     /// - Method: POST
-    /// - Route: /api/admin/domain-registrations/{registrationId}/complete
+    /// - Route: /api/management/domain-registrations/{registrationId}/complete
     /// - Auth: Bearer JWT with "Admin" role claim
     /// - Completes a pending domain registration (WHMCS + DNS + Front Door) without Stripe payment
     /// </remarks>
@@ -80,7 +80,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// </returns>
         [Function("AdminGetIncompleteDomainRegistrations")]
         public async Task<IActionResult> AdminGetIncompleteDomainRegistrations(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "admin/domain-registrations")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "management/domain-registrations")] HttpRequest req)
         {
             _logger.LogInformation("AdminGetIncompleteDomainRegistrations function processed a request");
 
@@ -187,7 +187,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// </returns>
         [Function("AdminCompleteDomainRegistration")]
         public async Task<IActionResult> AdminCompleteDomainRegistration(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "admin/domain-registrations/{registrationId}/complete")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "management/domain-registrations/{registrationId}/complete")] HttpRequest req,
             string registrationId)
         {
             _logger.LogInformation("AdminCompleteDomainRegistration function processed a request for ID: {RegistrationId}", registrationId);
