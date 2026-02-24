@@ -19,5 +19,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         /// <param name="secondLevelDomain">Second-level domain (e.g., "example").</param>
         /// <returns>Array of AuthorApiResponse objects with all associated data, or empty array if none found.</returns>
         Task<List<AuthorApiResponse>> GetAuthorsByDomainAsync(string topLevelDomain, string secondLevelDomain);
+
+        /// <summary>
+        /// Gets all authors whose EmailAddress matches the specified email, along with all associated data.
+        /// </summary>
+        /// <param name="emailAddress">The user's email address (e.g., "user@example.com").</param>
+        /// <returns>Array of AuthorApiResponse objects with all associated data, or empty array if none found.</returns>
+        Task<List<AuthorApiResponse>> GetAuthorsByEmailAsync(string emailAddress);
     }
 }

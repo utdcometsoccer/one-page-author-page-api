@@ -171,5 +171,38 @@ namespace OnePageAuthor.Test
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
         }
+
+        [Fact]
+        public async Task GetByEmailAsync_ReturnsAuthors()
+        {
+            var cosmosMock = new Mock<IDataContainer>();
+            var authors = new List<Author> {
+                new Author {
+                    id = Guid.NewGuid().ToString(),
+                    AuthorName = "A1",
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "example",
+                    LanguageName = "en",
+                    RegionName = "us",
+                    WelcomeText = "Welcome!",
+                    AboutText = "About me.",
+                    CopyrightText = "Copyright",
+                    EmailAddress = "author@example.com"
+                }
+            };
+            var iteratorMock = new Mock<FeedIterator<Author>>();
+            var responseMock = new Mock<FeedResponse<Author>>();
+            responseMock.Setup(r => r.Resource).Returns(authors);
+            iteratorMock.SetupSequence(i => i.HasMoreResults)
+                .Returns(true)
+                .Returns(false);
+            iteratorMock.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(responseMock.Object);
+            cosmosMock.Setup(c => c.GetItemQueryIterator<Author>(It.IsAny<QueryDefinition>(), null, null)).Returns(iteratorMock.Object);
+            var repo = new AuthorRepository(cosmosMock.Object);
+            var result = await repo.GetByEmailAsync("author@example.com");
+            Assert.NotNull(result);
+            Assert.Single(result);
+            Assert.Equal("author@example.com", result[0].EmailAddress);
+        }
     }
 }

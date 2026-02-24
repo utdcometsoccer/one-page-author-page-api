@@ -82,5 +82,27 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             }
             return results;
         }
+
+        /// <summary>
+        /// Gets all authors whose EmailAddress matches the specified email.
+        /// </summary>
+        /// <param name="emailAddress">The user's email address.</param>
+        /// <returns>List of matching Author entities.</returns>
+        public async Task<IList<Author>> GetByEmailAsync(string emailAddress)
+        {
+            var query = new QueryDefinition(
+                "SELECT * FROM c WHERE c.EmailAddress = @email")
+                .WithParameter("@email", emailAddress);
+            var results = new List<Author>();
+            using (var iterator = _container.GetItemQueryIterator<Author>(query))
+            {
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response.Resource);
+                }
+            }
+            return results;
+        }
     }
 }
