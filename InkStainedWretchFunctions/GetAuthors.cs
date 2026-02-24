@@ -28,11 +28,10 @@ public class GetAuthors
 
     [Function("GetAuthors")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "authors")] HttpRequest req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "authors/{secondLevelDomain?}/{topLevelDomain?}")] HttpRequest req,
+        string? secondLevelDomain,
+        string? topLevelDomain)
     {
-        var secondLevelDomain = req.Query["secondLevelDomain"].FirstOrDefault();
-        var topLevelDomain = req.Query["topLevelDomain"].FirstOrDefault();
-
         bool hasDomainParams = !string.IsNullOrWhiteSpace(secondLevelDomain) && !string.IsNullOrWhiteSpace(topLevelDomain);
 
         // Authenticate the request using JWT token

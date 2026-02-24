@@ -145,7 +145,7 @@
 | Function | HTTP Method | Route | Auth | Side Effects | Sync/Async | Role Access |
 |----------|-------------|-------|------|--------------|------------|-------------|
 | **GetPlatformStats** | GET | `/api/stats/platform` | None | Read-only | Async | Public (cached 1hr) |
-| **GetAuthors** | GET | `/api/authors` | JWT Required | Read-only | Async | Author.Read scope |
+| **GetAuthors** | GET | `/api/authors/{secondLevelDomain?}/{topLevelDomain?}` | JWT Required | Read-only | Async | Author.Read scope |
 | **GetExperiments** | GET | `/api/experiments` | None | Read-only | Async | Public |
 
 **Special Notes:**

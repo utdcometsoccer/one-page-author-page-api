@@ -35,14 +35,9 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockUserIdentityService.Object);
         }
 
-        private static HttpRequest CreateRequest(string? sld = null, string? tld = null, string? authToken = null)
+        private static HttpRequest CreateRequest(string? authToken = null)
         {
             var context = new DefaultHttpContext();
-            var queryString = new List<string>();
-            if (sld != null) queryString.Add($"secondLevelDomain={sld}");
-            if (tld != null) queryString.Add($"topLevelDomain={tld}");
-            if (queryString.Count > 0)
-                context.Request.QueryString = new QueryString("?" + string.Join("&", queryString));
             if (authToken != null)
                 context.Request.Headers["Authorization"] = $"Bearer {authToken}";
             return context.Request;
@@ -62,7 +57,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             var req = CreateRequest();
 
-            var result = await _function.Run(req);
+            var result = await _function.Run(req, null, null);
 
             Assert.IsType<UnauthorizedObjectResult>(result);
         }
@@ -75,7 +70,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 .Setup(s => s.ValidateTokenAsync("invalid-token"))
                 .ReturnsAsync((ClaimsPrincipal?)null);
 
-            var result = await _function.Run(req);
+            var result = await _function.Run(req, null, null);
 
             Assert.IsType<UnauthorizedObjectResult>(result);
         }
@@ -92,18 +87,18 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 .Setup(s => s.ValidateTokenAsync("valid-token"))
                 .ReturnsAsync(userWithoutScope);
 
-            var result = await _function.Run(req);
+            var result = await _function.Run(req, null, null);
 
             var objectResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(StatusCodes.Status403Forbidden, objectResult.StatusCode);
         }
 
-        // --- Domain-based lookup (both params provided) ---
+        // --- Domain-based lookup (both route params provided) ---
 
         [Fact]
         public async Task Run_WithDomainParams_AuthorsNotFound_ReturnsNotFound()
         {
-            var req = CreateRequest(sld: "example", tld: "com", authToken: "valid-token");
+            var req = CreateRequest(authToken: "valid-token");
             _mockJwtValidationService
                 .Setup(s => s.ValidateTokenAsync("valid-token"))
                 .ReturnsAsync(CreateUserWithScope());
@@ -111,7 +106,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 .Setup(s => s.GetAuthorsByDomainAsync("com", "example"))
                 .ReturnsAsync(new List<AuthorApiResponse>());
 
-            var result = await _function.Run(req);
+            var result = await _function.Run(req, "example", "com");
 
             Assert.IsType<NotFoundObjectResult>(result);
         }
@@ -119,7 +114,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         [Fact]
         public async Task Run_WithDomainParams_AuthorsFound_ReturnsOk()
         {
-            var req = CreateRequest(sld: "example", tld: "com", authToken: "valid-token");
+            var req = CreateRequest(authToken: "valid-token");
             _mockJwtValidationService
                 .Setup(s => s.ValidateTokenAsync("valid-token"))
                 .ReturnsAsync(CreateUserWithScope());
@@ -137,13 +132,13 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 .Setup(s => s.GetAuthorsByDomainAsync("com", "example"))
                 .ReturnsAsync(authors);
 
-            var result = await _function.Run(req);
+            var result = await _function.Run(req, "example", "com");
 
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(authors, okResult.Value);
         }
 
-        // --- User-based lookup (no domain params) ---
+        // --- User-based lookup (no route params) ---
 
         [Fact]
         public async Task Run_NoDomainParams_ReturnsAuthorsForLoggedInUser()
@@ -172,7 +167,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 .Setup(s => s.GetAuthorsByEmailAsync(userEmail))
                 .ReturnsAsync(authors);
 
-            var result = await _function.Run(req);
+            var result = await _function.Run(req, null, null);
 
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(authors, okResult.Value);
@@ -194,7 +189,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 .Setup(s => s.GetAuthorsByEmailAsync(userEmail))
                 .ReturnsAsync(new List<AuthorApiResponse>());
 
-            var result = await _function.Run(req);
+            var result = await _function.Run(req, null, null);
 
             Assert.IsType<NotFoundObjectResult>(result);
         }
@@ -202,9 +197,9 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         [Fact]
         public async Task Run_OnlySecondLevelDomain_FallsBackToUserLookup()
         {
-            // Only one domain param provided — treated as no-domain lookup (user-based)
+            // Only one route param provided — falls back to user-based lookup
             const string userEmail = "author@example.com";
-            var req = CreateRequest(sld: "example", authToken: "valid-token");
+            var req = CreateRequest(authToken: "valid-token");
             var user = CreateUserWithScope(userEmail: userEmail);
             _mockJwtValidationService
                 .Setup(s => s.ValidateTokenAsync("valid-token"))
@@ -216,9 +211,9 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 .Setup(s => s.GetAuthorsByEmailAsync(userEmail))
                 .ReturnsAsync(new List<AuthorApiResponse>());
 
-            var result = await _function.Run(req);
+            var result = await _function.Run(req, "example", null);
 
-            // No domain params (incomplete) → user lookup → no authors → 404
+            // Incomplete domain → user lookup → no authors → 404
             Assert.IsType<NotFoundObjectResult>(result);
             _mockAuthorDataService.Verify(s => s.GetAuthorsByEmailAsync(userEmail), Times.Once);
         }
