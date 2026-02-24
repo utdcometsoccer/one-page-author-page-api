@@ -290,7 +290,7 @@ System.Xml.XmlElement
 
 Admin HTTP endpoints for domain registration management. All endpoints require the `Admin` role claim in the caller's JWT.
 
-##### GET /api/inkadmin/domain-registrations
+##### GET /api/management/domain-registrations
 
 **Description:** Returns all incomplete domain registrations (status: Pending, InProgress, or Failed) across all users. Contact information is redacted from results.
 
@@ -313,7 +313,7 @@ See [ADMIN_DOMAIN_CREATION_API.md](ADMIN_DOMAIN_CREATION_API.md) for full docume
 
 ---
 
-##### POST /api/inkadmin/domain-registrations/{registrationId}/complete
+##### POST /api/management/domain-registrations/{registrationId}/complete
 
 **Description:** Completes domain provisioning for a partially registered author site without requiring a Stripe subscription. Executes WHMCS domain registration, DNS zone setup, name-server update, and Azure Front Door configuration.
 

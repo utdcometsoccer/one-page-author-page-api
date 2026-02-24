@@ -40,8 +40,8 @@ The InkStainedWretchFunctions project provides a comprehensive Azure Functions a
 - **GET /api/domain-registrations** - Gets all domain registrations for user
 - **GET /api/domain-registrations/{registrationId}** - Gets specific domain registration
 - **PUT /api/domain-registrations/{registrationId}** - Updates a domain registration
-- **GET /api/inkadmin/domain-registrations** - Lists all incomplete domain registrations across users (Admin role required)
-- **POST /api/inkadmin/domain-registrations/{registrationId}/complete** - Completes domain provisioning workflow (Admin role required)
+- **GET /api/management/domain-registrations** - Lists all incomplete domain registrations across users (Admin role required)
+- **POST /api/management/domain-registrations/{registrationId}/complete** - Completes domain provisioning workflow (Admin role required)
 - **GET /api/whmcs/tld-pricing** - Gets TLD pricing information from WHMCS (requires auth)
 - **GET /api/countries/{language}** - Gets countries by language
 - **GET /api/languages/{language}** - Gets languages with localized names
@@ -483,7 +483,7 @@ Gets a specific domain registration by ID.
 
 #### Admin: List Incomplete Domain Registrations
 
-**Endpoint:** `GET /api/inkadmin/domain-registrations`
+**Endpoint:** `GET /api/management/domain-registrations`
 
 Returns all incomplete domain registrations (Pending, InProgress, Failed) across **all users**. Requires the `Admin` role.
 
@@ -496,11 +496,11 @@ Returns all incomplete domain registrations (Pending, InProgress, Failed) across
 **Example Request:**
 
 ```bash
-curl -X GET "https://your-api.azurewebsites.net/api/inkadmin/domain-registrations" \
+curl -X GET "https://your-api.azurewebsites.net/api/management/domain-registrations" \
   -H "Authorization: Bearer your-admin-jwt-token"
 
 # With optional limit
-curl -X GET "https://your-api.azurewebsites.net/api/inkadmin/domain-registrations?maxResults=25" \
+curl -X GET "https://your-api.azurewebsites.net/api/management/domain-registrations?maxResults=25" \
   -H "Authorization: Bearer your-admin-jwt-token"
 ```
 
@@ -508,7 +508,7 @@ See [ADMIN_DOMAIN_CREATION_API.md](../docs/ADMIN_DOMAIN_CREATION_API.md) for the
 
 #### Admin: Complete Domain Registration
 
-**Endpoint:** `POST /api/inkadmin/domain-registrations/{registrationId}/complete`
+**Endpoint:** `POST /api/management/domain-registrations/{registrationId}/complete`
 
 Runs the full domain-provisioning workflow (WHMCS registration → DNS zone → Front Door). Requires the `Admin` role.
 
