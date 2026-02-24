@@ -59,5 +59,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="id">The registration id</param>
         /// <returns>The domain registration if found, null otherwise</returns>
         Task<DomainRegistration?> GetByIdCrossPartitionAsync(string id);
+
+        /// <summary>
+        /// Gets all incomplete domain registrations across all users (cross-partition query).
+        /// Incomplete registrations have a status of Pending, InProgress, or Failed.
+        /// </summary>
+        /// <returns>List of incomplete domain registrations</returns>
+        Task<IEnumerable<DomainRegistration>> GetAllIncompleteAsync();
     }
 }
