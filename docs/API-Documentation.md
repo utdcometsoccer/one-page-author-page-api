@@ -286,6 +286,48 @@ System.Xml.XmlElement
 
 ---
 
+#### AdminDomainRegistrationFunction
+
+Admin HTTP endpoints for domain registration management. All endpoints require the `Admin` role claim in the caller's JWT.
+
+##### GET /api/admin/domain-registrations
+
+**Description:** Returns all incomplete domain registrations (status: Pending, InProgress, or Failed) across all users. Contact information is redacted from results.
+
+**Query Parameters:**
+
+- `maxResults` (optional): Positive integer to cap the number of results returned.
+
+**Response Codes:**
+
+| Status | Description |
+|--------|-------------|
+| 200 OK | Array of incomplete domain registration objects (may be empty) |
+| 401 Unauthorized | Missing or invalid JWT |
+| 403 Forbidden | Caller does not have the `Admin` role |
+| 500 Internal Server Error | Unexpected server error |
+
+**Returns:** Array of `DomainRegistrationResponse` objects with `contactInformation` set to `null`.
+
+See [ADMIN_DOMAIN_CREATION_API.md](ADMIN_DOMAIN_CREATION_API.md) for full documentation, TypeScript interfaces, and usage examples.
+
+---
+
+##### POST /api/admin/domain-registrations/{registrationId}/complete
+
+**Description:** Completes domain provisioning for a partially registered author site without requiring a Stripe subscription. Executes WHMCS domain registration, DNS zone setup, name-server update, and Azure Front Door configuration.
+
+**Parameters:**
+
+- `req`: HTTP request
+- `registrationId`: The domain registration ID to complete
+
+**Returns:** Updated `DomainRegistrationResponse` with provisioning status.
+
+See [ADMIN_DOMAIN_CREATION_API.md](ADMIN_DOMAIN_CREATION_API.md) for full documentation, TypeScript interfaces, and usage examples.
+
+---
+
 #### DomainRegistrationTriggerFunction
 
 Azure Function triggered by changes to the DomainRegistrations Cosmos DB container. Processes new domain registrations and adds them to Azure Front Door if they don't already exist.

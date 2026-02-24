@@ -1,4 +1,4 @@
-# Admin Domain Registration APIs — JavaScript / TypeScript Client Guide
+# Admin Domain Registrations API — JavaScript / TypeScript Client Guide
 
 > **Audience:** Frontend developers building admin dashboards or tooling in JavaScript or TypeScript.
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-The **Admin Domain Registration** API provides two endpoints for users with the `Admin` role:
+The **Admin Domain Registrations** endpoints let users with the `Admin` role:
 
 1. **`GET /api/admin/domain-registrations`** — lists all incomplete domain registrations (Pending, InProgress, Failed) across all users.
 2. **`POST /api/admin/domain-registrations/{registrationId}/complete`** — runs the full domain-provisioning workflow for a specific registration, which includes:
@@ -87,9 +87,9 @@ dotnet user-secrets set "AAD_TENANT_ID"            "your-tenant-id"
 dotnet user-secrets set "AAD_AUDIENCE"             "your-api-client-id"
 
 # Azure infrastructure — required for provisioning steps in POST endpoint
-dotnet user-secrets set "AZURE_SUBSCRIPTION_ID"       "your-subscription-id"
-dotnet user-secrets set "AZURE_DNS_RESOURCE_GROUP"    "your-dns-resource-group"
-dotnet user-secrets set "AZURE_RESOURCE_GROUP_NAME"   "your-frontdoor-resource-group"
+dotnet user-secrets set "AZURE_SUBSCRIPTION_ID"        "your-subscription-id"
+dotnet user-secrets set "AZURE_DNS_RESOURCE_GROUP"     "your-dns-resource-group"
+dotnet user-secrets set "AZURE_RESOURCE_GROUP_NAME"    "your-frontdoor-resource-group"
 dotnet user-secrets set "AZURE_FRONTDOOR_PROFILE_NAME" "your-frontdoor-profile-name"
 
 # WHMCS — required for domain registration in POST endpoint
@@ -195,7 +195,13 @@ async function listIncompleteDomains(
 
 ### POST /api/admin/domain-registrations/{registrationId}/complete
 
-Completes the full domain-provisioning workflow for a partially registered author site **without requiring a Stripe subscription**.
+Completes domain provisioning for a partially registered author site without requiring a Stripe subscription.
+
+### Endpoint
+
+```
+POST /api/admin/domain-registrations/{registrationId}/complete
+```
 
 | Detail | Value |
 |--------|-------|
@@ -204,9 +210,11 @@ Completes the full domain-provisioning workflow for a partially registered autho
 | Path param | `registrationId` — the Cosmos DB document ID of the domain registration |
 | Request body | *(none required)* |
 
-## Authorization
+---
 
-Both admin endpoints require a JWT that includes the `Admin` value in the `roles` claim issued by Microsoft Entra ID:
+### Authorization
+
+The caller's JWT **must** include the `Admin` value in the `roles` claim issued by Microsoft Entra ID.
 
 ```json
 {
@@ -221,7 +229,7 @@ Requests with a valid JWT but no `Admin` role receive **403 Forbidden**.
 
 ---
 
-## Response Codes (POST complete)
+### Response Codes
 
 | Status | Meaning |
 |--------|---------|
@@ -234,7 +242,7 @@ Requests with a valid JWT but no `Admin` role receive **403 Forbidden**.
 
 ---
 
-## Response Body
+### Response Body
 
 ```typescript
 interface DomainRegistrationResponse {
@@ -273,9 +281,9 @@ type DomainRegistrationStatus =
 
 ---
 
-## JavaScript / TypeScript Examples
+### JavaScript / TypeScript Examples
 
-### Minimal fetch call
+#### Minimal fetch call
 
 ```typescript
 async function adminCompleteDomain(
@@ -429,30 +437,16 @@ export default CompleteDomainButton;
 
 ---
 
-### Listing pending registrations before completing them
+### Listing incomplete registrations before completing them
 
-Use the standard `GET /api/domain-registrations` endpoint to list registrations, then filter by `status === 0` (Pending) before calling the admin endpoint.
+Use `GET /api/admin/domain-registrations` to list incomplete registrations across all users, then call the complete endpoint for each one you want to provision.
 
 ```typescript
-interface ListDomainRegistrationsResponse extends Array<DomainRegistrationResponse> {}
-
-async function listPendingRegistrations(
-  userToken: string
-): Promise<DomainRegistrationResponse[]> {
-  const response = await fetch("/api/domain-registrations", {
-    headers: { Authorization: `Bearer ${userToken}` },
-  });
-
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-  const all: ListDomainRegistrationsResponse = await response.json();
-  return all.filter((r) => r.status === 0 /* Pending */);
-}
-
-// Admin workflow: list pending → complete each one
+// Admin workflow: list all incomplete registrations → complete each Pending one
 async function processAllPending(adminToken: string): Promise<void> {
-  const pending = await listPendingRegistrations(adminToken);
-  console.log(`Found ${pending.length} pending registrations`);
+  const registrations = await adminGetIncompleteRegistrations(adminToken);
+  const pending = registrations.filter((r) => r.status === 0 /* Pending */);
+  console.log(`Found ${pending.length} pending registration(s)`);
 
   for (const reg of pending) {
     console.log(`Completing domain: ${reg.domain.secondLevelDomain}.${reg.domain.topLevelDomain}`);
