@@ -26,6 +26,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
     {
         private readonly Mock<ILogger<AdminDomainRegistrationFunction>> _mockLogger;
         private readonly Mock<IJwtValidationService> _mockJwtValidationService;
+        private readonly Mock<IRoleChecker> _mockRoleChecker;
         private readonly Mock<IDomainRegistrationRepository> _mockDomainRegistrationRepository;
         private readonly Mock<IFrontDoorService> _mockFrontDoorService;
         private readonly Mock<IWhmcsService> _mockWhmcsService;
@@ -36,14 +37,21 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             _mockLogger = new Mock<ILogger<AdminDomainRegistrationFunction>>();
             _mockJwtValidationService = new Mock<IJwtValidationService>();
+            _mockRoleChecker = new Mock<IRoleChecker>();
             _mockDomainRegistrationRepository = new Mock<IDomainRegistrationRepository>();
             _mockFrontDoorService = new Mock<IFrontDoorService>();
             _mockWhmcsService = new Mock<IWhmcsService>();
             _mockDnsZoneService = new Mock<IDnsZoneService>();
 
+            // Default: delegate to the real JwtAuthenticationHelper so existing claim-based
+            // user stubs (CreateAdminUser / CreateNonAdminUser) still drive the outcome.
+            _mockRoleChecker.Setup(x => x.HasRole(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
+                            .Returns((ClaimsPrincipal user, string role) => JwtAuthenticationHelper.HasRole(user, role));
+
             _function = new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
@@ -120,6 +128,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 null!,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
@@ -131,6 +140,20 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
+                null!,
+                _mockRoleChecker.Object,
+                _mockDomainRegistrationRepository.Object,
+                _mockFrontDoorService.Object,
+                _mockWhmcsService.Object,
+                _mockDnsZoneService.Object));
+        }
+
+        [Fact]
+        public void Constructor_WithNullRoleChecker_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
+                _mockLogger.Object,
+                _mockJwtValidationService.Object,
                 null!,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
@@ -144,6 +167,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 null!,
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
@@ -156,6 +180,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 null!,
                 _mockWhmcsService.Object,
@@ -168,6 +193,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
                 null!,
@@ -180,6 +206,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
@@ -192,6 +219,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var function = new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
@@ -785,6 +813,42 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert
             Assert.True(isAdmin, "User recognised via IsInRole should be recognized as admin");
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="AdminDomainRegistrationFunction"/> delegates the role check
+        /// to the injected <see cref="IRoleChecker"/>, so a custom implementation can be swapped in.
+        /// </summary>
+        [Fact]
+        public async Task AdminGetIncompleteDomainRegistrations_UsesInjectedRoleChecker()
+        {
+            // Arrange – override the default mock to always deny (custom policy)
+            var customRoleChecker = new Mock<IRoleChecker>();
+            customRoleChecker.Setup(x => x.HasRole(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
+                             .Returns(false);
+
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var function = new AdminDomainRegistrationFunction(
+                _mockLogger.Object,
+                _mockJwtValidationService.Object,
+                customRoleChecker.Object,
+                _mockDomainRegistrationRepository.Object,
+                _mockFrontDoorService.Object,
+                _mockWhmcsService.Object,
+                _mockDnsZoneService.Object);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await function.AdminGetIncompleteDomainRegistrations(req);
+
+            // Assert – even though the JWT principal has "Admin" claim, the custom checker denied it
+            var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
+            Assert.Equal(403, objectResult.StatusCode);
+            customRoleChecker.Verify(x => x.HasRole(adminUser, "Admin"), Times.Once);
         }
 
         #endregion
