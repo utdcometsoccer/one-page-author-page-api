@@ -853,6 +853,97 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
         #endregion
 
+        #region Non-PII Claim Logging Tests
+
+        [Fact]
+        public void GetNonPiiClaimsForLogging_IncludesOidAndRoles_ExcludesUpn()
+        {
+            // Arrange – user with both non-PII (oid, roles) and PII (upn) claims
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim("oid",   "user-oid-456"),
+                new Claim("roles", "Editor"),
+                new Claim("upn",   "user@example.com")
+            }));
+
+            // Act
+            var result = JwtAuthenticationHelper.GetNonPiiClaimsForLogging(user);
+
+            // Assert – non-PII claims present, PII claims absent
+            Assert.Contains("oid=user-oid-456", result);
+            Assert.Contains("roles=Editor", result);
+            Assert.DoesNotContain("upn", result);
+            Assert.DoesNotContain("user@example.com", result);
+        }
+
+        [Fact]
+        public void GetNonPiiClaimsForLogging_WithNoNonPiiClaims_ReturnsEmptyString()
+        {
+            // Arrange – user has only PII claims
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim("upn",   "user@example.com"),
+                new Claim("email", "user@example.com"),
+                new Claim("name",  "Test User")
+            }));
+
+            // Act
+            var result = JwtAuthenticationHelper.GetNonPiiClaimsForLogging(user);
+
+            // Assert
+            Assert.Equal(string.Empty, result);
+        }
+
+        [Fact]
+        public async Task AdminGetIncompleteDomainRegistrations_NonAdminUser_LogsNonPiiClaims()
+        {
+            // Arrange
+            var nonAdminUser = CreateNonAdminUser(); // has oid=user-oid-456, no Admin role
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(nonAdminUser);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            await _function.AdminGetIncompleteDomainRegistrations(req);
+
+            // Assert – warning log must include the oid claim value
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("oid=user-oid-456")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task AdminCompleteDomainRegistration_NonAdminUser_LogsNonPiiClaims()
+        {
+            // Arrange
+            var nonAdminUser = CreateNonAdminUser(); // has oid=user-oid-456, no Admin role
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(nonAdminUser);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
+
+            // Assert – warning log must include the oid claim value
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("oid=user-oid-456")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        #endregion
+
         #region Function Metadata Tests
 
         [Fact]
