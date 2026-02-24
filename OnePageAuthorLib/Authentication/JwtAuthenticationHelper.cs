@@ -10,8 +10,18 @@ namespace InkStainedWretch.OnePageAuthorAPI.Authentication;
 /// </summary>
 public static class JwtAuthenticationHelper
 {
-    private static readonly string[] NonPiiClaimTypes =
-        ["oid", "tid", "roles", ClaimTypes.Role, "scp", "appid", "azp"];
+    // Maps underlying claim types to stable log keys so that semantically equivalent claims
+    // (e.g., "roles" and ClaimTypes.Role) are logged under a single consistent name.
+    private static readonly (string ClaimType, string LogKey)[] NonPiiClaimMappings =
+    [
+        ("oid",          "oid"),
+        ("tid",          "tid"),
+        ("roles",        "roles"),
+        (ClaimTypes.Role, "roles"),
+        ("scp",          "scp"),
+        ("appid",        "appid"),
+        ("azp",          "azp")
+    ];
 
     /// <summary>
     /// Validates JWT token from Authorization header and returns authenticated user
@@ -97,18 +107,20 @@ public static class JwtAuthenticationHelper
     }
 
     /// <summary>
-    /// Returns a comma-separated string of non-PII claim type/value pairs from the user's token,
-    /// suitable for diagnostic logging. Only non-identifying claim types are included
-    /// (object ID, tenant ID, roles, scopes, and application IDs). PII claim types such as
-    /// UPN, email, name, and subject are intentionally excluded.
+    /// Returns a comma-separated string of selected diagnostic claim type/value pairs from the user's token,
+    /// intended for use in server-side diagnostic logging. This helper excludes common human-readable PII
+    /// claim types such as UPN, email, name, and subject, but still includes stable identifiers such as
+    /// object ID (<c>oid</c>), tenant ID (<c>tid</c>), roles, scopes, and application IDs (<c>appid</c>, <c>azp</c>),
+    /// which may be considered personal data depending on your compliance and privacy definitions.
+    /// Use only in trusted logging environments and protect logs appropriately.
     /// </summary>
     /// <param name="user">The authenticated claims principal.</param>
     /// <returns>A string such as <c>"oid=abc123, tid=tenant-id, roles=Admin"</c>, or an empty string when no matching claims are present.</returns>
     public static string GetNonPiiClaimsForLogging(ClaimsPrincipal user)
     {
-        var parts = NonPiiClaimTypes
-            .SelectMany(t => user.FindAll(t))
-            .Select(c => $"{c.Type}={c.Value}");
+        var parts = NonPiiClaimMappings
+            .SelectMany(mapping => user.FindAll(mapping.ClaimType)
+                .Select(c => $"{mapping.LogKey}={c.Value}"));
         return string.Join(", ", parts);
     }
 }

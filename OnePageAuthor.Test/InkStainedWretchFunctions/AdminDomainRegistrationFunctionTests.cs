@@ -895,6 +895,25 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
+        public void GetNonPiiClaimsForLogging_WithMappedClaimTypesRole_NormalizesToRolesKey()
+        {
+            // Arrange – simulate a ClaimsPrincipal where JwtSecurityTokenHandler has mapped the "roles"
+            // JWT claim to ClaimTypes.Role (the full URI form); the log key should still be "roles".
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim("oid",          "admin-oid-123"),
+                new Claim(ClaimTypes.Role, "Admin")
+            }));
+
+            // Act
+            var result = JwtAuthenticationHelper.GetNonPiiClaimsForLogging(user);
+
+            // Assert – the mapped role claim should appear as "roles=Admin", not with the full URI type
+            Assert.Contains("roles=Admin", result);
+            Assert.DoesNotContain(ClaimTypes.Role, result);
+        }
+
+        [Fact]
         public async Task AdminGetIncompleteDomainRegistrations_NonAdminUser_LogsNonPiiClaims()
         {
             // Arrange
