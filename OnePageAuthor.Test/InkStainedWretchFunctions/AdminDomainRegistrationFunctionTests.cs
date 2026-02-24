@@ -26,6 +26,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
     {
         private readonly Mock<ILogger<AdminDomainRegistrationFunction>> _mockLogger;
         private readonly Mock<IJwtValidationService> _mockJwtValidationService;
+        private readonly Mock<IRoleChecker> _mockRoleChecker;
         private readonly Mock<IDomainRegistrationRepository> _mockDomainRegistrationRepository;
         private readonly Mock<IFrontDoorService> _mockFrontDoorService;
         private readonly Mock<IWhmcsService> _mockWhmcsService;
@@ -36,14 +37,21 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             _mockLogger = new Mock<ILogger<AdminDomainRegistrationFunction>>();
             _mockJwtValidationService = new Mock<IJwtValidationService>();
+            _mockRoleChecker = new Mock<IRoleChecker>();
             _mockDomainRegistrationRepository = new Mock<IDomainRegistrationRepository>();
             _mockFrontDoorService = new Mock<IFrontDoorService>();
             _mockWhmcsService = new Mock<IWhmcsService>();
             _mockDnsZoneService = new Mock<IDnsZoneService>();
 
+            // Default: delegate to the real JwtAuthenticationHelper so existing claim-based
+            // user stubs (CreateAdminUser / CreateNonAdminUser) still drive the outcome.
+            _mockRoleChecker.Setup(x => x.HasRole(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
+                            .Returns((ClaimsPrincipal user, string role) => JwtAuthenticationHelper.HasRole(user, role));
+
             _function = new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
@@ -120,6 +128,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 null!,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
@@ -131,6 +140,20 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
+                null!,
+                _mockRoleChecker.Object,
+                _mockDomainRegistrationRepository.Object,
+                _mockFrontDoorService.Object,
+                _mockWhmcsService.Object,
+                _mockDnsZoneService.Object));
+        }
+
+        [Fact]
+        public void Constructor_WithNullRoleChecker_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
+                _mockLogger.Object,
+                _mockJwtValidationService.Object,
                 null!,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
@@ -144,6 +167,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 null!,
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
@@ -156,6 +180,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 null!,
                 _mockWhmcsService.Object,
@@ -168,6 +193,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
                 null!,
@@ -180,6 +206,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
@@ -192,6 +219,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var function = new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
                 _mockJwtValidationService.Object,
+                _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
                 _mockWhmcsService.Object,
@@ -690,9 +718,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Arrange
             var adminUser = CreateAdminUser();
 
-            // Act - check admin role as the function would
-            var isAdmin = adminUser.FindAll("roles").Any(c => c.Value == "Admin")
-                       || adminUser.IsInRole("Admin");
+            // Act - delegate to the extracted helper as the function does
+            var isAdmin = JwtAuthenticationHelper.HasRole(adminUser, "Admin");
 
             // Assert
             Assert.True(isAdmin, "User with 'Admin' role claim should be recognized as admin");
@@ -705,8 +732,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var nonAdminUser = CreateNonAdminUser();
 
             // Act
-            var isAdmin = nonAdminUser.FindAll("roles").Any(c => c.Value == "Admin")
-                       || nonAdminUser.IsInRole("Admin");
+            var isAdmin = JwtAuthenticationHelper.HasRole(nonAdminUser, "Admin");
 
             // Assert
             Assert.False(isAdmin, "User without 'Admin' role claim should not be recognized as admin");
@@ -723,11 +749,106 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             }));
 
             // Act
-            var isAdmin = user.FindAll("roles").Any(c => c.Value == "Admin")
-                       || user.IsInRole("Admin");
+            var isAdmin = JwtAuthenticationHelper.HasRole(user, "Admin");
 
             // Assert
             Assert.False(isAdmin, "User with 'Editor' role but not 'Admin' should not be recognized as admin");
+        }
+
+        /// <summary>
+        /// Regression test: JwtSecurityTokenHandler maps the JWT "roles" claim to
+        /// <see cref="ClaimTypes.Role"/> (the long-form URI) when processing Entra ID tokens.
+        /// HasRole must handle this mapped claim type so that admin users are not incorrectly
+        /// denied access with "Admin role required".
+        /// </summary>
+        [Fact]
+        public void HasRole_UserWithMappedClaimTypesRole_IsAdmin()
+        {
+            // Arrange – simulate a ClaimsPrincipal produced by JwtSecurityTokenHandler where
+            // the "roles" JWT claim has been mapped to ClaimTypes.Role (full URI form)
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim("upn", "admin@example.com"),
+                new Claim(ClaimTypes.Role, "Admin")
+            }));
+
+            // Act
+            var isAdmin = JwtAuthenticationHelper.HasRole(user, "Admin");
+
+            // Assert
+            Assert.True(isAdmin, "User with mapped ClaimTypes.Role 'Admin' claim should be recognized as admin");
+        }
+
+        [Fact]
+        public void HasRole_UserWithMappedClaimTypesRole_NonAdmin_IsNotAdmin()
+        {
+            // Arrange – user with a different mapped role
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim("upn", "editor@example.com"),
+                new Claim(ClaimTypes.Role, "Editor")
+            }));
+
+            // Act
+            var isAdmin = JwtAuthenticationHelper.HasRole(user, "Admin");
+
+            // Assert
+            Assert.False(isAdmin, "User with mapped ClaimTypes.Role 'Editor' claim should not be recognized as admin");
+        }
+
+        [Fact]
+        public void HasRole_UserWithIsInRole_IsAdmin()
+        {
+            // Arrange – ClaimsIdentity constructed so that IsInRole works correctly
+            var identity = new ClaimsIdentity(
+                new[] { new Claim("upn", "admin@example.com") },
+                authenticationType: "Test",
+                nameType: "upn",
+                roleType: "roles");
+            identity.AddClaim(new Claim("roles", "Admin"));
+            var user = new ClaimsPrincipal(identity);
+
+            // Act
+            var isAdmin = JwtAuthenticationHelper.HasRole(user, "Admin");
+
+            // Assert
+            Assert.True(isAdmin, "User recognised via IsInRole should be recognized as admin");
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="AdminDomainRegistrationFunction"/> delegates the role check
+        /// to the injected <see cref="IRoleChecker"/>, so a custom implementation can be swapped in.
+        /// </summary>
+        [Fact]
+        public async Task AdminGetIncompleteDomainRegistrations_UsesInjectedRoleChecker()
+        {
+            // Arrange – override the default mock to always deny (custom policy)
+            var customRoleChecker = new Mock<IRoleChecker>();
+            customRoleChecker.Setup(x => x.HasRole(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
+                             .Returns(false);
+
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var function = new AdminDomainRegistrationFunction(
+                _mockLogger.Object,
+                _mockJwtValidationService.Object,
+                customRoleChecker.Object,
+                _mockDomainRegistrationRepository.Object,
+                _mockFrontDoorService.Object,
+                _mockWhmcsService.Object,
+                _mockDnsZoneService.Object);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await function.AdminGetIncompleteDomainRegistrations(req);
+
+            // Assert – even though the JWT principal has "Admin" claim, the custom checker denied it
+            var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
+            Assert.Equal(403, objectResult.StatusCode);
+            customRoleChecker.Verify(x => x.HasRole(adminUser, "Admin"), Times.Once);
         }
 
         #endregion

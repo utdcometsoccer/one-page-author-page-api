@@ -812,6 +812,8 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<InkStainedWretch.OnePageAuthorAPI.Authentication.ITokenIntrospectionService,
                               InkStainedWretch.OnePageAuthorAPI.Authentication.TokenIntrospectionService>();
             services.AddScoped<Interfaces.IScopeValidationService, API.ScopeValidationService>();
+            services.AddScoped<InkStainedWretch.OnePageAuthorAPI.Authentication.IRoleChecker,
+                              InkStainedWretch.OnePageAuthorAPI.Authentication.RoleChecker>();
 
             return services;
         }
