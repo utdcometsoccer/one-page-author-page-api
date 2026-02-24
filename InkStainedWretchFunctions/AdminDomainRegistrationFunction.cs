@@ -32,6 +32,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 
         private readonly ILogger<AdminDomainRegistrationFunction> _logger;
         private readonly IJwtValidationService _jwtValidationService;
+        private readonly IRoleChecker _roleChecker;
         private readonly IDomainRegistrationRepository _domainRegistrationRepository;
         private readonly IFrontDoorService _frontDoorService;
         private readonly IWhmcsService _whmcsService;
@@ -40,6 +41,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         public AdminDomainRegistrationFunction(
             ILogger<AdminDomainRegistrationFunction> logger,
             IJwtValidationService jwtValidationService,
+            IRoleChecker roleChecker,
             IDomainRegistrationRepository domainRegistrationRepository,
             IFrontDoorService frontDoorService,
             IWhmcsService whmcsService,
@@ -47,6 +49,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _jwtValidationService = jwtValidationService ?? throw new ArgumentNullException(nameof(jwtValidationService));
+            _roleChecker = roleChecker ?? throw new ArgumentNullException(nameof(roleChecker));
             _domainRegistrationRepository = domainRegistrationRepository ?? throw new ArgumentNullException(nameof(domainRegistrationRepository));
             _frontDoorService = frontDoorService ?? throw new ArgumentNullException(nameof(frontDoorService));
             _whmcsService = whmcsService ?? throw new ArgumentNullException(nameof(whmcsService));
@@ -92,9 +95,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             }
 
             // Check admin role claim
-            var isAdmin = authenticatedUser!.FindAll("roles").Any(c => c.Value == AdminRole)
-                       || authenticatedUser.IsInRole(AdminRole);
-            if (!isAdmin)
+            if (!_roleChecker.HasRole(authenticatedUser!, AdminRole))
             {
                 _logger.LogWarning("User attempted to access admin endpoint without Admin role");
                 return new ObjectResult(new { error = "Admin role required" })
@@ -200,9 +201,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             }
 
             // Check admin role claim
-            var isAdmin = authenticatedUser!.FindAll("roles").Any(c => c.Value == AdminRole)
-                       || authenticatedUser.IsInRole(AdminRole);
-            if (!isAdmin)
+            if (!_roleChecker.HasRole(authenticatedUser!, AdminRole))
             {
                 _logger.LogWarning("User attempted to access admin endpoint without Admin role");
                 return new ObjectResult(new { error = "Admin role required" })
