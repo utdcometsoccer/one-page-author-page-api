@@ -1,4 +1,4 @@
-# Admin Domain Creation API — JavaScript / TypeScript Client Guide
+# Admin Domain Registration APIs — JavaScript / TypeScript Client Guide
 
 > **Audience:** Frontend developers building admin dashboards or tooling in JavaScript or TypeScript.
 
@@ -6,20 +6,196 @@
 
 ## Overview
 
-The **Admin Domain Creation** endpoint lets users with the `Admin` role complete the full domain-provisioning workflow for a partially registered author site **without requiring a Stripe subscription**. It executes:
+The **Admin Domain Registration** API provides two endpoints for users with the `Admin` role:
 
-1. WHMCS domain registration
-2. Azure DNS zone creation and name-server retrieval
-3. WHMCS name-server update
-4. Azure Front Door custom-domain setup
+1. **`GET /api/admin/domain-registrations`** — lists all incomplete domain registrations (Pending, InProgress, Failed) across all users.
+2. **`POST /api/admin/domain-registrations/{registrationId}/complete`** — runs the full domain-provisioning workflow for a specific registration, which includes:
+   1. WHMCS domain registration
+   2. Azure DNS zone creation and name-server retrieval
+   3. WHMCS name-server update
+   4. Azure Front Door custom-domain setup
 
 ---
 
-## Endpoint
+## Required Configuration
 
+Both admin endpoints require **Cosmos DB** and **JWT authentication** to work. The complete endpoint additionally requires Azure infrastructure and WHMCS credentials.
+
+### Minimum configuration — GET endpoint
+
+| Variable | Required | Description | How to obtain |
+|----------|----------|-------------|---------------|
+| `COSMOSDB_ENDPOINT_URI` | ✅ Yes | Cosmos DB account endpoint | Azure Portal → Cosmos DB → Keys → URI |
+| `COSMOSDB_PRIMARY_KEY` | ✅ Yes | Cosmos DB primary access key | Azure Portal → Cosmos DB → Keys → Primary Key |
+| `COSMOSDB_DATABASE_ID` | ✅ Yes | Database name (e.g. `OnePageAuthorDb`) | Your Cosmos DB database name |
+| `CosmosDBConnection` | ✅ Yes | Full connection string for triggers | `AccountEndpoint={URI};AccountKey={KEY};` |
+| `AAD_TENANT_ID` | ✅ Yes | Azure AD tenant ID for JWT validation | Azure Portal → Microsoft Entra ID → Overview → Tenant ID |
+| `AAD_AUDIENCE` | ✅ Yes | API application client ID | Azure Portal → Microsoft Entra ID → App registrations → Your App → Application (client) ID |
+
+### Additional configuration — POST complete endpoint
+
+The variables below enable the provisioning steps. Each integration degrades gracefully if its variables are absent (the step is skipped, logged, and the endpoint continues).
+
+| Variable | Step enabled | Description | How to obtain |
+|----------|-------------|-------------|---------------|
+| `AZURE_SUBSCRIPTION_ID` | DNS + Front Door | Azure subscription ID | Azure Portal → Subscriptions → Subscription ID |
+| `AZURE_DNS_RESOURCE_GROUP` | DNS zone creation | Resource group for DNS zones | Azure Portal → Resource Groups → name |
+| `AZURE_RESOURCE_GROUP_NAME` | Front Door | Resource group that contains the Front Door profile | Azure Portal → Resource Groups → name |
+| `AZURE_FRONTDOOR_PROFILE_NAME` | Front Door | Azure Front Door profile name | Azure Portal → Front Door → Profile name |
+| `WHMCS_API_URL` | WHMCS registration | WHMCS API endpoint URL | `https://<your-whmcs-host>/includes/api.php` |
+| `WHMCS_API_IDENTIFIER` | WHMCS registration | WHMCS API identifier | WHMCS Admin → Setup → API Credentials |
+| `WHMCS_API_SECRET` | WHMCS registration | WHMCS API secret | WHMCS Admin → Setup → API Credentials |
+
+> **Important:** `AZURE_SUBSCRIPTION_ID`, `AZURE_DNS_RESOURCE_GROUP`, `AZURE_RESOURCE_GROUP_NAME`, and `AZURE_FRONTDOOR_PROFILE_NAME` must all be present together for their respective steps to run. Providing only some of them results in the step being skipped.
+
+### Azure RBAC permissions
+
+The Azure Functions managed identity (or service principal) requires the following RBAC roles to operate on Azure resources:
+
+| Role | Scope | Required for |
+|------|-------|-------------|
+| `DNS Zone Contributor` | DNS resource group | Creating and reading DNS zones |
+| `CDN Profile Contributor` | Front Door profile | Adding custom domains to Front Door |
+
+Assign these roles with the Azure CLI:
+
+```bash
+# DNS Zone Contributor
+az role assignment create \
+  --assignee <managed-identity-object-id> \
+  --role "DNS Zone Contributor" \
+  --resource-group <AZURE_DNS_RESOURCE_GROUP>
+
+# CDN Profile Contributor (for Front Door)
+az role assignment create \
+  --assignee <managed-identity-object-id> \
+  --role "CDN Profile Contributor" \
+  --scope /subscriptions/<AZURE_SUBSCRIPTION_ID>/resourceGroups/<AZURE_RESOURCE_GROUP_NAME>/providers/Microsoft.Cdn/profiles/<AZURE_FRONTDOOR_PROFILE_NAME>
 ```
-POST /api/admin/domain-registrations/{registrationId}/complete
+
+### Development setup (user secrets)
+
+```bash
+cd InkStainedWretchFunctions
+
+# Core — required for the GET endpoint
+dotnet user-secrets set "COSMOSDB_ENDPOINT_URI"    "https://your-account.documents.azure.com:443/"
+dotnet user-secrets set "COSMOSDB_PRIMARY_KEY"     "your-primary-key=="
+dotnet user-secrets set "COSMOSDB_DATABASE_ID"     "OnePageAuthorDb"
+dotnet user-secrets set "CosmosDBConnection"       "AccountEndpoint=https://your-account.documents.azure.com:443/;AccountKey=your-primary-key==;"
+dotnet user-secrets set "AAD_TENANT_ID"            "your-tenant-id"
+dotnet user-secrets set "AAD_AUDIENCE"             "your-api-client-id"
+
+# Azure infrastructure — required for provisioning steps in POST endpoint
+dotnet user-secrets set "AZURE_SUBSCRIPTION_ID"       "your-subscription-id"
+dotnet user-secrets set "AZURE_DNS_RESOURCE_GROUP"    "your-dns-resource-group"
+dotnet user-secrets set "AZURE_RESOURCE_GROUP_NAME"   "your-frontdoor-resource-group"
+dotnet user-secrets set "AZURE_FRONTDOOR_PROFILE_NAME" "your-frontdoor-profile-name"
+
+# WHMCS — required for domain registration in POST endpoint
+dotnet user-secrets set "WHMCS_API_URL"        "https://your-whmcs-host/includes/api.php"
+dotnet user-secrets set "WHMCS_API_IDENTIFIER" "your-api-identifier"
+dotnet user-secrets set "WHMCS_API_SECRET"     "your-api-secret"
 ```
+
+### Production setup (Azure CLI)
+
+```bash
+az functionapp config appsettings set \
+  --name <function-app-name> \
+  --resource-group <rg-name> \
+  --settings \
+    COSMOSDB_ENDPOINT_URI="https://your-account.documents.azure.com:443/" \
+    COSMOSDB_PRIMARY_KEY="your-primary-key==" \
+    COSMOSDB_DATABASE_ID="OnePageAuthorDb" \
+    CosmosDBConnection="AccountEndpoint=...;AccountKey=...;" \
+    AAD_TENANT_ID="your-tenant-id" \
+    AAD_AUDIENCE="your-api-client-id" \
+    AZURE_SUBSCRIPTION_ID="your-subscription-id" \
+    AZURE_DNS_RESOURCE_GROUP="your-dns-resource-group" \
+    AZURE_RESOURCE_GROUP_NAME="your-frontdoor-resource-group" \
+    AZURE_FRONTDOOR_PROFILE_NAME="your-frontdoor-profile-name" \
+    WHMCS_API_URL="https://your-whmcs-host/includes/api.php" \
+    WHMCS_API_IDENTIFIER="your-api-identifier" \
+    WHMCS_API_SECRET="your-api-secret"
+```
+
+---
+
+## Endpoints
+
+### GET /api/admin/domain-registrations
+
+Lists all incomplete domain registrations (status Pending, InProgress, or Failed) across all users. Contact information is redacted from the response.
+
+| Detail | Value |
+|--------|-------|
+| Method | `GET` |
+| Auth | Bearer JWT with `Admin` role claim |
+| Query param | `maxResults` (optional, integer) — caps the number of results returned |
+| Request body | *(none)* |
+
+#### Response codes
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | Returns array of registration responses (may be empty) |
+| `401 Unauthorized` | Missing or invalid JWT |
+| `403 Forbidden` | Authenticated user does not have the `Admin` role |
+| `500 Internal Server Error` | Unexpected server error |
+
+#### Response body
+
+```typescript
+type DomainRegistrationStatus =
+  | 0  // Pending
+  | 1  // InProgress
+  | 2  // Completed
+  | 3  // Failed
+  | 4; // Cancelled
+
+interface AdminDomainRegistrationResponse {
+  id: string;
+  domain: {
+    topLevelDomain: string;    // e.g. "com"
+    secondLevelDomain: string; // e.g. "mysite"
+  };
+  contactInformation: null;    // always redacted in admin cross-user listing
+  createdAt: string;           // ISO 8601
+  lastUpdatedAt: string;       // ISO 8601
+  status: DomainRegistrationStatus;
+}
+```
+
+#### Example
+
+```typescript
+async function listIncompleteDomains(
+  adminToken: string,
+  maxResults?: number,
+  baseUrl = ""
+): Promise<AdminDomainRegistrationResponse[]> {
+  const url = new URL(`${baseUrl}/api/admin/domain-registrations`);
+  if (maxResults !== undefined) url.searchParams.set("maxResults", String(maxResults));
+
+  const response = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${adminToken}` },
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`HTTP ${response.status}: ${body}`);
+  }
+
+  return response.json();
+}
+```
+
+---
+
+### POST /api/admin/domain-registrations/{registrationId}/complete
+
+Completes the full domain-provisioning workflow for a partially registered author site **without requiring a Stripe subscription**.
 
 | Detail | Value |
 |--------|-------|
@@ -28,11 +204,9 @@ POST /api/admin/domain-registrations/{registrationId}/complete
 | Path param | `registrationId` — the Cosmos DB document ID of the domain registration |
 | Request body | *(none required)* |
 
----
-
 ## Authorization
 
-The caller's JWT **must** include the `Admin` value in the `roles` claim issued by Microsoft Entra ID.
+Both admin endpoints require a JWT that includes the `Admin` value in the `roles` claim issued by Microsoft Entra ID:
 
 ```json
 {
@@ -47,7 +221,7 @@ Requests with a valid JWT but no `Admin` role receive **403 Forbidden**.
 
 ---
 
-## Response Codes
+## Response Codes (POST complete)
 
 | Status | Meaning |
 |--------|---------|

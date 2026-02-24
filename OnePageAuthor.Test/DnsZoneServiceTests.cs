@@ -29,25 +29,29 @@ namespace OnePageAuthor.Test
         }
 
         [Fact]
-        public void Constructor_ThrowsOnMissingSubscriptionId()
+        public void Constructor_LogsWarning_MissingSubscriptionId()
         {
             var logger = new Mock<ILogger<DnsZoneService>>();
             var config = new Mock<IConfiguration>();
             config.Setup(c => c["AZURE_SUBSCRIPTION_ID"]).Returns((string?)null);
             config.Setup(c => c["AZURE_DNS_RESOURCE_GROUP"]).Returns("test-rg");
 
-            Assert.Throws<InvalidOperationException>(() => new DnsZoneService(logger.Object, config.Object));
+            // Should NOT throw; service constructs with _isConfigured = false
+            var service = new DnsZoneService(logger.Object, config.Object);
+            Assert.NotNull(service);
         }
 
         [Fact]
-        public void Constructor_ThrowsOnMissingResourceGroup()
+        public void Constructor_LogsWarning_MissingResourceGroup()
         {
             var logger = new Mock<ILogger<DnsZoneService>>();
             var config = new Mock<IConfiguration>();
             config.Setup(c => c["AZURE_SUBSCRIPTION_ID"]).Returns("test-sub-id");
             config.Setup(c => c["AZURE_DNS_RESOURCE_GROUP"]).Returns((string?)null);
 
-            Assert.Throws<InvalidOperationException>(() => new DnsZoneService(logger.Object, config.Object));
+            // Should NOT throw; service constructs with _isConfigured = false
+            var service = new DnsZoneService(logger.Object, config.Object);
+            Assert.NotNull(service);
         }
 
         [Fact]
@@ -164,6 +168,56 @@ namespace OnePageAuthor.Test
 
             var service = new DnsZoneService(logger.Object, config.Object);
             var result = await service.GetNameServersAsync(null!);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task EnsureDnsZoneExistsAsync_ReturnsFalse_WhenNotConfigured()
+        {
+            var logger = new Mock<ILogger<DnsZoneService>>();
+            var config = new Mock<IConfiguration>();
+            config.Setup(c => c["AZURE_SUBSCRIPTION_ID"]).Returns((string?)null);
+            config.Setup(c => c["AZURE_DNS_RESOURCE_GROUP"]).Returns((string?)null);
+
+            var service = new DnsZoneService(logger.Object, config.Object);
+            var domainRegistration = new DomainRegistrationEntity
+            {
+                id = "test-id",
+                Upn = "test@example.com",
+                Domain = new DomainEntity { SecondLevelDomain = "example", TopLevelDomain = "com" },
+                ContactInformation = new ContactInformationEntity()
+            };
+
+            var result = await service.EnsureDnsZoneExistsAsync(domainRegistration);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task DnsZoneExistsAsync_ReturnsFalse_WhenNotConfigured()
+        {
+            var logger = new Mock<ILogger<DnsZoneService>>();
+            var config = new Mock<IConfiguration>();
+            config.Setup(c => c["AZURE_SUBSCRIPTION_ID"]).Returns((string?)null);
+            config.Setup(c => c["AZURE_DNS_RESOURCE_GROUP"]).Returns((string?)null);
+
+            var service = new DnsZoneService(logger.Object, config.Object);
+            var result = await service.DnsZoneExistsAsync("example.com");
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task GetNameServersAsync_ReturnsNull_WhenNotConfigured()
+        {
+            var logger = new Mock<ILogger<DnsZoneService>>();
+            var config = new Mock<IConfiguration>();
+            config.Setup(c => c["AZURE_SUBSCRIPTION_ID"]).Returns((string?)null);
+            config.Setup(c => c["AZURE_DNS_RESOURCE_GROUP"]).Returns((string?)null);
+
+            var service = new DnsZoneService(logger.Object, config.Object);
+            var result = await service.GetNameServersAsync("example.com");
 
             Assert.Null(result);
         }

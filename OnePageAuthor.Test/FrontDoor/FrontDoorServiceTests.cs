@@ -78,33 +78,33 @@ namespace OnePageAuthor.Test.FrontDoor
         }
 
         [Fact]
-        public void Constructor_ThrowsException_MissingSubscriptionId()
+        public void Constructor_LogsWarning_MissingSubscriptionId()
         {
-            // Arrange & Act & Assert
-            var ex = Assert.Throws<InvalidOperationException>(() => 
-                CreateServiceWithConfig(subscriptionId: null));
-            
-            Assert.Contains("AZURE_SUBSCRIPTION_ID", ex.Message);
+            // Arrange & Act — should NOT throw; service constructs with _isConfigured = false
+            var service = CreateServiceWithConfig(subscriptionId: null);
+
+            // Assert
+            Assert.NotNull(service);
         }
 
         [Fact]
-        public void Constructor_ThrowsException_MissingResourceGroupName()
+        public void Constructor_LogsWarning_MissingResourceGroupName()
         {
-            // Arrange & Act & Assert
-            var ex = Assert.Throws<InvalidOperationException>(() => 
-                CreateServiceWithConfig(resourceGroupName: null));
-            
-            Assert.Contains("AZURE_RESOURCE_GROUP_NAME", ex.Message);
+            // Arrange & Act — should NOT throw; service constructs with _isConfigured = false
+            var service = CreateServiceWithConfig(resourceGroupName: null);
+
+            // Assert
+            Assert.NotNull(service);
         }
 
         [Fact]
-        public void Constructor_ThrowsException_MissingFrontDoorProfileName()
+        public void Constructor_LogsWarning_MissingFrontDoorProfileName()
         {
-            // Arrange & Act & Assert
-            var ex = Assert.Throws<InvalidOperationException>(() => 
-                CreateServiceWithConfig(frontDoorProfileName: null));
-            
-            Assert.Contains("AZURE_FRONTDOOR_PROFILE_NAME", ex.Message);
+            // Arrange & Act — should NOT throw; service constructs with _isConfigured = false
+            var service = CreateServiceWithConfig(frontDoorProfileName: null);
+
+            // Assert
+            Assert.NotNull(service);
         }
 
         [Fact]
@@ -177,6 +177,33 @@ namespace OnePageAuthor.Test.FrontDoor
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() => 
                 service.AddDomainToFrontDoorAsync(registration));
+        }
+
+        [Fact]
+        public async Task AddDomainToFrontDoorAsync_ReturnsFalse_WhenNotConfigured()
+        {
+            // Arrange — service constructed without any Azure config
+            var service = CreateServiceWithConfig(subscriptionId: null, resourceGroupName: null, frontDoorProfileName: null);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            var result = await service.AddDomainToFrontDoorAsync(registration);
+
+            // Assert — graceful degradation when not configured
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task DomainExistsAsync_ReturnsFalse_WhenNotConfigured()
+        {
+            // Arrange — service constructed without any Azure config
+            var service = CreateServiceWithConfig(subscriptionId: null, resourceGroupName: null, frontDoorProfileName: null);
+
+            // Act
+            var result = await service.DomainExistsAsync("example.com");
+
+            // Assert — graceful degradation when not configured
+            Assert.False(result);
         }
 
         [Fact]

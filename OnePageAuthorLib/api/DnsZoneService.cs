@@ -16,9 +16,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
     public class DnsZoneService : IDnsZoneService
     {
         private readonly ILogger<DnsZoneService> _logger;
-        private readonly ArmClient _armClient;
-        private readonly string _subscriptionId;
-        private readonly string _resourceGroupName;
+        private readonly ArmClient? _armClient;
+        private readonly string? _subscriptionId;
+        private readonly string? _resourceGroupName;
+        private readonly bool _isConfigured;
 
         public DnsZoneService(
             ILogger<DnsZoneService> logger,
@@ -30,10 +31,19 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 throw new ArgumentNullException(nameof(configuration));
 
             // Get Azure credentials and configuration
-            _subscriptionId = configuration["AZURE_SUBSCRIPTION_ID"] 
-                ?? throw new InvalidOperationException("AZURE_SUBSCRIPTION_ID configuration is required");
-            _resourceGroupName = configuration["AZURE_DNS_RESOURCE_GROUP"] 
-                ?? throw new InvalidOperationException("AZURE_DNS_RESOURCE_GROUP configuration is required");
+            _subscriptionId = configuration["AZURE_SUBSCRIPTION_ID"];
+            _resourceGroupName = configuration["AZURE_DNS_RESOURCE_GROUP"];
+
+            _isConfigured = !string.IsNullOrWhiteSpace(_subscriptionId)
+                         && !string.IsNullOrWhiteSpace(_resourceGroupName);
+
+            if (!_isConfigured)
+            {
+                _logger.LogWarning("DnsZoneService is not fully configured. " +
+                    "AZURE_SUBSCRIPTION_ID and AZURE_DNS_RESOURCE_GROUP are required. " +
+                    "DNS zone operations will be skipped.");
+                return;
+            }
 
             // Initialize Azure Resource Manager client with DefaultAzureCredential
             // This supports multiple authentication methods: managed identity, environment variables, Azure CLI, etc.
@@ -57,6 +67,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             if (string.IsNullOrWhiteSpace(domainName))
             {
                 _logger.LogWarning("Domain name is empty");
+                return false;
+            }
+
+            if (!_isConfigured)
+            {
+                _logger.LogInformation("DnsZoneService is not configured, skipping EnsureDnsZoneExistsAsync for {DomainName}", domainName);
                 return false;
             }
 
@@ -91,10 +107,16 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 return false;
             }
 
+            if (!_isConfigured)
+            {
+                _logger.LogInformation("DnsZoneService is not configured, skipping DnsZoneExistsAsync for {DomainName}", domainName);
+                return false;
+            }
+
             try
             {
                 // Get the subscription
-                var subscription = await _armClient.GetSubscriptionResource(
+                var subscription = await _armClient!.GetSubscriptionResource(
                     new ResourceIdentifier($"/subscriptions/{_subscriptionId}")).GetAsync();
 
                 // Get the resource group
@@ -124,7 +146,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             _logger.LogInformation("Creating DNS zone for domain: {DomainName}", domainName);
 
             // Get the subscription
-            var subscription = await _armClient.GetSubscriptionResource(
+            var subscription = await _armClient!.GetSubscriptionResource(
                 new ResourceIdentifier($"/subscriptions/{_subscriptionId}")).GetAsync();
 
             // Get the resource group
@@ -154,12 +176,18 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 return null;
             }
 
+            if (!_isConfigured)
+            {
+                _logger.LogInformation("DnsZoneService is not configured, skipping GetNameServersAsync for {DomainName}", domainName);
+                return null;
+            }
+
             _logger.LogInformation("Retrieving name servers for domain: {DomainName}", domainName);
 
             try
             {
                 // Get the subscription
-                var subscription = await _armClient.GetSubscriptionResource(
+                var subscription = await _armClient!.GetSubscriptionResource(
                     new ResourceIdentifier($"/subscriptions/{_subscriptionId}")).GetAsync();
 
                 // Get the resource group

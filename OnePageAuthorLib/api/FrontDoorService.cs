@@ -18,10 +18,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
     {
         private readonly ILogger<FrontDoorService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly ArmClient _armClient;
-        private readonly string _subscriptionId;
-        private readonly string _resourceGroupName;
-        private readonly string _frontDoorProfileName;
+        private readonly ArmClient? _armClient;
+        private readonly string? _subscriptionId;
+        private readonly string? _resourceGroupName;
+        private readonly string? _frontDoorProfileName;
+        private readonly bool _isConfigured;
 
         public FrontDoorService(
             ILogger<FrontDoorService> logger,
@@ -30,13 +31,22 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-            // Get configuration values
-            _subscriptionId = _configuration["AZURE_SUBSCRIPTION_ID"] 
-                ?? throw new InvalidOperationException("AZURE_SUBSCRIPTION_ID configuration is required");
-            _resourceGroupName = _configuration["AZURE_RESOURCE_GROUP_NAME"] 
-                ?? throw new InvalidOperationException("AZURE_RESOURCE_GROUP_NAME configuration is required");
-            _frontDoorProfileName = _configuration["AZURE_FRONTDOOR_PROFILE_NAME"] 
-                ?? throw new InvalidOperationException("AZURE_FRONTDOOR_PROFILE_NAME configuration is required");
+            // Get configuration values — all three must be present to be considered configured
+            _subscriptionId = _configuration["AZURE_SUBSCRIPTION_ID"];
+            _resourceGroupName = _configuration["AZURE_RESOURCE_GROUP_NAME"];
+            _frontDoorProfileName = _configuration["AZURE_FRONTDOOR_PROFILE_NAME"];
+
+            _isConfigured = !string.IsNullOrWhiteSpace(_subscriptionId)
+                         && !string.IsNullOrWhiteSpace(_resourceGroupName)
+                         && !string.IsNullOrWhiteSpace(_frontDoorProfileName);
+
+            if (!_isConfigured)
+            {
+                _logger.LogWarning("FrontDoorService is not fully configured. " +
+                    "AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP_NAME, and AZURE_FRONTDOOR_PROFILE_NAME are required. " +
+                    "Front Door domain operations will be skipped.");
+                return;
+            }
 
             // Initialize ARM client with DefaultAzureCredential (supports managed identity)
             var credential = new DefaultAzureCredential();
@@ -53,11 +63,17 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 throw new ArgumentException("Domain name cannot be null or empty", nameof(domainName));
             }
 
+            if (!_isConfigured)
+            {
+                _logger.LogInformation("FrontDoorService is not configured, skipping DomainExistsAsync for {DomainName}", domainName);
+                return false;
+            }
+
             try
             {
                 _logger.LogInformation("Checking if domain {DomainName} exists in Front Door", domainName);
 
-                var subscription = await _armClient.GetSubscriptionResource(
+                var subscription = await _armClient!.GetSubscriptionResource(
                     new ResourceIdentifier($"/subscriptions/{_subscriptionId}")).GetAsync();
                 
                 var resourceGroups = subscription.Value.GetResourceGroups();
@@ -104,6 +120,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
             var domainName = domainRegistration.Domain.FullDomainName;
 
+            if (!_isConfigured)
+            {
+                _logger.LogInformation("FrontDoorService is not configured, skipping AddDomainToFrontDoorAsync for {DomainName}", domainName);
+                return false;
+            }
+
             try
             {
                 _logger.LogInformation("Attempting to add domain {DomainName} to Front Door", domainName);
@@ -116,7 +138,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 }
 
                 // Get the Front Door profile
-                var subscription = await _armClient.GetSubscriptionResource(
+                var subscription = await _armClient!.GetSubscriptionResource(
                     new ResourceIdentifier($"/subscriptions/{_subscriptionId}")).GetAsync();
                 
                 var resourceGroups = subscription.Value.GetResourceGroups();
