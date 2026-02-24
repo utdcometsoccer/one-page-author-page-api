@@ -92,9 +92,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             }
 
             // Check admin role claim
-            var isAdmin = authenticatedUser!.FindAll("roles").Any(c => c.Value == AdminRole)
-                       || authenticatedUser.IsInRole(AdminRole);
-            if (!isAdmin)
+            if (!JwtAuthenticationHelper.HasRole(authenticatedUser!, AdminRole))
             {
                 _logger.LogWarning("User attempted to access admin endpoint without Admin role");
                 return new ObjectResult(new { error = "Admin role required" })
@@ -200,9 +198,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             }
 
             // Check admin role claim
-            var isAdmin = authenticatedUser!.FindAll("roles").Any(c => c.Value == AdminRole)
-                       || authenticatedUser.IsInRole(AdminRole);
-            if (!isAdmin)
+            if (!JwtAuthenticationHelper.HasRole(authenticatedUser!, AdminRole))
             {
                 _logger.LogWarning("User attempted to access admin endpoint without Admin role");
                 return new ObjectResult(new { error = "Admin role required" })

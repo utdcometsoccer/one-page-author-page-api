@@ -690,9 +690,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Arrange
             var adminUser = CreateAdminUser();
 
-            // Act - check admin role as the function would
-            var isAdmin = adminUser.FindAll("roles").Any(c => c.Value == "Admin")
-                       || adminUser.IsInRole("Admin");
+            // Act - delegate to the extracted helper as the function does
+            var isAdmin = JwtAuthenticationHelper.HasRole(adminUser, "Admin");
 
             // Assert
             Assert.True(isAdmin, "User with 'Admin' role claim should be recognized as admin");
@@ -705,8 +704,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var nonAdminUser = CreateNonAdminUser();
 
             // Act
-            var isAdmin = nonAdminUser.FindAll("roles").Any(c => c.Value == "Admin")
-                       || nonAdminUser.IsInRole("Admin");
+            var isAdmin = JwtAuthenticationHelper.HasRole(nonAdminUser, "Admin");
 
             // Assert
             Assert.False(isAdmin, "User without 'Admin' role claim should not be recognized as admin");
@@ -723,11 +721,70 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             }));
 
             // Act
-            var isAdmin = user.FindAll("roles").Any(c => c.Value == "Admin")
-                       || user.IsInRole("Admin");
+            var isAdmin = JwtAuthenticationHelper.HasRole(user, "Admin");
 
             // Assert
             Assert.False(isAdmin, "User with 'Editor' role but not 'Admin' should not be recognized as admin");
+        }
+
+        /// <summary>
+        /// Regression test: JwtSecurityTokenHandler maps the JWT "roles" claim to
+        /// <see cref="ClaimTypes.Role"/> (the long-form URI) when processing Entra ID tokens.
+        /// HasRole must handle this mapped claim type so that admin users are not incorrectly
+        /// denied access with "Admin role required".
+        /// </summary>
+        [Fact]
+        public void HasRole_UserWithMappedClaimTypesRole_IsAdmin()
+        {
+            // Arrange – simulate a ClaimsPrincipal produced by JwtSecurityTokenHandler where
+            // the "roles" JWT claim has been mapped to ClaimTypes.Role (full URI form)
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim("upn", "admin@example.com"),
+                new Claim(ClaimTypes.Role, "Admin")
+            }));
+
+            // Act
+            var isAdmin = JwtAuthenticationHelper.HasRole(user, "Admin");
+
+            // Assert
+            Assert.True(isAdmin, "User with mapped ClaimTypes.Role 'Admin' claim should be recognized as admin");
+        }
+
+        [Fact]
+        public void HasRole_UserWithMappedClaimTypesRole_NonAdmin_IsNotAdmin()
+        {
+            // Arrange – user with a different mapped role
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim("upn", "editor@example.com"),
+                new Claim(ClaimTypes.Role, "Editor")
+            }));
+
+            // Act
+            var isAdmin = JwtAuthenticationHelper.HasRole(user, "Admin");
+
+            // Assert
+            Assert.False(isAdmin, "User with mapped ClaimTypes.Role 'Editor' claim should not be recognized as admin");
+        }
+
+        [Fact]
+        public void HasRole_UserWithIsInRole_IsAdmin()
+        {
+            // Arrange – ClaimsIdentity constructed so that IsInRole works correctly
+            var identity = new ClaimsIdentity(
+                new[] { new Claim("upn", "admin@example.com") },
+                authenticationType: "Test",
+                nameType: "upn",
+                roleType: "roles");
+            identity.AddClaim(new Claim("roles", "Admin"));
+            var user = new ClaimsPrincipal(identity);
+
+            // Act
+            var isAdmin = JwtAuthenticationHelper.HasRole(user, "Admin");
+
+            // Assert
+            Assert.True(isAdmin, "User recognised via IsInRole should be recognized as admin");
         }
 
         #endregion

@@ -75,4 +75,21 @@ public static class JwtAuthenticationHelper
             { StatusCode = StatusCodes.Status500InternalServerError });
         }
     }
+
+    /// <summary>
+    /// Determines whether the authenticated user has the specified role.
+    /// Checks both the short-form <c>"roles"</c> claim type used directly in JWT tokens from
+    /// Microsoft Entra ID and the mapped <see cref="ClaimTypes.Role"/> URI that
+    /// <see cref="System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler"/> may produce,
+    /// as well as the identity's built-in <see cref="ClaimsPrincipal.IsInRole"/> method.
+    /// </summary>
+    /// <param name="user">The authenticated claims principal.</param>
+    /// <param name="role">The role name to check (e.g. <c>"Admin"</c>).</param>
+    /// <returns><c>true</c> if the user has the role; otherwise <c>false</c>.</returns>
+    public static bool HasRole(ClaimsPrincipal user, string role)
+    {
+        return user.FindAll("roles").Any(c => c.Value == role)
+            || user.FindAll(ClaimTypes.Role).Any(c => c.Value == role)
+            || user.IsInRole(role);
+    }
 }
