@@ -32,5 +32,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         /// <param name="regionName">Region name (e.g., "US").</param>
         /// <returns>List of matching Author entities.</returns>
         Task<IList<Author>> GetByDomainAndLocaleAsync(string topLevelDomain, string secondLevelDomain, string languageName, string regionName);
+
+        /// <summary>
+        /// Gets all authors whose EmailAddress matches the specified email.
+        /// </summary>
+        /// <param name="emailAddress">The user's email address (e.g., "user@example.com").</param>
+        /// <returns>List of matching Author entities.</returns>
+        Task<IList<Author>> GetByEmailAsync(string emailAddress);
     }
 }

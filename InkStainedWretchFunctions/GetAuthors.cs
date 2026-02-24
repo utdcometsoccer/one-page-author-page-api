@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
+using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 
 namespace InkStainedWretchFunctions;
 
@@ -11,15 +12,18 @@ public class GetAuthors
     private readonly ILogger<GetAuthors> _logger;
     private readonly InkStainedWretch.OnePageAuthorAPI.API.IAuthorDataService _authorDataService;
     private readonly IJwtValidationService _jwtValidationService;
+    private readonly IUserIdentityService _userIdentityService;
 
     public GetAuthors(
         ILogger<GetAuthors> logger, 
         InkStainedWretch.OnePageAuthorAPI.API.IAuthorDataService authorDataService,
-        IJwtValidationService jwtValidationService)
+        IJwtValidationService jwtValidationService,
+        IUserIdentityService userIdentityService)
     {
         _logger = logger;
         _authorDataService = authorDataService;
         _jwtValidationService = jwtValidationService;
+        _userIdentityService = userIdentityService;
     }
 
     [Function("GetAuthors")]
@@ -29,16 +33,7 @@ public class GetAuthors
         var secondLevelDomain = req.Query["secondLevelDomain"].FirstOrDefault();
         var topLevelDomain = req.Query["topLevelDomain"].FirstOrDefault();
 
-        if (string.IsNullOrWhiteSpace(secondLevelDomain) || string.IsNullOrWhiteSpace(topLevelDomain))
-        {
-            var missing = new List<string>();
-            if (string.IsNullOrWhiteSpace(secondLevelDomain)) missing.Add("secondLevelDomain");
-            if (string.IsNullOrWhiteSpace(topLevelDomain)) missing.Add("topLevelDomain");
-            _logger.LogWarning("Missing required query parameters: {MissingParams}", string.Join(", ", missing));
-            return new BadRequestObjectResult(new { error = $"Missing required query parameter(s): {string.Join(", ", missing)}" });
-        }
-
-        _logger.LogInformation($"Received request for authors with TLD: {topLevelDomain}, SLD: {secondLevelDomain}");
+        bool hasDomainParams = !string.IsNullOrWhiteSpace(secondLevelDomain) && !string.IsNullOrWhiteSpace(topLevelDomain);
 
         // Authenticate the request using JWT token
         var (user, errorResult) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
@@ -59,20 +54,32 @@ public class GetAuthors
 
         try
         {
-            var authors = await _authorDataService.GetAuthorsByDomainAsync(topLevelDomain, secondLevelDomain);
-            
-            if (authors == null || !authors.Any())
+            List<InkStainedWretch.OnePageAuthorAPI.API.AuthorApiResponse> authors;
+
+            if (hasDomainParams)
             {
-                _logger.LogInformation($"No authors found for TLD: {topLevelDomain}, SLD: {secondLevelDomain}");
-                return new NotFoundObjectResult(new { error = "Domain not found" });
+                _logger.LogInformation("Received request for authors with TLD: {TopLevelDomain}, SLD: {SecondLevelDomain}", topLevelDomain, secondLevelDomain);
+                authors = await _authorDataService.GetAuthorsByDomainAsync(topLevelDomain!, secondLevelDomain!);
+            }
+            else
+            {
+                var email = _userIdentityService.GetUserUpn(user!);
+                _logger.LogInformation("Received request for all authors for user: {Email}", email);
+                authors = await _authorDataService.GetAuthorsByEmailAsync(email);
             }
 
-            _logger.LogInformation($"Successfully retrieved {authors.Count} authors for TLD: {topLevelDomain}, SLD: {secondLevelDomain}");
+            if (authors == null || !authors.Any())
+            {
+                _logger.LogInformation("No authors found");
+                return new NotFoundObjectResult(new { error = "No authors found" });
+            }
+
+            _logger.LogInformation("Successfully retrieved {Count} author(s)", authors.Count);
             return new OkObjectResult(authors);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving authors for TLD: {TopLevelDomain}, SLD: {SecondLevelDomain}", topLevelDomain, secondLevelDomain);
+            _logger.LogError(ex, "Error retrieving authors");
             return new ObjectResult(new { error = "Internal server error" })
             {
                 StatusCode = StatusCodes.Status500InternalServerError

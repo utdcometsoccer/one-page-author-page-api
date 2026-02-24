@@ -145,12 +145,12 @@
 | Function | HTTP Method | Route | Auth | Side Effects | Sync/Async | Role Access |
 |----------|-------------|-------|------|--------------|------------|-------------|
 | **GetPlatformStats** | GET | `/api/stats/platform` | None | Read-only | Async | Public (cached 1hr) |
-| **GetAuthors** | GET | `/api/authors?secondLevelDomain={sld}&topLevelDomain={tld}` | JWT Required | Read-only | Async | Author.Read scope |
+| **GetAuthors** | GET | `/api/authors` | JWT Required | Read-only | Async | Author.Read scope |
 | **GetExperiments** | GET | `/api/experiments` | None | Read-only | Async | Public |
 
 **Special Notes:**
 - GetPlatformStats: Cached with Cache-Control header (max-age=3600)
-- GetAuthors: Requires specific `Author.Read` scope claim
+- GetAuthors: Requires specific `Author.Read` scope claim; omit domain params to return all authors for the logged-in user
 
 #### 2.8 Test Functions (Development Only)
 
