@@ -514,7 +514,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
             Assert.Equal(403, objectResult.StatusCode);
 
-            _mockDomainRegistrationRepository.Verify(x => x.GetAllIncompleteAsync(), Times.Never);
+            _mockDomainRegistrationRepository.Verify(x => x.GetAllIncompleteAsync(It.IsAny<int?>()), Times.Never);
         }
 
         [Fact]
@@ -532,7 +532,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 CreateTestDomainRegistration("reg-3", DomainRegistrationStatus.Failed)
             };
 
-            _mockDomainRegistrationRepository.Setup(x => x.GetAllIncompleteAsync())
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllIncompleteAsync(It.IsAny<int?>()))
                                              .ReturnsAsync(registrations);
 
             var req = CreateHttpRequestWithAuth();
@@ -546,7 +546,91 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(ok.Value);
             Assert.Equal(3, response.Count());
 
-            _mockDomainRegistrationRepository.Verify(x => x.GetAllIncompleteAsync(), Times.Once);
+            _mockDomainRegistrationRepository.Verify(x => x.GetAllIncompleteAsync(It.IsAny<int?>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task AdminGetIncompleteDomainRegistrations_ResponseHasNullContactInformation()
+        {
+            // Arrange - contact information must be redacted in admin cross-user listing
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var registrations = new List<DomainRegistrationEntity>
+            {
+                CreateTestDomainRegistration("reg-1", DomainRegistrationStatus.Pending)
+            };
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllIncompleteAsync(It.IsAny<int?>()))
+                                             .ReturnsAsync(registrations);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminGetIncompleteDomainRegistrations(req);
+
+            // Assert - ContactInformation must be null (redacted) to avoid PII exposure
+            var ok = Assert.IsType<OkObjectResult>(result);
+            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(ok.Value).ToList();
+            Assert.Single(response);
+            Assert.Null(response[0].ContactInformation);
+        }
+
+        [Fact]
+        public async Task AdminGetIncompleteDomainRegistrations_SkipsRegistrationsWithNullDomain()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var validReg = CreateTestDomainRegistration("reg-valid");
+            var invalidReg = new DomainRegistrationEntity
+            {
+                id = "reg-no-domain",
+                Upn = "user@example.com",
+                Domain = null!,
+                ContactInformation = new ContactInformationEntity { FirstName = "Test" },
+                Status = DomainRegistrationStatus.Pending
+            };
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllIncompleteAsync(It.IsAny<int?>()))
+                                             .ReturnsAsync(new List<DomainRegistrationEntity> { validReg, invalidReg });
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminGetIncompleteDomainRegistrations(req);
+
+            // Assert - only the valid registration is returned
+            var ok = Assert.IsType<OkObjectResult>(result);
+            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(ok.Value).ToList();
+            Assert.Single(response);
+            Assert.Equal("reg-valid", response[0].Id);
+        }
+
+        [Fact]
+        public async Task AdminGetIncompleteDomainRegistrations_WithMaxResultsQueryParam_PassesValueToRepository()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllIncompleteAsync(It.IsAny<int?>()))
+                                             .ReturnsAsync(Enumerable.Empty<DomainRegistrationEntity>());
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "Bearer valid-token";
+            context.Request.QueryString = new QueryString("?maxResults=50");
+            var req = context.Request;
+
+            // Act
+            await _function.AdminGetIncompleteDomainRegistrations(req);
+
+            // Assert - repository was called with the parsed maxResults value
+            _mockDomainRegistrationRepository.Verify(x => x.GetAllIncompleteAsync(50), Times.Once);
         }
 
         [Fact]
@@ -557,7 +641,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
                                      .ReturnsAsync(adminUser);
 
-            _mockDomainRegistrationRepository.Setup(x => x.GetAllIncompleteAsync())
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllIncompleteAsync(It.IsAny<int?>()))
                                              .ReturnsAsync(Enumerable.Empty<DomainRegistrationEntity>());
 
             var req = CreateHttpRequestWithAuth();
@@ -580,7 +664,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
                                      .ReturnsAsync(adminUser);
 
-            _mockDomainRegistrationRepository.Setup(x => x.GetAllIncompleteAsync())
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllIncompleteAsync(It.IsAny<int?>()))
                                              .ThrowsAsync(new Exception("Database error"));
 
             var req = CreateHttpRequestWithAuth();

@@ -64,7 +64,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// Gets all incomplete domain registrations across all users (cross-partition query).
         /// Incomplete registrations have a status of Pending, InProgress, or Failed.
         /// </summary>
+        /// <param name="maxResults">Optional upper bound on items returned. Defaults to unlimited when null.</param>
         /// <returns>List of incomplete domain registrations</returns>
-        Task<IEnumerable<DomainRegistration>> GetAllIncompleteAsync();
+        Task<IEnumerable<DomainRegistration>> GetAllIncompleteAsync(int? maxResults = null);
     }
 }

@@ -16,7 +16,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
     /// <remarks>
     /// AdminGetIncompleteDomainRegistrations:
     /// - Method: GET
-    /// - Route: /api/admin/domain-registrations/
+    /// - Route: /api/admin/domain-registrations
     /// - Auth: Bearer JWT with "Admin" role claim
     /// - Returns all incomplete domain registrations (Pending, InProgress, Failed) regardless of UPN
     ///
@@ -105,8 +105,37 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 
             try
             {
-                var registrations = await _domainRegistrationRepository.GetAllIncompleteAsync();
-                var response = registrations.Select(DomainRegistrationResponse.FromEntity).ToList();
+                int? maxResults = null;
+                if (req.Query.TryGetValue("maxResults", out var maxResultsStr)
+                    && int.TryParse(maxResultsStr, out var parsedMax)
+                    && parsedMax > 0)
+                {
+                    maxResults = parsedMax;
+                }
+
+                var registrations = await _domainRegistrationRepository.GetAllIncompleteAsync(maxResults);
+
+                var validRegistrations = registrations
+                    .Where(r => r.Domain != null && r.ContactInformation != null)
+                    .ToList();
+
+                var skippedCount = registrations.Count() - validRegistrations.Count;
+                if (skippedCount > 0)
+                {
+                    _logger.LogWarning(
+                        "Skipped {SkippedCount} incomplete domain registrations due to missing Domain or ContactInformation",
+                        skippedCount);
+                }
+
+                var response = validRegistrations
+                    .Select(r =>
+                    {
+                        var dto = DomainRegistrationResponse.FromEntity(r);
+                        dto.ContactInformation = null;
+                        return dto;
+                    })
+                    .ToList();
+
                 return new OkObjectResult(response);
             }
             catch (Exception ex)

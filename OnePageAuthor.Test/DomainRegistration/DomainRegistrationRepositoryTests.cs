@@ -698,6 +698,51 @@ namespace OnePageAuthor.Test.DomainRegistration
             Assert.Empty(result);
         }
 
+        [Fact]
+        public async Task GetAllIncompleteAsync_ReturnsAllItems_WhenResultsSpanMultiplePages()
+        {
+            // Arrange – first page has 2 items, second page has 1 item
+            var page1Items = new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>
+            {
+                CreateTestDomainRegistration("reg-page1-a"),
+                CreateTestDomainRegistration("reg-page1-b")
+            };
+            var page2Items = new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>
+            {
+                CreateTestDomainRegistration("reg-page2-a")
+            };
+            page2Items[0].Status = DomainRegistrationStatus.InProgress;
+
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var page1Response = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var page2Response = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            page1Response.Setup(r => r.Resource).Returns(page1Items);
+            page2Response.Setup(r => r.Resource).Returns(page2Items);
+
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.SetupSequence(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(page1Response.Object)
+                       .ReturnsAsync(page2Response.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetAllIncompleteAsync();
+
+            // Assert – all 3 items across both pages are returned
+            Assert.NotNull(result);
+            Assert.Equal(3, result.Count());
+            Assert.Contains(result, r => r.id == "reg-page1-a");
+            Assert.Contains(result, r => r.id == "reg-page1-b");
+            Assert.Contains(result, r => r.id == "reg-page2-a");
+        }
+
         #endregion
     }
 }
