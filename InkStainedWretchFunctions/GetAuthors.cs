@@ -24,10 +24,20 @@ public class GetAuthors
 
     [Function("GetAuthors")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "authors/{secondLevelDomain}/{topLevelDomain}")] HttpRequest req,
-        string secondLevelDomain,
-        string topLevelDomain)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "authors")] HttpRequest req)
     {
+        var secondLevelDomain = req.Query["secondLevelDomain"].FirstOrDefault();
+        var topLevelDomain = req.Query["topLevelDomain"].FirstOrDefault();
+
+        if (string.IsNullOrWhiteSpace(secondLevelDomain) || string.IsNullOrWhiteSpace(topLevelDomain))
+        {
+            var missing = new List<string>();
+            if (string.IsNullOrWhiteSpace(secondLevelDomain)) missing.Add("secondLevelDomain");
+            if (string.IsNullOrWhiteSpace(topLevelDomain)) missing.Add("topLevelDomain");
+            _logger.LogWarning("Missing required query parameters: {MissingParams}", string.Join(", ", missing));
+            return new BadRequestObjectResult(new { error = $"Missing required query parameter(s): {string.Join(", ", missing)}" });
+        }
+
         _logger.LogInformation($"Received request for authors with TLD: {topLevelDomain}, SLD: {secondLevelDomain}");
 
         // Authenticate the request using JWT token
