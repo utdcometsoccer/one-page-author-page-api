@@ -47,7 +47,10 @@ public class GetAuthors
         // Check if user has the required scope for author reading
         if (user != null && !_scopeValidationService.HasRequiredScope(user, "Author.Read"))
         {
-            _logger.LogWarning("User does not have required Author.Read scope");
+            var availableScopes = string.Join(" ", user.FindAll("scp")
+                .SelectMany(c => c.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                .Distinct());
+            _logger.LogWarning("User does not have required Author.Read scope. Available scopes: {AvailableScopes}", availableScopes);
             return new ObjectResult(new { error = "Insufficient permissions" })
             {
                 StatusCode = StatusCodes.Status403Forbidden
