@@ -753,8 +753,9 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         [Fact]
         public void AdminGetIncompleteDomainRegistrations_HasCorrectHttpRoute()
         {
-            // Verify the HttpTrigger is bound to GET "admin/domain-registrations".
-            // This ensures the function responds to /api/admin/domain-registrations as documented.
+            // Verify the HttpTrigger is bound to GET "management/domain-registrations".
+            // This ensures the function responds to /api/management/domain-registrations as documented.
+            // Note: the "admin/" prefix is reserved by Azure Functions built-in routes; "management/" is used instead.
             var method = typeof(AdminDomainRegistrationFunction)
                 .GetMethod("AdminGetIncompleteDomainRegistrations");
 
@@ -767,7 +768,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             var triggerAttr = triggerParam.GetCustomAttribute<HttpTriggerAttribute>();
             Assert.NotNull(triggerAttr);
-            Assert.Equal("admin/domain-registrations", triggerAttr.Route);
+            Assert.Equal("management/domain-registrations", triggerAttr.Route);
             Assert.Contains("get", triggerAttr.Methods, StringComparer.OrdinalIgnoreCase);
         }
 
@@ -788,7 +789,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         [Fact]
         public void AdminCompleteDomainRegistration_HasCorrectHttpRoute()
         {
-            // Verify the HttpTrigger is bound to POST "admin/domain-registrations/{registrationId}/complete".
+            // Verify the HttpTrigger is bound to POST "management/domain-registrations/{registrationId}/complete".
             var method = typeof(AdminDomainRegistrationFunction)
                 .GetMethod("AdminCompleteDomainRegistration");
 
@@ -801,7 +802,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             var triggerAttr = triggerParam.GetCustomAttribute<HttpTriggerAttribute>();
             Assert.NotNull(triggerAttr);
-            Assert.Equal("admin/domain-registrations/{registrationId}/complete", triggerAttr.Route);
+            Assert.Equal("management/domain-registrations/{registrationId}/complete", triggerAttr.Route);
             Assert.Contains("post", triggerAttr.Methods, StringComparer.OrdinalIgnoreCase);
         }
 
