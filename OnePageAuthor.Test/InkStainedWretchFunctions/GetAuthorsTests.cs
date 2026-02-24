@@ -103,6 +103,34 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Equal(StatusCodes.Status403Forbidden, objectResult.StatusCode);
         }
 
+        [Fact]
+        public async Task Run_ValidTokenNoScope_LogsAvailableScopes()
+        {
+            var req = CreateRequest(authToken: "valid-token");
+            var userWithOtherScopes = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim("upn", "test@example.com"),
+                new Claim("scp", "openid profile")
+            }));
+            _mockJwtValidationService
+                .Setup(s => s.ValidateTokenAsync("valid-token"))
+                .ReturnsAsync(userWithOtherScopes);
+            _mockScopeValidationService
+                .Setup(s => s.HasRequiredScope(userWithOtherScopes, "Author.Read"))
+                .Returns(false);
+
+            await _function.Run(req, null, null);
+
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("openid") && v.ToString()!.Contains("profile")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
         // --- Domain-based lookup (both route params provided) ---
 
         [Fact]
