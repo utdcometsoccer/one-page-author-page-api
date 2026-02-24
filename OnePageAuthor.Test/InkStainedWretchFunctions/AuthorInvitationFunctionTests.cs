@@ -6,35 +6,26 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Entities;
+using InkStainedWretch.OnePageAuthorAPI.Services;
 using InkStainedWretchFunctions;
 using System.Net;
 
 namespace OnePageAuthor.Test.InkStainedWretchFunctions
 {
     /// <summary>
-    /// Unit tests for AuthorInvitationFunction.
+    /// Unit tests for AuthorInvitationFunction and AuthorInvitationService.
     /// </summary>
     public class AuthorInvitationFunctionTests
     {
         private readonly Mock<ILogger<AuthorInvitationFunction>> _mockLogger;
-        private readonly Mock<IAuthorInvitationRepository> _mockRepository;
-        private readonly Mock<IEmailService> _mockEmailService;
+        private readonly Mock<IAuthorInvitationService> _mockService;
         private readonly AuthorInvitationFunction _function;
-        private readonly AuthorInvitationFunction _functionWithoutEmail;
 
         public AuthorInvitationFunctionTests()
         {
             _mockLogger = new Mock<ILogger<AuthorInvitationFunction>>();
-            _mockRepository = new Mock<IAuthorInvitationRepository>();
-            _mockEmailService = new Mock<IEmailService>();
-            _function = new AuthorInvitationFunction(
-                _mockLogger.Object,
-                _mockRepository.Object,
-                _mockEmailService.Object);
-            _functionWithoutEmail = new AuthorInvitationFunction(
-                _mockLogger.Object,
-                _mockRepository.Object,
-                null);
+            _mockService = new Mock<IAuthorInvitationService>();
+            _function = new AuthorInvitationFunction(_mockLogger.Object, _mockService.Object);
         }
 
         [Fact]
@@ -42,9 +33,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             // Arrange & Act
             var logger = new Mock<ILogger<AuthorInvitationFunction>>();
-            var repository = new Mock<IAuthorInvitationRepository>();
-            var emailService = new Mock<IEmailService>();
-            var function = new AuthorInvitationFunction(logger.Object, repository.Object, emailService.Object);
+            var service = new Mock<IAuthorInvitationService>();
+            var function = new AuthorInvitationFunction(logger.Object, service.Object);
 
             // Assert
             Assert.NotNull(function);
@@ -53,10 +43,10 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         [Fact]
         public void Constructor_InitializesWithoutEmailService()
         {
-            // Arrange & Act - Email service is optional
+            // The service handles optional email internally; function only needs the service.
             var logger = new Mock<ILogger<AuthorInvitationFunction>>();
-            var repository = new Mock<IAuthorInvitationRepository>();
-            var function = new AuthorInvitationFunction(logger.Object, repository.Object, null);
+            var service = new Mock<IAuthorInvitationService>();
+            var function = new AuthorInvitationFunction(logger.Object, service.Object);
 
             // Assert
             Assert.NotNull(function);
@@ -153,13 +143,12 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         [InlineData(null, false)]
         public void EmailValidation_WorksCorrectly(string? email, bool expectedValid)
         {
-            // This test validates the email validation logic through reflection
-            var method = typeof(AuthorInvitationFunction).GetMethod("IsValidEmail", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            
-            // Assert
-            Assert.NotNull(method);
-            var result = (bool)method!.Invoke(null, new object?[] { email })!;
+            // Validation logic is now in AuthorInvitationService
+            var repository = new Mock<IAuthorInvitationRepository>();
+            var logger = new Mock<ILogger<AuthorInvitationService>>();
+            var service = new AuthorInvitationService(repository.Object, logger.Object);
+
+            var result = service.IsValidEmail(email!);
             Assert.Equal(expectedValid, result);
         }
 
@@ -180,120 +169,139 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         [InlineData(null, false)]
         public void DomainValidation_WorksCorrectly(string? domain, bool expectedValid)
         {
-            // This test validates the domain validation logic through reflection
-            var method = typeof(AuthorInvitationFunction).GetMethod("IsValidDomain", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            
-            // Assert
-            Assert.NotNull(method);
-            var result = (bool)method!.Invoke(null, new object?[] { domain })!;
+            // Validation logic is now in AuthorInvitationService
+            var repository = new Mock<IAuthorInvitationRepository>();
+            var logger = new Mock<ILogger<AuthorInvitationService>>();
+            var service = new AuthorInvitationService(repository.Object, logger.Object);
+
+            var result = service.IsValidDomain(domain!);
             Assert.Equal(expectedValid, result);
         }
 
         [Fact]
-        public async Task Repository_WhenNoExistingInvitation_CreatesNewInvitation()
+        public async Task Service_WhenNoExistingInvitation_CreatesNewInvitation()
         {
             // Arrange
             var testInvitation = new AuthorInvitation("test@example.com", "example.com", "Test");
             testInvitation.id = "test-123";
+            var result = new CreateInvitationResult { Invitation = testInvitation, EmailSent = false };
 
-            _mockRepository.Setup(r => r.GetByEmailAsync("test@example.com"))
-                .ReturnsAsync((AuthorInvitation?)null);
-            
-            _mockRepository.Setup(r => r.AddAsync(It.IsAny<AuthorInvitation>()))
-                .ReturnsAsync(testInvitation);
-
-            // Act - Since we can't easily mock HttpRequestData, we verify the repository setup
-            
-            // Assert - Verify mocks were set up correctly
-            var existingCheck = await _mockRepository.Object.GetByEmailAsync("test@example.com");
-            Assert.Null(existingCheck);
-            
-            var created = await _mockRepository.Object.AddAsync(testInvitation);
-            Assert.NotNull(created);
-            Assert.Equal("test-123", created.id);
-        }
-
-        [Fact]
-        public async Task Repository_WhenExistingInvitation_ShouldReturnConflict()
-        {
-            // Arrange
-            var existingInvitation = new AuthorInvitation("test@example.com", "example.com", "Existing");
-            existingInvitation.id = "existing-123";
-            existingInvitation.Status = "Pending";
-
-            _mockRepository.Setup(r => r.GetByEmailAsync("test@example.com"))
-                .ReturnsAsync(existingInvitation);
-
-            // Act - Verify repository returns existing invitation
-            var result = await _mockRepository.Object.GetByEmailAsync("test@example.com");
-
-            // Assert - Should find existing invitation (function should return 409)
-            Assert.NotNull(result);
-            Assert.Equal("existing-123", result.id);
-            Assert.Equal("Pending", result.Status);
-        }
-
-        [Fact]
-        public async Task EmailService_WhenConfigured_IsCalled()
-        {
-            // Arrange
-            _mockEmailService.Setup(e => e.SendInvitationEmailAsync(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<string>()))
-                .ReturnsAsync(true);
+            _mockService.Setup(s => s.CreateInvitationAsync(
+                    "test@example.com",
+                    It.IsAny<List<string>>(),
+                    It.IsAny<string?>()))
+                .ReturnsAsync(result);
 
             // Act
-            var result = await _mockEmailService.Object.SendInvitationEmailAsync(
-                "test@example.com", 
-                "example.com", 
-                "invite-123");
+            var created = await _mockService.Object.CreateInvitationAsync(
+                "test@example.com", new List<string> { "example.com" }, "Test");
 
             // Assert
-            Assert.True(result);
-            _mockEmailService.Verify(e => e.SendInvitationEmailAsync(
-                "test@example.com",
-                "example.com",
-                "invite-123"), Times.Once);
-        }
-
-        [Fact]
-        public async Task EmailService_WhenNotConfigured_DoesNotThrow()
-        {
-            // Arrange - Function created without email service
-            var testInvitation = new AuthorInvitation("test@example.com", "example.com", "Test");
-            testInvitation.id = "test-123";
-
-            _mockRepository.Setup(r => r.GetByEmailAsync("test@example.com"))
-                .ReturnsAsync((AuthorInvitation?)null);
-            
-            _mockRepository.Setup(r => r.AddAsync(It.IsAny<AuthorInvitation>()))
-                .ReturnsAsync(testInvitation);
-
-            // Act & Assert - Should not throw when email service is null
-            var created = await _mockRepository.Object.AddAsync(testInvitation);
             Assert.NotNull(created);
+            Assert.NotNull(created.Invitation);
+            Assert.Equal("test-123", created.Invitation.id);
         }
 
         [Fact]
-        public async Task EmailService_WhenThrowsException_ShouldBeCaught()
+        public async Task Service_WhenExistingInvitation_ThrowsInvalidOperationException()
         {
             // Arrange
-            _mockEmailService.Setup(e => e.SendInvitationEmailAsync(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<string>()))
+            var mockService = new Mock<IAuthorInvitationService>();
+            mockService.Setup(s => s.CreateInvitationAsync(
+                    "test@example.com",
+                    It.IsAny<List<string>>(),
+                    It.IsAny<string?>()))
+                .ThrowsAsync(new InvalidOperationException(
+                    "An invitation already exists for test@example.com with status 'Pending'."));
+
+            // Act & Assert - Service should throw when invitation already exists
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                await mockService.Object.CreateInvitationAsync(
+                    "test@example.com", new List<string> { "example.com" }, "Test");
+            });
+        }
+
+        [Fact]
+        public async Task Service_WhenEmailServiceConfigured_EmailSentFlagReflectedInResult()
+        {
+            // Arrange
+            var mockService = new Mock<IAuthorInvitationService>();
+            var invitation = new AuthorInvitation("test@example.com", "example.com", "Test");
+            invitation.id = "invite-123";
+            var expectedResult = new CreateInvitationResult { Invitation = invitation, EmailSent = true };
+
+            mockService.Setup(s => s.CreateInvitationAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<List<string>>(),
+                    It.IsAny<string?>()))
+                .ReturnsAsync(expectedResult);
+
+            // Act
+            var result = await mockService.Object.CreateInvitationAsync(
+                "test@example.com", new List<string> { "example.com" }, "Test");
+
+            // Assert
+            Assert.True(result.EmailSent);
+            mockService.Verify(s => s.CreateInvitationAsync(
+                "test@example.com",
+                It.IsAny<List<string>>(),
+                It.IsAny<string?>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Service_WhenEmailServiceNotConfigured_EmailSentFalse()
+        {
+            // Arrange - Service returns EmailSent = false when email service is unavailable
+            var mockService = new Mock<IAuthorInvitationService>();
+            var invitation = new AuthorInvitation("test@example.com", "example.com", "Test");
+            invitation.id = "test-123";
+            var expectedResult = new CreateInvitationResult { Invitation = invitation, EmailSent = false };
+
+            mockService.Setup(s => s.CreateInvitationAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<List<string>>(),
+                    It.IsAny<string?>()))
+                .ReturnsAsync(expectedResult);
+
+            // Act
+            var result = await mockService.Object.CreateInvitationAsync(
+                "test@example.com", new List<string> { "example.com" }, "Test");
+
+            // Assert
+            Assert.NotNull(result.Invitation);
+            Assert.False(result.EmailSent);
+        }
+
+        [Fact]
+        public async Task Service_WhenEmailThrowsException_CreateInvitationHandlesGracefully()
+        {
+            // Arrange - Service catches email exceptions and returns EmailSent = false
+            var repository = new Mock<IAuthorInvitationRepository>();
+            var emailService = new Mock<IEmailService>();
+            var logger = new Mock<ILogger<AuthorInvitationService>>();
+
+            repository.Setup(r => r.GetByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync((AuthorInvitation?)null);
+
+            var savedInvitation = new AuthorInvitation("test@example.com", "example.com", "Test");
+            savedInvitation.id = "test-123";
+            repository.Setup(r => r.AddAsync(It.IsAny<AuthorInvitation>()))
+                .ReturnsAsync(savedInvitation);
+
+            emailService.Setup(e => e.SendInvitationEmailAsync(
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception("Email service error"));
 
-            // Act & Assert - Exception should be caught and handled
-            await Assert.ThrowsAsync<Exception>(async () =>
-            {
-                await _mockEmailService.Object.SendInvitationEmailAsync(
-                    "test@example.com",
-                    "example.com",
-                    "invite-123");
-            });
+            var service = new AuthorInvitationService(repository.Object, logger.Object, emailService.Object);
+
+            // Act - Email exception should be caught; invitation should still be created
+            var result = await service.CreateInvitationAsync(
+                "test@example.com", new List<string> { "example.com" }, "Test");
+
+            // Assert
+            Assert.NotNull(result.Invitation);
+            Assert.False(result.EmailSent);
         }
 
         [Fact]
@@ -401,7 +409,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
-        public async Task Repository_UpdateAsync_UpdatesInvitation()
+        public async Task Service_UpdateAsync_UpdatesInvitation()
         {
             // Arrange
             var invitation = new AuthorInvitation("test@example.com", "example.com");
@@ -409,11 +417,19 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             invitation.DomainNames = new List<string> { "example.com", "newdomain.com" };
             invitation.LastUpdatedAt = DateTime.UtcNow;
 
-            _mockRepository.Setup(r => r.UpdateAsync(It.IsAny<AuthorInvitation>()))
+            _mockService.Setup(s => s.UpdateInvitationAsync(
+                    "test-123",
+                    It.IsAny<List<string>>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<DateTime?>()))
                 .ReturnsAsync(invitation);
 
             // Act
-            var result = await _mockRepository.Object.UpdateAsync(invitation);
+            var result = await _mockService.Object.UpdateInvitationAsync(
+                "test-123",
+                new List<string> { "example.com", "newdomain.com" },
+                null,
+                null);
 
             // Assert
             Assert.NotNull(result);
@@ -423,7 +439,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
-        public async Task Repository_GetPendingInvitationsAsync_ReturnsOnlyPending()
+        public async Task Service_GetPendingInvitationsAsync_ReturnsOnlyPending()
         {
             // Arrange
             var pendingInvitations = new List<AuthorInvitation>
@@ -432,11 +448,11 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 new AuthorInvitation("test2@example.com", "example2.com") { Status = "Pending" }
             };
 
-            _mockRepository.Setup(r => r.GetPendingInvitationsAsync())
+            _mockService.Setup(s => s.GetPendingInvitationsAsync())
                 .ReturnsAsync(pendingInvitations);
 
             // Act
-            var result = await _mockRepository.Object.GetPendingInvitationsAsync();
+            var result = await _mockService.Object.GetPendingInvitationsAsync();
 
             // Assert
             Assert.NotNull(result);
@@ -456,10 +472,10 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
-        public void AuthorInvitationFunction_HasGetAuthorInvitationMethod()
+        public void AuthorInvitationFunction_HasGetAuthorInvitationByIdMethod()
         {
             // Arrange & Act
-            var method = typeof(AuthorInvitationFunction).GetMethod("GetAuthorInvitation");
+            var method = typeof(AuthorInvitationFunction).GetMethod("GetAuthorInvitationById");
 
             // Assert
             Assert.NotNull(method);
