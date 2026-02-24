@@ -139,7 +139,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             if (string.IsNullOrWhiteSpace(id))
                 return null;
 
-            var query = new QueryDefinition("SELECT TOP 1 * FROM c WHERE c.id = @id")
+            var query = new QueryDefinition("SELECT * FROM c WHERE c.id = @id")
                 .WithParameter("@id", id);
 
             try
