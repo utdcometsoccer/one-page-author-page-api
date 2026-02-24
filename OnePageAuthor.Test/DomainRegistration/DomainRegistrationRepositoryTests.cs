@@ -583,5 +583,29 @@ namespace OnePageAuthor.Test.DomainRegistration
             Assert.Equal("target-id", result.id);
             Assert.Equal("test@example.com", result.Upn);
         }
+
+        [Fact]
+        public async Task GetByIdCrossPartitionAsync_QueryDoesNotUseTOP_EnsuresFullCrossPartitionScan()
+        {
+            // Arrange – capture the QueryDefinition passed to GetItemQueryIterator
+            QueryDefinition? capturedQuery = null;
+
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            mockIterator.Setup(i => i.HasMoreResults).Returns(false);
+
+            _containerMock
+                .Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                    It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                .Callback<QueryDefinition, string?, QueryRequestOptions?>((qd, _, __) => capturedQuery = qd)
+                .Returns(mockIterator.Object);
+
+            // Act
+            await _repository.GetByIdCrossPartitionAsync("any-id");
+
+            // Assert – the query must NOT contain TOP to ensure all physical partitions are scanned
+            Assert.NotNull(capturedQuery);
+            Assert.DoesNotContain("TOP", capturedQuery.QueryText, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("WHERE c.id = @id", capturedQuery.QueryText, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
