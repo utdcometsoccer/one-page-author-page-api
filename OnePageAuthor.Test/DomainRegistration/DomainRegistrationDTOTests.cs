@@ -99,6 +99,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             Assert.Equal("test-id-123", response.Id);
             Assert.Equal("org", response.Domain.TopLevelDomain);
             Assert.Equal("testsite", response.Domain.SecondLevelDomain);
+            Assert.NotNull(response.ContactInformation);
             Assert.Equal("Jane", response.ContactInformation.FirstName);
             Assert.Equal("Smith", response.ContactInformation.LastName);
             Assert.Equal("456 Oak Ave", response.ContactInformation.Address);

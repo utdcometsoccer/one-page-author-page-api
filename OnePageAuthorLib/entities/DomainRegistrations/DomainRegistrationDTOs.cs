@@ -185,9 +185,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistrations
         public DomainDto Domain { get; set; } = new();
 
         /// <summary>
-        /// Contact information for the registration.
+        /// Contact information for the registration. May be null when redacted (e.g., in admin cross-user listings).
         /// </summary>
-        public ContactInformationDto ContactInformation { get; set; } = new();
+        public ContactInformationDto? ContactInformation { get; set; } = new();
 
         /// <summary>
         /// Timestamp when the registration was created.

@@ -163,5 +163,31 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 return null;
             }
         }
+
+        public async Task<IEnumerable<DomainRegistration>> GetAllIncompleteAsync(int? maxResults = null)
+        {
+            // Incomplete = Pending (0), InProgress (1), or Failed (3) — excludes Completed (2) and Cancelled (4)
+            var query = new QueryDefinition(
+                "SELECT * FROM c WHERE c.status IN (0, 1, 3) ORDER BY c.createdAt DESC");
+
+            var requestOptions = maxResults.HasValue
+                ? new QueryRequestOptions { MaxItemCount = maxResults.Value }
+                : null;
+
+            var results = new List<DomainRegistration>();
+
+            using var iterator = _container.GetItemQueryIterator<DomainRegistration>(query, requestOptions: requestOptions);
+
+            while (iterator.HasMoreResults)
+            {
+                var page = await iterator.ReadNextAsync();
+                if (page?.Resource != null)
+                {
+                    results.AddRange(page.Resource);
+                }
+            }
+
+            return maxResults.HasValue ? results.Take(maxResults.Value) : results;
+        }
     }
 }

@@ -14,6 +14,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
     /// These endpoints require the caller to have the "Admin" role claim in their JWT token.
     /// </summary>
     /// <remarks>
+    /// AdminGetIncompleteDomainRegistrations:
+    /// - Method: GET
+    /// - Route: /api/admin/domain-registrations
+    /// - Auth: Bearer JWT with "Admin" role claim
+    /// - Returns all incomplete domain registrations (Pending, InProgress, Failed) regardless of UPN
+    ///
     /// AdminCompleteDomainRegistration:
     /// - Method: POST
     /// - Route: /api/admin/domain-registrations/{registrationId}/complete
@@ -45,6 +51,98 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             _frontDoorService = frontDoorService ?? throw new ArgumentNullException(nameof(frontDoorService));
             _whmcsService = whmcsService ?? throw new ArgumentNullException(nameof(whmcsService));
             _dnsZoneService = dnsZoneService ?? throw new ArgumentNullException(nameof(dnsZoneService));
+        }
+
+        /// <summary>
+        /// Gets all incomplete domain registrations across all users.
+        /// Returns registrations with a status of Pending, InProgress, or Failed, regardless of the owner's UPN.
+        /// </summary>
+        /// <param name="req">HTTP request</param>
+        /// <returns>
+        /// <list type="table">
+        /// <item>
+        /// <term>200 OK</term>
+        /// <description>Returns a list of incomplete domain registration responses (may be empty).</description>
+        /// </item>
+        /// <item>
+        /// <term>401 Unauthorized</term>
+        /// <description>Invalid or missing JWT token</description>
+        /// </item>
+        /// <item>
+        /// <term>403 Forbidden</term>
+        /// <description>Caller does not have the Admin role</description>
+        /// </item>
+        /// <item>
+        /// <term>500 Internal Server Error</term>
+        /// <description>Unexpected error during processing</description>
+        /// </item>
+        /// </list>
+        /// </returns>
+        [Function("AdminGetIncompleteDomainRegistrations")]
+        public async Task<IActionResult> AdminGetIncompleteDomainRegistrations(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "admin/domain-registrations")] HttpRequest req)
+        {
+            _logger.LogInformation("AdminGetIncompleteDomainRegistrations function processed a request");
+
+            // Validate JWT token and get authenticated user
+            var (authenticatedUser, authError) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+            if (authError != null)
+            {
+                return authError;
+            }
+
+            // Check admin role claim
+            var isAdmin = authenticatedUser!.FindAll("roles").Any(c => c.Value == AdminRole)
+                       || authenticatedUser.IsInRole(AdminRole);
+            if (!isAdmin)
+            {
+                _logger.LogWarning("User attempted to access admin endpoint without Admin role");
+                return new ObjectResult(new { error = "Admin role required" })
+                {
+                    StatusCode = StatusCodes.Status403Forbidden
+                };
+            }
+
+            try
+            {
+                int? maxResults = null;
+                if (req.Query.TryGetValue("maxResults", out var maxResultsStr)
+                    && int.TryParse(maxResultsStr, out var parsedMax)
+                    && parsedMax > 0)
+                {
+                    maxResults = parsedMax;
+                }
+
+                var registrations = await _domainRegistrationRepository.GetAllIncompleteAsync(maxResults);
+
+                var validRegistrations = registrations
+                    .Where(r => r.Domain != null && r.ContactInformation != null)
+                    .ToList();
+
+                var skippedCount = registrations.Count() - validRegistrations.Count;
+                if (skippedCount > 0)
+                {
+                    _logger.LogWarning(
+                        "Skipped {SkippedCount} incomplete domain registrations due to missing Domain or ContactInformation",
+                        skippedCount);
+                }
+
+                var response = validRegistrations
+                    .Select(r =>
+                    {
+                        var dto = DomainRegistrationResponse.FromEntity(r);
+                        dto.ContactInformation = null;
+                        return dto;
+                    })
+                    .ToList();
+
+                return new OkObjectResult(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving incomplete domain registrations");
+                return new StatusCodeResult(500);
+            }
         }
 
         /// <summary>

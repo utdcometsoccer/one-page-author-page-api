@@ -607,5 +607,142 @@ namespace OnePageAuthor.Test.DomainRegistration
             Assert.DoesNotContain("TOP", capturedQuery.QueryText, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("WHERE c.id = @id", capturedQuery.QueryText, StringComparison.OrdinalIgnoreCase);
         }
+
+        #region GetAllIncompleteAsync Tests
+
+        [Fact]
+        public async Task GetAllIncompleteAsync_ReturnsIncompleteRegistrations()
+        {
+            // Arrange
+            var registrations = new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>
+            {
+                CreateTestDomainRegistration("pending-reg"),
+                CreateTestDomainRegistration("inprogress-reg"),
+                CreateTestDomainRegistration("failed-reg")
+            };
+            registrations[1].Status = DomainRegistrationStatus.InProgress;
+            registrations[2].Status = DomainRegistrationStatus.Failed;
+
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var mockResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            mockResponse.Setup(r => r.Resource).Returns(registrations);
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(mockResponse.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetAllIncompleteAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(3, result.Count());
+        }
+
+        [Fact]
+        public async Task GetAllIncompleteAsync_ReturnsEmptyList_WhenNoIncompleteRegistrations()
+        {
+            // Arrange
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var mockResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            mockResponse.Setup(r => r.Resource).Returns(new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>());
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(mockResponse.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetAllIncompleteAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAllIncompleteAsync_ReturnsEmpty_WhenNoResultsAcrossMultiplePages()
+        {
+            // Arrange
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var emptyResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            emptyResponse.Setup(r => r.Resource).Returns(new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>());
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(emptyResponse.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetAllIncompleteAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAllIncompleteAsync_ReturnsAllItems_WhenResultsSpanMultiplePages()
+        {
+            // Arrange – first page has 2 items, second page has 1 item
+            var page1Items = new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>
+            {
+                CreateTestDomainRegistration("reg-page1-a"),
+                CreateTestDomainRegistration("reg-page1-b")
+            };
+            var page2Items = new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>
+            {
+                CreateTestDomainRegistration("reg-page2-a")
+            };
+            page2Items[0].Status = DomainRegistrationStatus.InProgress;
+
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var page1Response = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var page2Response = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            page1Response.Setup(r => r.Resource).Returns(page1Items);
+            page2Response.Setup(r => r.Resource).Returns(page2Items);
+
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.SetupSequence(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(page1Response.Object)
+                       .ReturnsAsync(page2Response.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetAllIncompleteAsync();
+
+            // Assert – all 3 items across both pages are returned
+            Assert.NotNull(result);
+            Assert.Equal(3, result.Count());
+            Assert.Contains(result, r => r.id == "reg-page1-a");
+            Assert.Contains(result, r => r.id == "reg-page1-b");
+            Assert.Contains(result, r => r.id == "reg-page2-a");
+        }
+
+        #endregion
     }
 }
