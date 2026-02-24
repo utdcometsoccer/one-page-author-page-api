@@ -8,8 +8,8 @@
 
 The **Admin Domain Registrations** endpoints let users with the `Admin` role:
 
-1. **`GET /api/management/domain-registrations`** — lists all incomplete domain registrations (Pending, InProgress, Failed) across all users.
-2. **`POST /api/management/domain-registrations/{registrationId}/complete`** — runs the full domain-provisioning workflow for a specific registration, which includes:
+1. **`GET /api/inkadmin/domain-registrations`** — lists all incomplete domain registrations (Pending, InProgress, Failed) across all users.
+2. **`POST /api/inkadmin/domain-registrations/{registrationId}/complete`** — runs the full domain-provisioning workflow for a specific registration, which includes:
    1. WHMCS domain registration
    2. Azure DNS zone creation and name-server retrieval
    3. WHMCS name-server update
@@ -124,7 +124,7 @@ az functionapp config appsettings set \
 
 ## Endpoints
 
-### GET /api/management/domain-registrations
+### GET /api/inkadmin/domain-registrations
 
 Lists all incomplete domain registrations (status Pending, InProgress, or Failed) across all users. Contact information is redacted from the response.
 
@@ -175,7 +175,7 @@ async function listIncompleteDomains(
   maxResults?: number,
   baseUrl = ""
 ): Promise<AdminDomainRegistrationResponse[]> {
-  const url = new URL(`${baseUrl}/api/management/domain-registrations`);
+  const url = new URL(`${baseUrl}/api/inkadmin/domain-registrations`);
   if (maxResults !== undefined) url.searchParams.set("maxResults", String(maxResults));
 
   const response = await fetch(url.toString(), {
@@ -193,14 +193,14 @@ async function listIncompleteDomains(
 
 ---
 
-### POST /api/management/domain-registrations/{registrationId}/complete
+### POST /api/inkadmin/domain-registrations/{registrationId}/complete
 
 Completes domain provisioning for a partially registered author site without requiring a Stripe subscription.
 
 ### Endpoint
 
 ```
-POST /api/management/domain-registrations/{registrationId}/complete
+POST /api/inkadmin/domain-registrations/{registrationId}/complete
 ```
 
 | Detail | Value |
@@ -291,7 +291,7 @@ async function adminCompleteDomain(
   adminToken: string,
   baseUrl = ""
 ): Promise<DomainRegistrationResponse> {
-  const url = `${baseUrl}/api/management/domain-registrations/${encodeURIComponent(registrationId)}/complete`;
+  const url = `${baseUrl}/api/inkadmin/domain-registrations/${encodeURIComponent(registrationId)}/complete`;
 
   const response = await fetch(url, {
     method: "POST",
@@ -335,7 +335,7 @@ async function completeDomainCreation(registrationId: string): Promise<void> {
   const token = await getAdminToken();
 
   const response = await fetch(
-    `/api/management/domain-registrations/${encodeURIComponent(registrationId)}/complete`,
+    `/api/inkadmin/domain-registrations/${encodeURIComponent(registrationId)}/complete`,
     {
       method: "POST",
       headers: {
@@ -397,7 +397,7 @@ const CompleteDomainButton: React.FC<Props> = ({ registrationId, adminToken }) =
 
     try {
       const response = await fetch(
-        `/api/management/domain-registrations/${encodeURIComponent(registrationId)}/complete`,
+        `/api/inkadmin/domain-registrations/${encodeURIComponent(registrationId)}/complete`,
         {
           method: "POST",
           headers: {
@@ -439,7 +439,7 @@ export default CompleteDomainButton;
 
 ### Listing incomplete registrations before completing them
 
-Use `GET /api/management/domain-registrations` to list incomplete registrations across all users, then call the complete endpoint for each one you want to provision.
+Use `GET /api/inkadmin/domain-registrations` to list incomplete registrations across all users, then call the complete endpoint for each one you want to provision.
 
 ```typescript
 // Admin workflow: list all incomplete registrations → complete each Pending one
