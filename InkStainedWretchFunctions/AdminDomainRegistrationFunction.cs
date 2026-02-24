@@ -97,7 +97,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             // Check admin role claim
             if (!_roleChecker.HasRole(authenticatedUser!, AdminRole))
             {
-                _logger.LogWarning("User attempted to access admin endpoint without Admin role");
+                _logger.LogWarning(
+                    "User attempted to access admin endpoint without Admin role. Claims: {Claims}",
+                    JwtAuthenticationHelper.GetNonPiiClaimsForLogging(authenticatedUser!));
                 return new ObjectResult(new { error = "Admin role required" })
                 {
                     StatusCode = StatusCodes.Status403Forbidden
@@ -203,7 +205,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             // Check admin role claim
             if (!_roleChecker.HasRole(authenticatedUser!, AdminRole))
             {
-                _logger.LogWarning("User attempted to access admin endpoint without Admin role");
+                _logger.LogWarning(
+                    "User attempted to access admin endpoint without Admin role. Claims: {Claims}",
+                    JwtAuthenticationHelper.GetNonPiiClaimsForLogging(authenticatedUser!));
                 return new ObjectResult(new { error = "Admin role required" })
                 {
                     StatusCode = StatusCodes.Status403Forbidden

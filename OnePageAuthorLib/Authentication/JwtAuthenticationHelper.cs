@@ -92,4 +92,21 @@ public static class JwtAuthenticationHelper
             || user.FindAll(ClaimTypes.Role).Any(c => c.Value == role)
             || user.IsInRole(role);
     }
+
+    /// <summary>
+    /// Returns a comma-separated string of non-PII claim type/value pairs from the user's token,
+    /// suitable for diagnostic logging. Only non-identifying claim types are included
+    /// (object ID, tenant ID, roles, scopes, and application IDs). PII claim types such as
+    /// UPN, email, name, and subject are intentionally excluded.
+    /// </summary>
+    /// <param name="user">The authenticated claims principal.</param>
+    /// <returns>A string such as <c>"oid=abc123, tid=tenant-id, roles=Admin"</c>, or an empty string when no matching claims are present.</returns>
+    public static string GetNonPiiClaimsForLogging(ClaimsPrincipal user)
+    {
+        var nonPiiClaimTypes = new[] { "oid", "tid", "roles", ClaimTypes.Role, "scp", "appid", "azp" };
+        var parts = nonPiiClaimTypes
+            .SelectMany(t => user.FindAll(t))
+            .Select(c => $"{c.Type}={c.Value}");
+        return string.Join(", ", parts);
+    }
 }
