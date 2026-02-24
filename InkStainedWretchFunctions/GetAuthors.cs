@@ -13,17 +13,20 @@ public class GetAuthors
     private readonly InkStainedWretch.OnePageAuthorAPI.API.IAuthorDataService _authorDataService;
     private readonly IJwtValidationService _jwtValidationService;
     private readonly IUserIdentityService _userIdentityService;
+    private readonly IScopeValidationService _scopeValidationService;
 
     public GetAuthors(
         ILogger<GetAuthors> logger, 
         InkStainedWretch.OnePageAuthorAPI.API.IAuthorDataService authorDataService,
         IJwtValidationService jwtValidationService,
-        IUserIdentityService userIdentityService)
+        IUserIdentityService userIdentityService,
+        IScopeValidationService scopeValidationService)
     {
         _logger = logger;
         _authorDataService = authorDataService;
         _jwtValidationService = jwtValidationService;
         _userIdentityService = userIdentityService;
+        _scopeValidationService = scopeValidationService;
     }
 
     [Function("GetAuthors")]
@@ -42,7 +45,7 @@ public class GetAuthors
         }
 
         // Check if user has the required scope for author reading
-        if (user != null && !HasRequiredScope(user))
+        if (user != null && !_scopeValidationService.HasRequiredScope(user, "Author.Read"))
         {
             _logger.LogWarning("User does not have required Author.Read scope");
             return new ObjectResult(new { error = "Insufficient permissions" })
@@ -84,16 +87,5 @@ public class GetAuthors
                 StatusCode = StatusCodes.Status500InternalServerError
             };
         }
-    }
-
-    private bool HasRequiredScope(System.Security.Claims.ClaimsPrincipal user)
-    {
-        // Check for the required scope: api://<your-api-client-id>/Author.Read
-        // This will match the scope pattern mentioned in the issue
-        var scopes = user.FindAll("scp")?.Select(c => c.Value) ?? new List<string>();
-        var allScopes = string.Join(" ", scopes);
-        
-        // Look for Author.Read scope in the scp claim
-        return allScopes.Contains("Author.Read");
     }
 }
