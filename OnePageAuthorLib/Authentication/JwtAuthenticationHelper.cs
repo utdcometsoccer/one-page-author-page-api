@@ -10,6 +10,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.Authentication;
 /// </summary>
 public static class JwtAuthenticationHelper
 {
+    private static readonly string[] NonPiiClaimTypes =
+        ["oid", "tid", "roles", ClaimTypes.Role, "scp", "appid", "azp"];
+
     /// <summary>
     /// Validates JWT token from Authorization header and returns authenticated user
     /// </summary>
@@ -103,8 +106,7 @@ public static class JwtAuthenticationHelper
     /// <returns>A string such as <c>"oid=abc123, tid=tenant-id, roles=Admin"</c>, or an empty string when no matching claims are present.</returns>
     public static string GetNonPiiClaimsForLogging(ClaimsPrincipal user)
     {
-        var nonPiiClaimTypes = new[] { "oid", "tid", "roles", ClaimTypes.Role, "scp", "appid", "azp" };
-        var parts = nonPiiClaimTypes
+        var parts = NonPiiClaimTypes
             .SelectMany(t => user.FindAll(t))
             .Select(c => $"{c.Type}={c.Value}");
         return string.Join(", ", parts);
