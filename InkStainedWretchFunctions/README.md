@@ -39,6 +39,9 @@ The InkStainedWretchFunctions project provides a comprehensive Azure Functions a
 - **POST /api/domain-registrations** - Creates new domain registrations
 - **GET /api/domain-registrations** - Gets all domain registrations for user
 - **GET /api/domain-registrations/{registrationId}** - Gets specific domain registration
+- **PUT /api/domain-registrations/{registrationId}** - Updates a domain registration
+- **GET /api/admin/domain-registrations** - Lists all incomplete domain registrations across users (Admin role required)
+- **POST /api/admin/domain-registrations/{registrationId}/complete** - Completes domain provisioning workflow (Admin role required)
 - **GET /api/whmcs/tld-pricing** - Gets TLD pricing information from WHMCS (requires auth)
 - **GET /api/countries/{language}** - Gets countries by language
 - **GET /api/languages/{language}** - Gets languages with localized names
@@ -115,14 +118,16 @@ dotnet user-secrets set "PENGUIN_RANDOM_HOUSE_API_DOMAIN" "PRH.US"
 #### 4. Azure Infrastructure (For Domain Registration Features)
 
 ```bash
-# Azure Resource Management
-dotnet user-secrets set "AZURE_SUBSCRIPTION_ID" "your-subscription-id"
-dotnet user-secrets set "AZURE_DNS_RESOURCE_GROUP" "your-dns-resource-group"
+# Azure Resource Management — required for DNS zone and Front Door operations
+dotnet user-secrets set "AZURE_SUBSCRIPTION_ID"        "your-subscription-id"
+dotnet user-secrets set "AZURE_DNS_RESOURCE_GROUP"     "your-dns-resource-group"
+dotnet user-secrets set "AZURE_RESOURCE_GROUP_NAME"    "your-frontdoor-resource-group"
+dotnet user-secrets set "AZURE_FRONTDOOR_PROFILE_NAME" "your-frontdoor-profile-name"
 
 # WHMCS Domain Registration API
-dotnet user-secrets set "WHMCS_API_URL" "https://your-whmcs-instance.com/includes/api.php"
+dotnet user-secrets set "WHMCS_API_URL"        "https://your-whmcs-instance.com/includes/api.php"
 dotnet user-secrets set "WHMCS_API_IDENTIFIER" "your-api-identifier"
-dotnet user-secrets set "WHMCS_API_SECRET" "your-api-secret"
+dotnet user-secrets set "WHMCS_API_SECRET"     "your-api-secret"
 ```
 
 #### 5. Testing Configuration (Optional)
@@ -145,6 +150,8 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 | `CosmosDBConnection` | ✅ Yes | Full Cosmos DB connection string (for triggers) |
 | `AZURE_SUBSCRIPTION_ID` | ⚪ Optional | Azure subscription for DNS/Front Door operations |
 | `AZURE_DNS_RESOURCE_GROUP` | ⚪ Optional | Resource group for DNS zones |
+| `AZURE_RESOURCE_GROUP_NAME` | ⚪ Optional | Resource group containing the Front Door profile |
+| `AZURE_FRONTDOOR_PROFILE_NAME` | ⚪ Optional | Azure Front Door profile name for custom domain setup |
 | `WHMCS_API_URL` | ⚪ Optional | WHMCS API endpoint URL for domain registration |
 | `WHMCS_API_IDENTIFIER` | ⚪ Optional | WHMCS API identifier for authentication |
 | `WHMCS_API_SECRET` | ⚪ Optional | WHMCS API secret for authentication |
@@ -176,17 +183,21 @@ dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 <details>
 <summary>🌐 Azure Infrastructure (Domain Management)</summary>
 
-**Required for domain registration features** - These enable automatic DNS zone creation and Azure Front Door integration.
+**Required for domain registration features** — these enable automatic DNS zone creation and Azure Front Door integration.
+
+All four variables must be present for their respective provisioning steps to run. If any are absent the step is skipped and logged as a warning.
 
 | Variable | Purpose | How to Obtain |
 |----------|---------|---------------|
-| `AZURE_SUBSCRIPTION_ID` | Identifies your Azure subscription for resource management | Azure Portal → Subscriptions → Select subscription → Subscription ID |
-| `AZURE_DNS_RESOURCE_GROUP` | Resource group where DNS zones will be created | Azure Portal → Resource Groups → Name of your DNS resource group |
+| `AZURE_SUBSCRIPTION_ID` | Azure subscription for resource management | Azure Portal → Subscriptions → Subscription ID |
+| `AZURE_DNS_RESOURCE_GROUP` | Resource group where DNS zones will be created | Azure Portal → Resource Groups → name |
+| `AZURE_RESOURCE_GROUP_NAME` | Resource group containing the Front Door profile | Azure Portal → Resource Groups → name |
+| `AZURE_FRONTDOOR_PROFILE_NAME` | Azure Front Door profile for custom domain setup | Azure Portal → Front Door and CDN Profiles → profile name |
 
 **RBAC Permissions Required**:
 
-- DNS Zone Contributor role on the DNS resource group
-- CDN Profile Contributor on the Front Door profile (if using Front Door integration)
+- `DNS Zone Contributor` role on the DNS resource group (`AZURE_DNS_RESOURCE_GROUP`)
+- `CDN Profile Contributor` role on the Front Door profile (`AZURE_FRONTDOOR_PROFILE_NAME`)
 
 </details>
 
@@ -469,6 +480,39 @@ Gets all domain registrations for the authenticated user.
 **Endpoint:** `GET /api/domain-registrations/{registrationId}`
 
 Gets a specific domain registration by ID.
+
+#### Admin: List Incomplete Domain Registrations
+
+**Endpoint:** `GET /api/admin/domain-registrations`
+
+Returns all incomplete domain registrations (Pending, InProgress, Failed) across **all users**. Requires the `Admin` role.
+
+**Query Parameters (Optional):**
+
+- `maxResults` — integer cap on the number of results returned
+
+**Required configuration:** Cosmos DB + JWT authentication variables (see table above).
+
+**Example Request:**
+
+```bash
+curl -X GET "https://your-api.azurewebsites.net/api/admin/domain-registrations" \
+  -H "Authorization: Bearer your-admin-jwt-token"
+
+# With optional limit
+curl -X GET "https://your-api.azurewebsites.net/api/admin/domain-registrations?maxResults=25" \
+  -H "Authorization: Bearer your-admin-jwt-token"
+```
+
+See [ADMIN_DOMAIN_CREATION_API.md](../docs/ADMIN_DOMAIN_CREATION_API.md) for the full reference including TypeScript examples.
+
+#### Admin: Complete Domain Registration
+
+**Endpoint:** `POST /api/admin/domain-registrations/{registrationId}/complete`
+
+Runs the full domain-provisioning workflow (WHMCS registration → DNS zone → Front Door). Requires the `Admin` role.
+
+See [ADMIN_DOMAIN_CREATION_API.md](../docs/ADMIN_DOMAIN_CREATION_API.md) for full details.
 
 #### Get TLD Pricing (WHMCS)
 
