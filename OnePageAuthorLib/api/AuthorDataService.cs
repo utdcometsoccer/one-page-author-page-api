@@ -77,6 +77,17 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         public async Task<List<AuthorApiResponse>> GetAuthorsByDomainAsync(string topLevelDomain, string secondLevelDomain)
         {
             var authors = await _authorRepository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
+            return await BuildAuthorApiResponsesAsync(authors);
+        }
+
+        public async Task<List<AuthorApiResponse>> GetAuthorsByEmailAsync(string emailAddress)
+        {
+            var authors = await _authorRepository.GetByEmailAsync(emailAddress);
+            return await BuildAuthorApiResponsesAsync(authors);
+        }
+
+        private async Task<List<AuthorApiResponse>> BuildAuthorApiResponsesAsync(IList<Entities.Author> authors)
+        {
             if (authors == null || !authors.Any())
                 return new List<AuthorApiResponse>();
 
@@ -88,7 +99,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 var articles = await _articleRepository.GetByAuthorIdAsync(Guid.Parse(author.id));
                 var socials = await _socialRepository.GetByAuthorIdAsync(Guid.Parse(author.id));
 
-                var response = new AuthorApiResponse
+                authorApiResponses.Add(new AuthorApiResponse
                 {
                     id = author.id,
                     AuthorName = author.AuthorName,
@@ -104,9 +115,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                     Articles = ConvertToApiArticles(articles.ToList()),
                     Books = ConvertToApiBooks(books.ToList()),
                     Socials = socials.Select(s => new SocialLink { Name = s.Name, Url = s.URL.ToString() }).ToList()
-                };
-                
-                authorApiResponses.Add(response);
+                });
             }
 
             return authorApiResponses;

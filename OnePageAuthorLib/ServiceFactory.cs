@@ -989,6 +989,17 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
+        /// Registers the <see cref="API.IAuthorInvitationService"/> and its dependencies.
+        /// Call <see cref="AddAuthorInvitationRepository"/> and, optionally,
+        /// <see cref="AddEmailService"/> before calling this method.
+        /// </summary>
+        public static IServiceCollection AddAuthorInvitationServices(this IServiceCollection services)
+        {
+            services.AddScoped<API.IAuthorInvitationService, Services.AuthorInvitationService>();
+            return services;
+        }
+
+        /// <summary>
         /// Registers Email service for sending invitation emails.
         /// </summary>
         /// <param name="services">Service collection.</param>

@@ -182,5 +182,53 @@ namespace OnePageAuthor.Test
             Assert.Equal("MX", author2.RegionName);
             Assert.Equal("author2@example.com", author2.EmailAddress);
         }
+
+        [Fact]
+        public async Task GetAuthorsByEmailAsync_ReturnsEmptyList_WhenNoAuthorsFound()
+        {
+            _authorRepoMock.Setup(r => r.GetByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync(new List<Author>());
+
+            var result = await _service.GetAuthorsByEmailAsync("nobody@example.com");
+
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAuthorsByEmailAsync_ReturnsAuthorApiResponses_WhenAuthorsFound()
+        {
+            var authorId = Guid.NewGuid().ToString();
+            const string email = "author@example.com";
+            var author = new Author
+            {
+                id = authorId,
+                TopLevelDomain = "com",
+                SecondLevelDomain = "example",
+                LanguageName = "en",
+                RegionName = "US",
+                AuthorName = "Email Author",
+                WelcomeText = "Welcome!",
+                AboutText = "About me.",
+                CopyrightText = "Copyright",
+                EmailAddress = email
+            };
+            _authorRepoMock.Setup(r => r.GetByEmailAsync(email))
+                .ReturnsAsync(new List<Author> { author });
+            _bookRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<InkStainedWretch.OnePageAuthorAPI.Entities.Book>());
+            _articleRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<InkStainedWretch.OnePageAuthorAPI.Entities.Article>());
+            _socialRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<Social>());
+
+            var result = await _service.GetAuthorsByEmailAsync(email);
+
+            Assert.NotNull(result);
+            Assert.Single(result);
+            Assert.Equal(authorId, result[0].id);
+            Assert.Equal("Email Author", result[0].AuthorName);
+            Assert.Equal(email, result[0].EmailAddress);
+        }
     }
 }
