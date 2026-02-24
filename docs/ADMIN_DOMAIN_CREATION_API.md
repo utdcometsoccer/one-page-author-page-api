@@ -1,4 +1,4 @@
-# Admin Domain Creation API — JavaScript / TypeScript Client Guide
+# Admin Domain Registrations API — JavaScript / TypeScript Client Guide
 
 > **Audience:** Frontend developers building admin dashboards or tooling in JavaScript or TypeScript.
 
@@ -6,7 +6,12 @@
 
 ## Overview
 
-The **Admin Domain Creation** endpoint lets users with the `Admin` role complete the full domain-provisioning workflow for a partially registered author site **without requiring a Stripe subscription**. It executes:
+The **Admin Domain Registrations** endpoints let users with the `Admin` role:
+
+1. **List** all incomplete domain registrations across all users (`GET /api/admin/domain-registrations`)
+2. **Complete** the full domain-provisioning workflow for a partially registered author site without requiring a Stripe subscription (`POST /api/admin/domain-registrations/{registrationId}/complete`)
+
+The completion workflow executes:
 
 1. WHMCS domain registration
 2. Azure DNS zone creation and name-server retrieval
@@ -15,22 +20,26 @@ The **Admin Domain Creation** endpoint lets users with the `Admin` role complete
 
 ---
 
-## Endpoint
+## GET /api/admin/domain-registrations
+
+Returns all incomplete domain registrations (status: Pending, InProgress, or Failed) across **all** users. Contact information is redacted from results for privacy.
+
+### Endpoint
 
 ```
-POST /api/admin/domain-registrations/{registrationId}/complete
+GET /api/admin/domain-registrations
 ```
 
 | Detail | Value |
 |--------|-------|
-| Method | `POST` |
+| Method | `GET` |
 | Auth | Bearer JWT with `Admin` role claim |
-| Path param | `registrationId` — the Cosmos DB document ID of the domain registration |
-| Request body | *(none required)* |
+| Query param | `maxResults` (optional) — positive integer to cap the number of results returned |
+| Request body | *(none)* |
 
 ---
 
-## Authorization
+### Authorization
 
 The caller's JWT **must** include the `Admin` value in the `roles` claim issued by Microsoft Entra ID.
 
@@ -47,7 +56,146 @@ Requests with a valid JWT but no `Admin` role receive **403 Forbidden**.
 
 ---
 
-## Response Codes
+### Response Codes
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | Returns an array of incomplete domain registration objects (may be empty) |
+| `401 Unauthorized` | Missing or invalid JWT |
+| `403 Forbidden` | Authenticated user does not have the `Admin` role |
+| `500 Internal Server Error` | Unexpected server error |
+
+---
+
+### Response Body
+
+```typescript
+interface DomainRegistrationResponse {
+  id: string;
+  domain: {
+    topLevelDomain: string;    // e.g. "com"
+    secondLevelDomain: string; // e.g. "mysite"
+  };
+  contactInformation: null;   // always null in admin list responses — redacted for privacy
+  createdAt: string;          // ISO 8601
+  lastUpdatedAt: string;      // ISO 8601
+  status: DomainRegistrationStatus;
+}
+
+type DomainRegistrationStatus =
+  | "Pending"    // 0 – awaiting processing
+  | "InProgress" // 1 – partially provisioned
+  | "Completed"  // 2 – all steps succeeded
+  | "Failed"     // 3 – registration failed
+  | "Cancelled"; // 4 – registration cancelled
+```
+
+> **Note:** Only registrations with status `Pending` (0), `InProgress` (1), or `Failed` (3) are returned. The `contactInformation` field is always `null` in admin list responses; use the individual user endpoint (`GET /api/domain-registrations/{registrationId}`) if contact details are needed.
+
+---
+
+### JavaScript / TypeScript Examples
+
+#### Minimal fetch call
+
+```typescript
+async function adminGetIncompleteRegistrations(
+  adminToken: string,
+  maxResults?: number,
+  baseUrl = ""
+): Promise<DomainRegistrationResponse[]> {
+  const url = new URL(`${baseUrl}/api/admin/domain-registrations`);
+  if (maxResults !== undefined) {
+    url.searchParams.set("maxResults", String(maxResults));
+  }
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`HTTP ${response.status}: ${body}`);
+  }
+
+  return response.json() as Promise<DomainRegistrationResponse[]>;
+}
+```
+
+#### Full example with error handling
+
+```typescript
+async function fetchIncompleteRegistrations(adminToken: string): Promise<void> {
+  const response = await fetch("/api/admin/domain-registrations?maxResults=50", {
+    method: "GET",
+    headers: { Authorization: `Bearer ${adminToken}` },
+  });
+
+  switch (response.status) {
+    case 200: {
+      const registrations: DomainRegistrationResponse[] = await response.json();
+      console.log(`Found ${registrations.length} incomplete registration(s)`);
+      for (const reg of registrations) {
+        console.log(
+          `[${reg.status}] ${reg.domain.secondLevelDomain}.${reg.domain.topLevelDomain} (id: ${reg.id})`
+        );
+      }
+      break;
+    }
+    case 401:
+      console.error("Unauthorized – obtain a fresh JWT and retry.");
+      break;
+    case 403:
+      console.error("Forbidden – your account does not have the Admin role.");
+      break;
+    default:
+      console.error("Unexpected error:", response.status, await response.text());
+  }
+}
+```
+
+---
+
+## POST /api/admin/domain-registrations/{registrationId}/complete
+
+Completes domain provisioning for a partially registered author site without requiring a Stripe subscription.
+
+### Endpoint
+
+```
+POST /api/admin/domain-registrations/{registrationId}/complete
+```
+
+| Detail | Value |
+|--------|-------|
+| Method | `POST` |
+| Auth | Bearer JWT with `Admin` role claim |
+| Path param | `registrationId` — the Cosmos DB document ID of the domain registration |
+| Request body | *(none required)* |
+
+---
+
+### Authorization
+
+The caller's JWT **must** include the `Admin` value in the `roles` claim issued by Microsoft Entra ID.
+
+```json
+{
+  "sub": "...",
+  "roles": ["Admin"],
+  ...
+}
+```
+
+Requests without a valid JWT receive **401 Unauthorized**.  
+Requests with a valid JWT but no `Admin` role receive **403 Forbidden**.
+
+---
+
+### Response Codes
 
 | Status | Meaning |
 |--------|---------|
@@ -60,7 +208,7 @@ Requests with a valid JWT but no `Admin` role receive **403 Forbidden**.
 
 ---
 
-## Response Body
+### Response Body
 
 ```typescript
 interface DomainRegistrationResponse {
@@ -99,9 +247,9 @@ type DomainRegistrationStatus =
 
 ---
 
-## JavaScript / TypeScript Examples
+### JavaScript / TypeScript Examples
 
-### Minimal fetch call
+#### Minimal fetch call
 
 ```typescript
 async function adminCompleteDomain(
@@ -255,30 +403,16 @@ export default CompleteDomainButton;
 
 ---
 
-### Listing pending registrations before completing them
+### Listing incomplete registrations before completing them
 
-Use the standard `GET /api/domain-registrations` endpoint to list registrations, then filter by `status === 0` (Pending) before calling the admin endpoint.
+Use `GET /api/admin/domain-registrations` to list incomplete registrations across all users, then call the complete endpoint for each one you want to provision.
 
 ```typescript
-interface ListDomainRegistrationsResponse extends Array<DomainRegistrationResponse> {}
-
-async function listPendingRegistrations(
-  userToken: string
-): Promise<DomainRegistrationResponse[]> {
-  const response = await fetch("/api/domain-registrations", {
-    headers: { Authorization: `Bearer ${userToken}` },
-  });
-
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-  const all: ListDomainRegistrationsResponse = await response.json();
-  return all.filter((r) => r.status === 0 /* Pending */);
-}
-
-// Admin workflow: list pending → complete each one
+// Admin workflow: list all incomplete registrations → complete each Pending one
 async function processAllPending(adminToken: string): Promise<void> {
-  const pending = await listPendingRegistrations(adminToken);
-  console.log(`Found ${pending.length} pending registrations`);
+  const registrations = await adminGetIncompleteRegistrations(adminToken);
+  const pending = registrations.filter((r) => r.status === 0 /* Pending */);
+  console.log(`Found ${pending.length} pending registration(s)`);
 
   for (const reg of pending) {
     console.log(`Completing domain: ${reg.domain.secondLevelDomain}.${reg.domain.topLevelDomain}`);
