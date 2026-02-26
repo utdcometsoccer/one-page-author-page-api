@@ -945,6 +945,17 @@ namespace InkStainedWretch.OnePageAuthorAPI
         }
 
         /// <summary>
+        /// Registers the WHMCS queue service that enqueues domain registration operations
+        /// to the Azure Service Bus queue for processing by the VM-hosted worker service.
+        /// Requires SERVICE_BUS_CONNECTION_STRING and SERVICE_BUS_WHMCS_QUEUE_NAME configuration.
+        /// </summary>
+        public static IServiceCollection AddWhmcsQueueService(this IServiceCollection services)
+        {
+            services.AddScoped<Interfaces.IWhmcsQueueService, API.WhmcsQueueService>();
+            return services;
+        }
+
+        /// <summary>
         /// Registers Language repository services for language management.
         /// Call this after registering a singleton Database in DI.
         /// </summary>
