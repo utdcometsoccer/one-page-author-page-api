@@ -22,6 +22,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
     public class DomainRegistrationTriggerFunction
     {
         private const int MinNameServersForWhmcs = 2;
+        private const int MaxNameServersForWhmcs = 5;
         private readonly ILogger<DomainRegistrationTriggerFunction> _logger;
         private readonly IFrontDoorService _frontDoorService;
         private readonly IWhmcsQueueService _whmcsQueueService;
@@ -98,17 +99,24 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                         _logger.LogInformation("DNS zone exists for domain {DomainName}, retrieving name servers", domainName);
                         nameServers = await _dnsZoneService.GetNameServersAsync(domainName) ?? [];
 
-                        if (nameServers.Length >= MinNameServersForWhmcs)
+                        if (nameServers.Length >= MinNameServersForWhmcs && nameServers.Length <= MaxNameServersForWhmcs)
                         {
                             _logger.LogInformation("Retrieved {Count} name servers for domain {DomainName}", 
                                 nameServers.Length, domainName);
                         }
+                        else if (nameServers.Length == 0)
+                        {
+                            _logger.LogWarning(
+                                "No name servers retrieved for domain {DomainName}; " +
+                                "name server update will be skipped by the worker.",
+                                domainName);
+                        }
                         else
                         {
                             _logger.LogWarning(
-                                "Retrieved {Count} name server(s) for domain {DomainName}; WHMCS requires at least 2. " +
-                                "Name server update will be skipped by the worker.",
-                                nameServers.Length, domainName);
+                                "Retrieved {Count} name server(s) for domain {DomainName}; " +
+                                "WHMCS requires {Min}–{Max}. Name server update will be skipped by the worker.",
+                                nameServers.Length, domainName, MinNameServersForWhmcs, MaxNameServersForWhmcs);
                         }
                     }
                     else

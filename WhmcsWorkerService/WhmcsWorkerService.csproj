@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="OnePageAuthor.Test" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OnePageAuthorLib\OnePageAuthorLib.csproj" />
   </ItemGroup>
 

@@ -8,7 +8,7 @@ param location string = resourceGroup().location
 param whmcsQueueName string = 'whmcs-domain-registrations'
 
 // Service Bus Namespace (Basic tier – lowest cost, supports queues only)
-resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' = {
+resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
   name: namespaceName
   location: location
   sku: {
@@ -23,7 +23,7 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview
 }
 
 // Queue for WHMCS domain registration messages
-resource whmcsQueue 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-preview' = {
+resource whmcsQueue 'Microsoft.ServiceBus/namespaces/queues@2021-11-01' = {
   parent: serviceBusNamespace
   name: whmcsQueueName
   properties: {
@@ -41,7 +41,7 @@ resource whmcsQueue 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-preview' 
 }
 
 // Shared access policy for the function app (send only)
-resource senderAuthRule 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2022-10-01-preview' = {
+resource senderAuthRule 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2021-11-01' = {
   parent: serviceBusNamespace
   name: 'WhmcsSender'
   properties: {
@@ -52,7 +52,7 @@ resource senderAuthRule 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2022
 }
 
 // Shared access policy for the VM worker (listen only)
-resource listenerAuthRule 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2022-10-01-preview' = {
+resource listenerAuthRule 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2021-11-01' = {
   parent: serviceBusNamespace
   name: 'WhmcsListener'
   properties: {
@@ -69,7 +69,9 @@ output namespaceName string = serviceBusNamespace.name
 output whmcsQueueName string = whmcsQueue.name
 
 @description('Connection string for the function app (Send)')
+@secure()
 output senderConnectionString string = listKeys(senderAuthRule.id, senderAuthRule.apiVersion).primaryConnectionString
 
 @description('Connection string for the VM worker (Listen)')
+@secure()
 output listenerConnectionString string = listKeys(listenerAuthRule.id, listenerAuthRule.apiVersion).primaryConnectionString

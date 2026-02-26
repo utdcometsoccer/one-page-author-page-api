@@ -951,7 +951,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// </summary>
         public static IServiceCollection AddWhmcsQueueService(this IServiceCollection services)
         {
-            services.AddScoped<Interfaces.IWhmcsQueueService, API.WhmcsQueueService>();
+            services.AddSingleton<Interfaces.IWhmcsQueueService, API.WhmcsQueueService>();
             return services;
         }
 

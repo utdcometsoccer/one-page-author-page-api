@@ -534,7 +534,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 x => x.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("WHMCS requires at least 2")),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("WHMCS requires")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);

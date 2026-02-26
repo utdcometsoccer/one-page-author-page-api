@@ -9,7 +9,7 @@ Type=notify
 User=whmcsworker
 Group=whmcsworker
 WorkingDirectory=/opt/whmcs-worker
-ExecStart=/opt/whmcs-worker/WhmcsWorkerService
+ExecStart=/usr/bin/dotnet /opt/whmcs-worker/WhmcsWorkerService.dll
 
 # Restart policy: always restart on failure with a 5-second delay
 Restart=always

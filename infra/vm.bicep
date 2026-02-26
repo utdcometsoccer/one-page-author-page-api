@@ -42,7 +42,7 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2024-01-01' = {
   }
 }
 
-// Network Security Group – allow only outbound HTTPS to WHMCS; inbound SSH restricted
+// Network Security Group – restrict inbound SSH; outbound traffic uses default NSG allow rules
 resource nsg 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
   name: nsgName
   location: location
