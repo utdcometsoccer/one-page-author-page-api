@@ -955,7 +955,6 @@ jobs:
       # =========================================
 
       - name: 'Deploy Service Bus Infrastructure'
-        continue-on-error: true
         shell: bash
         env:
           WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
@@ -980,27 +979,22 @@ jobs:
             echo "✓ Resource group exists: $WHMCS_WORKER_RESOURCE_GROUP"
           fi
 
-          echo "✓ Checking if Service Bus namespace exists: $SB_NAMESPACE"
-          if ! az servicebus namespace show \
-               --name "$SB_NAMESPACE" \
-               --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" &>/dev/null; then
-            echo "📦 Service Bus namespace not found. Deploying..."
-            az deployment group create \
-              --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
-              --template-file infra/servicebus.bicep \
-              --parameters namespaceName="$SB_NAMESPACE" location="$LOCATION" \
-              --output none
-            echo "✓ Service Bus deployed successfully"
-          else
-            echo "✓ Service Bus namespace already exists. Skipping deployment."
-          fi
+          # Always deploy via Bicep (incremental mode) so the queue and auth rules
+          # (WhmcsSender/WhmcsListener) are created/updated even when the namespace
+          # already exists.
+          echo "📦 Deploying/Updating Service Bus namespace and related resources via Bicep (idempotent)..."
+          az deployment group create \
+            --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
+            --template-file infra/servicebus.bicep \
+            --parameters namespaceName="$SB_NAMESPACE" location="$LOCATION" \
+            --output none
+          echo "✓ Service Bus infrastructure deployment completed"
 
       # =========================================
       # Deploy WHMCS Worker VM Infrastructure (Conditional)
       # =========================================
 
       - name: 'Deploy WHMCS Worker VM Infrastructure'
-        continue-on-error: true
         shell: bash
         env:
           WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
@@ -1027,19 +1021,25 @@ jobs:
                --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" &>/dev/null; then
             echo "📦 VM not found. Deploying infrastructure..."
 
-            PARAMS="vmName=$VM_NAME location=$LOCATION adminSshPublicKey=$WHMCS_WORKER_SSH_PUBLIC_KEY"
+            # SSH public keys contain spaces, so build the parameters as an array
+            # to avoid word-splitting issues during deployment.
+            extraParams=()
             if [ -n "$WHMCS_WORKER_ADMIN_USERNAME" ]; then
-              PARAMS="$PARAMS adminUsername=$WHMCS_WORKER_ADMIN_USERNAME"
+              extraParams+=( "adminUsername=$WHMCS_WORKER_ADMIN_USERNAME" )
             fi
 
             az deployment group create \
               --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
               --template-file infra/vm.bicep \
-              --parameters $PARAMS \
+              --parameters \
+                "vmName=$VM_NAME" \
+                "location=$LOCATION" \
+                "adminSshPublicKey=$WHMCS_WORKER_SSH_PUBLIC_KEY" \
+                "${extraParams[@]}" \
               --output json > vm-deployment-output.json
 
-            STATIC_IP=$(cat vm-deployment-output.json | \
-              jq -r '.properties.outputs.staticPublicIpAddress.value // "unknown"')
+            STATIC_IP=$(jq -r '.properties.outputs.staticPublicIpAddress.value // "unknown"' \
+              vm-deployment-output.json)
             echo "✓ VM infrastructure deployed. Static IP: $STATIC_IP"
             echo "ℹ️ Add this IP to the WHMCS API credential IP allowlist."
           else
@@ -1051,7 +1051,6 @@ jobs:
       # =========================================
 
       - name: 'Deploy WhmcsWorkerService to VM'
-        continue-on-error: true
         shell: bash
         env:
           WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
@@ -1099,7 +1098,11 @@ jobs:
             --full-uri \
             --output tsv)
 
-          # Define the deployment script as a variable to avoid quoting issues
+          # Define the deployment script as a variable to avoid quoting issues.
+          # The script is self-contained: it installs any missing prerequisites
+          # (unzip, aspnetcore-runtime-10.0, whmcsworker system user, directories)
+          # so that it works on both a freshly provisioned VM (where cloud-init may
+          # have already run) and on an existing VM that predates the cloud-init changes.
           DEPLOY_SCRIPT=$(cat << 'SCRIPTEOF'
           set -e
           DOWNLOAD_URL="$1"
@@ -1107,6 +1110,25 @@ jobs:
           DEPLOY_DIR="/tmp/whmcs-worker-stage"
           INSTALL_DIR="/opt/whmcs-worker"
           SERVICE="whmcs-worker"
+
+          # ---- Ensure prerequisites ----
+          # set -e is active, so any unhandled failure here will abort the script.
+          if ! command -v unzip &>/dev/null || ! command -v dotnet &>/dev/null; then
+            echo "Installing prerequisites..."
+            if ! dpkg -s 'packages-microsoft-prod' &>/dev/null; then
+              wget -q https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb \
+                -O /tmp/packages-microsoft-prod.deb
+              dpkg -i /tmp/packages-microsoft-prod.deb
+              rm /tmp/packages-microsoft-prod.deb
+              apt-get update -y
+            fi
+            apt-get install -y --no-install-recommends aspnetcore-runtime-10.0 unzip
+          fi
+
+          # ---- Ensure service user and directories ----
+          getent passwd whmcsworker >/dev/null 2>&1 || \
+            useradd --system --no-create-home --shell /usr/sbin/nologin whmcsworker
+          mkdir -p "$INSTALL_DIR" /etc/whmcs-worker /var/log/whmcs-worker
 
           echo "Downloading deployment package..."
           wget -q -O "$DEPLOY_ZIP" "$DOWNLOAD_URL"
@@ -1120,15 +1142,12 @@ jobs:
           unzip -q "$DEPLOY_ZIP" -d "$DEPLOY_DIR"
 
           echo "Installing application files..."
-          mkdir -p "$INSTALL_DIR"
           cp -r "$DEPLOY_DIR"/. "$INSTALL_DIR/"
 
           echo "Setting ownership..."
-          if id -u whmcsworker &>/dev/null; then
-            chown -R whmcsworker:whmcsworker "$INSTALL_DIR" || echo "⚠️ chown failed; check permissions on $INSTALL_DIR"
-          else
-            echo "⚠️ whmcsworker user not found; skipping chown (cloud-init may still be running)"
-          fi
+          chown -R whmcsworker:whmcsworker "$INSTALL_DIR" /var/log/whmcs-worker || \
+            echo "⚠️ chown failed for $INSTALL_DIR and/or /var/log/whmcs-worker; check permissions"
+          chown root:root /etc/whmcs-worker && chmod 750 /etc/whmcs-worker
 
           if [ -f "$INSTALL_DIR/whmcs-worker.service" ]; then
             echo "Installing systemd unit..."
@@ -1161,7 +1180,6 @@ jobs:
       # =========================================
 
       - name: 'Configure WhmcsWorkerService Environment'
-        continue-on-error: true
         shell: bash
         env:
           WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
@@ -1179,9 +1197,9 @@ jobs:
           fi
 
           if [ -z "$WHMCS_API_URL" ] || [ -z "$WHMCS_API_IDENTIFIER" ] || [ -z "$WHMCS_API_SECRET" ]; then
-            echo "⚠️ Skipping environment configuration: WHMCS API secrets not configured"
+            echo "❌ WHMCS API secrets not configured; cannot write environment file."
             echo "   Required: WHMCS_API_URL, WHMCS_API_IDENTIFIER, WHMCS_API_SECRET"
-            exit 0
+            exit 1
           fi
 
           VM_NAME="${WHMCS_WORKER_VM_NAME:-whmcs-worker-vm}"
@@ -1197,9 +1215,9 @@ jobs:
             --output tsv 2>/dev/null || echo "")
 
           if [ -z "$SB_CONN" ]; then
-            echo "⚠️ Could not retrieve Service Bus listener connection string from namespace '$SB_NAMESPACE'."
+            echo "❌ Could not retrieve Service Bus listener connection string from namespace '$SB_NAMESPACE'."
             echo "   Ensure the Service Bus is deployed and the WhmcsListener policy exists."
-            exit 0
+            exit 1
           fi
 
           # Write the environment file on the VM via run-command.
