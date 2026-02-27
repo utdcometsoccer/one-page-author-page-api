@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InkStainedWretchesConfig", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhmcsTestHarness", "WhmcsTestHarness\WhmcsTestHarness.csproj", "{0E9FE34E-5BF9-4002-B202-DD5E206611A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhmcsWorkerService", "WhmcsWorkerService\WhmcsWorkerService.csproj", "{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -267,6 +269,18 @@ Global
 		{0E9FE34E-5BF9-4002-B202-DD5E206611A4}.Release|x64.Build.0 = Release|Any CPU
 		{0E9FE34E-5BF9-4002-B202-DD5E206611A4}.Release|x86.ActiveCfg = Release|Any CPU
 		{0E9FE34E-5BF9-4002-B202-DD5E206611A4}.Release|x86.Build.0 = Release|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Debug|x64.Build.0 = Debug|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Debug|x86.Build.0 = Debug|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Release|x64.ActiveCfg = Release|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Release|x64.Build.0 = Release|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Release|x86.ActiveCfg = Release|Any CPU
+		{C5D8A3F2-1B4E-4F7A-9C6D-8E2F1A3B5C7D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

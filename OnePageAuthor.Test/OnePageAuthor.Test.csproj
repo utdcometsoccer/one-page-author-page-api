@@ -36,6 +36,7 @@
     <ProjectReference Include="..\InkStainedWretchFunctions\InkStainedWretchFunctions.csproj" />
     <ProjectReference Include="..\InkStainedWretchStripe\InkStainedWretchStripe.csproj" />
     <ProjectReference Include="..\function-app\function-app.csproj" />
+    <ProjectReference Include="..\WhmcsWorkerService\WhmcsWorkerService.csproj" />
   </ItemGroup>
 
 </Project>
