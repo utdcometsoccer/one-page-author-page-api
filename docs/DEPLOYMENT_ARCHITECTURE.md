@@ -113,6 +113,103 @@ This document provides visual representations of the deployment architecture for
                     └─────────────────────────────┘
 ```
 
+## WHMCS Domain Registration Proxy Architecture
+
+Domain registration uses a **queue-based VM proxy pattern** to work around the dynamic outbound IPs of Azure Functions.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│           WHMCS Domain Registration Proxy Architecture               │
+└─────────────────────────────────────────────────────────────────────┘
+
+   Client Request
+       │
+       │  POST /api/domain-registrations
+       ▼
+┌──────────────────────────────────────────┐
+│  DomainRegistrationFunction              │
+│  (Azure Functions — InkStainedWretches)  │
+│  Dynamic outbound IP  ⚠️ NOT allowlisted │
+└───────────────┬──────────────────────────┘
+                │
+                │  IWhmcsQueueService.EnqueueDomainRegistrationAsync()
+                │  (WhmcsDomainRegistrationMessage with domain + name servers)
+                ▼
+┌──────────────────────────────────────────┐
+│  Azure Service Bus Queue                 │
+│  Name: whmcs-domain-registrations        │
+│  Max delivery count: 10                  │
+│  Message TTL: 14 days (default)          │
+│                                          │
+│  On transient failure → abandon (retry)  │
+│  On permanent failure → dead-letter      │
+└───────────────┬──────────────────────────┘
+                │
+                │  dequeues one message at a time
+                ▼
+┌──────────────────────────────────────────┐
+│  WhmcsWorkerService                      │
+│  Linux VM — STATIC public IP ✅          │
+│  Managed by systemd (whmcs-worker)       │
+│  Config: /etc/whmcs-worker/environment   │
+│                                          │
+│  1. RegisterDomainAsync()                │
+│  2. UpdateNameServersAsync() (if NS set) │
+│  3. Complete message on success          │
+│     Abandon on transient error           │
+│     Dead-letter on permanent error       │
+└───────────────┬──────────────────────────┘
+                │
+                │  HTTPS POST (form-encoded)
+                │  WHMCS_API_URL  — static IP allowlisted in WHMCS
+                ▼
+┌──────────────────────────────────────────┐
+│  WHMCS API                               │
+│  Action: DomainRegister                  │
+│  Action: DomainUpdateNameservers         │
+│  IP allowlist: VM's static IP only       │
+└───────────────┬──────────────────────────┘
+                │
+                ▼
+        Domain Registrar
+```
+
+### WHMCS Proxy — Key Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `DomainRegistrationTriggerFunction` | InkStainedWretchFunctions | Detects new Pending records in Cosmos DB, enqueues message |
+| `IWhmcsQueueService` / `WhmcsQueueService` | OnePageAuthorLib | Sends registration message to Service Bus |
+| Azure Service Bus queue | Azure cloud | Durable buffer between function and worker |
+| `WhmcsWorkerService` | Linux VM (static IP) | Dequeues messages, calls WHMCS REST API |
+| `IWhmcsService` / `WhmcsService` | OnePageAuthorLib | Makes WHMCS REST API calls (DomainRegister, UpdateNameservers) |
+
+### WHMCS Proxy — Why Not Call WHMCS Directly from the Function?
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  PROBLEM: Azure Functions have dynamic outbound IPs                   │
+│                                                                        │
+│  Azure Function ──► Dynamic IP (changes anytime)                      │
+│                     e.g., 52.x.x.x, 13.x.x.x, 20.x.x.x, ...         │
+│                                                                        │
+│  WHMCS requires a stable IP allowlist → IMPOSSIBLE with Functions     │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│  SOLUTION: VM proxy with static public IP                              │
+│                                                                        │
+│  Azure Function ──► Service Bus ──► VM (static IP: e.g., 20.x.x.x)  │
+│                                        ↓                              │
+│                                      WHMCS (allowlist: 20.x.x.x)     │
+│                                                                        │
+│  WHMCS allowlist entry is permanent and never needs updating          │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+> **Setup guide**: [`WhmcsWorkerService/README.md`](../WhmcsWorkerService/README.md)
+> **Architecture details**: [`docs/WHMCS_INTEGRATION_SUMMARY.md`](WHMCS_INTEGRATION_SUMMARY.md)
+
 ## Data Flow Architecture
 
 ### User Request Flow
@@ -400,10 +497,12 @@ This document provides visual representations of the deployment architecture for
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: December 2024
+**Document Version**: 2.0
+**Last Updated**: February 2026
 **Related Documentation**:
 
 - [Deployment Guide](DEPLOYMENT_GUIDE.md)
 - [GitHub Secrets Reference](GITHUB_SECRETS_REFERENCE.md)
 - [Implementation Summary](IMPLEMENTATION_SUMMARY_MULTI_FUNCTION_DEPLOYMENT.md)
+- [WhmcsWorkerService/README.md](../WhmcsWorkerService/README.md)
+- [WHMCS Integration Summary](WHMCS_INTEGRATION_SUMMARY.md)
