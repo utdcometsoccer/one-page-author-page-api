@@ -11,10 +11,20 @@ All documentation is organized in the [`docs/`](.) directory with the following 
 Start here if you're new to the project:
 
 1. [**Main README**](../README.md) - Project overview, quick start, and architecture
-2. [**PRODUCT_ROADMAP**](../PRODUCT_ROADMAP.md) - **Strategic roadmap** - Features, technical debt, and release planning
-3. [**CONTRIBUTING**](CONTRIBUTING.md) - How to contribute to the project
-4. [**CODE_OF_CONDUCT**](CODE_OF_CONDUCT.md) - Community guidelines
+2. [**PRODUCT_ROADMAP**](../docs/PRODUCT_ROADMAP.md) - **Strategic roadmap** - Features, technical debt, and release planning
+3. [**CONTRIBUTING**](../CONTRIBUTING.md) - How to contribute to the project
+4. [**CODE_OF_CONDUCT**](../CODE_OF_CONDUCT.md) - Community guidelines
 5. [**SECURITY**](SECURITY.md) - Security policies and vulnerability reporting
+
+### 🌐 WHMCS API Proxy (Domain Registration)
+
+**Domain registration uses a queue-based VM proxy** — start here to understand and deploy it:
+
+- [**WhmcsWorkerService/README.md**](../WhmcsWorkerService/README.md) ⭐ — **Full step-by-step deployment guide**: provision Azure VM with static IP, install .NET runtime, build and deploy the worker, configure systemd, set WHMCS IP allowlist
+- [**WHMCS_INTEGRATION_SUMMARY**](WHMCS_INTEGRATION_SUMMARY.md) — Architecture deep-dive: queue-based proxy pattern, implementation details, configuration reference, monitoring, and troubleshooting
+- [**GET_TLD_PRICING_API**](GET_TLD_PRICING_API.md) — TLD pricing API reference (uses WHMCS credentials directly from the Function App)
+
+> **Why a VM proxy?** Azure Functions run on shared infrastructure with dynamic outbound IPs. WHMCS restricts API access by IP. The `WhmcsWorkerService` runs on a Linux VM with a **static public IP**, so WHMCS can allowlist exactly one address. The Function enqueues domain registration requests to Azure Service Bus; the worker dequeues and calls WHMCS.
 
 ### 🔐 Authentication & Authorization
 
@@ -56,8 +66,8 @@ Documentation for local development and configuration:
 
 Complete deployment workflow documentation:
 
-- [**DEPLOYMENT_GUIDE**](DEPLOYMENT_GUIDE.md) - **START HERE** - Complete deployment workflow
-- [**DEPLOYMENT_ARCHITECTURE**](DEPLOYMENT_ARCHITECTURE.md) - Infrastructure architecture overview
+- [**DEPLOYMENT_GUIDE**](DEPLOYMENT_GUIDE.md) - **START HERE** - Complete deployment workflow (includes WHMCS Worker Service)
+- [**DEPLOYMENT_ARCHITECTURE**](DEPLOYMENT_ARCHITECTURE.md) - Infrastructure architecture overview (includes WHMCS proxy diagram)
 - [**GITHUB_SECRETS_REFERENCE**](GITHUB_SECRETS_REFERENCE.md) - **Essential** - All GitHub Secrets explained
 - [**COSMOS_APPINSIGHTS_DEPLOYMENT**](COSMOS_APPINSIGHTS_DEPLOYMENT.md) - Monitoring deployment
 - [**QUICKSTART_COSMOS_APPINSIGHTS**](QUICKSTART_COSMOS_APPINSIGHTS.md) - Quick start for monitoring
@@ -111,11 +121,10 @@ Detailed implementation documentation for specific features:
 
 #### Integrations
 
-- [**GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY**](GOOGLE_DOMAINS_IMPLEMENTATION_SUMMARY.md) - Domain registration
+- [**WHMCS_INTEGRATION_SUMMARY**](WHMCS_INTEGRATION_SUMMARY.md) - WHMCS domain registration integration (queue-based proxy architecture)
 - [**KEY_VAULT_IMPLEMENTATION_SUMMARY**](KEY_VAULT_IMPLEMENTATION_SUMMARY.md) - Secrets management
 - [**KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION**](KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION.md) - Key Vault RBAC
 - [**FEDIVERSE_INTEGRATION**](FEDIVERSE_INTEGRATION.md) - Fediverse and ActivityPub integration (NEW)
-- [**WHMCS_INTEGRATION_SUMMARY**](WHMCS_INTEGRATION_SUMMARY.md) - WHMCS domain registration integration
 - [**GET_TLD_PRICING_API**](GET_TLD_PRICING_API.md) - TLD pricing API for JS/TS developers
 
 #### User Features
@@ -169,19 +178,34 @@ Guides for utility tools and scripts:
 2. Configure [GITHUB_SECRETS_REFERENCE](GITHUB_SECRETS_REFERENCE.md)
 3. Review [DEPLOYMENT_ARCHITECTURE](DEPLOYMENT_ARCHITECTURE.md)
 4. Check [COSMOS_APPINSIGHTS_DEPLOYMENT](COSMOS_APPINSIGHTS_DEPLOYMENT.md)
+5. **Deploy WHMCS Worker**: Follow [WhmcsWorkerService/README.md](../WhmcsWorkerService/README.md)
+
+### WHMCS API Proxy Setup
+
+1. Read the [WHMCS Integration Summary](WHMCS_INTEGRATION_SUMMARY.md) for architecture context
+2. Follow the [WhmcsWorkerService/README.md](../WhmcsWorkerService/README.md) step-by-step guide:
+   - Provision a Linux VM with a static public IP
+   - Install .NET 10 runtime and set up system directories
+   - Build and publish `WhmcsWorkerService`
+   - Deploy to `/opt/whmcs-worker/` and configure `/etc/whmcs-worker/environment`
+   - Install and enable the `whmcs-worker` systemd service
+   - Configure WHMCS API credentials with the VM's static IP in the allowlist
+   - Verify end-to-end with a test domain registration
+3. Configure the Azure Function App with `SERVICE_BUS_CONNECTION_STRING` and `SERVICE_BUS_WHMCS_QUEUE_NAME`
+4. Monitor with `sudo journalctl -u whmcs-worker -f` on the VM
 
 ### Feature Developer
 
 1. Review [Complete-System-Documentation](Complete-System-Documentation.md)
 2. Check relevant implementation summaries
-3. Follow [CONTRIBUTING](CONTRIBUTING.md) guidelines
+3. Follow [CONTRIBUTING](../CONTRIBUTING.md) guidelines
 4. Run [TESTING_SCENARIOS_GUIDE](TESTING_SCENARIOS_GUIDE.md)
 
 ## 📊 Documentation Statistics
 
 - **Total Documentation Files**: 70+ markdown files
-- **Main README Size**: 4,431 lines (consolidated from 6,868)
-- **Documentation Categories**: 8 major categories
+- **Main README Size**: 4,500+ lines (consolidated overview)
+- **Documentation Categories**: 9 major categories
 - **Implementation Summaries**: 15+ detailed guides
 - **API Endpoints Documented**: 40+ endpoints across 4 function apps
 
@@ -194,6 +218,7 @@ Guides for utility tools and scripts:
 3. **Deployment**: [DEPLOYMENT_GUIDE](DEPLOYMENT_GUIDE.md)
 4. **Secrets Configuration**: [GITHUB_SECRETS_REFERENCE](GITHUB_SECRETS_REFERENCE.md)
 5. **Development**: [DEVELOPMENT_SCRIPTS](DEVELOPMENT_SCRIPTS.md)
+6. **WHMCS Proxy**: [WhmcsWorkerService/README.md](../WhmcsWorkerService/README.md)
 
 ### By Role
 
@@ -208,6 +233,7 @@ Guides for utility tools and scripts:
 - [DEPLOYMENT_GUIDE](DEPLOYMENT_GUIDE.md)
 - [GITHUB_SECRETS_REFERENCE](GITHUB_SECRETS_REFERENCE.md)
 - [DEPLOYMENT_ARCHITECTURE](DEPLOYMENT_ARCHITECTURE.md)
+- [WhmcsWorkerService/README.md](../WhmcsWorkerService/README.md) — WHMCS VM worker deployment
 
 **Security Specialist**:
 
@@ -228,7 +254,7 @@ Guides for utility tools and scripts:
 2. Keep documentation close to the code it describes
 3. Update implementation summaries when making significant changes
 4. Link between related documents
-5. Follow the [CONTRIBUTING](CONTRIBUTING.md) guidelines
+5. Follow the [CONTRIBUTING](../CONTRIBUTING.md) guidelines
 
 ### Documentation Standards
 
@@ -245,10 +271,10 @@ If you can't find what you're looking for:
 1. Check the [Main README](../README.md) first
 2. Search this index for relevant keywords
 3. Check implementation summaries for feature-specific docs
-4. Review [CONTRIBUTING](CONTRIBUTING.md) for contribution guidelines
+4. Review [CONTRIBUTING](../CONTRIBUTING.md) for contribution guidelines
 5. Open an issue on GitHub if documentation is missing or unclear
 
 ---
 
-**Last Updated**: December 2024
+**Last Updated**: February 2026
 **Maintained By**: OnePageAuthor API Team

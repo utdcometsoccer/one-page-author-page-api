@@ -642,6 +642,147 @@ To rollback a deployment:
 3. Click "Redeploy" to rollback infrastructure
 4. For code changes, revert the commit and push
 
+## 🌐 WHMCS Worker Service Deployment
+
+Domain registration uses a **queue-based WHMCS proxy** — the `WhmcsWorkerService` runs on a Linux VM with a static public IP and processes domain registration requests from an Azure Service Bus queue.
+
+> **Full step-by-step guide**: [`WhmcsWorkerService/README.md`](../WhmcsWorkerService/README.md)
+> **Architecture overview**: [`docs/WHMCS_INTEGRATION_SUMMARY.md`](WHMCS_INTEGRATION_SUMMARY.md)
+
+### Why a Separate VM?
+
+Azure Functions have dynamic outbound IPs that cannot be added to a WHMCS IP allowlist. The `WhmcsWorkerService` runs on a Linux VM with a permanent static IP so WHMCS can restrict API access to exactly one address.
+
+### Quick Setup Steps
+
+1. **Provision Azure VM with static public IP**
+
+   ```bash
+   az network public-ip create \
+     --resource-group whmcs-worker-rg \
+     --name whmcs-worker-pip \
+     --allocation-method Static \
+     --sku Standard
+
+   az vm create \
+     --resource-group whmcs-worker-rg \
+     --name whmcs-worker-vm \
+     --image Ubuntu2404 \
+     --size Standard_B1s \
+     --admin-username azureuser \
+     --ssh-key-values ~/.ssh/id_rsa.pub \
+     --public-ip-address whmcs-worker-pip \
+     --public-ip-sku Standard
+   ```
+
+2. **Record the VM's static public IP** — you will add this to WHMCS in step 5
+
+   ```bash
+   az vm show --resource-group whmcs-worker-rg --name whmcs-worker-vm \
+     --show-details --query publicIps --output tsv
+   ```
+
+3. **Create the Azure Service Bus queue**
+
+   ```bash
+   az servicebus namespace create \
+     --resource-group whmcs-worker-rg \
+     --name whmcs-worker-sb \
+     --location eastus \
+     --sku Standard
+
+   az servicebus queue create \
+     --resource-group whmcs-worker-rg \
+     --namespace-name whmcs-worker-sb \
+     --name whmcs-domain-registrations \
+     --max-delivery-count 10
+   ```
+
+4. **Build, publish, and deploy the service to the VM**
+
+   ```bash
+   # Build (on development machine)
+   dotnet publish WhmcsWorkerService/WhmcsWorkerService.csproj \
+     -c Release -r linux-x64 --self-contained false \
+     -o /tmp/whmcs-worker-publish
+
+   # Copy to VM
+   scp -r /tmp/whmcs-worker-publish/* azureuser@<vm-ip>:/tmp/whmcs-worker-stage/
+
+   # On VM: move files and set permissions
+   ssh azureuser@<vm-ip>
+   sudo cp -r /tmp/whmcs-worker-stage/* /opt/whmcs-worker/
+   sudo chown -R whmcsworker:whmcsworker /opt/whmcs-worker/
+   ```
+
+5. **Configure WHMCS API credentials with IP allowlist**
+
+   - Log in to WHMCS Admin → **Setup** → **Staff Management** → **API Credentials**
+   - Click **Generate New API Credential**
+   - Set **IP Restriction** to the VM's static public IP (from step 2)
+   - Enable roles: `Domain: Register Domain`, `Domain: Update Nameservers`, `Billing: Get TLD Pricing`
+   - Copy the **Identifier** and **Secret**
+
+6. **Create the environment file on the VM**
+
+   ```bash
+   sudo tee /etc/whmcs-worker/environment > /dev/null <<'EOF'
+   SERVICE_BUS_CONNECTION_STRING=Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=...;SharedAccessKey=...
+   SERVICE_BUS_WHMCS_QUEUE_NAME=whmcs-domain-registrations
+   WHMCS_API_URL=https://your-whmcs.com/includes/api.php
+   WHMCS_API_IDENTIFIER=your-api-identifier
+   WHMCS_API_SECRET=your-api-secret
+   EOF
+   sudo chmod 600 /etc/whmcs-worker/environment
+   sudo chown root:root /etc/whmcs-worker/environment
+   ```
+
+7. **Install and start the systemd service**
+
+   ```bash
+   sudo cp /opt/whmcs-worker/whmcs-worker.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable whmcs-worker
+   sudo systemctl start whmcs-worker
+   sudo systemctl status whmcs-worker
+   ```
+
+8. **Configure the Azure Function App** with Service Bus and WHMCS settings
+
+   ```bash
+   az functionapp config appsettings set \
+     --name <function-app-name> \
+     --resource-group <resource-group> \
+     --settings \
+       SERVICE_BUS_CONNECTION_STRING="Endpoint=sb://..." \
+       SERVICE_BUS_WHMCS_QUEUE_NAME="whmcs-domain-registrations" \
+       WHMCS_API_URL="https://your-whmcs.com/includes/api.php" \
+       WHMCS_API_IDENTIFIER="your-identifier" \
+       WHMCS_API_SECRET="your-secret"
+   ```
+
+9. **Verify end-to-end**: Create a `Pending` domain registration in Cosmos DB and watch the worker logs:
+
+   ```bash
+   sudo journalctl -u whmcs-worker -f
+   ```
+
+### GitHub Secrets for WHMCS Worker CI/CD
+
+The GitHub Actions workflow automatically builds and deploys the `WhmcsWorkerService` to the VM. Configure these additional secrets:
+
+| Secret Name | Description |
+|-------------|-------------|
+| `WHMCS_VM_RESOURCE_GROUP` | Resource group containing the WHMCS worker VM |
+| `WHMCS_VM_NAME` | Name of the WHMCS worker VM |
+| `WHMCS_WORKER_STORAGE_ACCOUNT` | Storage account used for deployment zip staging |
+| `WHMCS_WORKER_STORAGE_CONTAINER` | Blob container for deployment zip staging |
+| `SERVICE_BUS_CONNECTION_STRING` | Azure Service Bus connection string |
+| `SERVICE_BUS_WHMCS_QUEUE_NAME` | Service Bus queue name |
+| `WHMCS_API_URL` | WHMCS API endpoint URL |
+| `WHMCS_API_IDENTIFIER` | WHMCS API credential identifier |
+| `WHMCS_API_SECRET` | WHMCS API credential secret |
+
 ## 📚 Additional Resources
 
 - [Azure Functions Documentation](https://docs.microsoft.com/en-us/azure/azure-functions/)
@@ -649,6 +790,10 @@ To rollback a deployment:
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Azure Key Vault Documentation](https://docs.microsoft.com/en-us/azure/key-vault/)
 - [Application Insights Documentation](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
+- [WhmcsWorkerService/README.md](../WhmcsWorkerService/README.md) — Complete WHMCS worker deployment guide
+- [WHMCS API Reference — DomainRegister](https://developers.whmcs.com/api-reference/domainregister/)
+- [Azure Service Bus Queues](https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions)
+- [Static Public IP Addresses in Azure](https://learn.microsoft.com/en-us/azure/virtual-network/ip-services/public-ip-addresses#allocation-method)
 
 ## 🤝 Support
 
@@ -662,5 +807,5 @@ For issues or questions:
 
 ---
 
-**Last Updated**: 2024
+**Last Updated**: February 2026
 **Maintained by**: OnePageAuthor Development Team

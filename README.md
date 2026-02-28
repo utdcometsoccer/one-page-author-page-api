@@ -568,6 +568,67 @@ dotnet test --filter "Category=Unit"
 
 </details>
 
+## 🌐 WHMCS API Proxy Setup
+
+Domain registration in this platform is handled through a **queue-based WHMCS proxy architecture**. Because Azure Functions run on shared infrastructure with dynamic outbound IPs, they cannot be allowlisted in WHMCS. A dedicated Linux VM with a **static public IP** bridges the gap: the Azure Function enqueues domain registration requests to an Azure Service Bus queue, and the `WhmcsWorkerService` (running on the VM) dequeues them and calls the WHMCS REST API from the stable, known IP.
+
+```
+Azure Function (dynamic IP)
+  │  enqueues message
+  ▼
+Azure Service Bus Queue  (whmcs-domain-registrations)
+  │  dequeues message
+  ▼
+WhmcsWorkerService on VM (static IP)
+  │  calls WHMCS REST API
+  ▼
+WHMCS → Domain Registrar
+```
+
+> **Full step-by-step guide**: [`WhmcsWorkerService/README.md`](WhmcsWorkerService/README.md)  
+> **Architecture deep-dive**: [`docs/WHMCS_INTEGRATION_SUMMARY.md`](docs/WHMCS_INTEGRATION_SUMMARY.md)
+
+### WHMCS Proxy — Quick Setup Summary
+
+| Step | What to do | Where |
+|------|-----------|-------|
+| 1 | Provision a Linux VM with a **static** public IP | Azure Portal or `az vm create` |
+| 2 | Record the VM's static public IP address | `az vm show --query publicIps` or `curl https://checkip.amazonaws.com` from the VM |
+| 3 | Create a Service Bus namespace + queue `whmcs-domain-registrations` (max-delivery-count 10) | Azure Portal or `az servicebus queue create` |
+| 4 | Install .NET 10 runtime and prepare directories on the VM | `sudo apt-get install aspnetcore-runtime-10.0` |
+| 5 | Build and publish `WhmcsWorkerService` | `dotnet publish WhmcsWorkerService/WhmcsWorkerService.csproj -c Release -r linux-x64 --self-contained false` |
+| 6 | Copy published output to `/opt/whmcs-worker/` on the VM | `scp -r ...` |
+| 7 | Create `/etc/whmcs-worker/environment` with required variables (permissions: `600 root:root`) | `sudo tee /etc/whmcs-worker/environment` |
+| 8 | Install and start the `whmcs-worker` systemd service | `sudo systemctl enable --now whmcs-worker` |
+| 9 | In WHMCS Admin → Setup → API Credentials: add the VM's IP to the allowlist and enable Domain Register + Update Nameservers roles | WHMCS Admin Panel |
+| 10 | Verify end-to-end: create a `Pending` domain registration in Cosmos DB and watch the worker logs | `sudo journalctl -u whmcs-worker -f` |
+
+### WHMCS Proxy — Required Environment Variables
+
+**Azure Function App (`InkStainedWretchFunctions`)**:
+
+| Variable | Description |
+|----------|-------------|
+| `SERVICE_BUS_CONNECTION_STRING` | Azure Service Bus connection string |
+| `SERVICE_BUS_WHMCS_QUEUE_NAME` | Queue name (default: `whmcs-domain-registrations`) |
+| `WHMCS_API_URL` | WHMCS API endpoint (used by `GetTLDPricing`) |
+| `WHMCS_API_IDENTIFIER` | WHMCS API credential identifier (used by `GetTLDPricing`) |
+| `WHMCS_API_SECRET` | WHMCS API credential secret (used by `GetTLDPricing`) |
+
+**WhmcsWorkerService VM (`/etc/whmcs-worker/environment`)**:
+
+| Variable | Description |
+|----------|-------------|
+| `SERVICE_BUS_CONNECTION_STRING` | Azure Service Bus connection string |
+| `SERVICE_BUS_WHMCS_QUEUE_NAME` | Queue name (default: `whmcs-domain-registrations`) |
+| `WHMCS_API_URL` | WHMCS API endpoint (e.g., `https://your-whmcs.com/includes/api.php`) |
+| `WHMCS_API_IDENTIFIER` | WHMCS API credential identifier |
+| `WHMCS_API_SECRET` | WHMCS API credential secret |
+
+> ⚠️ **Security**: `/etc/whmcs-worker/environment` contains credentials — keep permissions as `600 root:root`. Never commit credentials to source control.
+
+---
+
 ## 🚀 Production Deployment
 
 ### Automated CI/CD Deployment
@@ -596,6 +657,8 @@ See the comprehensive guides:
 - **Application Insights** for monitoring and logging
 - **DNS Zone** for custom domains (optional)
 - **Static Web App** for frontend hosting (optional)
+- **Azure Service Bus** Standard namespace + queue (for WHMCS domain registration proxy)
+- **Linux VM with static public IP** running `WhmcsWorkerService` (for WHMCS domain registration proxy)
 
 ### Quick Deployment Setup
 
@@ -616,6 +679,7 @@ See the comprehensive guides:
 - [ ] Set up Application Insights monitoring
 - [ ] Configure Stripe webhook endpoints
 - [ ] Validate JWT token configuration
+- [ ] **Deploy WHMCS Worker Service** — see [WHMCS API Proxy Setup](#-whmcs-api-proxy-setup) and [`WhmcsWorkerService/README.md`](WhmcsWorkerService/README.md)
 - [ ] Run smoke tests on deployed endpoints
 
 ### ⚠️ Common Deployment Issues
@@ -676,6 +740,11 @@ az functionapp deployment source config-zip \
 ## 📖 Enhancement & Implementation Documentation
 
 For detailed documentation on specific features, enhancements, and implementations, see the [`docs/`](docs/) directory:
+
+### Domain Registration & WHMCS Proxy
+
+- **[WHMCS Integration Summary](docs/WHMCS_INTEGRATION_SUMMARY.md)** — Architecture, implementation details, configuration, and deployment checklist for the WHMCS queue-based proxy
+- **[WhmcsWorkerService Deployment Guide](WhmcsWorkerService/README.md)** — Step-by-step guide: provision VM, install runtime, deploy service, configure systemd, set up WHMCS IP allowlist
 
 ### Feature Enhancements
 
