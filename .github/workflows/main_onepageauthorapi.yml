@@ -14,6 +14,8 @@ env:
   INK_STAINED_WRETCH_FUNCTIONS_PATH: 'InkStainedWretchFunctions'
   INK_STAINED_WRETCH_STRIPE_PATH: 'InkStainedWretchStripe'
   INK_STAINED_WRETCHES_CONFIG_PATH: 'InkStainedWretchesConfig'
+  # WHMCS Worker Service path
+  WHMCS_WORKER_SERVICE_PATH: 'WhmcsWorkerService'
 
 jobs:
   build-and-deploy:
@@ -173,6 +175,33 @@ jobs:
         run: |
           cd '${{ env.INK_STAINED_WRETCHES_CONFIG_PATH }}/output'
           zip -r ../inkstainedwretchesconfig.zip .
+          cd ../..
+
+      - name: 'Build and Publish WhmcsWorkerService'
+        shell: bash
+        run: |
+          echo "Building WhmcsWorkerService..."
+          echo "Version: ${{ env.VERSION }}"
+          echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
+          pushd '${{ env.WHMCS_WORKER_SERVICE_PATH }}'
+          # -r linux-x64 with --self-contained false produces a framework-dependent
+          # publish trimmed for the Linux x64 target (excludes Windows/macOS binaries).
+          dotnet publish --configuration Release \
+            -r linux-x64 \
+            --self-contained false \
+            --output ./output \
+            /p:Version=${{ env.VERSION }} \
+            /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          popd
+
+      - name: 'Zip WhmcsWorkerService Output'
+        shell: bash
+        run: |
+          # Include the systemd service unit file in the deployment package
+          cp '${{ env.WHMCS_WORKER_SERVICE_PATH }}/whmcs-worker.service' \
+             '${{ env.WHMCS_WORKER_SERVICE_PATH }}/output/'
+          cd '${{ env.WHMCS_WORKER_SERVICE_PATH }}/output'
+          zip -r ../whmcsworker.zip .
           cd ../..
 
       # =========================================
@@ -920,3 +949,306 @@ jobs:
           fi
 
           echo "✓ InkStainedWretchesConfig deployed successfully"
+
+      # =========================================
+      # Deploy Service Bus Infrastructure (Conditional)
+      # =========================================
+
+      - name: 'Deploy Service Bus Infrastructure'
+        shell: bash
+        env:
+          WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
+          WHMCS_WORKER_LOCATION: ${{ secrets.WHMCS_WORKER_LOCATION }}
+          WHMCS_SB_NAMESPACE_NAME: ${{ secrets.WHMCS_SB_NAMESPACE_NAME }}
+          DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
+        run: |
+          if [ "$DEPLOY_WHMCS_WORKER" != "true" ] || [ -z "$WHMCS_WORKER_RESOURCE_GROUP" ]; then
+            echo "⚠️ Skipping Service Bus deployment: DEPLOY_WHMCS_WORKER not set to 'true' or WHMCS_WORKER_RESOURCE_GROUP missing"
+            echo "   Required: DEPLOY_WHMCS_WORKER=true, WHMCS_WORKER_RESOURCE_GROUP"
+            exit 0
+          fi
+
+          SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-sb}"
+          LOCATION="${WHMCS_WORKER_LOCATION:-eastus}"
+
+          echo "📦 Ensuring resource group exists: $WHMCS_WORKER_RESOURCE_GROUP"
+          if ! az group show --name "$WHMCS_WORKER_RESOURCE_GROUP" &>/dev/null; then
+            az group create --name "$WHMCS_WORKER_RESOURCE_GROUP" --location "$LOCATION"
+            echo "✓ Resource group created: $WHMCS_WORKER_RESOURCE_GROUP"
+          else
+            echo "✓ Resource group exists: $WHMCS_WORKER_RESOURCE_GROUP"
+          fi
+
+          # Always deploy via Bicep (incremental mode) so the queue and auth rules
+          # (WhmcsSender/WhmcsListener) are created/updated even when the namespace
+          # already exists.
+          echo "📦 Deploying/Updating Service Bus namespace and related resources via Bicep (idempotent)..."
+          az deployment group create \
+            --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
+            --template-file infra/servicebus.bicep \
+            --parameters namespaceName="$SB_NAMESPACE" location="$LOCATION" \
+            --output none
+          echo "✓ Service Bus infrastructure deployment completed"
+
+      # =========================================
+      # Deploy WHMCS Worker VM Infrastructure (Conditional)
+      # =========================================
+
+      - name: 'Deploy WHMCS Worker VM Infrastructure'
+        shell: bash
+        env:
+          WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
+          WHMCS_WORKER_LOCATION: ${{ secrets.WHMCS_WORKER_LOCATION }}
+          WHMCS_WORKER_VM_NAME: ${{ secrets.WHMCS_WORKER_VM_NAME }}
+          WHMCS_WORKER_ADMIN_USERNAME: ${{ secrets.WHMCS_WORKER_ADMIN_USERNAME }}
+          WHMCS_WORKER_SSH_PUBLIC_KEY: ${{ secrets.WHMCS_WORKER_SSH_PUBLIC_KEY }}
+          DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
+        run: |
+          if [ "$DEPLOY_WHMCS_WORKER" != "true" ] || \
+             [ -z "$WHMCS_WORKER_RESOURCE_GROUP" ] || \
+             [ -z "$WHMCS_WORKER_SSH_PUBLIC_KEY" ]; then
+            echo "⚠️ Skipping VM infrastructure deployment"
+            echo "   Required: DEPLOY_WHMCS_WORKER=true, WHMCS_WORKER_RESOURCE_GROUP, WHMCS_WORKER_SSH_PUBLIC_KEY"
+            exit 0
+          fi
+
+          VM_NAME="${WHMCS_WORKER_VM_NAME:-whmcs-worker-vm}"
+          LOCATION="${WHMCS_WORKER_LOCATION:-eastus}"
+
+          echo "✓ Checking if VM exists: $VM_NAME"
+          if ! az vm show \
+               --name "$VM_NAME" \
+               --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" &>/dev/null; then
+            echo "📦 VM not found. Deploying infrastructure..."
+
+            # SSH public keys contain spaces, so build the parameters as an array
+            # to avoid word-splitting issues during deployment.
+            extraParams=()
+            if [ -n "$WHMCS_WORKER_ADMIN_USERNAME" ]; then
+              extraParams+=( "adminUsername=$WHMCS_WORKER_ADMIN_USERNAME" )
+            fi
+
+            az deployment group create \
+              --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
+              --template-file infra/vm.bicep \
+              --parameters \
+                "vmName=$VM_NAME" \
+                "location=$LOCATION" \
+                "adminSshPublicKey=$WHMCS_WORKER_SSH_PUBLIC_KEY" \
+                "${extraParams[@]}" \
+              --output json > vm-deployment-output.json
+
+            STATIC_IP=$(jq -r '.properties.outputs.staticPublicIpAddress.value // "unknown"' \
+              vm-deployment-output.json)
+            echo "✓ VM infrastructure deployed. Static IP: $STATIC_IP"
+            echo "ℹ️ Add this IP to the WHMCS API credential IP allowlist."
+          else
+            echo "✓ VM already exists. Skipping infrastructure deployment."
+          fi
+
+      # =========================================
+      # Deploy WhmcsWorkerService Binary (Conditional)
+      # =========================================
+
+      - name: 'Deploy WhmcsWorkerService to VM'
+        shell: bash
+        env:
+          WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
+          WHMCS_WORKER_VM_NAME: ${{ secrets.WHMCS_WORKER_VM_NAME }}
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
+        run: |
+          if [ "$DEPLOY_WHMCS_WORKER" != "true" ] || \
+             [ -z "$WHMCS_WORKER_RESOURCE_GROUP" ] || \
+             [ -z "$AZURE_STORAGE_CONNECTION_STRING" ]; then
+            echo "⚠️ Skipping WhmcsWorkerService binary deployment"
+            echo "   Required: DEPLOY_WHMCS_WORKER=true, WHMCS_WORKER_RESOURCE_GROUP, AZURE_STORAGE_CONNECTION_STRING"
+            exit 0
+          fi
+
+          VM_NAME="${WHMCS_WORKER_VM_NAME:-whmcs-worker-vm}"
+          CONTAINER="whmcs-worker-deploy"
+          BLOB="whmcsworker-${{ github.run_number }}.zip"
+
+          # Ensure the deployment container exists
+          az storage container create \
+            --name "$CONTAINER" \
+            --connection-string "$AZURE_STORAGE_CONNECTION_STRING" \
+            --output none 2>/dev/null || true
+
+          # Upload deployment artifact
+          echo "📦 Uploading deployment package: $BLOB"
+          az storage blob upload \
+            --container-name "$CONTAINER" \
+            --file '${{ env.WHMCS_WORKER_SERVICE_PATH }}/whmcsworker.zip' \
+            --name "$BLOB" \
+            --connection-string "$AZURE_STORAGE_CONNECTION_STRING" \
+            --overwrite \
+            --output none
+
+          # Generate a time-limited SAS URL (valid 30 minutes) for the VM to download.
+          # date -u -d requires GNU date, which is available on ubuntu-latest runners.
+          EXPIRY=$(date -u -d "+30 minutes" '+%Y-%m-%dT%H:%MZ')
+          SAS_URL=$(az storage blob generate-sas \
+            --container-name "$CONTAINER" \
+            --name "$BLOB" \
+            --permissions r \
+            --expiry "$EXPIRY" \
+            --connection-string "$AZURE_STORAGE_CONNECTION_STRING" \
+            --full-uri \
+            --output tsv)
+
+          # Define the deployment script as a variable to avoid quoting issues.
+          # The script is self-contained: it installs any missing prerequisites
+          # (unzip, aspnetcore-runtime-10.0, whmcsworker system user, directories)
+          # so that it works on both a freshly provisioned VM (where cloud-init may
+          # have already run) and on an existing VM that predates the cloud-init changes.
+          DEPLOY_SCRIPT=$(cat << 'SCRIPTEOF'
+          set -e
+          DOWNLOAD_URL="$1"
+          DEPLOY_ZIP="/tmp/whmcs-worker-deploy.zip"
+          DEPLOY_DIR="/tmp/whmcs-worker-stage"
+          INSTALL_DIR="/opt/whmcs-worker"
+          SERVICE="whmcs-worker"
+
+          # ---- Ensure prerequisites ----
+          # set -e is active, so any unhandled failure here will abort the script.
+          if ! command -v unzip &>/dev/null || ! command -v dotnet &>/dev/null; then
+            echo "Installing prerequisites..."
+            if ! dpkg -s 'packages-microsoft-prod' &>/dev/null; then
+              wget -q https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb \
+                -O /tmp/packages-microsoft-prod.deb
+              dpkg -i /tmp/packages-microsoft-prod.deb
+              rm /tmp/packages-microsoft-prod.deb
+              apt-get update -y
+            fi
+            apt-get install -y --no-install-recommends aspnetcore-runtime-10.0 unzip
+          fi
+
+          # ---- Ensure service user and directories ----
+          getent passwd whmcsworker >/dev/null 2>&1 || \
+            useradd --system --no-create-home --shell /usr/sbin/nologin whmcsworker
+          mkdir -p "$INSTALL_DIR" /etc/whmcs-worker /var/log/whmcs-worker
+
+          echo "Downloading deployment package..."
+          wget -q -O "$DEPLOY_ZIP" "$DOWNLOAD_URL"
+
+          # Stopping the service may fail if it is not yet installed; that is expected.
+          echo "Stopping service if running..."
+          systemctl stop "$SERVICE" 2>/dev/null && echo "Service stopped." || echo "Service was not running (OK on first deploy)."
+
+          echo "Extracting package..."
+          rm -rf "$DEPLOY_DIR" && mkdir -p "$DEPLOY_DIR"
+          unzip -q "$DEPLOY_ZIP" -d "$DEPLOY_DIR"
+
+          echo "Installing application files..."
+          cp -r "$DEPLOY_DIR"/. "$INSTALL_DIR/"
+
+          echo "Setting ownership..."
+          chown -R whmcsworker:whmcsworker "$INSTALL_DIR" /var/log/whmcs-worker || \
+            echo "⚠️ chown failed for $INSTALL_DIR and/or /var/log/whmcs-worker; check permissions"
+          chown root:root /etc/whmcs-worker && chmod 750 /etc/whmcs-worker
+
+          if [ -f "$INSTALL_DIR/whmcs-worker.service" ]; then
+            echo "Installing systemd unit..."
+            cp "$INSTALL_DIR/whmcs-worker.service" /etc/systemd/system/
+            systemctl daemon-reload
+          fi
+
+          systemctl enable "$SERVICE"
+          systemctl start "$SERVICE"
+
+          rm -f "$DEPLOY_ZIP" && rm -rf "$DEPLOY_DIR"
+          echo "Deployment complete."
+          systemctl status "$SERVICE" --no-pager || true
+          SCRIPTEOF
+          )
+
+          echo "🚀 Deploying to VM: $VM_NAME"
+          az vm run-command invoke \
+            --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
+            --name "$VM_NAME" \
+            --command-id RunShellScript \
+            --scripts "$DEPLOY_SCRIPT" \
+            --parameters "$SAS_URL" \
+            --output json
+
+          echo "✓ WhmcsWorkerService deployed to VM"
+
+      # =========================================
+      # Configure WhmcsWorkerService Environment (Conditional)
+      # =========================================
+
+      - name: 'Configure WhmcsWorkerService Environment'
+        shell: bash
+        env:
+          WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
+          WHMCS_WORKER_VM_NAME: ${{ secrets.WHMCS_WORKER_VM_NAME }}
+          WHMCS_SB_NAMESPACE_NAME: ${{ secrets.WHMCS_SB_NAMESPACE_NAME }}
+          WHMCS_SB_QUEUE_NAME: ${{ secrets.WHMCS_SB_QUEUE_NAME }}
+          WHMCS_API_URL: ${{ secrets.WHMCS_API_URL }}
+          WHMCS_API_IDENTIFIER: ${{ secrets.WHMCS_API_IDENTIFIER }}
+          WHMCS_API_SECRET: ${{ secrets.WHMCS_API_SECRET }}
+          DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
+        run: |
+          if [ "$DEPLOY_WHMCS_WORKER" != "true" ] || [ -z "$WHMCS_WORKER_RESOURCE_GROUP" ]; then
+            echo "⚠️ Skipping environment configuration: DEPLOY_WHMCS_WORKER not set or WHMCS_WORKER_RESOURCE_GROUP missing"
+            exit 0
+          fi
+
+          if [ -z "$WHMCS_API_URL" ] || [ -z "$WHMCS_API_IDENTIFIER" ] || [ -z "$WHMCS_API_SECRET" ]; then
+            echo "❌ WHMCS API secrets not configured; cannot write environment file."
+            echo "   Required: WHMCS_API_URL, WHMCS_API_IDENTIFIER, WHMCS_API_SECRET"
+            exit 1
+          fi
+
+          VM_NAME="${WHMCS_WORKER_VM_NAME:-whmcs-worker-vm}"
+          SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-sb}"
+          QUEUE_NAME="${WHMCS_SB_QUEUE_NAME:-whmcs-domain-registrations}"
+
+          # Retrieve the WhmcsListener connection string from the Service Bus namespace
+          SB_CONN=$(az servicebus namespace authorization-rule keys list \
+            --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
+            --namespace-name "$SB_NAMESPACE" \
+            --name WhmcsListener \
+            --query primaryConnectionString \
+            --output tsv 2>/dev/null || echo "")
+
+          if [ -z "$SB_CONN" ]; then
+            echo "❌ Could not retrieve Service Bus listener connection string from namespace '$SB_NAMESPACE'."
+            echo "   Ensure the Service Bus is deployed and the WhmcsListener policy exists."
+            exit 1
+          fi
+
+          # Write the environment file on the VM via run-command.
+          # Secrets are passed as protected --parameters (positional $1-$5 in the script)
+          # so they are not stored in the run-command definition visible in Azure Activity Logs.
+          # Parameter order: $1=SERVICE_BUS_CONNECTION_STRING, $2=SERVICE_BUS_WHMCS_QUEUE_NAME,
+          #                  $3=WHMCS_API_URL, $4=WHMCS_API_IDENTIFIER, $5=WHMCS_API_SECRET
+          ENV_SCRIPT=$(cat << 'SCRIPTEOF'
+          set -e
+          mkdir -p /etc/whmcs-worker
+          {
+            printf 'SERVICE_BUS_CONNECTION_STRING=%s\n' "$1"
+            printf 'SERVICE_BUS_WHMCS_QUEUE_NAME=%s\n'  "$2"
+            printf 'WHMCS_API_URL=%s\n'                  "$3"
+            printf 'WHMCS_API_IDENTIFIER=%s\n'           "$4"
+            printf 'WHMCS_API_SECRET=%s\n'               "$5"
+          } > /etc/whmcs-worker/environment
+          chmod 600 /etc/whmcs-worker/environment
+          chown root:root /etc/whmcs-worker/environment
+          systemctl restart whmcs-worker 2>/dev/null || true
+          echo "Environment file written and service restarted."
+          SCRIPTEOF
+          )
+
+          echo "🔧 Writing environment file on VM: $VM_NAME"
+          az vm run-command invoke \
+            --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
+            --name "$VM_NAME" \
+            --command-id RunShellScript \
+            --scripts "$ENV_SCRIPT" \
+            --parameters "$SB_CONN" "$QUEUE_NAME" "$WHMCS_API_URL" "$WHMCS_API_IDENTIFIER" "$WHMCS_API_SECRET" \
+            --output json
+
+          echo "✓ Environment configured on VM: $VM_NAME"

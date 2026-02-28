@@ -5,7 +5,7 @@ param vmName string = 'whmcs-worker-vm'
 param location string = resourceGroup().location
 
 @description('Admin username for the virtual machine')
-param adminUsername string = 'whmcsworker'
+param adminUsername string = 'azureuser'
 
 @description('SSH public key for the virtual machine admin user')
 @secure()
@@ -28,6 +28,24 @@ param publicIpName string = '${vmName}-pip'
 
 @description('The name of the OS disk')
 param osDiskName string = '${vmName}-osdisk'
+
+// Cloud-init script that runs on first boot to install the .NET 10 runtime and
+// create the whmcsworker system user with the directory structure expected by the
+// WhmcsWorkerService and its systemd unit file.
+var cloudInitScript = '''#cloud-config
+package_update: true
+runcmd:
+  - wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O /tmp/packages-microsoft-prod.deb
+  - dpkg -i /tmp/packages-microsoft-prod.deb
+  - rm /tmp/packages-microsoft-prod.deb
+  - apt-get update -y
+  - apt-get install -y aspnetcore-runtime-10.0 unzip
+  - getent passwd whmcsworker > /dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin whmcsworker
+  - mkdir -p /opt/whmcs-worker /etc/whmcs-worker /var/log/whmcs-worker
+  - chown -R whmcsworker:whmcsworker /opt/whmcs-worker /var/log/whmcs-worker
+  - chown root:root /etc/whmcs-worker
+  - chmod 750 /etc/whmcs-worker
+'''
 
 // Static Public IP for outbound WHMCS API calls (required for IP allowlisting)
 resource publicIp 'Microsoft.Network/publicIPAddresses@2024-01-01' = {
@@ -163,6 +181,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
           ]
         }
       }
+      customData: base64(cloudInitScript)
     }
     networkProfile: {
       networkInterfaces: [
