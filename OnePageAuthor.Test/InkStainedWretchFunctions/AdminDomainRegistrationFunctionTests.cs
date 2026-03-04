@@ -366,7 +366,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert
             var ok = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, ok.StatusCode);
-            var response = Assert.IsType<DomainRegistrationResponse>(ok.Value);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsType<DomainRegistrationResponse>(okValue);
             Assert.Equal(DomainRegistrationStatus.Completed, response.Status);
 
             // Verify all provisioning calls were made
@@ -406,7 +407,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert
             var ok = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, ok.StatusCode);
-            var response = Assert.IsType<DomainRegistrationResponse>(ok.Value);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsType<DomainRegistrationResponse>(okValue);
             Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
 
             // DNS steps should be skipped when WHMCS fails
@@ -449,7 +451,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert
             var ok = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, ok.StatusCode);
-            var response = Assert.IsType<DomainRegistrationResponse>(ok.Value);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsType<DomainRegistrationResponse>(okValue);
             Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
 
             // Status saved as InProgress
@@ -485,7 +488,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert - DNS failure means status is InProgress even if FrontDoor succeeds
             var ok = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, ok.StatusCode);
-            var response = Assert.IsType<DomainRegistrationResponse>(ok.Value);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsType<DomainRegistrationResponse>(okValue);
             Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
 
             _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
@@ -574,7 +578,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert
             var ok = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, ok.StatusCode);
-            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(ok.Value);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(okValue);
             Assert.Equal(3, response.Count());
 
             _mockDomainRegistrationRepository.Verify(x => x.GetAllIncompleteAsync(It.IsAny<int?>()), Times.Once);
@@ -603,7 +608,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert - ContactInformation must be null (redacted) to avoid PII exposure
             var ok = Assert.IsType<OkObjectResult>(result);
-            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(ok.Value).ToList();
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(okValue).ToList();
             Assert.Single(response);
             Assert.Null(response[0].ContactInformation);
         }
@@ -636,7 +642,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert - only the valid registration is returned
             var ok = Assert.IsType<OkObjectResult>(result);
-            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(ok.Value).ToList();
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(okValue).ToList();
             Assert.Single(response);
             Assert.Equal("reg-valid", response[0].Id);
         }
@@ -683,7 +690,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert
             var ok = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, ok.StatusCode);
-            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(ok.Value);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(okValue);
             Assert.Empty(response);
         }
 
@@ -912,7 +920,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 x => x.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("oid=user-oid-456")),
+                    It.Is<It.IsAnyType>((v, t) => ((v == null ? string.Empty : v.ToString()) ?? string.Empty)
+                        .Contains("oid=user-oid-456")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
@@ -936,7 +945,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 x => x.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("oid=user-oid-456")),
+                    It.Is<It.IsAnyType>((v, t) => ((v == null ? string.Empty : v.ToString()) ?? string.Empty)
+                        .Contains("oid=user-oid-456")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
@@ -957,7 +967,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             Assert.NotNull(method);
 
-            var functionAttr = method.GetCustomAttribute<FunctionAttribute>();
+            var functionAttr = method!.GetCustomAttribute<FunctionAttribute>();
             Assert.NotNull(functionAttr);
             Assert.Equal("AdminGetIncompleteDomainRegistrations", functionAttr.Name);
         }
@@ -973,15 +983,16 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             Assert.NotNull(method);
 
-            var triggerParam = method.GetParameters()
+            var triggerParam = method!.GetParameters()
                 .FirstOrDefault(p => p.GetCustomAttribute<HttpTriggerAttribute>() != null);
 
             Assert.NotNull(triggerParam);
 
-            var triggerAttr = triggerParam.GetCustomAttribute<HttpTriggerAttribute>();
+            var triggerAttr = triggerParam!.GetCustomAttribute<HttpTriggerAttribute>();
             Assert.NotNull(triggerAttr);
             Assert.Equal("management/domain-registrations", triggerAttr.Route);
-            Assert.Contains("get", triggerAttr.Methods, StringComparer.OrdinalIgnoreCase);
+            var methods = triggerAttr.Methods ?? throw new InvalidOperationException("Expected HttpTriggerAttribute.Methods to be non-null.");
+            Assert.Contains("get", methods, StringComparer.OrdinalIgnoreCase);
         }
 
         [Fact]
@@ -993,7 +1004,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             Assert.NotNull(method);
 
-            var functionAttr = method.GetCustomAttribute<FunctionAttribute>();
+            var functionAttr = method!.GetCustomAttribute<FunctionAttribute>();
             Assert.NotNull(functionAttr);
             Assert.Equal("AdminCompleteDomainRegistration", functionAttr.Name);
         }
@@ -1007,15 +1018,16 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             Assert.NotNull(method);
 
-            var triggerParam = method.GetParameters()
+            var triggerParam = method!.GetParameters()
                 .FirstOrDefault(p => p.GetCustomAttribute<HttpTriggerAttribute>() != null);
 
             Assert.NotNull(triggerParam);
 
-            var triggerAttr = triggerParam.GetCustomAttribute<HttpTriggerAttribute>();
+            var triggerAttr = triggerParam!.GetCustomAttribute<HttpTriggerAttribute>();
             Assert.NotNull(triggerAttr);
             Assert.Equal("management/domain-registrations/{registrationId}/complete", triggerAttr.Route);
-            Assert.Contains("post", triggerAttr.Methods, StringComparer.OrdinalIgnoreCase);
+            var methods = triggerAttr.Methods ?? throw new InvalidOperationException("Expected HttpTriggerAttribute.Methods to be non-null.");
+            Assert.Contains("post", methods, StringComparer.OrdinalIgnoreCase);
         }
 
         [Fact]
@@ -1027,8 +1039,8 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var adminMethods = typeof(AdminDomainRegistrationFunction)
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .Select(m => m.GetCustomAttribute<FunctionAttribute>())
-                .Where(a => a != null)
-                .Select(a => a!.Name)
+                .OfType<FunctionAttribute>()
+                .Select(a => a.Name)
                 .ToList();
 
             Assert.DoesNotContain("CreateAuthorInvitation", adminMethods);
