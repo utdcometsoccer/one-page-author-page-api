@@ -383,6 +383,13 @@ $secretDefinitions = @{
     
     "WHMCS Domain Registration (Optional)" = @(
         @{
+            Name = "WHMCS_CLIENT_ID"
+            Description = "WHMCS client ID (optional; used by pricing/domain functions when a clientId is not provided via query string)"
+            Required = $false
+            Example = "181"
+            Category = "Domain"
+        },
+        @{
             Name = "WHMCS_API_URL"
             Description = "WHMCS API endpoint URL"
             Required = $false
@@ -404,6 +411,66 @@ $secretDefinitions = @{
             Example = "secret123456"
             Category = "Domain"
             Sensitive = $true
+        }
+    )
+
+    "WHMCS Worker Deployment (Optional)" = @(
+        @{
+            Name = "DEPLOY_WHMCS_WORKER"
+            Description = "Enable deployment of the WHMCS worker VM + service (set to 'true' to enable)"
+            Required = $false
+            Example = "true"
+            Category = "Worker"
+        },
+        @{
+            Name = "WHMCS_WORKER_RESOURCE_GROUP"
+            Description = "Azure Resource Group where the WHMCS worker VM + Service Bus will be deployed"
+            Required = $false
+            Example = "rg-whmcs-worker-prod"
+            Category = "Worker"
+        },
+        @{
+            Name = "WHMCS_WORKER_LOCATION"
+            Description = "Azure region for the WHMCS worker VM and supporting resources"
+            Required = $false
+            Example = "eastus"
+            Category = "Worker"
+        },
+        @{
+            Name = "WHMCS_WORKER_VM_NAME"
+            Description = "VM name for the WHMCS worker (defaults to 'whmcs-worker-vm' if not set)"
+            Required = $false
+            Example = "whmcs-worker-vm"
+            Category = "Worker"
+        },
+        @{
+            Name = "WHMCS_WORKER_ADMIN_USERNAME"
+            Description = "Admin username for the VM (defaults to the template default if not set)"
+            Required = $false
+            Example = "azureuser"
+            Category = "Worker"
+        },
+        @{
+            Name = "WHMCS_WORKER_SSH_PUBLIC_KEY"
+            Description = "SSH public key for VM admin access (contents of your .pub file; e.g., starts with 'ssh-ed25519' or 'ssh-rsa')"
+            Required = $false
+            Example = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... whmcs-worker"
+            Category = "Worker"
+            Sensitive = $true
+        },
+        @{
+            Name = "WHMCS_SB_NAMESPACE_NAME"
+            Description = "Service Bus namespace name for WHMCS domain registration events (defaults to 'onepageauthor-sb' if not set)"
+            Required = $false
+            Example = "onepageauthor-sb"
+            Category = "Worker"
+        },
+        @{
+            Name = "WHMCS_SB_QUEUE_NAME"
+            Description = "Service Bus queue name for WHMCS domain registration events (defaults to 'whmcs-domain-registrations' if not set)"
+            Required = $false
+            Example = "whmcs-domain-registrations"
+            Category = "Worker"
         }
     )
 
