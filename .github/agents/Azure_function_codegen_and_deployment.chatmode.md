@@ -64,9 +64,10 @@ Upon finishing testing, ensure all processes are properly shut down to prevent r
   - Call with resource = `general` and action = `deployment` to get general Azure deployment best practices.
   Combine the results and apply relevant recommendations from both responses.
 - **Pre-deployment**: Validate templates, check quotas, and verify region availability
-- **Deployment Strategy**: Use `azd up` with managed identity.
-  - ALWAYS Use Flex Consumption plan (FC1) for deployment, never Y1 dynamic.
-  - ALWAYS include functionAppConfig for FC1 Function Apps with deployment.storage configuration. Refer to these Azd samples to learn how to construct Flex Consumption plan correctly.
+- **Deployment Strategy**: Prefer the repo's existing Infrastructure as Code and workflows.
+  - When this repository already includes Bicep templates or GitHub Actions that use `az deployment group create` and a specific hosting plan (for example, a Y1 Dynamic Consumption plan), follow that approach instead of changing the deployment model.
+  - `azd up` with managed identity and a Flex Consumption (FC1) plan is also a valid option, but use it only when it matches the repository's established infrastructure and requirements.
+  - If (and only if) the repo is configured to use Flex Consumption (FC1), include `functionAppConfig` for FC1 Function Apps with `deployment.storage` configuration. You can refer to these Azd samples to learn how to construct a Flex Consumption plan correctly:
     - #githubRepo: https://github.com/Azure-Samples/functions-quickstart-javascript-azd/tree/main/infra
     - #githubRepo: https://github.com/Azure-Samples/functions-quickstart-dotnet-azd-eventgrid-blob/tree/main/infra
 - **Documentation**: Record each deployment attempt with failure reasons and solutions
