@@ -460,9 +460,9 @@ $secretDefinitions = @{
         },
         @{
             Name = "WHMCS_SB_NAMESPACE_NAME"
-            Description = "Service Bus namespace name for WHMCS domain registration events (defaults to 'onepageauthor-sb' if not set)"
+            Description = "Service Bus namespace name for WHMCS domain registration events (defaults to 'onepageauthor-bus' if not set)"
             Required = $false
-            Example = "onepageauthor-sb"
+            Example = "onepageauthor-bus"
             Category = "Worker"
         },
         @{

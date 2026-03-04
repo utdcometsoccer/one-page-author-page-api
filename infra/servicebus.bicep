@@ -1,5 +1,5 @@
 @description('The name of the Service Bus namespace')
-param namespaceName string = 'onepageauthor-sb'
+param namespaceName string = 'onepageauthor-bus'
 
 @description('The location for all resources')
 param location string = resourceGroup().location
@@ -8,7 +8,7 @@ param location string = resourceGroup().location
 param whmcsQueueName string = 'whmcs-domain-registrations'
 
 // Service Bus Namespace (Basic tier – lowest cost, supports queues only)
-resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
+resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' = {
   name: namespaceName
   location: location
   sku: {
@@ -28,7 +28,7 @@ resource whmcsQueue 'Microsoft.ServiceBus/namespaces/queues@2021-11-01' = {
   name: whmcsQueueName
   properties: {
     // Retain unprocessed messages for 14 days
-    messageTimeToLive: 'P14D'
+    defaultMessageTimeToLive: 'P14D'
     // Lock duration: 5 minutes (enough time for a WHMCS API call)
     lockDuration: 'PT5M'
     // Maximum delivery count before dead-lettering
@@ -70,8 +70,8 @@ output whmcsQueueName string = whmcsQueue.name
 
 @description('Connection string for the function app (Send)')
 @secure()
-output senderConnectionString string = listKeys(senderAuthRule.id, senderAuthRule.apiVersion).primaryConnectionString
+output senderConnectionString string = senderAuthRule.listKeys().primaryConnectionString
 
 @description('Connection string for the VM worker (Listen)')
 @secure()
-output listenerConnectionString string = listKeys(listenerAuthRule.id, listenerAuthRule.apiVersion).primaryConnectionString
+output listenerConnectionString string = listenerAuthRule.listKeys().primaryConnectionString
