@@ -505,7 +505,7 @@ jobs:
             exit 0
           fi
 
-          SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-sb}"
+          SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-bus}"
           LOCATION="${WHMCS_WORKER_LOCATION:-eastus}"
           SB_QUEUE_NAME="${WHMCS_SB_QUEUE_NAME:-whmcs-domain-registrations}"
 
@@ -1235,7 +1235,7 @@ jobs:
           fi
 
           VM_NAME="${WHMCS_WORKER_VM_NAME:-whmcs-worker-vm}"
-          SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-sb}"
+          SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-bus}"
           QUEUE_NAME="${WHMCS_SB_QUEUE_NAME_DEPLOYED:-${WHMCS_SB_QUEUE_NAME:-whmcs-domain-registrations}}"
 
           # Prefer the listener connection string captured from the Bicep deployment outputs.
