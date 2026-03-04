@@ -77,6 +77,17 @@ param stripeApiKey string = ''
 param stripeWebhookSecret string = ''
 
 // =========================================
+// Azure Service Bus (Optional - WHMCS Queue)
+// =========================================
+
+@description('Service Bus connection string used by InkStainedWretchFunctions to enqueue WHMCS domain registration messages (optional)')
+@secure()
+param serviceBusConnectionString string = ''
+
+@description('Service Bus queue name used by InkStainedWretchFunctions for WHMCS domain registration messages (optional)')
+param serviceBusWhmcsQueueName string = 'whmcs-domain-registrations'
+
+// =========================================
 // Azure Communication Services Email (Optional)
 // =========================================
 
@@ -650,6 +661,17 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
         {
           name: 'USE_KEY_VAULT'
           value: 'false'
+        }
+      ] : [],
+      // WHMCS queue integration (optional)
+      !empty(serviceBusConnectionString) ? [
+        {
+          name: 'SERVICE_BUS_CONNECTION_STRING'
+          value: serviceBusConnectionString
+        }
+        {
+          name: 'SERVICE_BUS_WHMCS_QUEUE_NAME'
+          value: serviceBusWhmcsQueueName
         }
       ] : []
       )

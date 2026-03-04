@@ -486,6 +486,70 @@ jobs:
       # Deploy Ink Stained Wretches Infrastructure
       # =========================================
 
+      # =========================================
+      # Deploy Service Bus Infrastructure (Conditional)
+      # =========================================
+
+      - name: 'Deploy Service Bus Infrastructure'
+        shell: bash
+        env:
+          WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
+          WHMCS_WORKER_LOCATION: ${{ secrets.WHMCS_WORKER_LOCATION }}
+          WHMCS_SB_NAMESPACE_NAME: ${{ secrets.WHMCS_SB_NAMESPACE_NAME }}
+          WHMCS_SB_QUEUE_NAME: ${{ secrets.WHMCS_SB_QUEUE_NAME }}
+          DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
+        run: |
+          if [ "$DEPLOY_WHMCS_WORKER" != "true" ] || [ -z "$WHMCS_WORKER_RESOURCE_GROUP" ]; then
+            echo "⚠️ Skipping Service Bus deployment: DEPLOY_WHMCS_WORKER not set to 'true' or WHMCS_WORKER_RESOURCE_GROUP missing"
+            echo "   Required: DEPLOY_WHMCS_WORKER=true, WHMCS_WORKER_RESOURCE_GROUP"
+            exit 0
+          fi
+
+          SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-sb}"
+          LOCATION="${WHMCS_WORKER_LOCATION:-eastus}"
+          SB_QUEUE_NAME="${WHMCS_SB_QUEUE_NAME:-whmcs-domain-registrations}"
+
+          echo "📦 Ensuring resource group exists: $WHMCS_WORKER_RESOURCE_GROUP"
+          if ! az group show --name "$WHMCS_WORKER_RESOURCE_GROUP" &>/dev/null; then
+            az group create --name "$WHMCS_WORKER_RESOURCE_GROUP" --location "$LOCATION"
+            echo "✓ Resource group created: $WHMCS_WORKER_RESOURCE_GROUP"
+          else
+            echo "✓ Resource group exists: $WHMCS_WORKER_RESOURCE_GROUP"
+          fi
+
+          # Always deploy via Bicep (incremental mode) so the queue and auth rules
+          # (WhmcsSender/WhmcsListener) are created/updated even when the namespace
+          # already exists.
+          echo "📦 Deploying/Updating Service Bus namespace and related resources via Bicep (idempotent)..."
+          az deployment group create \
+            --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
+            --template-file infra/servicebus.bicep \
+            --parameters namespaceName="$SB_NAMESPACE" location="$LOCATION" whmcsQueueName="$SB_QUEUE_NAME" \
+            --output json > sb-deployment-output.json
+          echo "✓ Service Bus infrastructure deployment completed"
+
+          # Capture outputs for later steps (avoid querying keys via az servicebus).
+          SB_LISTENER_CONN=$(jq -r '.properties.outputs.listenerConnectionString.value // empty' sb-deployment-output.json)
+          SB_SENDER_CONN=$(jq -r '.properties.outputs.senderConnectionString.value // empty' sb-deployment-output.json)
+          SB_QUEUE_OUT=$(jq -r '.properties.outputs.whmcsQueueName.value // empty' sb-deployment-output.json)
+
+          if [ -n "$SB_LISTENER_CONN" ]; then
+            echo "::add-mask::$SB_LISTENER_CONN"
+            echo "WHMCS_SB_LISTENER_CONNECTION_STRING=$SB_LISTENER_CONN" >> $GITHUB_ENV
+          fi
+
+          if [ -n "$SB_SENDER_CONN" ]; then
+            echo "::add-mask::$SB_SENDER_CONN"
+            echo "WHMCS_SB_SENDER_CONNECTION_STRING=$SB_SENDER_CONN" >> $GITHUB_ENV
+          fi
+
+          # Prefer the queue name emitted by the template (should match the parameter).
+          if [ -n "$SB_QUEUE_OUT" ]; then
+            echo "WHMCS_SB_QUEUE_NAME_DEPLOYED=$SB_QUEUE_OUT" >> $GITHUB_ENV
+          else
+            echo "WHMCS_SB_QUEUE_NAME_DEPLOYED=$SB_QUEUE_NAME" >> $GITHUB_ENV
+          fi
+
       - name: 'Deploy Ink Stained Wretches Infrastructure'
         continue-on-error: true
         shell: bash
@@ -530,6 +594,9 @@ jobs:
           WHMCS_API_URL: ${{ secrets.WHMCS_API_URL }}
           WHMCS_API_IDENTIFIER: ${{ secrets.WHMCS_API_IDENTIFIER }}
           WHMCS_API_SECRET: ${{ secrets.WHMCS_API_SECRET }}
+
+          # WHMCS Service Bus (optional)
+          WHMCS_SB_QUEUE_NAME: ${{ secrets.WHMCS_SB_QUEUE_NAME }}
           
           # Google Domains Integration (optional)
           GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
@@ -593,6 +660,11 @@ jobs:
           [ -n "$COSMOSDB_ENDPOINT_URI" ] && PARAMS_ARRAY+=("cosmosDbEndpointUri=$COSMOSDB_ENDPOINT_URI")
           [ -n "$COSMOSDB_PRIMARY_KEY" ] && SECURE_PARAMS_ARRAY+=("cosmosDbPrimaryKey=$COSMOSDB_PRIMARY_KEY")
           [ -n "$COSMOSDB_DATABASE_ID" ] && PARAMS_ARRAY+=("cosmosDbDatabaseId=$COSMOSDB_DATABASE_ID")
+
+          # Add WHMCS Service Bus parameters conditionally (captured from Bicep outputs)
+          [ -n "$WHMCS_SB_SENDER_CONNECTION_STRING" ] && SECURE_PARAMS_ARRAY+=("serviceBusConnectionString=$WHMCS_SB_SENDER_CONNECTION_STRING")
+          SB_QUEUE_FOR_FUNCTIONS="${WHMCS_SB_QUEUE_NAME_DEPLOYED:-${WHMCS_SB_QUEUE_NAME:-}}"
+          [ -n "$SB_QUEUE_FOR_FUNCTIONS" ] && PARAMS_ARRAY+=("serviceBusWhmcsQueueName=$SB_QUEUE_FOR_FUNCTIONS")
           
           # Add ImageAPI storage parameter conditionally
           [ -n "$AZURE_STORAGE_CONNECTION_STRING" ] && SECURE_PARAMS_ARRAY+=("azureStorageConnectionString=$AZURE_STORAGE_CONNECTION_STRING")
@@ -951,46 +1023,6 @@ jobs:
           echo "✓ InkStainedWretchesConfig deployed successfully"
 
       # =========================================
-      # Deploy Service Bus Infrastructure (Conditional)
-      # =========================================
-
-      - name: 'Deploy Service Bus Infrastructure'
-        shell: bash
-        env:
-          WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
-          WHMCS_WORKER_LOCATION: ${{ secrets.WHMCS_WORKER_LOCATION }}
-          WHMCS_SB_NAMESPACE_NAME: ${{ secrets.WHMCS_SB_NAMESPACE_NAME }}
-          DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
-        run: |
-          if [ "$DEPLOY_WHMCS_WORKER" != "true" ] || [ -z "$WHMCS_WORKER_RESOURCE_GROUP" ]; then
-            echo "⚠️ Skipping Service Bus deployment: DEPLOY_WHMCS_WORKER not set to 'true' or WHMCS_WORKER_RESOURCE_GROUP missing"
-            echo "   Required: DEPLOY_WHMCS_WORKER=true, WHMCS_WORKER_RESOURCE_GROUP"
-            exit 0
-          fi
-
-          SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-sb}"
-          LOCATION="${WHMCS_WORKER_LOCATION:-eastus}"
-
-          echo "📦 Ensuring resource group exists: $WHMCS_WORKER_RESOURCE_GROUP"
-          if ! az group show --name "$WHMCS_WORKER_RESOURCE_GROUP" &>/dev/null; then
-            az group create --name "$WHMCS_WORKER_RESOURCE_GROUP" --location "$LOCATION"
-            echo "✓ Resource group created: $WHMCS_WORKER_RESOURCE_GROUP"
-          else
-            echo "✓ Resource group exists: $WHMCS_WORKER_RESOURCE_GROUP"
-          fi
-
-          # Always deploy via Bicep (incremental mode) so the queue and auth rules
-          # (WhmcsSender/WhmcsListener) are created/updated even when the namespace
-          # already exists.
-          echo "📦 Deploying/Updating Service Bus namespace and related resources via Bicep (idempotent)..."
-          az deployment group create \
-            --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
-            --template-file infra/servicebus.bicep \
-            --parameters namespaceName="$SB_NAMESPACE" location="$LOCATION" \
-            --output none
-          echo "✓ Service Bus infrastructure deployment completed"
-
-      # =========================================
       # Deploy WHMCS Worker VM Infrastructure (Conditional)
       # =========================================
 
@@ -1204,15 +1236,20 @@ jobs:
 
           VM_NAME="${WHMCS_WORKER_VM_NAME:-whmcs-worker-vm}"
           SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-sb}"
-          QUEUE_NAME="${WHMCS_SB_QUEUE_NAME:-whmcs-domain-registrations}"
+          QUEUE_NAME="${WHMCS_SB_QUEUE_NAME_DEPLOYED:-${WHMCS_SB_QUEUE_NAME:-whmcs-domain-registrations}}"
 
-          # Retrieve the WhmcsListener connection string from the Service Bus namespace
-          SB_CONN=$(az servicebus namespace authorization-rule keys list \
-            --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
-            --namespace-name "$SB_NAMESPACE" \
-            --name WhmcsListener \
-            --query primaryConnectionString \
-            --output tsv 2>/dev/null || echo "")
+          # Prefer the listener connection string captured from the Bicep deployment outputs.
+          SB_CONN="${WHMCS_SB_LISTENER_CONNECTION_STRING:-}"
+
+          # Fallback: retrieve the WhmcsListener connection string from the Service Bus namespace.
+          if [ -z "$SB_CONN" ]; then
+            SB_CONN=$(az servicebus namespace authorization-rule keys list \
+              --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
+              --namespace-name "$SB_NAMESPACE" \
+              --name WhmcsListener \
+              --query primaryConnectionString \
+              --output tsv 2>/dev/null || echo "")
+          fi
 
           if [ -z "$SB_CONN" ]; then
             echo "❌ Could not retrieve Service Bus listener connection string from namespace '$SB_NAMESPACE'."
