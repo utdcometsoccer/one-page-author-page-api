@@ -81,6 +81,10 @@ Complete deployment workflow documentation:
 
 Comprehensive API reference and guides:
 
+- [**API_ENDPOINT_INVENTORY**](API_ENDPOINT_INVENTORY.md) ⭐ — **Exhaustive endpoint listing** — all HTTP routes, request/response schemas, authorization requirements, service dependencies, and unit test coverage
+- [**COPILOT_IMPLEMENTATION_PROMPTS**](COPILOT_IMPLEMENTATION_PROMPTS.md) ⭐ — **Copilot prompts** to implement every endpoint in the new consolidated single-Function-App architecture (enqueue pattern for POST/PUT/DELETE, Notification Hub for completions)
+- [**WHMCS_WORKER_REBUILD_PROMPT**](WHMCS_WORKER_REBUILD_PROMPT.md) — Copilot prompt to recreate the `WhmcsWorkerService` from scratch
+- [**GITHUB_ACTIONS_SINGLE_APP_PROMPT**](GITHUB_ACTIONS_SINGLE_APP_PROMPT.md) — Copilot prompt to rebuild the GitHub Actions CI/CD workflow for the consolidated single Function App
 - [**ADMIN_DOMAIN_CREATION_API**](ADMIN_DOMAIN_CREATION_API.md) - **Admin endpoint** — complete domain provisioning without Stripe (JS/TS client guide)
 - [**API-Documentation**](API-Documentation.md) - **Complete API reference** with TypeScript examples
 - [**Complete-System-Documentation**](Complete-System-Documentation.md) - Auto-generated system overview
