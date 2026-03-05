@@ -117,6 +117,7 @@ The platform serves as a backend for author profile management, content publishi
 
 ### Security
 - **Never commit secrets** - Use environment variables or Azure Key Vault
+- **`secrets.config.json` is excluded from source control** via `.gitignore` - this file holds local secret overrides and must never be committed
 - **Validate JWT tokens** on protected endpoints using `[Authorize]` attribute
 - **Verify Stripe webhook signatures** in webhook handlers
 - **Sanitize user inputs** to prevent injection attacks
@@ -131,6 +132,7 @@ The platform serves as a backend for author profile management, content publishi
 
 ### Configuration Management
 - **Environment variables** for configuration (see `local.settings.json` example)
+- **`secrets.config.json`** stores local secret overrides and is listed in `.gitignore` — it is never stored in source control
 - **Configuration validation** on startup
 - **Masking sensitive values** in logs (see `ConfigurationMaskingStandardization.md`)
 
