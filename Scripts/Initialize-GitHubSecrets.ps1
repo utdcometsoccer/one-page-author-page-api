@@ -190,14 +190,14 @@ $secretDefinitions = @{
             Category = "Infrastructure"
         },
         @{
-            Name = "AZURE_RESOURCE_GROUP"
+            Name = "FUNCTION_APP_RESOURCE_GROUP"
             Description = "Resource group that contains the standalone function-app"
             Required = $false
             Example = "rg-onepageauthor-prod"
             Category = "Infrastructure"
         },
         @{
-            Name = "AZURE_LOCATION"
+            Name = "FUNCTION_APP_LOCATION"
             Description = "Azure region for the standalone function-app infrastructure deployment"
             Required = $false
             Example = "eastus"
