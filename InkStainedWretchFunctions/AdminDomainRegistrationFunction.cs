@@ -309,14 +309,16 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             // Step 2: Enqueue domain registration to the WHMCS Service Bus queue.
             // The VM-hosted worker service will dequeue this message and call the
             // WHMCS REST API from a static IP address (required by WHMCS allowlisting).
+            bool enqueueSucceeded = false;
             try
             {
                 await _whmcsQueueService.EnqueueDomainRegistrationAsync(registration, nameServers);
-                _logger.LogInformation("Successfully enqueued WHMCS registration for domain {DomainName}", domainName);
+                enqueueSucceeded = true;
+                _logger.LogInformation("WHMCS registration enqueued for domain {DomainName}", domainName);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to enqueue WHMCS registration for domain {DomainName}", domainName);
+                _logger.LogError(ex, "Failed to enqueue WHMCS registration for domain {DomainName}; domain will remain InProgress until retried", domainName);
             }
 
             // Step 3: Add domain to Azure Front Door.
@@ -338,9 +340,18 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 _logger.LogError(ex, "Exception while adding domain {DomainName} to Azure Front Door", domainName);
             }
 
-            // Update status to InProgress: the WHMCS step is now processed asynchronously by the
+            // Update status to InProgress: the WHMCS step is processed asynchronously by the
             // VM worker service, so Completed cannot be confirmed here. The status reflects that
-            // all synchronous steps have been attempted and the WHMCS message has been dispatched.
+            // all synchronous steps have been attempted; log a warning when the enqueue did not
+            // succeed so operators know the registration needs to be retried.
+            if (!enqueueSucceeded)
+            {
+                _logger.LogWarning(
+                    "WHMCS registration was NOT enqueued for domain {DomainName} (registration {RegistrationId}). " +
+                    "Status is set to InProgress so the admin endpoint can be called again to retry.",
+                    domainName, registrationId);
+            }
+
             registration.Status = DomainRegistrationStatus.InProgress;
             registration.LastUpdatedAt = DateTime.UtcNow;
 

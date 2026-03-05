@@ -159,6 +159,7 @@ var services = builder.Services
     .AddPlatformStatsService() // Add PlatformStats service for landing page social proof
     .AddDnsZoneService() // Add DNS zone service for domain registration triggers
     .AddFrontDoorServices() // Add Azure Front Door services for domain management
+    .AddWhmcsService() // Add WHMCS service for direct WHMCS API interactions (e.g., TLD pricing via GetTLDPricingFunction)
     .AddWhmcsQueueService() // Add WHMCS queue service - enqueues domain registrations to Service Bus for VM worker
     .AddReferralRepository() // Add Referral repository for referral program
     .AddReferralServices() // Add Referral services for referral program

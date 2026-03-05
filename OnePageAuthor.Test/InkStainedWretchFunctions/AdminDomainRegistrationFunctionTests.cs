@@ -413,6 +413,10 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var response = Assert.IsType<DomainRegistrationResponse>(okValue);
             Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
 
+            // Enqueue was called (and threw), then Front Door was still attempted
+            _mockWhmcsQueueService.Verify(x => x.EnqueueDomainRegistrationAsync(
+                It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>()), Times.Once);
+
             // Front Door is still attempted even when enqueue fails
             _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(registration), Times.Once);
 
