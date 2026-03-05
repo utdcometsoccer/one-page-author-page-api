@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 
@@ -48,9 +49,14 @@ public class GetAuthors
         if (user != null && !_scopeValidationService.HasRequiredScope(user, "Author.Read"))
         {
             var availableScopes = string.Join(" ", user.FindAll("scp")
+                .Concat(user.FindAll(ScopeValidationService.ScopeUriClaimType))
                 .SelectMany(c => c.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 .Distinct());
-            _logger.LogWarning("User does not have required Author.Read scope. Available scopes: {AvailableScopes}", availableScopes);
+            var nonPiiClaims = JwtAuthenticationHelper.GetNonPiiClaimsForLogging(user);
+            _logger.LogWarning(
+                "User does not have required Author.Read scope. Available scopes: {AvailableScopes}. Non-PII claims present: {NonPiiClaims}",
+                availableScopes,
+                nonPiiClaims);
             return new ObjectResult(new { error = "Insufficient permissions" })
             {
                 StatusCode = StatusCodes.Status403Forbidden

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using InkStainedWretch.OnePageAuthorAPI.API;
 
 namespace InkStainedWretch.OnePageAuthorAPI.Authentication;
 
@@ -11,7 +12,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.Authentication;
 public static class JwtAuthenticationHelper
 {
     private static readonly string[] NonPiiClaimTypes =
-        ["oid", "tid", "roles", ClaimTypes.Role, "scp", "appid", "azp"];
+        [
+            "oid", "tid", "roles", ClaimTypes.Role,
+            // "scp" is the raw JWT claim name; the URI form is what JwtSecurityTokenHandler
+            // produces when MapInboundClaims is enabled (the default).
+            "scp",
+            ScopeValidationService.ScopeUriClaimType,
+            "appid", "azp"
+        ];
 
     /// <summary>
     /// Validates JWT token from Authorization header and returns authenticated user
