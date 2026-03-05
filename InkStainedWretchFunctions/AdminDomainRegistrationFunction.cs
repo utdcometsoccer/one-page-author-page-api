@@ -24,18 +24,22 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
     /// - Method: POST
     /// - Route: /api/management/domain-registrations/{registrationId}/complete
     /// - Auth: Bearer JWT with "Admin" role claim
-    /// - Completes a pending domain registration (WHMCS + DNS + Front Door) without Stripe payment
+    /// - Enqueues the domain registration to the WHMCS Service Bus queue, ensures the DNS zone
+    ///   exists, and adds the domain to Azure Front Door. The VM-hosted WHMCS worker service
+    ///   dequeues the message and calls the WHMCS REST API from a static IP address.
     /// </remarks>
     public class AdminDomainRegistrationFunction
     {
         private const string AdminRole = "Admin";
+        private const int MinNameServersForWhmcs = 2;
+        private const int MaxNameServersForWhmcs = 5;
 
         private readonly ILogger<AdminDomainRegistrationFunction> _logger;
         private readonly IJwtValidationService _jwtValidationService;
         private readonly IRoleChecker _roleChecker;
         private readonly IDomainRegistrationRepository _domainRegistrationRepository;
         private readonly IFrontDoorService _frontDoorService;
-        private readonly IWhmcsService _whmcsService;
+        private readonly IWhmcsQueueService _whmcsQueueService;
         private readonly IDnsZoneService _dnsZoneService;
 
         public AdminDomainRegistrationFunction(
@@ -44,7 +48,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             IRoleChecker roleChecker,
             IDomainRegistrationRepository domainRegistrationRepository,
             IFrontDoorService frontDoorService,
-            IWhmcsService whmcsService,
+            IWhmcsQueueService whmcsQueueService,
             IDnsZoneService dnsZoneService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -52,7 +56,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             _roleChecker = roleChecker ?? throw new ArgumentNullException(nameof(roleChecker));
             _domainRegistrationRepository = domainRegistrationRepository ?? throw new ArgumentNullException(nameof(domainRegistrationRepository));
             _frontDoorService = frontDoorService ?? throw new ArgumentNullException(nameof(frontDoorService));
-            _whmcsService = whmcsService ?? throw new ArgumentNullException(nameof(whmcsService));
+            _whmcsQueueService = whmcsQueueService ?? throw new ArgumentNullException(nameof(whmcsQueueService));
             _dnsZoneService = dnsZoneService ?? throw new ArgumentNullException(nameof(dnsZoneService));
         }
 
@@ -149,9 +153,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         }
 
         /// <summary>
-        /// Completes domain creation for a partially registered author site without requiring a Stripe payment.
-        /// Executes the full domain provisioning workflow: WHMCS domain registration, DNS zone setup,
-        /// name server update, and Azure Front Door configuration.
+        /// Dispatches the domain provisioning workflow for a partially registered author site without
+        /// requiring a Stripe payment. Ensures the DNS zone exists, enqueues the WHMCS domain
+        /// registration to the Service Bus queue (the VM worker calls the WHMCS API from a static IP),
+        /// and adds the domain to Azure Front Door. The registration status is set to InProgress
+        /// because the WHMCS step is processed asynchronously by the worker service.
         /// </summary>
         /// <param name="req">HTTP request</param>
         /// <param name="registrationId">The domain registration ID to complete</param>
@@ -159,8 +165,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         /// <list type="table">
         /// <item>
         /// <term>200 OK</term>
-        /// <description>Domain creation workflow completed - returns updated DomainRegistrationResponse.
-        /// Status is Completed when all steps succeed, InProgress when some steps failed.</description>
+        /// <description>Domain provisioning workflow dispatched - returns updated DomainRegistrationResponse.
+        /// Status is InProgress because WHMCS registration is processed asynchronously by the worker service.</description>
         /// </item>
         /// <item>
         /// <term>400 Bad Request</term>
@@ -258,73 +264,66 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             }
 
             var domainName = registration.Domain.FullDomainName;
-            _logger.LogInformation("Admin completing domain creation for {DomainName} (registration {RegistrationId})", domainName, registrationId);
+            _logger.LogInformation("Admin dispatching domain provisioning for {DomainName} (registration {RegistrationId})", domainName, registrationId);
 
-            // Step 1: Register domain via WHMCS API
-            bool whmcsSuccess = false;
+            // Step 1: Ensure DNS zone exists and retrieve Azure DNS name servers.
+            // This runs in the function app (no static IP needed for Azure DNS management).
+            string[] nameServers = [];
             try
             {
-                whmcsSuccess = await _whmcsService.RegisterDomainAsync(registration);
-                if (whmcsSuccess)
+                var dnsZoneReady = await _dnsZoneService.EnsureDnsZoneExistsAsync(registration);
+                if (dnsZoneReady)
                 {
-                    _logger.LogInformation("Successfully registered domain {DomainName} via WHMCS API", domainName);
+                    _logger.LogInformation("DNS zone ready for domain {DomainName}, retrieving name servers", domainName);
+                    nameServers = await _dnsZoneService.GetNameServersAsync(domainName) ?? [];
+
+                    if (nameServers.Length >= MinNameServersForWhmcs && nameServers.Length <= MaxNameServersForWhmcs)
+                    {
+                        _logger.LogInformation("Retrieved {Count} name servers for domain {DomainName}", nameServers.Length, domainName);
+                    }
+                    else if (nameServers.Length == 0)
+                    {
+                        _logger.LogWarning(
+                            "No name servers retrieved for domain {DomainName}; " +
+                            "name server update will be skipped by the worker.",
+                            domainName);
+                    }
+                    else
+                    {
+                        _logger.LogWarning(
+                            "Retrieved {Count} name server(s) for domain {DomainName}; " +
+                            "WHMCS requires {Min}–{Max}. Name server update will be skipped by the worker.",
+                            nameServers.Length, domainName, MinNameServersForWhmcs, MaxNameServersForWhmcs);
+                    }
                 }
                 else
                 {
-                    _logger.LogWarning("WHMCS registration returned false for domain {DomainName}", domainName);
+                    _logger.LogWarning("Failed to ensure DNS zone for domain {DomainName}; enqueueing without name servers", domainName);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception while registering domain {DomainName} via WHMCS API", domainName);
+                _logger.LogError(ex, "Error during DNS zone setup for domain {DomainName}", domainName);
             }
 
-            // Steps 2 & 3: DNS zone creation and name server update (only if WHMCS succeeded)
-            bool dnsSuccess = false;
-            if (whmcsSuccess)
-            {
-                try
-                {
-                    var dnsZoneReady = await _dnsZoneService.EnsureDnsZoneExistsAsync(registration);
-                    if (dnsZoneReady)
-                    {
-                        _logger.LogInformation("DNS zone ready for domain {DomainName}, retrieving name servers", domainName);
-                        var nameServers = await _dnsZoneService.GetNameServersAsync(domainName);
-
-                        if (nameServers != null && nameServers.Length >= 2 && nameServers.Length <= 5)
-                        {
-                            bool nsUpdated = await _whmcsService.UpdateNameServersAsync(domainName, nameServers);
-                            if (nsUpdated)
-                            {
-                                _logger.LogInformation("Successfully updated name servers for domain {DomainName}", domainName);
-                                dnsSuccess = true;
-                            }
-                            else
-                            {
-                                _logger.LogWarning("Failed to update name servers for domain {DomainName} in WHMCS", domainName);
-                            }
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Could not retrieve valid name servers for domain {DomainName}, skipping name server update", domainName);
-                        }
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Failed to ensure DNS zone for domain {DomainName}", domainName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error during DNS zone setup for domain {DomainName}", domainName);
-                }
-            }
-
-            // Step 4: Add domain to Azure Front Door
-            bool frontDoorSuccess = false;
+            // Step 2: Enqueue domain registration to the WHMCS Service Bus queue.
+            // The VM-hosted worker service will dequeue this message and call the
+            // WHMCS REST API from a static IP address (required by WHMCS allowlisting).
             try
             {
-                frontDoorSuccess = await _frontDoorService.AddDomainToFrontDoorAsync(registration);
+                await _whmcsQueueService.EnqueueDomainRegistrationAsync(registration, nameServers);
+                _logger.LogInformation("Successfully enqueued WHMCS registration for domain {DomainName}", domainName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to enqueue WHMCS registration for domain {DomainName}", domainName);
+            }
+
+            // Step 3: Add domain to Azure Front Door.
+            // This uses Azure SDK calls (no static IP needed).
+            try
+            {
+                var frontDoorSuccess = await _frontDoorService.AddDomainToFrontDoorAsync(registration);
                 if (frontDoorSuccess)
                 {
                     _logger.LogInformation("Successfully added domain {DomainName} to Azure Front Door", domainName);
@@ -339,10 +338,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 _logger.LogError(ex, "Exception while adding domain {DomainName} to Azure Front Door", domainName);
             }
 
-            // Update status: Completed when all steps succeed, InProgress when partial
-            registration.Status = (whmcsSuccess && dnsSuccess && frontDoorSuccess)
-                ? DomainRegistrationStatus.Completed
-                : DomainRegistrationStatus.InProgress;
+            // Update status to InProgress: the WHMCS step is now processed asynchronously by the
+            // VM worker service, so Completed cannot be confirmed here. The status reflects that
+            // all synchronous steps have been attempted and the WHMCS message has been dispatched.
+            registration.Status = DomainRegistrationStatus.InProgress;
             registration.LastUpdatedAt = DateTime.UtcNow;
 
             try

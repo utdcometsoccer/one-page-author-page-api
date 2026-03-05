@@ -29,7 +29,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         private readonly Mock<IRoleChecker> _mockRoleChecker;
         private readonly Mock<IDomainRegistrationRepository> _mockDomainRegistrationRepository;
         private readonly Mock<IFrontDoorService> _mockFrontDoorService;
-        private readonly Mock<IWhmcsService> _mockWhmcsService;
+        private readonly Mock<IWhmcsQueueService> _mockWhmcsQueueService;
         private readonly Mock<IDnsZoneService> _mockDnsZoneService;
         private readonly AdminDomainRegistrationFunction _function;
 
@@ -40,7 +40,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockRoleChecker = new Mock<IRoleChecker>();
             _mockDomainRegistrationRepository = new Mock<IDomainRegistrationRepository>();
             _mockFrontDoorService = new Mock<IFrontDoorService>();
-            _mockWhmcsService = new Mock<IWhmcsService>();
+            _mockWhmcsQueueService = new Mock<IWhmcsQueueService>();
             _mockDnsZoneService = new Mock<IDnsZoneService>();
 
             // Default: delegate to the real JwtAuthenticationHelper so existing claim-based
@@ -54,7 +54,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
-                _mockWhmcsService.Object,
+                _mockWhmcsQueueService.Object,
                 _mockDnsZoneService.Object);
         }
 
@@ -131,7 +131,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
-                _mockWhmcsService.Object,
+                _mockWhmcsQueueService.Object,
                 _mockDnsZoneService.Object));
         }
 
@@ -144,7 +144,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
-                _mockWhmcsService.Object,
+                _mockWhmcsQueueService.Object,
                 _mockDnsZoneService.Object));
         }
 
@@ -157,7 +157,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 null!,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
-                _mockWhmcsService.Object,
+                _mockWhmcsQueueService.Object,
                 _mockDnsZoneService.Object));
         }
 
@@ -170,7 +170,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockRoleChecker.Object,
                 null!,
                 _mockFrontDoorService.Object,
-                _mockWhmcsService.Object,
+                _mockWhmcsQueueService.Object,
                 _mockDnsZoneService.Object));
         }
 
@@ -183,12 +183,12 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 null!,
-                _mockWhmcsService.Object,
+                _mockWhmcsQueueService.Object,
                 _mockDnsZoneService.Object));
         }
 
         [Fact]
-        public void Constructor_WithNullWhmcsService_ThrowsArgumentNullException()
+        public void Constructor_WithNullWhmcsQueueService_ThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => new AdminDomainRegistrationFunction(
                 _mockLogger.Object,
@@ -209,7 +209,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
-                _mockWhmcsService.Object,
+                _mockWhmcsQueueService.Object,
                 null!));
         }
 
@@ -222,7 +222,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
-                _mockWhmcsService.Object,
+                _mockWhmcsQueueService.Object,
                 _mockDnsZoneService.Object);
 
             Assert.NotNull(function);
@@ -264,7 +264,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Equal(403, objectResult.StatusCode);
 
             // No provisioning calls should have been made
-            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+            _mockWhmcsQueueService.Verify(x => x.EnqueueDomainRegistrationAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>()), Times.Never);
             _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
         }
 
@@ -309,7 +309,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert - no re-provisioning should occur
             var conflict = Assert.IsType<ConflictObjectResult>(result);
             Assert.Equal(409, conflict.StatusCode);
-            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+            _mockWhmcsQueueService.Verify(x => x.EnqueueDomainRegistrationAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>()), Times.Never);
         }
 
         [Fact]
@@ -335,7 +335,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
-        public async Task AdminCompleteDomainRegistration_AllStepsSucceed_Returns200WithCompletedStatus()
+        public async Task AdminCompleteDomainRegistration_AllStepsSucceed_Returns200WithInProgressStatus()
         {
             // Arrange
             var adminUser = CreateAdminUser();
@@ -346,53 +346,11 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
                                              .ReturnsAsync(registration);
 
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration)).ReturnsAsync(true);
             _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(registration)).ReturnsAsync(true);
             _mockDnsZoneService.Setup(x => x.GetNameServersAsync("mysite.com"))
                                .ReturnsAsync(new[] { "ns1.azure.com", "ns2.azure.com" });
-            _mockWhmcsService.Setup(x => x.UpdateNameServersAsync("mysite.com", It.IsAny<string[]>()))
-                             .ReturnsAsync(true);
-            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration)).ReturnsAsync(true);
-
-            var completedRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.Completed);
-            _mockDomainRegistrationRepository.Setup(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()))
-                                             .ReturnsAsync(completedRegistration);
-
-            var req = CreateHttpRequestWithAuth();
-
-            // Act
-            var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
-
-            // Assert
-            var ok = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal(200, ok.StatusCode);
-            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
-            var response = Assert.IsType<DomainRegistrationResponse>(okValue);
-            Assert.Equal(DomainRegistrationStatus.Completed, response.Status);
-
-            // Verify all provisioning calls were made
-            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(registration), Times.Once);
-            _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(registration), Times.Once);
-            _mockDnsZoneService.Verify(x => x.GetNameServersAsync("mysite.com"), Times.Once);
-            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync("mysite.com", It.IsAny<string[]>()), Times.Once);
-            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(registration), Times.Once);
-            _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
-                r => r.Status == DomainRegistrationStatus.Completed)), Times.Once);
-        }
-
-        [Fact]
-        public async Task AdminCompleteDomainRegistration_WhmcsFails_Returns200WithInProgressStatus()
-        {
-            // Arrange
-            var adminUser = CreateAdminUser();
-            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
-                                     .ReturnsAsync(adminUser);
-
-            var registration = CreateTestDomainRegistration("test-reg-123");
-            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
-                                             .ReturnsAsync(registration);
-
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration)).ReturnsAsync(false);
+            _mockWhmcsQueueService.Setup(x => x.EnqueueDomainRegistrationAsync(registration, It.IsAny<string[]>()))
+                                  .Returns(Task.CompletedTask);
             _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration)).ReturnsAsync(true);
 
             var inProgressRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.InProgress);
@@ -404,15 +362,59 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Act
             var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
 
-            // Assert
+            // Assert - status is always InProgress because WHMCS is now processed async by the worker
             var ok = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, ok.StatusCode);
             var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
             var response = Assert.IsType<DomainRegistrationResponse>(okValue);
             Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
 
-            // DNS steps should be skipped when WHMCS fails
-            _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+            // Verify DNS zone setup and enqueue were called; no direct WHMCS API calls
+            _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(registration), Times.Once);
+            _mockDnsZoneService.Verify(x => x.GetNameServersAsync("mysite.com"), Times.Once);
+            _mockWhmcsQueueService.Verify(x => x.EnqueueDomainRegistrationAsync(registration, It.IsAny<string[]>()), Times.Once);
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(registration), Times.Once);
+            _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
+                r => r.Status == DomainRegistrationStatus.InProgress)), Times.Once);
+        }
+
+        [Fact]
+        public async Task AdminCompleteDomainRegistration_EnqueueFails_Returns200WithInProgressStatus()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var registration = CreateTestDomainRegistration("test-reg-123");
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
+                                             .ReturnsAsync(registration);
+
+            _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(registration)).ReturnsAsync(true);
+            _mockDnsZoneService.Setup(x => x.GetNameServersAsync("mysite.com"))
+                               .ReturnsAsync(new[] { "ns1.azure.com", "ns2.azure.com" });
+            _mockWhmcsQueueService.Setup(x => x.EnqueueDomainRegistrationAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>()))
+                                  .ThrowsAsync(new Exception("Service Bus unavailable"));
+            _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration)).ReturnsAsync(true);
+
+            var inProgressRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.InProgress);
+            _mockDomainRegistrationRepository.Setup(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()))
+                                             .ReturnsAsync(inProgressRegistration);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
+
+            // Assert - still returns 200 with InProgress; enqueue failure is logged but not fatal
+            var ok = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, ok.StatusCode);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsType<DomainRegistrationResponse>(okValue);
+            Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
+
+            // Front Door is still attempted even when enqueue fails
+            _mockFrontDoorService.Verify(x => x.AddDomainToFrontDoorAsync(registration), Times.Once);
 
             // Status saved as InProgress
             _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
@@ -431,12 +433,11 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
                                              .ReturnsAsync(registration);
 
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration)).ReturnsAsync(true);
             _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(registration)).ReturnsAsync(true);
             _mockDnsZoneService.Setup(x => x.GetNameServersAsync("mysite.com"))
                                .ReturnsAsync(new[] { "ns1.azure.com", "ns2.azure.com" });
-            _mockWhmcsService.Setup(x => x.UpdateNameServersAsync("mysite.com", It.IsAny<string[]>()))
-                             .ReturnsAsync(true);
+            _mockWhmcsQueueService.Setup(x => x.EnqueueDomainRegistrationAsync(registration, It.IsAny<string[]>()))
+                                  .Returns(Task.CompletedTask);
             _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration)).ReturnsAsync(false);
 
             var inProgressRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.InProgress);
@@ -455,13 +456,16 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             var response = Assert.IsType<DomainRegistrationResponse>(okValue);
             Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
 
+            // Enqueue was still called even though Front Door failed
+            _mockWhmcsQueueService.Verify(x => x.EnqueueDomainRegistrationAsync(registration, It.IsAny<string[]>()), Times.Once);
+
             // Status saved as InProgress
             _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
                 r => r.Status == DomainRegistrationStatus.InProgress)), Times.Once);
         }
 
         [Fact]
-        public async Task AdminCompleteDomainRegistration_DnsFails_Returns200WithInProgressStatus()
+        public async Task AdminCompleteDomainRegistration_DnsFails_EnqueuesWithoutNameServers()
         {
             // Arrange
             var adminUser = CreateAdminUser();
@@ -472,8 +476,9 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
                                              .ReturnsAsync(registration);
 
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(registration)).ReturnsAsync(true);
             _mockDnsZoneService.Setup(x => x.EnsureDnsZoneExistsAsync(registration)).ReturnsAsync(false); // DNS zone fails
+            _mockWhmcsQueueService.Setup(x => x.EnqueueDomainRegistrationAsync(registration, It.IsAny<string[]>()))
+                                  .Returns(Task.CompletedTask);
             _mockFrontDoorService.Setup(x => x.AddDomainToFrontDoorAsync(registration)).ReturnsAsync(true);
 
             var inProgressRegistration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.InProgress);
@@ -485,12 +490,16 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Act
             var result = await _function.AdminCompleteDomainRegistration(req, "test-reg-123");
 
-            // Assert - DNS failure means status is InProgress even if FrontDoor succeeds
+            // Assert - DNS failure does NOT skip the enqueue; worker receives empty name servers
             var ok = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, ok.StatusCode);
             var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
             var response = Assert.IsType<DomainRegistrationResponse>(okValue);
             Assert.Equal(DomainRegistrationStatus.InProgress, response.Status);
+
+            // Enqueue is called with empty name servers array
+            _mockWhmcsQueueService.Verify(x => x.EnqueueDomainRegistrationAsync(
+                registration, It.Is<string[]>(ns => ns.Length == 0)), Times.Once);
 
             _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
                 r => r.Status == DomainRegistrationStatus.InProgress)), Times.Once);
@@ -845,7 +854,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 customRoleChecker.Object,
                 _mockDomainRegistrationRepository.Object,
                 _mockFrontDoorService.Object,
-                _mockWhmcsService.Object,
+                _mockWhmcsQueueService.Object,
                 _mockDnsZoneService.Object);
 
             var req = CreateHttpRequestWithAuth();
