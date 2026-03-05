@@ -344,13 +344,13 @@ jobs:
         shell: bash
         env:
           FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
-          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-          LOCATION: ${{ secrets.AZURE_LOCATION }}
+          RESOURCE_GROUP: ${{ secrets.FUNCTION_APP_RESOURCE_GROUP }}
+          LOCATION: ${{ secrets.FUNCTION_APP_LOCATION }}
         run: |
           # Validate required secrets are available
           if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ] || [ -z "$LOCATION" ]; then
             echo "⚠️ Skipping function-app infrastructure deployment: Required secrets not configured"
-            echo "   Required: AZURE_FUNCTIONAPP_NAME, AZURE_RESOURCE_GROUP, AZURE_LOCATION"
+            echo "   Required: AZURE_FUNCTIONAPP_NAME, FUNCTION_APP_RESOURCE_GROUP, FUNCTION_APP_LOCATION"
             exit 0
           fi
 
@@ -373,12 +373,12 @@ jobs:
         shell: bash
         env:
           FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
-          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          RESOURCE_GROUP: ${{ secrets.FUNCTION_APP_RESOURCE_GROUP }}
         run: |
           # Validate required secrets are available
           if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ]; then
             echo "⚠️ Skipping function-app deployment: Required secrets not configured"
-            echo "   Required: AZURE_FUNCTIONAPP_NAME, AZURE_RESOURCE_GROUP"
+            echo "   Required: AZURE_FUNCTIONAPP_NAME, FUNCTION_APP_RESOURCE_GROUP"
             exit 0
           fi
 
@@ -394,7 +394,7 @@ jobs:
         shell: bash
         env:
           FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
-          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          RESOURCE_GROUP: ${{ secrets.FUNCTION_APP_RESOURCE_GROUP }}
           APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
           APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP }}
         run: |
@@ -403,7 +403,13 @@ jobs:
           # Validate required secrets are available
           if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ] || [ -z "$AI_CONN" ]; then
             echo "⚠️ Skipping app setting update for function-app (missing required values)"
-            echo "   Required: AZURE_FUNCTIONAPP_NAME, AZURE_RESOURCE_GROUP, APPLICATIONINSIGHTS_CONNECTION_STRING(_FUNCTION_APP)"
+            echo "   Required: AZURE_FUNCTIONAPP_NAME, FUNCTION_APP_RESOURCE_GROUP, APPLICATIONINSIGHTS_CONNECTION_STRING(_FUNCTION_APP)"
+            exit 0
+          fi
+
+          # Verify the Function App exists before attempting to set app settings
+          if ! az functionapp show --name "$FUNCTION_APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
+            echo "⚠️ Function App '$FUNCTION_APP_NAME' not found in resource group '$RESOURCE_GROUP'. Skipping app setting update."
             exit 0
           fi
 
@@ -415,6 +421,46 @@ jobs:
             --only-show-errors \
             --output none
           echo "✓ App setting applied to function-app"
+
+      - name: 'Set function-app Cosmos DB settings'
+        continue-on-error: true
+        shell: bash
+        env:
+          FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
+          RESOURCE_GROUP: ${{ secrets.FUNCTION_APP_RESOURCE_GROUP }}
+          COSMOSDB_ENDPOINT_URI: ${{ secrets.COSMOSDB_ENDPOINT_URI }}
+          COSMOSDB_PRIMARY_KEY: ${{ secrets.COSMOSDB_PRIMARY_KEY }}
+          COSMOSDB_DATABASE_ID: ${{ secrets.COSMOSDB_DATABASE_ID }}
+        run: |
+          # Validate required values are available
+          if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ]; then
+            echo "⚠️ Skipping Cosmos DB app setting update for function-app (missing AZURE_FUNCTIONAPP_NAME/FUNCTION_APP_RESOURCE_GROUP)"
+            exit 0
+          fi
+
+          if [ -z "$COSMOSDB_ENDPOINT_URI" ] || [ -z "$COSMOSDB_PRIMARY_KEY" ] || [ -z "$COSMOSDB_DATABASE_ID" ]; then
+            echo "⚠️ Skipping Cosmos DB app setting update for function-app (missing Cosmos DB settings)"
+            echo "   Required: COSMOSDB_ENDPOINT_URI, COSMOSDB_PRIMARY_KEY, COSMOSDB_DATABASE_ID"
+            exit 0
+          fi
+
+          # Verify the Function App exists before attempting to set app settings
+          if ! az functionapp show --name "$FUNCTION_APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
+            echo "⚠️ Function App '$FUNCTION_APP_NAME' not found in resource group '$RESOURCE_GROUP'. Skipping Cosmos DB app setting update."
+            exit 0
+          fi
+
+          echo "🔧 Setting Cosmos DB settings on function-app..."
+          az functionapp config appsettings set \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --settings \
+              "COSMOSDB_ENDPOINT_URI=$COSMOSDB_ENDPOINT_URI" \
+              "COSMOSDB_PRIMARY_KEY=$COSMOSDB_PRIMARY_KEY" \
+              "COSMOSDB_DATABASE_ID=$COSMOSDB_DATABASE_ID" \
+            --only-show-errors \
+            --output none
+          echo "✓ Cosmos DB app settings applied to function-app"
 
       # =========================================
       # Register Azure Communication Services Provider (if needed)
