@@ -416,6 +416,40 @@ jobs:
             --output none
           echo "✓ App setting applied to function-app"
 
+      - name: 'Set function-app Cosmos DB settings'
+        continue-on-error: true
+        shell: bash
+        env:
+          FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
+          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          COSMOSDB_ENDPOINT_URI: ${{ secrets.COSMOSDB_ENDPOINT_URI }}
+          COSMOSDB_PRIMARY_KEY: ${{ secrets.COSMOSDB_PRIMARY_KEY }}
+          COSMOSDB_DATABASE_ID: ${{ secrets.COSMOSDB_DATABASE_ID }}
+        run: |
+          # Validate required values are available
+          if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ]; then
+            echo "⚠️ Skipping Cosmos DB app setting update for function-app (missing AZURE_FUNCTIONAPP_NAME/AZURE_RESOURCE_GROUP)"
+            exit 0
+          fi
+
+          if [ -z "$COSMOSDB_ENDPOINT_URI" ] || [ -z "$COSMOSDB_PRIMARY_KEY" ] || [ -z "$COSMOSDB_DATABASE_ID" ]; then
+            echo "⚠️ Skipping Cosmos DB app setting update for function-app (missing Cosmos DB settings)"
+            echo "   Required: COSMOSDB_ENDPOINT_URI, COSMOSDB_PRIMARY_KEY, COSMOSDB_DATABASE_ID"
+            exit 0
+          fi
+
+          echo "🔧 Setting Cosmos DB settings on function-app..."
+          az functionapp config appsettings set \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --settings \
+              "COSMOSDB_ENDPOINT_URI=$COSMOSDB_ENDPOINT_URI" \
+              "COSMOSDB_PRIMARY_KEY=$COSMOSDB_PRIMARY_KEY" \
+              "COSMOSDB_DATABASE_ID=$COSMOSDB_DATABASE_ID" \
+            --only-show-errors \
+            --output none
+          echo "✓ Cosmos DB app settings applied to function-app"
+
       # =========================================
       # Register Azure Communication Services Provider (if needed)
       # =========================================

@@ -181,6 +181,116 @@ $secretDefinitions = @{
         }
     )
 
+    "Core Function App (function-app) Deployment (Optional)" = @(
+        @{
+            Name = "AZURE_FUNCTIONAPP_NAME"
+            Description = "Standalone function-app Azure Function App name (used by the workflow's function-app deploy steps)"
+            Required = $false
+            Example = "onepageauthor-core-api"
+            Category = "Infrastructure"
+        },
+        @{
+            Name = "AZURE_RESOURCE_GROUP"
+            Description = "Resource group that contains the standalone function-app"
+            Required = $false
+            Example = "rg-onepageauthor-prod"
+            Category = "Infrastructure"
+        },
+        @{
+            Name = "AZURE_LOCATION"
+            Description = "Azure region for the standalone function-app infrastructure deployment"
+            Required = $false
+            Example = "eastus"
+            Category = "Infrastructure"
+        }
+    )
+
+    "Deployment Flags (Optional)" = @(
+        @{
+            Name = "DEPLOY_IMAGE_API"
+            Description = "Enable ImageAPI Function App deployment (true/false)"
+            Required = $false
+            Example = "true"
+            Category = "Deployment"
+        },
+        @{
+            Name = "DEPLOY_ISW_FUNCTIONS"
+            Description = "Enable InkStainedWretchFunctions Function App deployment (true/false)"
+            Required = $false
+            Example = "true"
+            Category = "Deployment"
+        },
+        @{
+            Name = "DEPLOY_ISW_STRIPE"
+            Description = "Enable InkStainedWretchStripe Function App deployment (true/false)"
+            Required = $false
+            Example = "true"
+            Category = "Deployment"
+        },
+        @{
+            Name = "DEPLOY_ISW_CONFIG"
+            Description = "Enable InkStainedWretchesConfig Function App deployment (true/false)"
+            Required = $false
+            Example = "true"
+            Category = "Deployment"
+        },
+        @{
+            Name = "DEPLOY_COMMUNICATION_SERVICES"
+            Description = "Enable Azure Communication Services deployment (true/false)"
+            Required = $false
+            Example = "true"
+            Category = "Deployment"
+        }
+    )
+
+    "Cosmos DB Provisioning (Optional)" = @(
+        @{
+            Name = "COSMOSDB_RESOURCE_GROUP"
+            Description = "Resource group used by the workflow for Cosmos DB + Application Insights deployments"
+            Required = $false
+            Example = "rg-onepageauthor-data"
+            Category = "Database"
+        },
+        @{
+            Name = "COSMOSDB_ACCOUNT_NAME"
+            Description = "Cosmos DB account name (used only when the workflow deploys Cosmos DB)"
+            Required = $false
+            Example = "onepageauthor-db-account"
+            Category = "Database"
+        },
+        @{
+            Name = "COSMOSDB_LOCATION"
+            Description = "Azure region for Cosmos DB + Application Insights deployments"
+            Required = $false
+            Example = "eastus"
+            Category = "Database"
+        },
+        @{
+            Name = "COSMOSDB_ENABLE_FREE_TIER"
+            Description = "Enable Cosmos DB Free Tier (true/false)"
+            Required = $false
+            Example = "true"
+            Category = "Database"
+        },
+        @{
+            Name = "COSMOSDB_ENABLE_ZONE_REDUNDANCY"
+            Description = "Enable Cosmos DB zone redundancy (true/false)"
+            Required = $false
+            Example = "false"
+            Category = "Database"
+        }
+    )
+
+    "Application Insights Resource (Optional)" = @(
+        @{
+            Name = "APPINSIGHTS_NAME"
+            Description = "Application Insights resource name (used only when the workflow deploys App Insights)"
+            Required = $false
+            Example = "onepageauthor-ai"
+            Category = "Observability"
+        }
+    )
+
     "Observability (Recommended)" = @(
         @{
             Name = "APPLICATIONINSIGHTS_CONNECTION_STRING"
@@ -377,6 +487,23 @@ $secretDefinitions = @{
             Description = "DNS zone name"
             Required = $false
             Example = "example.com"
+            Category = "Domain"
+        }
+    )
+
+    "Google Domains (Optional)" = @(
+        @{
+            Name = "GOOGLE_CLOUD_PROJECT_ID"
+            Description = "Google Cloud project ID for Google Domains integration"
+            Required = $false
+            Example = "my-gcp-project"
+            Category = "Domain"
+        },
+        @{
+            Name = "GOOGLE_DOMAINS_LOCATION"
+            Description = "Google Domains API location (typically 'global')"
+            Required = $false
+            Example = "global"
             Category = "Domain"
         }
     )
