@@ -97,5 +97,44 @@ namespace OnePageAuthor.Test.API
 
             Assert.False(result);
         }
+
+        // --- URI-mapped claim type (JwtSecurityTokenHandler with MapInboundClaims = true) ---
+
+        [Fact]
+        public void HasRequiredScope_ScopeStoredUnderUriClaimType_ReturnsTrue()
+        {
+            // JwtSecurityTokenHandler (MapInboundClaims = true, the default) remaps the "scp"
+            // JWT claim to the URI form.  HasRequiredScope must recognise both forms.
+            var claims = new[] { new Claim(ScopeValidationService.ScopeUriClaimType, "Author.Read") };
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "Bearer"));
+
+            var result = _service.HasRequiredScope(user, "Author.Read");
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void HasRequiredScope_SpaceSeparatedScopeUnderUriClaimType_ReturnsTrue()
+        {
+            // Token handler may produce a space-delimited scope string under the URI claim type,
+            // matching the "access_as_user Author.Read" format seen in production tokens.
+            var claims = new[] { new Claim(ScopeValidationService.ScopeUriClaimType, "access_as_user Author.Read") };
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "Bearer"));
+
+            var result = _service.HasRequiredScope(user, "Author.Read");
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void HasRequiredScope_UriClaimTypePresentButWrongScope_ReturnsFalse()
+        {
+            var claims = new[] { new Claim(ScopeValidationService.ScopeUriClaimType, "access_as_user") };
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "Bearer"));
+
+            var result = _service.HasRequiredScope(user, "Author.Read");
+
+            Assert.False(result);
+        }
     }
 }
