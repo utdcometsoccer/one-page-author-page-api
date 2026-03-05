@@ -48,7 +48,7 @@ public class GetAuthors
         // Check if user has the required scope for author reading
         if (user != null && !_scopeValidationService.HasRequiredScope(user, "Author.Read"))
         {
-            var availableScopes = string.Join(" ", user.FindAll("scp")
+            var availableScopes = string.Join(" ", user.FindAll(ScopeValidationService.ScpClaimType)
                 .Concat(user.FindAll(ScopeValidationService.ScopeUriClaimType))
                 .SelectMany(c => c.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 .Distinct());
