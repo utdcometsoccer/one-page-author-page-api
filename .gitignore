@@ -278,3 +278,6 @@ secrets.json
 secrets-*.json
 !secrets-template.json
 secrets.config.json
+
+# Azure service principal credential dumps (never commit)
+azure-credentials*.json
