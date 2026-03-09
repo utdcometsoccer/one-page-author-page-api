@@ -91,7 +91,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
   - Test address validation (US, CA, MX)
   - Test international addresses
   - **Target:** 30+ contact validation tests
-- [ ] Create end-to-end workflow integration tests
+- [ ] **PRIORITY 3:** Create end-to-end workflow integration tests
   - Mock WHMCS API responses
   - Test successful registration flow
   - Test registration failures (domain unavailable, payment failed)

@@ -402,3 +402,23 @@ dotnet run
 
 - **DomainRegistrationTestHarness** - General domain registration test harness
 - **WHMCS_INTEGRATION_SUMMARY.md** - Comprehensive WHMCS integration documentation
+
+## Best Practices
+
+1. **Test Environment First**: Always test against a WHMCS sandbox/development environment
+2. **Use Test Domains**: Use obviously test domains (e.g., whmcstest001.com) that you intend to register
+3. **Check Availability**: Manually verify domain availability before running tests
+4. **Monitor Costs**: Keep track of domain registration costs during testing
+5. **Review Logs**: Check WHMCS Activity Log after each test run
+6. **Clean Up**: Delete or cancel test domain registrations after testing
+7. **Secure Credentials**: Never commit WHMCS credentials to source control
+
+## Support
+
+For issues or questions:
+
+1. Check the troubleshooting section above
+2. Review WHMCS API documentation: https://developers.whmcs.com/api-reference/domainregister/
+3. Consult the WHMCS Integration Summary: `docs/WHMCS_INTEGRATION_SUMMARY.md`
+4. Check the main project README.md
+5. Verify Azure Cosmos DB connection status
