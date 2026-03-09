@@ -598,6 +598,21 @@ $secretDefinitions = @{
             Required = $false
             Example = "whmcs-domain-registrations"
             Category = "Worker"
+        },
+        @{
+            Name = "APPLICATIONINSIGHTS_CONNECTION_STRING_WHMCS_WORKER"
+            Description = "Application Insights connection string for the WHMCS Worker Service VM. When set, structured logs are exported to Azure Monitor for KQL querying. Falls back to APPLICATIONINSIGHTS_CONNECTION_STRING if not set."
+            Required = $false
+            Example = "InstrumentationKey=...;IngestionEndpoint=..."
+            Category = "Worker"
+            Sensitive = $true
+        },
+        @{
+            Name = "WHMCS_WORKER_LOG_LEVEL"
+            Description = "Minimum log level for the WHMCS Worker Service. Controls verbosity without redeployment. Accepted values: Trace, Debug, Information (default), Warning, Error, Critical. Set to Debug or Trace to enable verbose telemetry."
+            Required = $false
+            Example = "Information"
+            Category = "Worker"
         }
     )
 
