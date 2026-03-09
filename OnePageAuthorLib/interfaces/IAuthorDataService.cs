@@ -26,5 +26,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         /// <param name="emailAddress">The user's email address (e.g., "user@example.com").</param>
         /// <returns>Array of AuthorApiResponse objects with all associated data, or empty array if none found.</returns>
         Task<List<AuthorApiResponse>> GetAuthorsByEmailAsync(string emailAddress);
+
+        /// <summary>
+        /// Gets a paged list of all authors, along with all associated data.
+        /// </summary>
+        /// <param name="page">The 1-based page number to retrieve.</param>
+        /// <param name="pageSize">The number of results per page (defaults to 10).</param>
+        /// <returns>Paged list of AuthorApiResponse objects with all associated data.</returns>
+        Task<List<AuthorApiResponse>> GetAllAuthorsPagedAsync(int page, int pageSize = 10);
     }
 }

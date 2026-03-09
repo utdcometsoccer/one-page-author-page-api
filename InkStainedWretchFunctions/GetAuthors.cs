@@ -38,42 +38,58 @@ public class GetAuthors
     {
         bool hasDomainParams = !string.IsNullOrWhiteSpace(secondLevelDomain) && !string.IsNullOrWhiteSpace(topLevelDomain);
 
-        // Authenticate the request using JWT token
+        // Scenario 2: Domain parameters present — return authors by domain, no authentication required.
+        if (hasDomainParams)
+        {
+            try
+            {
+                _logger.LogInformation("Received request for authors with TLD: {TopLevelDomain}, SLD: {SecondLevelDomain}", topLevelDomain, secondLevelDomain);
+                var domainAuthors = await _authorDataService.GetAuthorsByDomainAsync(topLevelDomain!, secondLevelDomain!);
+                if (domainAuthors == null || !domainAuthors.Any())
+                {
+                    _logger.LogInformation("No authors found");
+                    return new NotFoundObjectResult(new { error = "No authors found" });
+                }
+                _logger.LogInformation("Successfully retrieved {Count} author(s)", domainAuthors.Count);
+                return new OkObjectResult(domainAuthors);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving authors");
+                return new ObjectResult(new { error = "Internal server error" })
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        // No domain parameters — authentication is required.
         var (user, errorResult) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
         if (errorResult != null)
         {
             return errorResult;
         }
 
-        // Check if user has the required scope for author reading
-        if (user != null && !_scopeValidationService.HasRequiredScope(user, "Author.Read"))
-        {
-            var availableScopes = string.Join(" ", user.FindAll(ScopeValidationService.ScpClaimType)
-                .Concat(user.FindAll(ScopeValidationService.ScopeUriClaimType))
-                .SelectMany(c => c.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                .Distinct());
-            var nonPiiClaims = JwtAuthenticationHelper.GetNonPiiClaimsForLogging(user);
-            _logger.LogWarning(
-                "User does not have required Author.Read scope. Available scopes: {AvailableScopes}. Non-PII claims present: {NonPiiClaims}",
-                availableScopes,
-                nonPiiClaims);
-            return new ObjectResult(new { error = "Insufficient permissions" })
-            {
-                StatusCode = StatusCodes.Status403Forbidden
-            };
-        }
-
         try
         {
             List<InkStainedWretch.OnePageAuthorAPI.API.AuthorApiResponse> authors;
 
-            if (hasDomainParams)
+            if (_scopeValidationService.HasRequiredScope(user!, "Author.Read"))
             {
-                _logger.LogInformation("Received request for authors with TLD: {TopLevelDomain}, SLD: {SecondLevelDomain}", topLevelDomain, secondLevelDomain);
-                authors = await _authorDataService.GetAuthorsByDomainAsync(topLevelDomain!, secondLevelDomain!);
+                // Scenario 1: Authenticated with Author.Read scope — return all authors with paging.
+                int page = 1;
+                if (req.Query.TryGetValue("page", out var pageStr) &&
+                    int.TryParse(pageStr, out int parsedPage) &&
+                    parsedPage > 0)
+                {
+                    page = parsedPage;
+                }
+                _logger.LogInformation("Received request for all authors (page {Page}) with Author.Read scope", page);
+                authors = await _authorDataService.GetAllAuthorsPagedAsync(page);
             }
             else
             {
+                // Scenario 3: Authenticated without Author.Read scope — return authors matching the user's email.
                 var email = _userIdentityService.GetUserUpn(user!);
                 _logger.LogInformation("Received request for all authors for user: {Email}", email);
                 authors = await _authorDataService.GetAuthorsByEmailAsync(email);

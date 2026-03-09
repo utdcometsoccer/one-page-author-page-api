@@ -39,5 +39,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         /// <param name="emailAddress">The user's email address (e.g., "user@example.com").</param>
         /// <returns>List of matching Author entities.</returns>
         Task<IList<Author>> GetByEmailAsync(string emailAddress);
+
+        /// <summary>
+        /// Gets all authors in the repository.
+        /// </summary>
+        /// <returns>List of all Author entities.</returns>
+        Task<IList<Author>> GetAllAsync();
     }
 }

@@ -86,6 +86,18 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             return await BuildAuthorApiResponsesAsync(authors);
         }
 
+        public async Task<List<AuthorApiResponse>> GetAllAuthorsPagedAsync(int page, int pageSize = 10)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+            var allAuthors = await _authorRepository.GetAllAsync();
+            var pagedAuthors = allAuthors
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            return await BuildAuthorApiResponsesAsync(pagedAuthors);
+        }
+
         private async Task<List<AuthorApiResponse>> BuildAuthorApiResponsesAsync(IList<Entities.Author> authors)
         {
             if (authors == null || !authors.Any())

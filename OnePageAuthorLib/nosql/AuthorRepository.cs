@@ -104,5 +104,24 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             }
             return results;
         }
+
+        /// <summary>
+        /// Gets all authors in the repository.
+        /// </summary>
+        /// <returns>List of all Author entities.</returns>
+        public async Task<IList<Author>> GetAllAsync()
+        {
+            var query = new QueryDefinition("SELECT * FROM c");
+            var results = new List<Author>();
+            using (var iterator = _container.GetItemQueryIterator<Author>(query))
+            {
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response.Resource);
+                }
+            }
+            return results;
+        }
     }
 }
