@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
@@ -38,45 +39,31 @@ public class GetAuthors
     {
         bool hasDomainParams = !string.IsNullOrWhiteSpace(secondLevelDomain) && !string.IsNullOrWhiteSpace(topLevelDomain);
 
-        // Scenario 2: Domain parameters present — return authors by domain, no authentication required.
-        if (hasDomainParams)
+        // Only authenticate when domain parameters are absent.
+        ClaimsPrincipal? user = null;
+        if (!hasDomainParams)
         {
-            try
+            var (validatedUser, errorResult) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+            if (errorResult != null)
             {
-                _logger.LogInformation("Received request for authors with TLD: {TopLevelDomain}, SLD: {SecondLevelDomain}", topLevelDomain, secondLevelDomain);
-                var domainAuthors = await _authorDataService.GetAuthorsByDomainAsync(topLevelDomain!, secondLevelDomain!);
-                if (domainAuthors == null || !domainAuthors.Any())
-                {
-                    _logger.LogInformation("No authors found");
-                    return new NotFoundObjectResult(new { error = "No authors found" });
-                }
-                _logger.LogInformation("Successfully retrieved {Count} author(s)", domainAuthors.Count);
-                return new OkObjectResult(domainAuthors);
+                return errorResult;
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving authors");
-                return new ObjectResult(new { error = "Internal server error" })
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
-            }
-        }
-
-        // No domain parameters — authentication is required.
-        var (user, errorResult) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
-        if (errorResult != null)
-        {
-            return errorResult;
+            user = validatedUser;
         }
 
         try
         {
             List<InkStainedWretch.OnePageAuthorAPI.API.AuthorApiResponse> authors;
 
-            if (_scopeValidationService.HasRequiredScope(user!, "Author.Read"))
+            if (hasDomainParams)
             {
-                // Scenario 1: Authenticated with Author.Read scope — return all authors with paging.
+                // Scenario 2: Domain parameters present — return authors by domain, no authentication required.
+                _logger.LogInformation("Received request for authors with TLD: {TopLevelDomain}, SLD: {SecondLevelDomain}", topLevelDomain, secondLevelDomain);
+                authors = await _authorDataService.GetAuthorsByDomainAsync(topLevelDomain!, secondLevelDomain!);
+            }
+            else if (_scopeValidationService.HasRequiredScope(user!, "Author.Read"))
+            {
+                // Scenario 1: Authenticated with Author.Read scope — return all authors paged.
                 int page = 1;
                 if (req.Query.TryGetValue("page", out var pageStr) &&
                     int.TryParse(pageStr, out int parsedPage) &&

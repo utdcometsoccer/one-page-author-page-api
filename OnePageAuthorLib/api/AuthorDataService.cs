@@ -90,11 +90,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         {
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
-            var allAuthors = await _authorRepository.GetAllAsync();
-            var pagedAuthors = allAuthors
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            // Delegate paging to the repository so Cosmos DB only returns the requested page.
+            var pagedAuthors = await _authorRepository.GetAllPagedAsync(page, pageSize);
             return await BuildAuthorApiResponsesAsync(pagedAuthors);
         }
 

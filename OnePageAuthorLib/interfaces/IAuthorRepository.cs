@@ -41,9 +41,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         Task<IList<Author>> GetByEmailAsync(string emailAddress);
 
         /// <summary>
-        /// Gets all authors in the repository.
+        /// Gets a page of all authors ordered by AuthorName and then by id for stable paging.
         /// </summary>
-        /// <returns>List of all Author entities.</returns>
-        Task<IList<Author>> GetAllAsync();
+        /// <param name="page">The 1-based page number.</param>
+        /// <param name="pageSize">The number of results per page.</param>
+        /// <returns>Page of Author entities ordered by AuthorName, id.</returns>
+        Task<IList<Author>> GetAllPagedAsync(int page, int pageSize);
     }
 }

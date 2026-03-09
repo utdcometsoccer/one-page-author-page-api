@@ -106,12 +106,15 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         }
 
         /// <summary>
-        /// Gets all authors in the repository.
+        /// Gets a page of all authors ordered by AuthorName then id for stable paging.
         /// </summary>
-        /// <returns>List of all Author entities.</returns>
-        public async Task<IList<Author>> GetAllAsync()
+        public async Task<IList<Author>> GetAllPagedAsync(int page, int pageSize)
         {
-            var query = new QueryDefinition("SELECT * FROM c");
+            int offset = (page - 1) * pageSize;
+            var query = new QueryDefinition(
+                "SELECT * FROM c ORDER BY c.AuthorName, c.id OFFSET @offset LIMIT @limit")
+                .WithParameter("@offset", offset)
+                .WithParameter("@limit", pageSize);
             var results = new List<Author>();
             using (var iterator = _container.GetItemQueryIterator<Author>(query))
             {

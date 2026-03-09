@@ -259,7 +259,7 @@ namespace OnePageAuthor.Test
         [Fact]
         public async Task GetAllAuthorsPagedAsync_ReturnsEmptyList_WhenNoAuthorsExist()
         {
-            _authorRepoMock.Setup(r => r.GetAllAsync())
+            _authorRepoMock.Setup(r => r.GetAllPagedAsync(1, 10))
                 .ReturnsAsync(new List<Author>());
 
             var result = await _service.GetAllAuthorsPagedAsync(1);
@@ -271,8 +271,8 @@ namespace OnePageAuthor.Test
         [Fact]
         public async Task GetAllAuthorsPagedAsync_ReturnsFirstPage_WhenAuthorsExist()
         {
-            var authors = CreateTestAuthors(25);
-            _authorRepoMock.Setup(r => r.GetAllAsync()).ReturnsAsync(authors);
+            var page1 = CreateTestAuthors(25).Take(10).ToList();
+            _authorRepoMock.Setup(r => r.GetAllPagedAsync(1, 10)).ReturnsAsync(page1);
             SetupEmptyRelatedRepos();
 
             var result = await _service.GetAllAuthorsPagedAsync(1);
@@ -285,8 +285,8 @@ namespace OnePageAuthor.Test
         [Fact]
         public async Task GetAllAuthorsPagedAsync_ReturnsSecondPage_WhenAuthorsExist()
         {
-            var authors = CreateTestAuthors(25);
-            _authorRepoMock.Setup(r => r.GetAllAsync()).ReturnsAsync(authors);
+            var page2 = CreateTestAuthors(25).Skip(10).Take(10).ToList();
+            _authorRepoMock.Setup(r => r.GetAllPagedAsync(2, 10)).ReturnsAsync(page2);
             SetupEmptyRelatedRepos();
 
             var result = await _service.GetAllAuthorsPagedAsync(2);
@@ -299,8 +299,8 @@ namespace OnePageAuthor.Test
         [Fact]
         public async Task GetAllAuthorsPagedAsync_ReturnsLastPartialPage_WhenBeyondFullPages()
         {
-            var authors = CreateTestAuthors(25);
-            _authorRepoMock.Setup(r => r.GetAllAsync()).ReturnsAsync(authors);
+            var page3 = CreateTestAuthors(25).Skip(20).ToList();
+            _authorRepoMock.Setup(r => r.GetAllPagedAsync(3, 10)).ReturnsAsync(page3);
             SetupEmptyRelatedRepos();
 
             var result = await _service.GetAllAuthorsPagedAsync(3);
@@ -313,8 +313,8 @@ namespace OnePageAuthor.Test
         [Fact]
         public async Task GetAllAuthorsPagedAsync_ReturnsEmptyList_WhenPageExceedsTotalAuthors()
         {
-            var authors = CreateTestAuthors(5);
-            _authorRepoMock.Setup(r => r.GetAllAsync()).ReturnsAsync(authors);
+            _authorRepoMock.Setup(r => r.GetAllPagedAsync(2, 10))
+                .ReturnsAsync(new List<Author>());
 
             var result = await _service.GetAllAuthorsPagedAsync(2);
 
