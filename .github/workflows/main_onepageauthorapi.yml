@@ -1256,6 +1256,8 @@ jobs:
           WHMCS_WORKER_VM_NAME: ${{ secrets.WHMCS_WORKER_VM_NAME }}
           WHMCS_SB_NAMESPACE_NAME: ${{ secrets.WHMCS_SB_NAMESPACE_NAME }}
           WHMCS_SB_QUEUE_NAME: ${{ secrets.WHMCS_SB_QUEUE_NAME }}
+          SERVICE_BUS_CONNECTION_STRING: ${{ secrets.SERVICE_BUS_CONNECTION_STRING }}
+          SERVICE_BUS_WHMCS_QUEUE_NAME: ${{ secrets.SERVICE_BUS_WHMCS_QUEUE_NAME }}
           WHMCS_API_URL: ${{ secrets.WHMCS_API_URL }}
           WHMCS_API_IDENTIFIER: ${{ secrets.WHMCS_API_IDENTIFIER }}
           WHMCS_API_SECRET: ${{ secrets.WHMCS_API_SECRET }}
@@ -1277,10 +1279,10 @@ jobs:
 
           VM_NAME="${WHMCS_WORKER_VM_NAME:-whmcs-worker-vm}"
           SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-bus}"
-          QUEUE_NAME="${WHMCS_SB_QUEUE_NAME_DEPLOYED:-${WHMCS_SB_QUEUE_NAME:-whmcs-domain-registrations}}"
+          QUEUE_NAME="${SERVICE_BUS_WHMCS_QUEUE_NAME:-${WHMCS_SB_QUEUE_NAME_DEPLOYED:-${WHMCS_SB_QUEUE_NAME:-whmcs-domain-registrations}}}"
 
           # Prefer the listener connection string captured from the Bicep deployment outputs.
-          SB_CONN="${WHMCS_SB_LISTENER_CONNECTION_STRING:-}"
+          SB_CONN="${SERVICE_BUS_CONNECTION_STRING:-${WHMCS_SB_LISTENER_CONNECTION_STRING:-}}"
 
           # Fallback: retrieve the WhmcsListener connection string from the Service Bus namespace.
           if [ -z "$SB_CONN" ]; then

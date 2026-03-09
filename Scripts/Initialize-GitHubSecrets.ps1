@@ -583,6 +583,21 @@ $secretDefinitions = @{
             Category = "Worker"
         },
         @{
+            Name = "SERVICE_BUS_CONNECTION_STRING"
+            Description = "Service Bus connection string used by the WHMCS Worker Service (overrides the workflow's automatic lookup when set)"
+            Required = $false
+            Example = "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=WhmcsListener;SharedAccessKey=..."
+            Category = "Worker"
+            Sensitive = $true
+        },
+        @{
+            Name = "SERVICE_BUS_WHMCS_QUEUE_NAME"
+            Description = "Queue name consumed by the WHMCS Worker Service (overrides default 'whmcs-domain-registrations' when set)"
+            Required = $false
+            Example = "whmcs-domain-registrations"
+            Category = "Worker"
+        },
+        @{
             Name = "APPLICATIONINSIGHTS_CONNECTION_STRING_WHMCS_WORKER"
             Description = "Application Insights connection string for the WHMCS Worker Service VM. When set, structured logs are exported to Azure Monitor for KQL querying. Falls back to APPLICATIONINSIGHTS_CONNECTION_STRING if not set."
             Required = $false
