@@ -25,8 +25,7 @@ $expectedSecrets = @(
     "AMAZON_PRODUCT_ACCESS_KEY",
     "AMAZON_PRODUCT_SECRET_KEY",
     "AAD_CLIENT_ID",
-    "AAD_TENANT_ID",
-    "GOOGLE_CLOUD_PROJECT_ID"
+    "AAD_TENANT_ID"
 )
 
 try {

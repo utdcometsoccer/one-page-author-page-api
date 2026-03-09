@@ -208,7 +208,7 @@ The test data file should contain an array of domain registration objects:
 
 ### Important Notes
 
-- **This test makes ACTUAL API calls to WHMCS** - Unlike the Google Domains test harness which runs in dry-run mode, this harness will attempt real domain registrations if WHMCS is configured properly
+- **This test makes ACTUAL API calls to WHMCS** - This harness will attempt real domain registrations if WHMCS is configured properly
 - **Billing implications** - Successful registrations may result in charges from your domain registrar (via WHMCS)
 - **Use test/sandbox environment** - It is highly recommended to test against a WHMCS sandbox/test environment first
 - **Test domain availability** - Ensure test domains are available or use domains you intend to register
@@ -398,15 +398,10 @@ dotnet run
 - Use HTTPS for all WHMCS API calls
 - Consider IP restrictions on WHMCS API credentials
 
-## Comparison with Google Domains Test Harness
+## See Also
 
-| Feature | Google Domains Test | WHMCS Test |
-|---------|---------------------|------------|
-| API Calls | Dry run mode (availability check only) | Live API calls (actual registration) |
-| Billing Impact | None | Possible domain registration charges |
-| Registration | Simulated | Actual (if WHMCS configured) |
-| Use Case | Pre-production validation | Integration testing |
-| Safety | Safe for production credentials | Requires test environment |
+- **DomainRegistrationTestHarness** - General domain registration test harness
+- **WHMCS_INTEGRATION_SUMMARY.md** - Comprehensive WHMCS integration documentation
 
 ## Best Practices
 
@@ -427,9 +422,3 @@ For issues or questions:
 3. Consult the WHMCS Integration Summary: `docs/WHMCS_INTEGRATION_SUMMARY.md`
 4. Check the main project README.md
 5. Verify Azure Cosmos DB connection status
-
-## See Also
-
-- **GoogleDomainRegistrationTest** - Similar test harness for Google Cloud Domains (dry-run mode)
-- **DomainRegistrationTestHarness** - General domain registration test harness
-- **WHMCS_INTEGRATION_SUMMARY.md** - Comprehensive WHMCS integration documentation

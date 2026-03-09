@@ -37,7 +37,7 @@ This document summarizes the work completed by Copilot AI in addressing the top 
 2. Configure Environment Variables for All Function Apps
 3. Update GitHub Secrets for CI/CD Pipeline
 4. Test Authentication Flow End-to-End
-5. Configure Google Domains API Access
+5. Configure WHMCS API Access
 6. Test Domain Registration Flow
 7. Configure Azure DNS Resources
 8. Configure Azure Front Door

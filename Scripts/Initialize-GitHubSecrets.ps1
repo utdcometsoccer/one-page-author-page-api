@@ -491,23 +491,6 @@ $secretDefinitions = @{
         }
     )
 
-    "Google Domains (Optional)" = @(
-        @{
-            Name = "GOOGLE_CLOUD_PROJECT_ID"
-            Description = "Google Cloud project ID for Google Domains integration"
-            Required = $false
-            Example = "my-gcp-project"
-            Category = "Domain"
-        },
-        @{
-            Name = "GOOGLE_DOMAINS_LOCATION"
-            Description = "Google Domains API location (typically 'global')"
-            Required = $false
-            Example = "global"
-            Category = "Domain"
-        }
-    )
-    
     "WHMCS Domain Registration (Optional)" = @(
         @{
             Name = "WHMCS_CLIENT_ID"

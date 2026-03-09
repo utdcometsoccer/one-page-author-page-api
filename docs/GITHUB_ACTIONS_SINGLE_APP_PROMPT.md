@@ -248,9 +248,6 @@ This avoids multiple restarts and is more efficient.
     # Notification Hub (new)
     NOTIFICATION_HUB_CONNECTION_STRING: ${{ secrets.NOTIFICATION_HUB_CONNECTION_STRING }}
     NOTIFICATION_HUB_NAME: ${{ secrets.NOTIFICATION_HUB_NAME }}
-    # Google (if applicable)
-    GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
-    GOOGLE_DOMAINS_LOCATION: ${{ secrets.GOOGLE_DOMAINS_LOCATION }}
     ISW_DNS_ZONE_NAME: ${{ secrets.ISW_DNS_ZONE_NAME }}
     ISW_LOCATION: ${{ secrets.ISW_LOCATION }}
   run: |
@@ -307,8 +304,6 @@ This avoids multiple restarts and is more efficient.
     add_setting "APPLICATIONINSIGHTS_CONNECTION_STRING" "$APPLICATIONINSIGHTS_CONNECTION_STRING"
     add_setting "NOTIFICATION_HUB_CONNECTION_STRING" "$NOTIFICATION_HUB_CONNECTION_STRING"
     add_setting "NOTIFICATION_HUB_NAME"       "$NOTIFICATION_HUB_NAME"
-    add_setting "GOOGLE_CLOUD_PROJECT_ID"     "$GOOGLE_CLOUD_PROJECT_ID"
-    add_setting "GOOGLE_DOMAINS_LOCATION"     "$GOOGLE_DOMAINS_LOCATION"
     add_setting "ISW_DNS_ZONE_NAME"           "$ISW_DNS_ZONE_NAME"
     add_setting "ISW_LOCATION"                "$ISW_LOCATION"
 
@@ -406,8 +401,6 @@ SECRETS TO KEEP (required):
   WHMCS_WORKER_ADMIN_USERNAME      — VM admin username
   WHMCS_WORKER_SSH_PUBLIC_KEY      — SSH public key for VM access
   DEPLOY_WHMCS_WORKER              — "true" to deploy the WHMCS worker
-  GOOGLE_CLOUD_PROJECT_ID          — Google Cloud project ID (if applicable)
-  GOOGLE_DOMAINS_LOCATION          — Google Domains location (if applicable)
 
 SECRETS TO REMOVE (no longer needed after consolidation):
   AZURE_FUNCTIONAPP_NAME           — Replaced by ISW_BASE_NAME

@@ -56,22 +56,22 @@ This document outlines tasks that require human intervention, judgment, or acces
 
 ## 🔴 CRITICAL PRIORITY - Domain Registration Validation Testing
 
-**Context:** Domain registration implementation is complete with Google Domains integration. Comprehensive automated tests are being created by Copilot AI. Human validation is required to test with real domains and production Google Domains API.
+**Context:** Domain registration implementation is complete. Comprehensive automated tests are being created by Copilot AI. Human validation is required to test with real domains and production APIs.
 
 ### 1. Test Domain Registration Flow ⚠️ **CRITICAL VALIDATION**
 
 **Status:** ⚠️ **URGENT - START AFTER COPILOT TESTS COMPLETE**  
 **Estimated Time:** 3-4 hours  
-**Prerequisites:** Google Domains configured, test domain available, Copilot AI tests passing  
+**Prerequisites:** WHMCS configured, test domain available, Copilot AI tests passing  
 **Due Date:** January 8, 2026
 
 **Context:**  
-End-to-end validation of domain registration workflow with REAL Google Domains API and test domain. **This is the critical validation after automated tests pass.**
+End-to-end validation of domain registration workflow with WHMCS and test domain. **This is the critical validation after automated tests pass.**
 
 **Prerequisites:**
 
 - [ ] Copilot AI domain registration tests are passing (115+ tests)
-- [ ] Google Domains API access configured (see Task 2 below if needed)
+- [ ] WHMCS API access configured
 - [ ] Test Stripe subscription is active
 - [ ] Test domain available (e.g., cheap .xyz or .test domain)
 - [ ] Azure DNS and Front Door configured
@@ -175,13 +175,6 @@ AZURE_SUBSCRIPTION_ID = [Azure Subscription GUID]
 AZURE_RESOURCE_GROUP_NAME = [Resource Group for Front Door]
 AZURE_DNS_RESOURCE_GROUP = [Resource Group for DNS Zones]
 AZURE_FRONTDOOR_PROFILE_NAME = [Front Door Profile Name]
-```
-
-#### Google Domains (Optional - if using Google Domains)
-
-```
-GOOGLE_APPLICATION_CREDENTIALS = [Path to service account JSON]
-GOOGLE_CLOUD_PROJECT = [Google Cloud Project ID]
 ```
 
 **Validation:**
@@ -339,66 +332,30 @@ Test each protected endpoint with valid token:
 
 ## 🔴 CRITICAL PRIORITY - Domain Registration Validation Testing
 
-**Context:** Domain registration implementation is complete with Google Domains integration. Comprehensive automated tests are being created by Copilot AI. Human validation is required to test with real domains and production APIs.
+**Context:** Domain registration implementation is complete. Comprehensive automated tests are being created by Copilot AI. Human validation is required to test with real domains and production APIs.
 
 ### 6. Test Domain Registration Flow ⚠️ **CRITICAL VALIDATION**
 
 **Status:** ⚠️ **URGENT - START AFTER COPILOT TESTS COMPLETE**  
 **Estimated Time:** 3-4 hours  
-**Prerequisites:** Google Domains configured, test domain available, Copilot AI tests passing  
+**Prerequisites:** WHMCS configured, test domain available, Copilot AI tests passing  
 **Due Date:** January 6, 2026
 
 **Context:**  
-The system can register domains through Google Domains API. This requires proper GCP setup.
+The system can register domains through WHMCS. This requires proper WHMCS setup.
 
 **Action Items:**
 
-- [ ] Log into Google Cloud Console (<https://console.cloud.google.com>)
-- [ ] Create or select existing project for domain management
-- [ ] Enable Google Domains API:
-  - Navigate to APIs & Services → Library
-  - Search for "Cloud Domains API"
-  - Click "Enable"
-- [ ] Create Service Account:
-  - Navigate to IAM & Admin → Service Accounts
-  - Click "Create Service Account"
-  - Name: `domain-registration-service`
-  - Grant roles:
-    - `Cloud Domains Owner`
-    - `DNS Administrator` (if managing DNS)
-- [ ] Create and download JSON key:
-  - Click on created service account
-  - Go to "Keys" tab
-  - Add Key → Create new key → JSON
-  - **IMPORTANT:** Securely store the downloaded JSON file
-- [ ] Configure billing:
-  - Ensure billing is enabled for the project
-  - Review pricing for domain registrations
-- [ ] Test API access:
-
-  ```bash
-  gcloud auth activate-service-account --key-file=service-account-key.json
-  gcloud domains registrations list
-  ```
-
-**Upload Service Account to Azure:**
-
-- [ ] Option 1: Azure Key Vault
-  - Upload JSON as secret
-  - Reference in Function App configuration
-- [ ] Option 2: App Configuration
-  - Base64 encode the JSON
-  - Store as environment variable
-
-  ```bash
-  base64 service-account-key.json
-  ```
+- [ ] Log into your WHMCS admin panel
+- [ ] Configure domain registrar settings in WHMCS
+- [ ] Set up WHMCS API credentials in Azure Function App settings
+- [ ] Test API access via WHMCS API
 
 **Validation:**
 
-- [ ] Verify API is enabled in GCP Console
-- [ ] Test service account has proper permissions
-- [ ] Function App can authenticate to Google Domains API
+- [ ] Verify WHMCS API credentials are configured
+- [ ] Test API endpoint can be reached
+- [ ] Function App can authenticate to WHMCS API
 
 ---
 
@@ -406,15 +363,15 @@ The system can register domains through Google Domains API. This requires proper
 
 **Status:** ⏳ Required  
 **Estimated Time:** 2-3 hours  
-**Prerequisites:** Google Domains configured, test domain available
+**Prerequisites:** WHMCS configured, test domain available
 
 **Context:**  
-End-to-end validation of domain registration workflow with REAL Google Domains API and test domain. **This is the critical validation after automated tests pass.**
+End-to-end validation of domain registration workflow with WHMCS and test domain. **This is the critical validation after automated tests pass.**
 
 **Prerequisites:**
 
 - [ ] Copilot AI domain registration tests are passing (115+ tests)
-- [ ] Google Domains API access configured (Task 5 - see below if needed)
+- [ ] WHMCS API access configured
 - [ ] Test Stripe subscription is active
 - [ ] Test domain available (e.g., cheap .xyz or .test domain)
 - [ ] Azure DNS and Front Door configured
@@ -457,7 +414,6 @@ End-to-end validation of domain registration workflow with REAL Google Domains A
 
 - [ ] Expected: 201 Created with registration ID
 - [ ] Verify in Cosmos DB: Domain registration record created
-- [ ] Verify in Google Domains Console: Domain registration initiated
 - [ ] Document registration ID for further testing
 
 #### Scenario 2: Retrieve Domain Registration
@@ -494,16 +450,15 @@ End-to-end validation of domain registration workflow with REAL Google Domains A
 - [ ] Create comprehensive test report with findings
 - [ ] Screenshot key API responses
 - [ ] Note any issues or improvements needed
-- [ ] Verify domain registration costs in Google Console
 - [ ] **Update validation status in roadmap**
 
 ---
 
-### 5. Configure Google Domains API Access (If Not Already Done)
+### 5. Configure WHMCS API Access (If Not Already Done)
 
-**Status:** ⏳ Required (Verify/Configure if using Google Domains)  
+**Status:** ⏳ Required (Verify/Configure if using WHMCS)  
 **Estimated Time:** 1-2 hours  
-**Prerequisites:** Google Cloud Platform account, billing enabled  
+**Prerequisites:** WHMCS account, billing enabled  
 **Due Date:** Before Task 6 (Domain Testing)
 
 ---
@@ -915,7 +870,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 4. ⚠️ Test Authentication Flow End-to-End (CRITICAL VALIDATION)
 
 **Domain Registration Validation (January 5-6, 2026):**
-5. ✅/⏳ Configure Google Domains API Access (Verify if needed)
+5. ✅/⏳ Configure WHMCS API Access (Verify if needed)
 6. ⚠️ Test Domain Registration Flow (CRITICAL VALIDATION)
 
 **DNS Configuration Validation (January 6-7, 2026):**
@@ -974,7 +929,7 @@ Validate automatic addition of custom domains to Azure Front Door in REAL produc
 ### Support Resources
 
 - Azure Documentation: <https://docs.microsoft.com/azure>
-- Google Domains API: <https://cloud.google.com/domains/docs>
+- WHMCS API: <https://developers.whmcs.com/api-reference/>
 - Microsoft Entra ID: <https://learn.microsoft.com/entra>
 - Internal documentation in `/docs` directory
 

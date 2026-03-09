@@ -83,8 +83,6 @@ resource myFunctionApp 'Microsoft.Web/sites@2024-04-01' = {
 | `stripeWebhookSecret` | string (secure) | No | Stripe webhook secret |
 | `azureSubscriptionId` | string | No | Azure subscription ID |
 | `azureDnsResourceGroup` | string | No | Azure DNS resource group |
-| `googleCloudProjectId` | string | No | Google Cloud project ID |
-| `googleDomainsLocation` | string | No | Google Domains location |
 | `amazonProductAccessKey` | string (secure) | No | Amazon Product access key |
 | `amazonProductSecretKey` | string (secure) | No | Amazon Product secret key |
 | `amazonProductPartnerTag` | string | No | Amazon Product partner tag |

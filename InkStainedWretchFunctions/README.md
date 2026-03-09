@@ -136,7 +136,6 @@ dotnet user-secrets set "WHMCS_API_SECRET"     "your-api-secret"
 # Testing Mode Settings
 dotnet user-secrets set "TESTING_MODE" "true"
 dotnet user-secrets set "MOCK_AZURE_INFRASTRUCTURE" "true"
-dotnet user-secrets set "MOCK_GOOGLE_DOMAINS" "true"
 dotnet user-secrets set "MAX_TEST_COST_LIMIT" "0.00"
 ```
 

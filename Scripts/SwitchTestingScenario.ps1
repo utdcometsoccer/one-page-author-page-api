@@ -23,7 +23,6 @@ try {
         {$_ -in "1", "frontend"} {
             $config.Values.TESTING_MODE = "true"
             $config.Values.MOCK_AZURE_INFRASTRUCTURE = "true"
-            $config.Values.MOCK_GOOGLE_DOMAINS = "true"
             $config.Values.MOCK_STRIPE_PAYMENTS = "true"
             $config.Values.MOCK_EXTERNAL_APIS = "true"
             $config.Values.SKIP_DOMAIN_PURCHASE = "true"
@@ -39,7 +38,6 @@ try {
         {$_ -in "2", "individual"} {
             $config.Values.TESTING_MODE = "true"
             $config.Values.MOCK_AZURE_INFRASTRUCTURE = "false"
-            $config.Values.MOCK_GOOGLE_DOMAINS = "true"
             $config.Values.MOCK_STRIPE_PAYMENTS = "true"
             $config.Values.MOCK_EXTERNAL_APIS = "false"
             $config.Values.SKIP_DOMAIN_PURCHASE = "true"
@@ -55,7 +53,6 @@ try {
         {$_ -in "3", "production"} {
             $config.Values.TESTING_MODE = "true"
             $config.Values.MOCK_AZURE_INFRASTRUCTURE = "false"
-            $config.Values.MOCK_GOOGLE_DOMAINS = "false"
             $config.Values.MOCK_STRIPE_PAYMENTS = "false"
             $config.Values.MOCK_EXTERNAL_APIS = "false"
             $config.Values.SKIP_DOMAIN_PURCHASE = "false"
@@ -84,7 +81,6 @@ try {
     Write-Host "   TEST_SCENARIO: $($config.Values.TEST_SCENARIO)" -ForegroundColor Gray
     Write-Host "   MAX_COST_LIMIT: $($config.Values.MAX_TEST_COST_LIMIT)" -ForegroundColor Gray
     Write-Host "   MOCK_AZURE: $($config.Values.MOCK_AZURE_INFRASTRUCTURE)" -ForegroundColor Gray
-    Write-Host "   MOCK_DOMAINS: $($config.Values.MOCK_GOOGLE_DOMAINS)" -ForegroundColor Gray
     Write-Host "   MOCK_STRIPE: $($config.Values.MOCK_STRIPE_PAYMENTS)" -ForegroundColor Gray
     
 } catch {

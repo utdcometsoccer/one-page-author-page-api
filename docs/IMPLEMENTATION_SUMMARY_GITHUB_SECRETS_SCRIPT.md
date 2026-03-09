@@ -50,7 +50,6 @@ Created a comprehensive automation solution that:
      - Azure Storage (1 secret)
      - Stripe (2 secrets)
      - Domain Management (3 secrets)
-     - Google Domains (2 secrets)
      - Amazon Product API (5 secrets)
      - Penguin Random House API (2 secrets)
 
@@ -142,7 +141,6 @@ Initialize-GitHubSecrets.ps1
 | Azure Storage | 1 | ImageAPI |
 | Stripe | 2 | InkStainedWretchStripe |
 | Domain Management | 3 | Domain features (optional) |
-| Google Domains | 2 | Google Domains integration (optional) |
 | Amazon Product API | 5 | Amazon integration (optional) |
 | Penguin Random House API | 2 | PRH integration (optional) |
 
