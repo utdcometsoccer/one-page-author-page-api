@@ -1,0 +1,21 @@
+// KQL Query: WHMCS Worker Service - Service Health Overview
+// Tracks worker lifecycle events (start, running, stop) and Service Bus errors.
+// Recommended visualization: Table
+// Use this to confirm the service is running, detect unexpected restarts,
+// and investigate Service Bus connectivity issues.
+
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(7d)
+| where customDimensions["EventId.Name"] in (
+    "WhmcsWorkerStarting",
+    "WhmcsWorkerRunning",
+    "WhmcsWorkerStopping",
+    "ServiceBusError"
+)
+| extend
+    EventName  = tostring(customDimensions["EventId.Name"]),
+    Source     = tostring(customDimensions["Source"]),
+    Entity     = tostring(customDimensions["Entity"])
+| project timestamp, EventName, Source, Entity, severityLevel, message
+| order by timestamp desc

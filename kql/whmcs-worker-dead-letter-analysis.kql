@@ -1,0 +1,22 @@
+// KQL Query: WHMCS Worker Service - Dead-Letter Queue Analysis
+// Lists all messages that were dead-lettered (invalid JSON or missing data).
+// Recommended visualization: Table
+// Use this to identify and investigate malformed or incomplete messages.
+
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(7d)
+| where customDimensions["EventId.Name"] in (
+    "MessageDeserializeFailed",
+    "MessageMissingData"
+)
+| extend
+    EventName = tostring(customDimensions["EventId.Name"]),
+    MessageId = tostring(customDimensions["MessageId"]),
+    Reason    = case(
+        customDimensions["EventId.Name"] == "MessageDeserializeFailed", "DeserializationFailure",
+        customDimensions["EventId.Name"] == "MessageMissingData",       "MissingDomainData",
+        "Unknown"
+    )
+| project timestamp, Reason, EventName, MessageId, severityLevel, message
+| order by timestamp desc

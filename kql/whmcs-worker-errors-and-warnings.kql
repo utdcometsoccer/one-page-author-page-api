@@ -1,0 +1,17 @@
+// KQL Query: WHMCS Worker Service - All Errors and Warnings
+// Shows every warning, error, and critical event emitted by the worker service.
+// Recommended visualization: Table
+// Use this for incident response and troubleshooting all non-nominal conditions.
+
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(24h)
+| where severityLevel >= 2  // 2=Warning, 3=Error, 4=Critical
+| extend
+    EventName = tostring(customDimensions["EventId.Name"]),
+    Domain    = tostring(customDimensions["Domain"]),
+    MessageId = tostring(customDimensions["MessageId"]),
+    Source    = tostring(customDimensions["Source"]),
+    Entity    = tostring(customDimensions["Entity"])
+| project timestamp, severityLevel, EventName, Domain, MessageId, Source, Entity, message
+| order by timestamp desc

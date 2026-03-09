@@ -1,0 +1,25 @@
+// KQL Query: WHMCS Worker Service - Processing Performance
+// Shows per-message processing durations (requires WHMCS_WORKER_LOG_LEVEL=Debug).
+// Recommended visualization: Time chart or scatter chart
+// Use this to detect slow WHMCS API responses or latency regressions.
+// Note: TotalElapsedMs and RegistrationElapsedMs are only emitted at Debug log level.
+//       Set WHMCS_WORKER_LOG_LEVEL=Debug to capture these fields.
+
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(24h)
+| where customDimensions["EventId.Name"] == "ProcessingCompleted"
+| extend
+    Domain          = tostring(customDimensions["Domain"]),
+    MessageId       = tostring(customDimensions["MessageId"]),
+    TotalElapsedMs  = tolong(customDimensions["TotalElapsedMs"])
+| where isnotnull(TotalElapsedMs)
+| summarize
+    AvgMs   = avg(TotalElapsedMs),
+    MaxMs   = max(TotalElapsedMs),
+    MinMs   = min(TotalElapsedMs),
+    P95Ms   = percentile(TotalElapsedMs, 95),
+    Count   = count()
+    by bin(timestamp, 1h)
+| order by timestamp desc
+| render timechart
