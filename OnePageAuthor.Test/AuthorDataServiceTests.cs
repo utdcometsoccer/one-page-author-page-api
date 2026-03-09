@@ -25,6 +25,31 @@ namespace OnePageAuthor.Test
                 _socialRepoMock.Object);
         }
 
+        private static List<Author> CreateTestAuthors(int count) =>
+            Enumerable.Range(1, count).Select(i => new Author
+            {
+                id = Guid.NewGuid().ToString(),
+                AuthorName = $"Author {i}",
+                EmailAddress = $"author{i}@example.com",
+                WelcomeText = $"Welcome {i}",
+                AboutText = $"About {i}",
+                CopyrightText = $"Copyright {i}",
+                LanguageName = "en",
+                RegionName = "US",
+                TopLevelDomain = "com",
+                SecondLevelDomain = $"example{i}"
+            }).ToList();
+
+        private void SetupEmptyRelatedRepos()
+        {
+            _bookRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<InkStainedWretch.OnePageAuthorAPI.Entities.Book>());
+            _articleRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<InkStainedWretch.OnePageAuthorAPI.Entities.Article>());
+            _socialRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<Social>());
+        }
+
         [Fact]
         public async Task GetAuthorWithDataAsync_ReturnsNull_WhenNoAuthorFound()
         {
@@ -229,6 +254,72 @@ namespace OnePageAuthor.Test
             Assert.Equal(authorId, result[0].id);
             Assert.Equal("Email Author", result[0].AuthorName);
             Assert.Equal(email, result[0].EmailAddress);
+        }
+
+        [Fact]
+        public async Task GetAllAuthorsPagedAsync_ReturnsEmptyList_WhenNoAuthorsExist()
+        {
+            _authorRepoMock.Setup(r => r.GetAllPagedAsync(1, 10))
+                .ReturnsAsync(new List<Author>());
+
+            var result = await _service.GetAllAuthorsPagedAsync(1);
+
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAllAuthorsPagedAsync_ReturnsFirstPage_WhenAuthorsExist()
+        {
+            var page1 = CreateTestAuthors(25).Take(10).ToList();
+            _authorRepoMock.Setup(r => r.GetAllPagedAsync(1, 10)).ReturnsAsync(page1);
+            SetupEmptyRelatedRepos();
+
+            var result = await _service.GetAllAuthorsPagedAsync(1);
+
+            Assert.Equal(10, result.Count);
+            Assert.Equal("Author 1", result[0].AuthorName);
+            Assert.Equal("Author 10", result[9].AuthorName);
+        }
+
+        [Fact]
+        public async Task GetAllAuthorsPagedAsync_ReturnsSecondPage_WhenAuthorsExist()
+        {
+            var page2 = CreateTestAuthors(25).Skip(10).Take(10).ToList();
+            _authorRepoMock.Setup(r => r.GetAllPagedAsync(2, 10)).ReturnsAsync(page2);
+            SetupEmptyRelatedRepos();
+
+            var result = await _service.GetAllAuthorsPagedAsync(2);
+
+            Assert.Equal(10, result.Count);
+            Assert.Equal("Author 11", result[0].AuthorName);
+            Assert.Equal("Author 20", result[9].AuthorName);
+        }
+
+        [Fact]
+        public async Task GetAllAuthorsPagedAsync_ReturnsLastPartialPage_WhenBeyondFullPages()
+        {
+            var page3 = CreateTestAuthors(25).Skip(20).ToList();
+            _authorRepoMock.Setup(r => r.GetAllPagedAsync(3, 10)).ReturnsAsync(page3);
+            SetupEmptyRelatedRepos();
+
+            var result = await _service.GetAllAuthorsPagedAsync(3);
+
+            Assert.Equal(5, result.Count);
+            Assert.Equal("Author 21", result[0].AuthorName);
+            Assert.Equal("Author 25", result[4].AuthorName);
+        }
+
+        [Fact]
+        public async Task GetAllAuthorsPagedAsync_ReturnsEmptyList_WhenPageExceedsTotalAuthors()
+        {
+            _authorRepoMock.Setup(r => r.GetAllPagedAsync(2, 10))
+                .ReturnsAsync(new List<Author>());
+
+            var result = await _service.GetAllAuthorsPagedAsync(2);
+
+            Assert.NotNull(result);
+            Assert.Empty(result);
         }
     }
 }

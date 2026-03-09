@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
@@ -38,29 +39,16 @@ public class GetAuthors
     {
         bool hasDomainParams = !string.IsNullOrWhiteSpace(secondLevelDomain) && !string.IsNullOrWhiteSpace(topLevelDomain);
 
-        // Authenticate the request using JWT token
-        var (user, errorResult) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
-        if (errorResult != null)
+        // Only authenticate when domain parameters are absent.
+        ClaimsPrincipal? user = null;
+        if (!hasDomainParams)
         {
-            return errorResult;
-        }
-
-        // Check if user has the required scope for author reading
-        if (user != null && !_scopeValidationService.HasRequiredScope(user, "Author.Read"))
-        {
-            var availableScopes = string.Join(" ", user.FindAll(ScopeValidationService.ScpClaimType)
-                .Concat(user.FindAll(ScopeValidationService.ScopeUriClaimType))
-                .SelectMany(c => c.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                .Distinct());
-            var nonPiiClaims = JwtAuthenticationHelper.GetNonPiiClaimsForLogging(user);
-            _logger.LogWarning(
-                "User does not have required Author.Read scope. Available scopes: {AvailableScopes}. Non-PII claims present: {NonPiiClaims}",
-                availableScopes,
-                nonPiiClaims);
-            return new ObjectResult(new { error = "Insufficient permissions" })
+            var (validatedUser, errorResult) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
+            if (errorResult != null)
             {
-                StatusCode = StatusCodes.Status403Forbidden
-            };
+                return errorResult;
+            }
+            user = validatedUser;
         }
 
         try
@@ -69,11 +57,26 @@ public class GetAuthors
 
             if (hasDomainParams)
             {
+                // Scenario 2: Domain parameters present — return authors by domain, no authentication required.
                 _logger.LogInformation("Received request for authors with TLD: {TopLevelDomain}, SLD: {SecondLevelDomain}", topLevelDomain, secondLevelDomain);
                 authors = await _authorDataService.GetAuthorsByDomainAsync(topLevelDomain!, secondLevelDomain!);
             }
+            else if (_scopeValidationService.HasRequiredScope(user!, "Author.Read"))
+            {
+                // Scenario 1: Authenticated with Author.Read scope — return all authors paged.
+                int page = 1;
+                if (req.Query.TryGetValue("page", out var pageStr) &&
+                    int.TryParse(pageStr, out int parsedPage) &&
+                    parsedPage > 0)
+                {
+                    page = parsedPage;
+                }
+                _logger.LogInformation("Received request for all authors (page {Page}) with Author.Read scope", page);
+                authors = await _authorDataService.GetAllAuthorsPagedAsync(page);
+            }
             else
             {
+                // Scenario 3: Authenticated without Author.Read scope — return authors matching the user's email.
                 var email = _userIdentityService.GetUserUpn(user!);
                 _logger.LogInformation("Received request for all authors for user: {Email}", email);
                 authors = await _authorDataService.GetAuthorsByEmailAsync(email);

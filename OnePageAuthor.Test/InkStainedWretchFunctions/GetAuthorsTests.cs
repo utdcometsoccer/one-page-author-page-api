@@ -42,11 +42,13 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockScopeValidationService.Object);
         }
 
-        private static HttpRequest CreateRequest(string? authToken = null)
+        private static HttpRequest CreateRequest(string? authToken = null, int? page = null)
         {
             var context = new DefaultHttpContext();
             if (authToken != null)
                 context.Request.Headers["Authorization"] = $"Bearer {authToken}";
+            if (page.HasValue)
+                context.Request.QueryString = new QueryString($"?page={page}");
             return context.Request;
         }
 
@@ -59,8 +61,18 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             }));
         }
 
+        private static ClaimsPrincipal CreateUserWithoutScope(string userEmail = "test@example.com")
+        {
+            return new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim("upn", userEmail)
+            }));
+        }
+
+        // --- Unauthenticated / bad token (no domain params) ---
+
         [Fact]
-        public async Task Run_MissingAuthorizationHeader_ReturnsUnauthorized()
+        public async Task Run_MissingAuthorizationHeader_NoDomainParams_ReturnsUnauthorized()
         {
             var req = CreateRequest();
 
@@ -70,7 +82,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
-        public async Task Run_InvalidToken_ReturnsUnauthorized()
+        public async Task Run_InvalidToken_NoDomainParams_ReturnsUnauthorized()
         {
             var req = CreateRequest(authToken: "invalid-token");
             _mockJwtValidationService
@@ -82,64 +94,12 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.IsType<UnauthorizedObjectResult>(result);
         }
 
-        [Fact]
-        public async Task Run_ValidTokenNoScope_ReturnsForbidden()
-        {
-            var req = CreateRequest(authToken: "valid-token");
-            var userWithoutScope = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
-                new Claim("upn", "test@example.com")
-            }));
-            _mockJwtValidationService
-                .Setup(s => s.ValidateTokenAsync("valid-token"))
-                .ReturnsAsync(userWithoutScope);
-            _mockScopeValidationService
-                .Setup(s => s.HasRequiredScope(userWithoutScope, "Author.Read"))
-                .Returns(false);
-
-            var result = await _function.Run(req, null, null);
-
-            var objectResult = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(StatusCodes.Status403Forbidden, objectResult.StatusCode);
-        }
+        // --- Scenario 2: Domain parameters present — no auth required ---
 
         [Fact]
-        public async Task Run_ValidTokenNoScope_LogsAvailableScopes()
+        public async Task Run_WithDomainParams_NoAuth_AuthorsNotFound_ReturnsNotFound()
         {
-            var req = CreateRequest(authToken: "valid-token");
-            var userWithOtherScopes = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
-                new Claim("upn", "test@example.com"),
-                new Claim("scp", "openid profile")
-            }));
-            _mockJwtValidationService
-                .Setup(s => s.ValidateTokenAsync("valid-token"))
-                .ReturnsAsync(userWithOtherScopes);
-            _mockScopeValidationService
-                .Setup(s => s.HasRequiredScope(userWithOtherScopes, "Author.Read"))
-                .Returns(false);
-
-            await _function.Run(req, null, null);
-
-            _mockLogger.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("openid") && v.ToString()!.Contains("profile")),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
-
-        // --- Domain-based lookup (both route params provided) ---
-
-        [Fact]
-        public async Task Run_WithDomainParams_AuthorsNotFound_ReturnsNotFound()
-        {
-            var req = CreateRequest(authToken: "valid-token");
-            _mockJwtValidationService
-                .Setup(s => s.ValidateTokenAsync("valid-token"))
-                .ReturnsAsync(CreateUserWithScope());
+            var req = CreateRequest(); // no auth token
             _mockAuthorDataService
                 .Setup(s => s.GetAuthorsByDomainAsync("com", "example"))
                 .ReturnsAsync(new List<AuthorApiResponse>());
@@ -150,12 +110,9 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
-        public async Task Run_WithDomainParams_AuthorsFound_ReturnsOk()
+        public async Task Run_WithDomainParams_NoAuth_AuthorsFound_ReturnsOk()
         {
-            var req = CreateRequest(authToken: "valid-token");
-            _mockJwtValidationService
-                .Setup(s => s.ValidateTokenAsync("valid-token"))
-                .ReturnsAsync(CreateUserWithScope());
+            var req = CreateRequest(); // no auth token
             var authors = new List<AuthorApiResponse>
             {
                 new AuthorApiResponse
@@ -176,17 +133,115 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Equal(authors, okResult.Value);
         }
 
-        // --- User-based lookup (no route params) ---
+        [Fact]
+        public async Task Run_WithDomainParams_WithAuth_AuthorsFound_ReturnsOk()
+        {
+            // Auth token present but should be ignored when domain params are provided
+            var req = CreateRequest(authToken: "valid-token");
+            var authors = new List<AuthorApiResponse>
+            {
+                new AuthorApiResponse
+                {
+                    id = Guid.NewGuid().ToString(),
+                    AuthorName = "Test Author",
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "example"
+                }
+            };
+            _mockAuthorDataService
+                .Setup(s => s.GetAuthorsByDomainAsync("com", "example"))
+                .ReturnsAsync(authors);
+
+            var result = await _function.Run(req, "example", "com");
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(authors, okResult.Value);
+            // JWT validation should not be called for domain lookups
+            _mockJwtValidationService.Verify(s => s.ValidateTokenAsync(It.IsAny<string>()), Times.Never);
+        }
+
+        // --- Scenario 1: Authenticated with Author.Read scope, no domain params — return all authors paged ---
 
         [Fact]
-        public async Task Run_NoDomainParams_ReturnsAuthorsForLoggedInUser()
+        public async Task Run_WithAuthorReadScope_NoDomainParams_ReturnsAllAuthorsPaged()
         {
-            const string userEmail = "author@example.com";
+            const string userEmail = "admin@example.com";
             var req = CreateRequest(authToken: "valid-token");
             var user = CreateUserWithScope(userEmail: userEmail);
             _mockJwtValidationService
                 .Setup(s => s.ValidateTokenAsync("valid-token"))
                 .ReturnsAsync(user);
+            var authors = new List<AuthorApiResponse>
+            {
+                new AuthorApiResponse { id = Guid.NewGuid().ToString(), AuthorName = "Author One" },
+                new AuthorApiResponse { id = Guid.NewGuid().ToString(), AuthorName = "Author Two" }
+            };
+            _mockAuthorDataService
+                .Setup(s => s.GetAllAuthorsPagedAsync(1, 10))
+                .ReturnsAsync(authors);
+
+            var result = await _function.Run(req, null, null);
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(authors, okResult.Value);
+            _mockAuthorDataService.Verify(s => s.GetAllAuthorsPagedAsync(1, 10), Times.Once);
+        }
+
+        [Fact]
+        public async Task Run_WithAuthorReadScope_NoDomainParams_PageParam_ReturnsCorrectPage()
+        {
+            const string userEmail = "admin@example.com";
+            var req = CreateRequest(authToken: "valid-token", page: 3);
+            var user = CreateUserWithScope(userEmail: userEmail);
+            _mockJwtValidationService
+                .Setup(s => s.ValidateTokenAsync("valid-token"))
+                .ReturnsAsync(user);
+            var authors = new List<AuthorApiResponse>
+            {
+                new AuthorApiResponse { id = Guid.NewGuid().ToString(), AuthorName = "Author On Page 3" }
+            };
+            _mockAuthorDataService
+                .Setup(s => s.GetAllAuthorsPagedAsync(3, 10))
+                .ReturnsAsync(authors);
+
+            var result = await _function.Run(req, null, null);
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(authors, okResult.Value);
+            _mockAuthorDataService.Verify(s => s.GetAllAuthorsPagedAsync(3, 10), Times.Once);
+        }
+
+        [Fact]
+        public async Task Run_WithAuthorReadScope_NoDomainParams_NoAuthors_ReturnsNotFound()
+        {
+            var req = CreateRequest(authToken: "valid-token");
+            var user = CreateUserWithScope();
+            _mockJwtValidationService
+                .Setup(s => s.ValidateTokenAsync("valid-token"))
+                .ReturnsAsync(user);
+            _mockAuthorDataService
+                .Setup(s => s.GetAllAuthorsPagedAsync(1, 10))
+                .ReturnsAsync(new List<AuthorApiResponse>());
+
+            var result = await _function.Run(req, null, null);
+
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
+
+        // --- Scenario 3: Authenticated without Author.Read scope, no domain params — return by email ---
+
+        [Fact]
+        public async Task Run_WithoutAuthorReadScope_NoDomainParams_ReturnsByEmail()
+        {
+            const string userEmail = "author@example.com";
+            var req = CreateRequest(authToken: "valid-token");
+            var user = CreateUserWithoutScope(userEmail: userEmail);
+            _mockJwtValidationService
+                .Setup(s => s.ValidateTokenAsync("valid-token"))
+                .ReturnsAsync(user);
+            _mockScopeValidationService
+                .Setup(s => s.HasRequiredScope(user, "Author.Read"))
+                .Returns(false);
             _mockUserIdentityService
                 .Setup(s => s.GetUserUpn(user))
                 .Returns(userEmail);
@@ -196,9 +251,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 {
                     id = Guid.NewGuid().ToString(),
                     AuthorName = "Author One",
-                    EmailAddress = userEmail,
-                    TopLevelDomain = "com",
-                    SecondLevelDomain = "example"
+                    EmailAddress = userEmail
                 }
             };
             _mockAuthorDataService
@@ -209,17 +262,21 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(authors, okResult.Value);
+            _mockAuthorDataService.Verify(s => s.GetAuthorsByEmailAsync(userEmail), Times.Once);
         }
 
         [Fact]
-        public async Task Run_NoDomainParams_NoAuthorsForUser_ReturnsNotFound()
+        public async Task Run_WithoutAuthorReadScope_NoDomainParams_NoAuthors_ReturnsNotFound()
         {
             const string userEmail = "noauthor@example.com";
             var req = CreateRequest(authToken: "valid-token");
-            var user = CreateUserWithScope(userEmail: userEmail);
+            var user = CreateUserWithoutScope(userEmail: userEmail);
             _mockJwtValidationService
                 .Setup(s => s.ValidateTokenAsync("valid-token"))
                 .ReturnsAsync(user);
+            _mockScopeValidationService
+                .Setup(s => s.HasRequiredScope(user, "Author.Read"))
+                .Returns(false);
             _mockUserIdentityService
                 .Setup(s => s.GetUserUpn(user))
                 .Returns(userEmail);
@@ -233,27 +290,24 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
-        public async Task Run_OnlySecondLevelDomain_FallsBackToUserLookup()
+        public async Task Run_PartialDomainParams_WithAuthorReadScope_ReturnsAllAuthorsPaged()
         {
-            // Only one route param provided — falls back to user-based lookup
-            const string userEmail = "author@example.com";
+            // Only one route param provided — hasDomainParams is false, falls back to paged lookup
+            const string userEmail = "admin@example.com";
             var req = CreateRequest(authToken: "valid-token");
             var user = CreateUserWithScope(userEmail: userEmail);
             _mockJwtValidationService
                 .Setup(s => s.ValidateTokenAsync("valid-token"))
                 .ReturnsAsync(user);
-            _mockUserIdentityService
-                .Setup(s => s.GetUserUpn(user))
-                .Returns(userEmail);
             _mockAuthorDataService
-                .Setup(s => s.GetAuthorsByEmailAsync(userEmail))
+                .Setup(s => s.GetAllAuthorsPagedAsync(1, 10))
                 .ReturnsAsync(new List<AuthorApiResponse>());
 
             var result = await _function.Run(req, "example", null);
 
-            // Incomplete domain → user lookup → no authors → 404
+            // Incomplete domain → authenticated path → Author.Read scope → paged → no authors → 404
             Assert.IsType<NotFoundObjectResult>(result);
-            _mockAuthorDataService.Verify(s => s.GetAuthorsByEmailAsync(userEmail), Times.Once);
+            _mockAuthorDataService.Verify(s => s.GetAllAuthorsPagedAsync(1, 10), Times.Once);
         }
     }
 }
