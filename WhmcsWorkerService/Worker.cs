@@ -132,7 +132,7 @@ namespace WhmcsWorkerService
         private async Task ProcessMessageAsync(ProcessMessageEventArgs args)
         {
             var messageId = args.Message.MessageId;
-            var bodyLength = args.Message.Body.ToArray().Length;
+            var bodyLength = args.Message.Body.ToMemory().Length;
             var enqueuedTime = args.Message.EnqueuedTime;
             var deliveryCount = args.Message.DeliveryCount;
             var sequenceNumber = args.Message.SequenceNumber;
@@ -258,7 +258,7 @@ namespace WhmcsWorkerService
                 return MessageProcessingOutcome.Abandon;
             }
 
-            _logger.LogDebug(EvtRegistrationSucceeded,
+            _logger.LogDebug(EvtRegistrationStarted,
                 "WHMCS RegisterDomainAsync completed in {RegistrationElapsedMs}ms for domain {Domain}, Result={Result}",
                 registrationStopwatch.ElapsedMilliseconds, domainName, registrationSuccess);
 
@@ -307,17 +307,19 @@ namespace WhmcsWorkerService
                     return MessageProcessingOutcome.Complete;
                 }
 
-                _logger.LogDebug(EvtNsUpdateSucceeded,
-                    "WHMCS UpdateNameServersAsync completed in {NsElapsedMs}ms for domain {Domain}, Result={Result}",
-                    nsStopwatch.ElapsedMilliseconds, domainName, nsUpdateSuccess);
-
                 if (nsUpdateSuccess)
                 {
+                    _logger.LogDebug(EvtNsUpdateSucceeded,
+                        "WHMCS UpdateNameServersAsync completed in {NsElapsedMs}ms for domain {Domain}, Result={Result}",
+                        nsStopwatch.ElapsedMilliseconds, domainName, nsUpdateSuccess);
                     _logger.LogInformation(EvtNsUpdateSucceeded,
                         "Successfully updated name servers for domain {Domain} in WHMCS", domainName);
                 }
                 else
                 {
+                    _logger.LogDebug(EvtNsUpdateFailed,
+                        "WHMCS UpdateNameServersAsync completed in {NsElapsedMs}ms for domain {Domain}, Result={Result}",
+                        nsStopwatch.ElapsedMilliseconds, domainName, nsUpdateSuccess);
                     _logger.LogWarning(EvtNsUpdateFailed,
                         "WHMCS name server update returned false for domain {Domain}. " +
                         "Registration was already completed; completing message anyway.",
