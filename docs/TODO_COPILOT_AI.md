@@ -66,7 +66,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 
 ## 🔴 CRITICAL PRIORITY - Domain Registration Validation (IMMEDIATE)
 
-**Context:** Domain registration implementation is complete with Google Domains integration, DNS automation, and Front Door integration. Now requires comprehensive end-to-end testing to validate all workflows.
+**Context:** Domain registration implementation is complete with WHMCS integration, DNS automation, and Front Door integration. Now requires comprehensive end-to-end testing to validate all workflows.
 
 ### 1. Create Comprehensive Domain Registration Tests ⚠️ **URGENT - START IMMEDIATELY**
 
@@ -79,7 +79,7 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
 
 - [ ] **PRIORITY 1:** Enhance unit tests for domain validation
   - Test domain name format validation (valid TLDs, invalid formats)
-  - Test TLD validation against Google Domains supported TLDs
+  - Test TLD validation against supported TLDs
   - Test restricted domain names (reserved, prohibited)
   - Test international domains (IDN/Punycode)
   - Test domain availability checking
@@ -91,8 +91,8 @@ This document outlines tasks that can be automated and executed by Copilot AI. T
   - Test address validation (US, CA, MX)
   - Test international addresses
   - **Target:** 30+ contact validation tests
-- [ ] **PRIORITY 3:** Create end-to-end workflow integration tests
-  - Mock Google Domains API responses
+- [ ] Create end-to-end workflow integration tests
+  - Mock WHMCS API responses
   - Test successful registration flow
   - Test registration failures (domain unavailable, payment failed)
   - Test duplicate domain handling
@@ -459,7 +459,7 @@ dotnet list package --outdated
   5. Verify Front Door domain addition triggered
   6. Verify final status updates
 - [ ] Use test doubles for external services
-- [ ] Mock Google Domains API
+- [ ] Mock WHMCS API
 - [ ] Mock Azure Resource Manager
 - [ ] Create test data cleanup
 
@@ -555,7 +555,7 @@ dotnet list package --outdated
   - Azure DNS
   - Azure Front Door
   - Stripe API
-  - Google Domains API (if configured)
+  - WHMCS API (if configured)
 - [ ] Provide clear error messages
 - [ ] Generate configuration checklist
 

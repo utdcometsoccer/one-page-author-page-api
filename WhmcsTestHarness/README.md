@@ -208,7 +208,7 @@ The test data file should contain an array of domain registration objects:
 
 ### Important Notes
 
-- **This test makes ACTUAL API calls to WHMCS** - Unlike the Google Domains test harness which runs in dry-run mode, this harness will attempt real domain registrations if WHMCS is configured properly
+- **This test makes ACTUAL API calls to WHMCS** - This harness will attempt real domain registrations if WHMCS is configured properly
 - **Billing implications** - Successful registrations may result in charges from your domain registrar (via WHMCS)
 - **Use test/sandbox environment** - It is highly recommended to test against a WHMCS sandbox/test environment first
 - **Test domain availability** - Ensure test domains are available or use domains you intend to register
@@ -398,38 +398,7 @@ dotnet run
 - Use HTTPS for all WHMCS API calls
 - Consider IP restrictions on WHMCS API credentials
 
-## Comparison with Google Domains Test Harness
-
-| Feature | Google Domains Test | WHMCS Test |
-|---------|---------------------|------------|
-| API Calls | Dry run mode (availability check only) | Live API calls (actual registration) |
-| Billing Impact | None | Possible domain registration charges |
-| Registration | Simulated | Actual (if WHMCS configured) |
-| Use Case | Pre-production validation | Integration testing |
-| Safety | Safe for production credentials | Requires test environment |
-
-## Best Practices
-
-1. **Test Environment First**: Always test against a WHMCS sandbox/development environment
-2. **Use Test Domains**: Use obviously test domains (e.g., whmcstest001.com) that you intend to register
-3. **Check Availability**: Manually verify domain availability before running tests
-4. **Monitor Costs**: Keep track of domain registration costs during testing
-5. **Review Logs**: Check WHMCS Activity Log after each test run
-6. **Clean Up**: Delete or cancel test domain registrations after testing
-7. **Secure Credentials**: Never commit WHMCS credentials to source control
-
-## Support
-
-For issues or questions:
-
-1. Check the troubleshooting section above
-2. Review WHMCS API documentation: https://developers.whmcs.com/api-reference/domainregister/
-3. Consult the WHMCS Integration Summary: `docs/WHMCS_INTEGRATION_SUMMARY.md`
-4. Check the main project README.md
-5. Verify Azure Cosmos DB connection status
-
 ## See Also
 
-- **GoogleDomainRegistrationTest** - Similar test harness for Google Cloud Domains (dry-run mode)
 - **DomainRegistrationTestHarness** - General domain registration test harness
 - **WHMCS_INTEGRATION_SUMMARY.md** - Comprehensive WHMCS integration documentation

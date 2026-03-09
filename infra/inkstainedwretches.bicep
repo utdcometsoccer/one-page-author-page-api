@@ -134,16 +134,6 @@ param azureSubscriptionId string = ''
 param azureDnsResourceGroup string = ''
 
 // =========================================
-// Google Domains Integration (Optional)
-// =========================================
-
-@description('Google Cloud Project ID (optional, for Google Domains registration)')
-param googleCloudProjectId string = ''
-
-@description('Google Domains Location (optional, default: global)')
-param googleDomainsLocation string = ''
-
-// =========================================
 // Amazon Product Advertising API (Optional)
 // =========================================
 
@@ -560,24 +550,6 @@ resource inkStainedWretchFunctionsApp 'Microsoft.Web/sites@2024-04-01' = if (dep
         {
           name: 'AZURE_DNS_RESOURCE_GROUP'
           value: azureDnsResourceGroup
-        }
-      ] : [],
-      // Google Domains Integration (optional)
-      !empty(googleCloudProjectId) ? [
-        {
-          name: 'GOOGLE_CLOUD_PROJECT_ID'
-          value: googleCloudProjectId
-        }
-      ] : [],
-      !empty(googleDomainsLocation) ? [
-        {
-          name: 'GOOGLE_DOMAINS_LOCATION'
-          value: googleDomainsLocation
-        }
-      ] : !empty(googleCloudProjectId) ? [
-        {
-          name: 'GOOGLE_DOMAINS_LOCATION'
-          value: 'global'
         }
       ] : [],
       // Amazon Product Advertising API (optional)

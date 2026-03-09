@@ -2497,7 +2497,6 @@ For issues or questions:
 {
   "TESTING_MODE": "true",
   "MOCK_AZURE_INFRASTRUCTURE": "true",
-  "MOCK_GOOGLE_DOMAINS": "true", 
   "MOCK_STRIPE_PAYMENTS": "true",
   "MOCK_EXTERNAL_APIS": "true",
   "SKIP_DOMAIN_PURCHASE": "true",
@@ -2519,7 +2518,6 @@ For issues or questions:
 {
   "TESTING_MODE": "true",
   "MOCK_AZURE_INFRASTRUCTURE": "false",
-  "MOCK_GOOGLE_DOMAINS": "true",
   "MOCK_STRIPE_PAYMENTS": "true", 
   "MOCK_EXTERNAL_APIS": "false",
   "SKIP_DOMAIN_PURCHASE": "true",
@@ -2541,7 +2539,6 @@ For issues or questions:
 {
   "TESTING_MODE": "true",
   "MOCK_AZURE_INFRASTRUCTURE": "false",
-  "MOCK_GOOGLE_DOMAINS": "false",
   "MOCK_STRIPE_PAYMENTS": "false",
   "MOCK_EXTERNAL_APIS": "false", 
   "SKIP_DOMAIN_PURCHASE": "false",
@@ -2621,7 +2618,6 @@ switch ($Scenario) {
     {$_ -in "1", "frontend"} {
         $config.Values.TESTING_MODE = "true"
         $config.Values.MOCK_AZURE_INFRASTRUCTURE = "true"
-        $config.Values.MOCK_GOOGLE_DOMAINS = "true"
         $config.Values.MOCK_STRIPE_PAYMENTS = "true"
         $config.Values.MOCK_EXTERNAL_APIS = "true"
         $config.Values.SKIP_DOMAIN_PURCHASE = "true"
@@ -2634,7 +2630,6 @@ switch ($Scenario) {
     {$_ -in "2", "individual"} {
         $config.Values.TESTING_MODE = "true"
         $config.Values.MOCK_AZURE_INFRASTRUCTURE = "false"
-        $config.Values.MOCK_GOOGLE_DOMAINS = "true"
         $config.Values.MOCK_STRIPE_PAYMENTS = "true"
         $config.Values.MOCK_EXTERNAL_APIS = "false"
         $config.Values.SKIP_DOMAIN_PURCHASE = "true"
@@ -2647,7 +2642,6 @@ switch ($Scenario) {
     {$_ -in "3", "production"} {
         $config.Values.TESTING_MODE = "true"
         $config.Values.MOCK_AZURE_INFRASTRUCTURE = "false"
-        $config.Values.MOCK_GOOGLE_DOMAINS = "false"
         $config.Values.MOCK_STRIPE_PAYMENTS = "false"
         $config.Values.MOCK_EXTERNAL_APIS = "false"
         $config.Values.SKIP_DOMAIN_PURCHASE = "false"
@@ -2783,7 +2777,6 @@ dotnet user-secrets set "AMAZON_PRODUCT_ACCESS_KEY" "your-actual-amazon-key"
 dotnet user-secrets set "AMAZON_PRODUCT_SECRET_KEY" "your-actual-amazon-secret"
 dotnet user-secrets set "AAD_TENANT_ID" "your-actual-tenant-id"
 dotnet user-secrets set "AAD_CLIENT_ID" "your-actual-client-id" 
-dotnet user-secrets set "GOOGLE_CLOUD_PROJECT_ID" "your-actual-project-id"
 
 ```
 

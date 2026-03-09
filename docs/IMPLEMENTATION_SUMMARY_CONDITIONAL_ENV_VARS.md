@@ -39,9 +39,6 @@ Previously, all environment variables were hardcoded in the Bicep template with 
 - **Azure Infrastructure** (optional, for domain management):
   - `azureSubscriptionId`, `azureDnsResourceGroup`
 
-- **Google Domains Integration** (optional):
-  - `googleCloudProjectId`, `googleDomainsLocation`
-
 - **Amazon Product API** (optional):
   - `amazonProductAccessKey`, `amazonProductSecretKey`
   - `amazonProductPartnerTag`, `amazonProductRegion`, `amazonProductMarketplace`
@@ -96,7 +93,7 @@ This ensures defaults are only applied when the feature is actually configured.
 Added all optional secrets to the workflow environment:
 
 - Core secrets (Cosmos DB, Stripe, Azure AD)
-- Optional integration secrets (Amazon, Penguin Random House, Google Domains)
+- Optional integration secrets (Amazon, Penguin Random House)
 - Azure infrastructure secrets
 
 #### Conditional Parameter Building
@@ -152,7 +149,6 @@ Created comprehensive guide including:
 
 - Azure AD: `AAD_TENANT_ID`, `AAD_AUDIENCE`
 - Domain Management: `AZURE_SUBSCRIPTION_ID`, `AZURE_DNS_RESOURCE_GROUP`
-- Google Domains: `GOOGLE_CLOUD_PROJECT_ID`, `GOOGLE_DOMAINS_LOCATION`
 - Amazon API: `AMAZON_PRODUCT_ACCESS_KEY`, `AMAZON_PRODUCT_SECRET_KEY`, `AMAZON_PRODUCT_PARTNER_TAG`, `AMAZON_PRODUCT_REGION`, `AMAZON_PRODUCT_MARKETPLACE`
 - Penguin Random House: `PENGUIN_RANDOM_HOUSE_API_KEY`, `PENGUIN_RANDOM_HOUSE_API_DOMAIN`
 - Key Vault: `KEY_VAULT_URL`, `USE_KEY_VAULT`

@@ -55,7 +55,6 @@ try {
     Write-Host "🔧 Key Settings:" -ForegroundColor Cyan
     Write-Host "   Testing Mode: $($values.TESTING_MODE)" -ForegroundColor $(if($values.TESTING_MODE -eq "true") { "Yellow" } else { "White" })
     Write-Host "   Mock Azure Infrastructure: $($values.MOCK_AZURE_INFRASTRUCTURE)" -ForegroundColor $(if($values.MOCK_AZURE_INFRASTRUCTURE -eq "true") { "Green" } else { "Red" })
-    Write-Host "   Mock Google Domains: $($values.MOCK_GOOGLE_DOMAINS)" -ForegroundColor $(if($values.MOCK_GOOGLE_DOMAINS -eq "true") { "Green" } else { "Red" })
     Write-Host "   Skip Domain Purchase: $($values.SKIP_DOMAIN_PURCHASE)" -ForegroundColor $(if($values.SKIP_DOMAIN_PURCHASE -eq "true") { "Green" } else { "Red" })
     Write-Host "   Max Test Cost Limit: `$$($values.MAX_TEST_COST_LIMIT)" -ForegroundColor $(if([decimal]$values.MAX_TEST_COST_LIMIT -eq 0) { "Green" } else { "Yellow" })
     Write-Host "   Test Scenario: $($values.TEST_SCENARIO)" -ForegroundColor White

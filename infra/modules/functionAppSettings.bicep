@@ -94,16 +94,6 @@ param azureSubscriptionId string = ''
 param azureDnsResourceGroup string = ''
 
 // =========================================
-// Google Domains Parameters (Optional)
-// =========================================
-
-@description('Google Cloud project ID (optional)')
-param googleCloudProjectId string = ''
-
-@description('Google Domains location (optional)')
-param googleDomainsLocation string = ''
-
-// =========================================
 // Amazon Product API Parameters (Optional)
 // =========================================
 
@@ -293,27 +283,6 @@ var azureInfraSettings = concat(
   ] : []
 )
 
-// Google Domains Integration (optional)
-var googleDomainsSettings = concat(
-  !empty(googleCloudProjectId) ? [
-    {
-      name: 'GOOGLE_CLOUD_PROJECT_ID'
-      value: googleCloudProjectId
-    }
-  ] : [],
-  !empty(googleDomainsLocation) ? [
-    {
-      name: 'GOOGLE_DOMAINS_LOCATION'
-      value: googleDomainsLocation
-    }
-  ] : (!empty(googleCloudProjectId) && empty(googleDomainsLocation)) ? [
-    {
-      name: 'GOOGLE_DOMAINS_LOCATION'
-      value: 'global'
-    }
-  ] : []
-)
-
 // Amazon Product API (optional)
 var amazonProductSettings = concat(
   !empty(amazonProductAccessKey) ? [
@@ -400,7 +369,6 @@ var allSettings = concat(
   azureStorageSettings,
   stripeSettings,
   azureInfraSettings,
-  googleDomainsSettings,
   amazonProductSettings,
   penguinRandomHouseSettings,
   keyVaultSettings

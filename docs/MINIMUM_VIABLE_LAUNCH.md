@@ -32,7 +32,7 @@ A user can:
 **Goal:** Validate domain registration workflow works end-to-end
 
 #### 1.1 Domain Registration E2E Test
-- [ ] Set up Google Domains API test environment
+- [ ] Set up WHMCS API test environment
 - [ ] Acquire test domain (e.g., cheap `.xyz` or `.test` domain)
 - [ ] Execute full registration flow with real API calls
 - [ ] Verify domain registration completes successfully
@@ -90,7 +90,6 @@ A user can:
 #### 2.3 External Service Configuration
 - [ ] Stripe: Production API keys configured, webhook endpoints registered
 - [ ] Entra ID: Production tenant configured, app registration complete
-- [ ] Google Domains: Production API credentials (if applicable)
 - [ ] Azure Communication Services: Email configuration (if using ACS)
 
 #### 2.4 Data Seeding (Production)

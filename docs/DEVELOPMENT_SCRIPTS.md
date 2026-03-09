@@ -185,7 +185,7 @@ gh secret list
 - ✅ **Cosmos DB** - Connection string, endpoint, key, database ID (REQUIRED)
 - ⚙️ **Azure Storage** - Required if using ImageAPI
 - ⚙️ **Stripe** - Required if using InkStainedWretchStripe
-- ⚙️ **External APIs** - Amazon, PRH, Google Domains (optional)
+- ⚙️ **External APIs** - Amazon, PRH (optional)
 
 ### 🚀 Start Development Session
 

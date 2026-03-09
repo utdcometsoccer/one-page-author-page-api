@@ -49,8 +49,7 @@ $secretKeys = @(
     "AAD_CLIENT_ID",
     "AAD_TENANT_ID",
     "STRIPE_SECRET_KEY",
-    "AZURE_STRIPE_SECRET_KEY",
-    "GOOGLE_CLOUD_PROJECT_ID"
+    "AZURE_STRIPE_SECRET_KEY"
 )
 
 # Define which keys should remain in local.settings.json (non-sensitive configuration)
@@ -72,11 +71,8 @@ $publicKeys = @(
     "AZURE_DNS_RESOURCE_GROUP",
     "AZURE_RESOURCE_GROUP_NAME",
     "AZURE_FRONTDOOR_PROFILE_NAME",
-    "GOOGLE_DOMAINS_LOCATION",
-    "GOOGLE_DOMAINS_PROJECT",
     "TESTING_MODE",
     "MOCK_AZURE_INFRASTRUCTURE",
-    "MOCK_GOOGLE_DOMAINS",
     "MOCK_STRIPE_PAYMENTS",
     "STRIPE_TEST_MODE",
     "MOCK_EXTERNAL_APIS",

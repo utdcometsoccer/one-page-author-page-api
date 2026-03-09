@@ -153,26 +153,6 @@ switch ($Scenario) {
             }
         }
         
-        # Test Google Domains operations (mocked in scenario 2)
-        Write-Host "🔍 Testing Google Domains operations..." -ForegroundColor Yellow
-        $googleTests = @(
-            @{ operation = "available"; description = "Check domain availability" }
-        )
-        
-        foreach ($test in $googleTests) {
-            $body = @{
-                domainName = $DomainName
-                operation = $test.operation
-            }
-            
-            Write-Host "  📋 $($test.description)..." -ForegroundColor Gray
-            $result = Invoke-FunctionRequest -Endpoint "/api/test/googledomains" -Body $body
-            
-            if ($result) {
-                $status = if ($result.success) { "✅" } else { "❌" }
-                Write-Host "     $status $($result.message) (mocked)" -ForegroundColor $(if($result.success) { "Green" } else { "Red" })
-            }
-        }
     }
     
     3 {

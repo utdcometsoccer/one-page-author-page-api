@@ -644,10 +644,6 @@ jobs:
           # WHMCS Service Bus (optional)
           WHMCS_SB_QUEUE_NAME: ${{ secrets.WHMCS_SB_QUEUE_NAME }}
           
-          # Google Domains Integration (optional)
-          GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
-          GOOGLE_DOMAINS_LOCATION: ${{ secrets.GOOGLE_DOMAINS_LOCATION }}
-          
           # Amazon Product Advertising API (optional)
           AMAZON_PRODUCT_ACCESS_KEY: ${{ secrets.AMAZON_PRODUCT_ACCESS_KEY }}
           AMAZON_PRODUCT_SECRET_KEY: ${{ secrets.AMAZON_PRODUCT_SECRET_KEY }}
@@ -734,10 +730,6 @@ jobs:
           # Add Azure Infrastructure parameters conditionally
           [ -n "$AZURE_SUBSCRIPTION_ID" ] && PARAMS_ARRAY+=("azureSubscriptionId=$AZURE_SUBSCRIPTION_ID")
           [ -n "$AZURE_DNS_RESOURCE_GROUP" ] && PARAMS_ARRAY+=("azureDnsResourceGroup=$AZURE_DNS_RESOURCE_GROUP")
-          
-          # Add Google Domains parameters conditionally
-          [ -n "$GOOGLE_CLOUD_PROJECT_ID" ] && PARAMS_ARRAY+=("googleCloudProjectId=$GOOGLE_CLOUD_PROJECT_ID")
-          [ -n "$GOOGLE_DOMAINS_LOCATION" ] && PARAMS_ARRAY+=("googleDomainsLocation=$GOOGLE_DOMAINS_LOCATION")
           
           # Add Amazon API parameters conditionally
           [ -n "$AMAZON_PRODUCT_ACCESS_KEY" ] && SECURE_PARAMS_ARRAY+=("amazonProductAccessKey=$AMAZON_PRODUCT_ACCESS_KEY")

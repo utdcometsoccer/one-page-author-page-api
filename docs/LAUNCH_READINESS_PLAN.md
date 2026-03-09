@@ -83,7 +83,7 @@ The OnePageAuthor API Platform is **95% ready for North America launch**. Core f
 
 **Action Required:**
 
-1. Set up test environment with Google Domains API credentials
+1. Set up test environment with WHMCS API credentials
 2. Execute domain registration with real test domain (`.test` or cheap `.xyz`)
 3. Validate entire workflow:
    - Domain availability check → Registration request → Payment processing → Confirmation
@@ -156,7 +156,7 @@ The OnePageAuthor API Platform is **95% ready for North America launch**. Core f
   - [ ] Production environment variables set for all Function Apps
   - [ ] Stripe production API keys configured
   - [ ] Entra ID production tenant configured
-  - [ ] Google Domains API credentials (if using Google Domains)
+  - [ ] WHMCS API credentials (if using WHMCS for domain registration)
   - [ ] Azure DNS subscription ID and resource group
   - [ ] Front Door profile name and resource group
 
@@ -253,7 +253,7 @@ The OnePageAuthor API Platform is **95% ready for North America launch**. Core f
 ### Week 1: Critical Validation (Current Week)
 
 **Days 1-2: Domain Registration Testing**
-- Set up Google Domains test environment
+- Set up WHMCS test environment
 - Execute end-to-end domain registration tests
 - Document findings and fix any issues
 

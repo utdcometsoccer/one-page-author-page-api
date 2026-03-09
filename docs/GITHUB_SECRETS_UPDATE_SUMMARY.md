@@ -204,14 +204,13 @@ The updated script now supports configuration for:
 4. **Azure Storage** (1 secret)
 5. **Stripe** (2 secrets)
 6. **Domain Management** (5 secrets) ← 2 new
-7. **Google Domains** (2 secrets)
-8. **Amazon Product API** (5 secrets)
-9. **Penguin Random House API** (2 secrets)
-10. **Azure Key Vault** (2 secrets) ← NEW category
-11. **Referral Program** (1 secret) ← NEW category
-12. **Testing Configuration** (11 secrets) ← NEW category
+7. **Amazon Product API** (5 secrets)
+8. **Penguin Random House API** (2 secrets)
+9. **Azure Key Vault** (2 secrets) ← NEW category
+10. **Referral Program** (1 secret) ← NEW category
+11. **Testing Configuration** (11 secrets) ← NEW category
 
-**Total: 43 secrets** (26 original + 18 new = 44, minus 1 reorganized = 43)
+**Total: 41 secrets** (26 original + 16 new = 42, minus 1 reorganized = 41)
 
 ---
 
