@@ -21,6 +21,12 @@ A .NET 10 background worker that dequeues domain-registration messages from an A
 - [Configuration Reference](#configuration-reference)
 - [Routine Maintenance](#routine-maintenance)
 - [Monitoring and Observability](#monitoring-and-observability)
+  - [systemd journal (real-time)](#systemd-journal-real-time)
+  - [Logging levels and verbose telemetry](#logging-levels-and-verbose-telemetry)
+  - [Key log messages to watch for](#key-log-messages-to-watch-for)
+  - [Structured EventId reference](#structured-eventid-reference)
+  - [Application Insights setup](#application-insights-setup)
+  - [KQL queries for worker service activity](#kql-queries-for-worker-service-activity)
 - [Troubleshooting](#troubleshooting)
 - [Security Notes](#security-notes)
 - [Related Components](#related-components)
@@ -381,6 +387,8 @@ sudo journalctl -u whmcs-worker -f
 
 All configuration is loaded from `/etc/whmcs-worker/environment` (and optionally from .NET User Secrets during development).
 
+### Core variables
+
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `SERVICE_BUS_CONNECTION_STRING` | **Yes** | — | Full Azure Service Bus connection string |
@@ -388,6 +396,13 @@ All configuration is loaded from `/etc/whmcs-worker/environment` (and optionally
 | `WHMCS_API_URL` | **Yes** | — | Full URL to the WHMCS API (e.g., `https://your-whmcs.com/includes/api.php`) |
 | `WHMCS_API_IDENTIFIER` | **Yes** | — | WHMCS API credential identifier |
 | `WHMCS_API_SECRET` | **Yes** | — | WHMCS API credential secret |
+
+### Telemetry and logging variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | No | — | Application Insights connection string. When set, all structured logs are exported to Azure Monitor for KQL querying. |
+| `WHMCS_WORKER_LOG_LEVEL` | No | `Information` | Minimum log level feature flag. Accepted values: `Trace`, `Debug`, `Information`, `Warning`, `Error`, `Critical`. Set to `Debug` or `Trace` to enable verbose telemetry. |
 
 The worker logs the configured/missing status of each variable at startup (values are never logged).
 
@@ -509,37 +524,296 @@ sudo journalctl -u whmcs-worker -n 100
 
 # Filter to errors only
 sudo journalctl -u whmcs-worker -p err
+
+# Since a specific time
+sudo journalctl -u whmcs-worker --since "2024-01-01 00:00:00"
+```
+
+### Logging levels and verbose telemetry
+
+The worker uses structured logging with five active log levels:
+
+| Level | When emitted | Set `WHMCS_WORKER_LOG_LEVEL` to |
+|-------|--------------|---------------------------------|
+| **Critical** | Service cannot start (missing config) | — |
+| **Error** | Message dead-lettered; exceptions thrown by WHMCS API or Service Bus | `Error` |
+| **Warning** | WHMCS returned a non-success result; incorrect name server count; NS update returned false | `Warning` |
+| **Information** | Normal operation events (service start/stop, message processing, registration success, NS update result) | `Information` *(default)* |
+| **Debug** | Detailed metadata — message body size, enqueue time, processing duration (ms), WHMCS API call durations, result flags | `Debug` |
+| **Trace** | Maximum verbosity — message body deserialization details, full name server lists, step-by-step flow | `Trace` |
+
+Setting `WHMCS_WORKER_LOG_LEVEL=Debug` (or `Trace`) in `/etc/whmcs-worker/environment` enables verbose telemetry without redeploying:
+
+```bash
+# Edit the environment file on the VM
+sudo nano /etc/whmcs-worker/environment
+
+# Add or update:
+WHMCS_WORKER_LOG_LEVEL=Debug
+
+# Restart to apply
+sudo systemctl restart whmcs-worker
+sudo journalctl -u whmcs-worker -f
 ```
 
 ### Key log messages to watch for
 
-| Log message | Meaning |
-|-------------|---------|
-| `WHMCS Worker Service starting. Listening on queue 'whmcs-domain-registrations'` | Service started successfully |
-| `Processing WHMCS registration for domain {Domain}` | A message was dequeued |
-| `Successfully registered domain {Domain} via WHMCS API` | Registration call succeeded |
-| `Successfully updated name servers for domain {Domain}` | Name server update succeeded |
-| `WHMCS domain registration returned false for domain {Domain}. Message will be abandoned for retry.` | WHMCS returned a non-success result; message will retry |
-| `Exception while registering domain {Domain} via WHMCS API. Message will be abandoned for retry.` | Network/HTTP error; message will retry |
-| `Failed to deserialize WHMCS queue message {MessageId}. Dead-lettering.` | Bad message format — inspect in dead-letter queue |
-| `SERVICE_BUS_CONNECTION_STRING is not configured` | Worker cannot start — check environment file |
+| Log message | Level | Meaning |
+|-------------|-------|---------|
+| `WHMCS Worker Service starting. Listening on queue '{Queue}'` | Info | Service started successfully |
+| `WHMCS Worker Service is running and listening for messages` | Info | Processor started; ready for messages |
+| `Processing WHMCS registration for domain {Domain}` | Info | A message was dequeued |
+| `Successfully registered domain {Domain} via WHMCS API` | Info | Registration call succeeded |
+| `Successfully updated name servers for domain {Domain}` | Info | NS update succeeded |
+| `WHMCS domain registration returned false for domain {Domain}. Message will be abandoned for retry.` | Warn | WHMCS returned a non-success result; message will retry |
+| `Exception while registering domain {Domain} via WHMCS API. Message will be abandoned for retry.` | Error | Network/HTTP error; message will retry |
+| `Failed to deserialize WHMCS queue message {MessageId}. Dead-lettering.` | Error | Bad message format — inspect in dead-letter queue |
+| `WHMCS queue message {MessageId} has no domain registration data. Dead-lettering.` | Error | Message missing domain — inspect in dead-letter queue |
+| `SERVICE_BUS_CONNECTION_STRING is not configured` | Critical | Worker cannot start — check environment file |
+| `WHMCS Worker Service is stopping` | Info | Graceful shutdown initiated |
 
-### Application Insights (Azure Functions side)
+### Structured EventId reference
 
-To correlate with the Azure Functions side, use these KQL queries:
+Every log entry emits a numeric `EventId` and an `EventId.Name`. Use these in KQL queries (see below) to filter by specific events without relying on message text matching.
+
+| EventId | Name | Level | Description |
+|---------|------|-------|-------------|
+| 1001 | `WhmcsWorkerStarting` | Info/Debug | Service started; queue name and processor options logged |
+| 1002 | `WhmcsWorkerRunning` | Info | Processor active; ready to receive messages |
+| 1003 | `WhmcsWorkerStopping` | Info | Graceful shutdown begun |
+| 2001 | `MessageReceived` | Debug | Service Bus message received (body size, delivery count, sequence number) |
+| 2002 | `MessageDeserializeFailed` | Error | JSON deserialization failed; message dead-lettered |
+| 2003 | `MessageMissingData` | Error | DomainRegistration or Domain is null; message dead-lettered |
+| 2010 | `ProcessingStarted` | Info/Debug/Trace | Domain registration processing started; metadata logged at Debug |
+| 2011 | `RegistrationStarted` | Debug | WHMCS `RegisterDomainAsync` call initiated; duration logged on completion |
+| 2012 | `RegistrationSucceeded` | Info | WHMCS domain registration returned success |
+| 2013 | `RegistrationFailed` | Warning | WHMCS returned false; message will be retried |
+| 2014 | `RegistrationException` | Error | Exception thrown during registration; message will be retried |
+| 2021 | `NameServerUpdateStarted` | Info/Trace | NS update initiated; full NS list logged at Trace |
+| 2022 | `NameServerUpdateSucceeded` | Info | WHMCS NS update returned success |
+| 2023 | `NameServerUpdateFailed` | Warning | WHMCS returned false for NS update; message completed anyway |
+| 2024 | `NameServerUpdateException` | Error | Exception during NS update; message completed anyway |
+| 2025 | `NameServerUpdateSkipped` | Info/Warning | No NS provided (Info) or invalid NS count (Warning) |
+| 2030 | `ProcessingCompleted` | Info/Debug | Processing finished; total elapsed ms logged at Debug |
+| 3001 | `ServiceBusError` | Error | Service Bus processor error (connection issues, etc.) |
+
+### Application Insights setup
+
+Set `APPLICATIONINSIGHTS_CONNECTION_STRING` in `/etc/whmcs-worker/environment` to export all structured logs to Azure Monitor. The connection string is available in the Azure Portal under your Application Insights resource → **Overview** → **Connection String**.
+
+```bash
+# Add to /etc/whmcs-worker/environment
+APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=...;IngestionEndpoint=...
+```
+
+Once configured, logs appear in the `traces` table in Log Analytics with:
+
+- `cloud_RoleName` = `WhmcsWorkerService`
+- `customDimensions["EventId"]` = numeric EventId (e.g. `2012`)
+- `customDimensions["EventId.Name"]` = EventId name (e.g. `RegistrationSucceeded`)
+- `customDimensions["Domain"]` = domain name (e.g. `example.com`)
+- `customDimensions["MessageId"]` = Service Bus message ID
+- `customDimensions["TotalElapsedMs"]` = total processing duration (Debug level only)
+- `customDimensions["RegistrationElapsedMs"]` = WHMCS registration API duration (Debug level only)
+- `customDimensions["NsElapsedMs"]` = WHMCS NS update API duration (Debug level only)
+
+### KQL queries for worker service activity
+
+All queries use `cloud_RoleName == "WhmcsWorkerService"` to scope results to this service. These queries are also available as `.kql` files in the [`/kql`](../kql/) directory.
+
+#### Service health
 
 ```kql
-// Messages enqueued by DomainRegistrationTriggerFunction
+// Worker service lifecycle events (starts, stops, Service Bus errors)
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(24h)
+| where customDimensions["EventId.Name"] in (
+    "WhmcsWorkerStarting",
+    "WhmcsWorkerRunning",
+    "WhmcsWorkerStopping",
+    "ServiceBusError"
+)
+| extend
+    EventName = tostring(customDimensions["EventId.Name"]),
+    Source    = tostring(customDimensions["Source"]),
+    Entity    = tostring(customDimensions["Entity"])
+| project timestamp, EventName, Source, Entity, severityLevel, message
+| order by timestamp desc
+```
+
+#### All errors and warnings
+
+```kql
+// All warning, error, and critical events
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(24h)
+| where severityLevel >= 2  // 2=Warning, 3=Error, 4=Critical
+| extend
+    EventName = tostring(customDimensions["EventId.Name"]),
+    Domain    = tostring(customDimensions["Domain"]),
+    MessageId = tostring(customDimensions["MessageId"])
+| project timestamp, severityLevel, EventName, Domain, MessageId, message
+| order by timestamp desc
+```
+
+#### Message processing lifecycle
+
+```kql
+// Full lifecycle of each domain registration message
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(24h)
+| where customDimensions["EventId.Name"] in (
+    "ProcessingStarted",
+    "ProcessingCompleted",
+    "RegistrationSucceeded",
+    "RegistrationFailed",
+    "RegistrationException",
+    "MessageDeserializeFailed",
+    "MessageMissingData"
+)
+| extend
+    EventName = tostring(customDimensions["EventId.Name"]),
+    Domain    = tostring(customDimensions["Domain"]),
+    MessageId = tostring(customDimensions["MessageId"])
+| project timestamp, EventName, Domain, MessageId, severityLevel, message
+| order by timestamp desc
+```
+
+#### Registration success rate over time
+
+```kql
+// Hourly registration success/failure/exception counts with success rate
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(7d)
+| where customDimensions["EventId.Name"] in (
+    "RegistrationSucceeded",
+    "RegistrationFailed",
+    "RegistrationException"
+)
+| extend EventName = tostring(customDimensions["EventId.Name"])
+| summarize
+    Succeeded     = countif(EventName == "RegistrationSucceeded"),
+    Failed        = countif(EventName == "RegistrationFailed"),
+    Exceptions    = countif(EventName == "RegistrationException"),
+    TotalAttempts = count()
+    by bin(timestamp, 1h)
+| extend SuccessRate = round(todouble(Succeeded) / todouble(TotalAttempts) * 100, 1)
+| order by timestamp desc
+| render timechart
+```
+
+#### Dead-letter queue analysis
+
+```kql
+// All dead-lettered messages (bad JSON or missing domain data)
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(7d)
+| where customDimensions["EventId.Name"] in (
+    "MessageDeserializeFailed",
+    "MessageMissingData"
+)
+| extend
+    EventName = tostring(customDimensions["EventId.Name"]),
+    MessageId = tostring(customDimensions["MessageId"]),
+    Reason = case(
+        customDimensions["EventId.Name"] == "MessageDeserializeFailed", "DeserializationFailure",
+        customDimensions["EventId.Name"] == "MessageMissingData",       "MissingDomainData",
+        "Unknown"
+    )
+| project timestamp, Reason, MessageId, message
+| order by timestamp desc
+```
+
+#### Processing performance (requires `WHMCS_WORKER_LOG_LEVEL=Debug`)
+
+```kql
+// Hourly P95, max, avg processing durations
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(24h)
+| where customDimensions["EventId.Name"] == "ProcessingCompleted"
+| extend
+    Domain         = tostring(customDimensions["Domain"]),
+    TotalElapsedMs = tolong(customDimensions["TotalElapsedMs"])
+| where isnotnull(TotalElapsedMs)
+| summarize
+    AvgMs  = avg(TotalElapsedMs),
+    MaxMs  = max(TotalElapsedMs),
+    P95Ms  = percentile(TotalElapsedMs, 95),
+    Count  = count()
+    by bin(timestamp, 1h)
+| order by timestamp desc
+| render timechart
+```
+
+#### Name server update outcomes
+
+```kql
+// Name server update success/failure/skip counts over time
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(7d)
+| where customDimensions["EventId.Name"] in (
+    "NameServerUpdateSucceeded",
+    "NameServerUpdateFailed",
+    "NameServerUpdateException",
+    "NameServerUpdateSkipped"
+)
+| extend EventName = tostring(customDimensions["EventId.Name"])
+| summarize
+    Succeeded  = countif(EventName == "NameServerUpdateSucceeded"),
+    Failed     = countif(EventName == "NameServerUpdateFailed"),
+    Exceptions = countif(EventName == "NameServerUpdateException"),
+    Skipped    = countif(EventName == "NameServerUpdateSkipped"),
+    TotalOps   = count()
+    by bin(timestamp, 1h)
+| order by timestamp desc
+| render timechart
+```
+
+#### Cross-service correlation (Azure Functions + Worker Service)
+
+```kql
+// Correlate enqueue events (Function side) with processing events (Worker side)
+// Useful for measuring end-to-end latency from enqueue to completion
+let enqueuedMessages =
+    traces
+    | where cloud_RoleName != "WhmcsWorkerService"
+    | where message contains "Enqueued WHMCS"
+    | extend Domain = extract(@"domain ([^\s,]+)", 1, message)
+    | project EnqueuedAt = timestamp, Domain;
+let processedMessages =
+    traces
+    | where cloud_RoleName == "WhmcsWorkerService"
+    | where customDimensions["EventId.Name"] == "ProcessingCompleted"
+    | extend Domain = tostring(customDimensions["Domain"])
+    | project ProcessedAt = timestamp, Domain;
+enqueuedMessages
+| join kind=leftouter processedMessages on Domain
+| extend LatencySeconds = datetime_diff("second", ProcessedAt, EnqueuedAt)
+| project EnqueuedAt, ProcessedAt, Domain, LatencySeconds
+| order by EnqueuedAt desc
+```
+
+```kql
+// Messages enqueued by DomainRegistrationTriggerFunction (Azure Functions side)
 traces
 | where message contains "Enqueued WHMCS"
-| project timestamp, message, severityLevel
+| project timestamp, message, severityLevel, cloud_RoleName
 | order by timestamp desc
+```
 
-// Domain registration trigger errors
+```kql
+// Domain registration trigger errors (Azure Functions side)
 traces
 | where operation_Name == "DomainRegistrationTrigger"
 | where severityLevel >= 3
-| project timestamp, message
+| project timestamp, message, cloud_RoleName
 | order by timestamp desc
 ```
 

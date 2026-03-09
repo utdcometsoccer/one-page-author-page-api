@@ -1267,6 +1267,9 @@ jobs:
           WHMCS_API_URL: ${{ secrets.WHMCS_API_URL }}
           WHMCS_API_IDENTIFIER: ${{ secrets.WHMCS_API_IDENTIFIER }}
           WHMCS_API_SECRET: ${{ secrets.WHMCS_API_SECRET }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING_WHMCS_WORKER: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_WHMCS_WORKER }}
+          WHMCS_WORKER_LOG_LEVEL: ${{ secrets.WHMCS_WORKER_LOG_LEVEL }}
           DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
         run: |
           if [ "$DEPLOY_WHMCS_WORKER" != "true" ] || [ -z "$WHMCS_WORKER_RESOURCE_GROUP" ]; then
@@ -1303,11 +1306,19 @@ jobs:
             exit 1
           fi
 
+          # Application Insights: use the worker-specific connection string, falling back to
+          # the shared APPLICATIONINSIGHTS_CONNECTION_STRING if the worker-specific one is not set.
+          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_WHMCS_WORKER:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+
+          # Log level defaults to Information if not set.
+          LOG_LEVEL="${WHMCS_WORKER_LOG_LEVEL:-Information}"
+
           # Write the environment file on the VM via run-command.
-          # Secrets are passed as protected --parameters (positional $1-$5 in the script)
+          # Secrets are passed as protected --parameters (positional $1-$7 in the script)
           # so they are not stored in the run-command definition visible in Azure Activity Logs.
           # Parameter order: $1=SERVICE_BUS_CONNECTION_STRING, $2=SERVICE_BUS_WHMCS_QUEUE_NAME,
-          #                  $3=WHMCS_API_URL, $4=WHMCS_API_IDENTIFIER, $5=WHMCS_API_SECRET
+          #                  $3=WHMCS_API_URL, $4=WHMCS_API_IDENTIFIER, $5=WHMCS_API_SECRET,
+          #                  $6=APPLICATIONINSIGHTS_CONNECTION_STRING, $7=WHMCS_WORKER_LOG_LEVEL
           ENV_SCRIPT=$(cat << 'SCRIPTEOF'
           set -e
           mkdir -p /etc/whmcs-worker
@@ -1317,6 +1328,10 @@ jobs:
             printf 'WHMCS_API_URL=%s\n'                  "$3"
             printf 'WHMCS_API_IDENTIFIER=%s\n'           "$4"
             printf 'WHMCS_API_SECRET=%s\n'               "$5"
+            if [ -n "$6" ]; then
+              printf 'APPLICATIONINSIGHTS_CONNECTION_STRING=%s\n' "$6"
+            fi
+            printf 'WHMCS_WORKER_LOG_LEVEL=%s\n'         "$7"
           } > /etc/whmcs-worker/environment
           chmod 600 /etc/whmcs-worker/environment
           chown root:root /etc/whmcs-worker/environment
@@ -1326,12 +1341,14 @@ jobs:
           )
 
           echo "🔧 Writing environment file on VM: $VM_NAME"
+          echo "   Log level: $LOG_LEVEL"
+          echo "   Application Insights: $([ -n "$AI_CONN" ] && echo 'configured' || echo 'not configured')"
           az vm run-command invoke \
             --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
             --name "$VM_NAME" \
             --command-id RunShellScript \
             --scripts "$ENV_SCRIPT" \
-            --parameters "$SB_CONN" "$QUEUE_NAME" "$WHMCS_API_URL" "$WHMCS_API_IDENTIFIER" "$WHMCS_API_SECRET" \
+            --parameters "$SB_CONN" "$QUEUE_NAME" "$WHMCS_API_URL" "$WHMCS_API_IDENTIFIER" "$WHMCS_API_SECRET" "$AI_CONN" "$LOG_LEVEL" \
             --output json
 
           echo "✓ Environment configured on VM: $VM_NAME"

@@ -1,0 +1,25 @@
+// KQL Query: WHMCS Worker Service - Message Processing Lifecycle
+// Shows the full lifecycle of each domain registration message processed by the worker.
+// Recommended visualization: Table
+// Use this to audit every message, trace a specific domain, or confirm delivery.
+// Note: Set WHMCS_WORKER_LOG_LEVEL=Debug in the worker environment to capture
+//       additional fields such as BodyBytes, DeliveryCount, and RegistrationId.
+
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(24h)
+| where customDimensions["EventId.Name"] in (
+    "ProcessingStarted",
+    "ProcessingCompleted",
+    "RegistrationSucceeded",
+    "RegistrationFailed",
+    "RegistrationException",
+    "MessageDeserializeFailed",
+    "MessageMissingData"
+)
+| extend
+    EventName    = tostring(customDimensions["EventId.Name"]),
+    Domain       = tostring(customDimensions["Domain"]),
+    MessageId    = tostring(customDimensions["MessageId"])
+| project timestamp, EventName, Domain, MessageId, severityLevel, message
+| order by timestamp desc

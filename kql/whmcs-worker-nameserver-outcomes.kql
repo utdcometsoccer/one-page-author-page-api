@@ -1,0 +1,29 @@
+// KQL Query: WHMCS Worker Service - Name Server Update Outcomes
+// Tracks name server update operations: success, failure, exceptions, and skips.
+// Recommended visualization: Time chart or table
+// Use this to verify name servers are being set correctly after registration,
+// or to identify domains where NS updates were skipped due to bad counts.
+
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(7d)
+| where customDimensions["EventId.Name"] in (
+    "NameServerUpdateSucceeded",
+    "NameServerUpdateFailed",
+    "NameServerUpdateException",
+    "NameServerUpdateSkipped"
+)
+| extend
+    EventName    = tostring(customDimensions["EventId.Name"]),
+    Domain       = tostring(customDimensions["Domain"]),
+    Count        = tolong(customDimensions["Count"]),
+    NsElapsedMs  = tolong(customDimensions["NsElapsedMs"])
+| summarize
+    Succeeded   = countif(EventName == "NameServerUpdateSucceeded"),
+    Failed      = countif(EventName == "NameServerUpdateFailed"),
+    Exceptions  = countif(EventName == "NameServerUpdateException"),
+    Skipped     = countif(EventName == "NameServerUpdateSkipped"),
+    TotalOps    = count()
+    by bin(timestamp, 1h)
+| order by timestamp desc
+| render timechart

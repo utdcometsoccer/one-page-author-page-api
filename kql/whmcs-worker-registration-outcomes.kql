@@ -1,0 +1,25 @@
+// KQL Query: WHMCS Worker Service - Registration Outcomes Over Time
+// Aggregates domain registration success, failure, and exception counts per hour.
+// Recommended visualization: Time chart (stacked area or line)
+// Use this to track registration success rates and spot degradation trends.
+
+traces
+| where cloud_RoleName == "WhmcsWorkerService"
+| where timestamp > ago(7d)
+| where customDimensions["EventId.Name"] in (
+    "RegistrationSucceeded",
+    "RegistrationFailed",
+    "RegistrationException"
+)
+| extend
+    EventName = tostring(customDimensions["EventId.Name"]),
+    Domain    = tostring(customDimensions["Domain"])
+| summarize
+    Succeeded    = countif(EventName == "RegistrationSucceeded"),
+    Failed       = countif(EventName == "RegistrationFailed"),
+    Exceptions   = countif(EventName == "RegistrationException"),
+    TotalAttempts = count()
+    by bin(timestamp, 1h)
+| extend SuccessRate = round(todouble(Succeeded) / todouble(TotalAttempts) * 100, 1)
+| order by timestamp desc
+| render timechart
