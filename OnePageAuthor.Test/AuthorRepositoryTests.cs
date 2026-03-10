@@ -204,5 +204,56 @@ namespace OnePageAuthor.Test
             Assert.Single(result);
             Assert.Equal("author@example.com", result[0].EmailAddress);
         }
+
+        [Fact]
+        public async Task GetAllPagedAsync_ReturnsPagedAuthors()
+        {
+            var cosmosMock = new Mock<IDataContainer>();
+            var authors = new List<Author> {
+                new Author {
+                    id = Guid.NewGuid().ToString(),
+                    AuthorName = "Alice",
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "alice",
+                    LanguageName = "en",
+                    RegionName = "us",
+                    WelcomeText = "Welcome!",
+                    AboutText = "About Alice.",
+                    CopyrightText = "Copyright",
+                    EmailAddress = "alice@example.com"
+                },
+                new Author {
+                    id = Guid.NewGuid().ToString(),
+                    AuthorName = "Bob",
+                    TopLevelDomain = "com",
+                    SecondLevelDomain = "bob",
+                    LanguageName = "en",
+                    RegionName = "us",
+                    WelcomeText = "Welcome!",
+                    AboutText = "About Bob.",
+                    CopyrightText = "Copyright",
+                    EmailAddress = "bob@example.com"
+                }
+            };
+            QueryDefinition? capturedQuery = null;
+            var iteratorMock = new Mock<FeedIterator<Author>>();
+            var responseMock = new Mock<FeedResponse<Author>>();
+            responseMock.Setup(r => r.Resource).Returns(authors);
+            iteratorMock.SetupSequence(i => i.HasMoreResults)
+                .Returns(true)
+                .Returns(false);
+            iteratorMock.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(responseMock.Object);
+            cosmosMock
+                .Setup(c => c.GetItemQueryIterator<Author>(It.IsAny<QueryDefinition>(), null, null))
+                .Callback<QueryDefinition, string?, QueryRequestOptions?>((q, _, __) => capturedQuery = q)
+                .Returns(iteratorMock.Object);
+            var repo = new AuthorRepository(cosmosMock.Object);
+            var result = await repo.GetAllPagedAsync(1, 10);
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
+            cosmosMock.Verify(c => c.GetItemQueryIterator<Author>(It.IsAny<QueryDefinition>(), null, null), Times.Once);
+            Assert.NotNull(capturedQuery);
+            Assert.Contains("ORDER BY c.AuthorName, c.id", capturedQuery.QueryText);
+        }
     }
 }
