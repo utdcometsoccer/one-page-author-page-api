@@ -1060,6 +1060,490 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.DoesNotContain("ListAuthorInvitations", adminMethods);
         }
 
+        [Fact]
+        public void AdminGetAllDomainRegistrationsPaged_HasCorrectFunctionName()
+        {
+            var method = typeof(AdminDomainRegistrationFunction)
+                .GetMethod("AdminGetAllDomainRegistrationsPaged");
+
+            Assert.NotNull(method);
+
+            var functionAttr = method!.GetCustomAttribute<FunctionAttribute>();
+            Assert.NotNull(functionAttr);
+            Assert.Equal("AdminGetAllDomainRegistrationsPaged", functionAttr.Name);
+        }
+
+        [Fact]
+        public void AdminGetAllDomainRegistrationsPaged_HasCorrectHttpRoute()
+        {
+            var method = typeof(AdminDomainRegistrationFunction)
+                .GetMethod("AdminGetAllDomainRegistrationsPaged");
+
+            Assert.NotNull(method);
+
+            var triggerParam = method!.GetParameters()
+                .FirstOrDefault(p => p.GetCustomAttribute<HttpTriggerAttribute>() != null);
+
+            Assert.NotNull(triggerParam);
+
+            var triggerAttr = triggerParam!.GetCustomAttribute<HttpTriggerAttribute>();
+            Assert.NotNull(triggerAttr);
+            Assert.Equal("management/domain-registrations/all", triggerAttr.Route);
+            var methods = triggerAttr.Methods ?? throw new InvalidOperationException("Expected HttpTriggerAttribute.Methods to be non-null.");
+            Assert.Contains("get", methods, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void AdminUpdateDomainRegistrationStatus_HasCorrectFunctionName()
+        {
+            var method = typeof(AdminDomainRegistrationFunction)
+                .GetMethod("AdminUpdateDomainRegistrationStatus");
+
+            Assert.NotNull(method);
+
+            var functionAttr = method!.GetCustomAttribute<FunctionAttribute>();
+            Assert.NotNull(functionAttr);
+            Assert.Equal("AdminUpdateDomainRegistrationStatus", functionAttr.Name);
+        }
+
+        [Fact]
+        public void AdminUpdateDomainRegistrationStatus_HasCorrectHttpRoute()
+        {
+            var method = typeof(AdminDomainRegistrationFunction)
+                .GetMethod("AdminUpdateDomainRegistrationStatus");
+
+            Assert.NotNull(method);
+
+            var triggerParam = method!.GetParameters()
+                .FirstOrDefault(p => p.GetCustomAttribute<HttpTriggerAttribute>() != null);
+
+            Assert.NotNull(triggerParam);
+
+            var triggerAttr = triggerParam!.GetCustomAttribute<HttpTriggerAttribute>();
+            Assert.NotNull(triggerAttr);
+            Assert.Equal("management/domain-registrations/{registrationId}/status", triggerAttr.Route);
+            var methods = triggerAttr.Methods ?? throw new InvalidOperationException("Expected HttpTriggerAttribute.Methods to be non-null.");
+            Assert.Contains("patch", methods, StringComparer.OrdinalIgnoreCase);
+        }
+
+        #endregion
+
+        #region AdminGetAllDomainRegistrationsPaged Tests
+
+        [Fact]
+        public async Task AdminGetAllDomainRegistrationsPaged_WithNoAuthHeader_Returns401()
+        {
+            // Arrange
+            var req = CreateHttpRequestWithoutAuth();
+
+            // Act
+            var result = await _function.AdminGetAllDomainRegistrationsPaged(req);
+
+            // Assert
+            var objectResult = Assert.IsType<UnauthorizedObjectResult>(result);
+            Assert.Equal(401, objectResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task AdminGetAllDomainRegistrationsPaged_NonAdminUser_Returns403()
+        {
+            // Arrange
+            var nonAdminUser = CreateNonAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(nonAdminUser);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminGetAllDomainRegistrationsPaged(req);
+
+            // Assert
+            var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
+            Assert.Equal(403, objectResult.StatusCode);
+
+            _mockDomainRegistrationRepository.Verify(x => x.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task AdminGetAllDomainRegistrationsPaged_AdminUser_Returns200WithList()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var registrations = new List<DomainRegistrationEntity>
+            {
+                CreateTestDomainRegistration("reg-1", DomainRegistrationStatus.Pending),
+                CreateTestDomainRegistration("reg-2", DomainRegistrationStatus.Completed),
+                CreateTestDomainRegistration("reg-3", DomainRegistrationStatus.Cancelled)
+            };
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>()))
+                                             .ReturnsAsync(registrations);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminGetAllDomainRegistrationsPaged(req);
+
+            // Assert
+            var ok = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, ok.StatusCode);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(okValue);
+            Assert.Equal(3, response.Count());
+
+            _mockDomainRegistrationRepository.Verify(x => x.GetAllPagedAsync(1, 20), Times.Once);
+        }
+
+        [Fact]
+        public async Task AdminGetAllDomainRegistrationsPaged_WithPageQueryParams_PassesValuesToRepository()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>()))
+                                             .ReturnsAsync(Enumerable.Empty<DomainRegistrationEntity>());
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "Bearer valid-token";
+            context.Request.QueryString = new QueryString("?page=3&pageSize=50");
+            var req = context.Request;
+
+            // Act
+            await _function.AdminGetAllDomainRegistrationsPaged(req);
+
+            // Assert
+            _mockDomainRegistrationRepository.Verify(x => x.GetAllPagedAsync(3, 50), Times.Once);
+        }
+
+        [Fact]
+        public async Task AdminGetAllDomainRegistrationsPaged_ResponseHasNullContactInformation()
+        {
+            // Arrange - contact information must be redacted in admin cross-user listing
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var registrations = new List<DomainRegistrationEntity>
+            {
+                CreateTestDomainRegistration("reg-1", DomainRegistrationStatus.Completed)
+            };
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>()))
+                                             .ReturnsAsync(registrations);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminGetAllDomainRegistrationsPaged(req);
+
+            // Assert - ContactInformation must be null (redacted) to avoid PII exposure
+            var ok = Assert.IsType<OkObjectResult>(result);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(okValue).ToList();
+            Assert.Single(response);
+            Assert.Null(response[0].ContactInformation);
+        }
+
+        [Fact]
+        public async Task AdminGetAllDomainRegistrationsPaged_Returns200WithAllStatuses()
+        {
+            // Arrange - all statuses should appear in results
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var registrations = new List<DomainRegistrationEntity>
+            {
+                CreateTestDomainRegistration("reg-1", DomainRegistrationStatus.Pending),
+                CreateTestDomainRegistration("reg-2", DomainRegistrationStatus.InProgress),
+                CreateTestDomainRegistration("reg-3", DomainRegistrationStatus.Completed),
+                CreateTestDomainRegistration("reg-4", DomainRegistrationStatus.Failed),
+                CreateTestDomainRegistration("reg-5", DomainRegistrationStatus.Cancelled)
+            };
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>()))
+                                             .ReturnsAsync(registrations);
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminGetAllDomainRegistrationsPaged(req);
+
+            // Assert - all 5 registrations are returned regardless of status
+            var ok = Assert.IsType<OkObjectResult>(result);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsAssignableFrom<IEnumerable<DomainRegistrationResponse>>(okValue).ToList();
+            Assert.Equal(5, response.Count());
+        }
+
+        [Fact]
+        public async Task AdminGetAllDomainRegistrationsPaged_RepositoryThrows_Returns500()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>()))
+                                             .ThrowsAsync(new Exception("Database error"));
+
+            var req = CreateHttpRequestWithAuth();
+
+            // Act
+            var result = await _function.AdminGetAllDomainRegistrationsPaged(req);
+
+            // Assert
+            var statusResult = Assert.IsType<StatusCodeResult>(result);
+            Assert.Equal(500, statusResult.StatusCode);
+        }
+
+        #endregion
+
+        #region AdminUpdateDomainRegistrationStatus Tests
+
+        [Fact]
+        public async Task AdminUpdateDomainRegistrationStatus_WithNoAuthHeader_Returns401()
+        {
+            // Arrange
+            var req = CreateHttpRequestWithoutAuth();
+
+            // Act
+            var result = await _function.AdminUpdateDomainRegistrationStatus(req, "test-reg-123");
+
+            // Assert
+            var objectResult = Assert.IsType<UnauthorizedObjectResult>(result);
+            Assert.Equal(401, objectResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task AdminUpdateDomainRegistrationStatus_NonAdminUser_Returns403()
+        {
+            // Arrange
+            var nonAdminUser = CreateNonAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(nonAdminUser);
+
+            var req = CreateHttpRequestWithStatusBody(DomainRegistrationStatus.Completed);
+
+            // Act
+            var result = await _function.AdminUpdateDomainRegistrationStatus(req, "test-reg-123");
+
+            // Assert
+            var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
+            Assert.Equal(403, objectResult.StatusCode);
+
+            _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task AdminUpdateDomainRegistrationStatus_WithEmptyRegistrationId_Returns400()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var req = CreateHttpRequestWithStatusBody(DomainRegistrationStatus.Completed);
+
+            // Act
+            var result = await _function.AdminUpdateDomainRegistrationStatus(req, "");
+
+            // Assert
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal(400, badRequest.StatusCode);
+        }
+
+        [Fact]
+        public async Task AdminUpdateDomainRegistrationStatus_WithInvalidBody_Returns400()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "Bearer valid-token";
+            context.Request.Body = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes("not valid json {{{"));
+            var req = context.Request;
+
+            // Act
+            var result = await _function.AdminUpdateDomainRegistrationStatus(req, "test-reg-123");
+
+            // Assert
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal(400, badRequest.StatusCode);
+        }
+
+        [Fact]
+        public async Task AdminUpdateDomainRegistrationStatus_WithNullBody_Returns400()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "Bearer valid-token";
+            context.Request.Body = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes("null"));
+            var req = context.Request;
+
+            // Act
+            var result = await _function.AdminUpdateDomainRegistrationStatus(req, "test-reg-123");
+
+            // Assert
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal(400, badRequest.StatusCode);
+        }
+
+        [Fact]
+        public async Task AdminUpdateDomainRegistrationStatus_RegistrationNotFound_Returns404()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("non-existent-id"))
+                                             .ReturnsAsync((DomainRegistrationEntity?)null);
+
+            var req = CreateHttpRequestWithStatusBody(DomainRegistrationStatus.Completed);
+
+            // Act
+            var result = await _function.AdminUpdateDomainRegistrationStatus(req, "non-existent-id");
+
+            // Assert
+            var notFound = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal(404, notFound.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(DomainRegistrationStatus.Pending)]
+        [InlineData(DomainRegistrationStatus.InProgress)]
+        [InlineData(DomainRegistrationStatus.Completed)]
+        [InlineData(DomainRegistrationStatus.Failed)]
+        [InlineData(DomainRegistrationStatus.Cancelled)]
+        public async Task AdminUpdateDomainRegistrationStatus_ValidStatus_Returns200WithUpdatedStatus(
+            DomainRegistrationStatus newStatus)
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var registration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.Pending);
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
+                                             .ReturnsAsync(registration);
+
+            var updatedRegistration = CreateTestDomainRegistration("test-reg-123", newStatus);
+            _mockDomainRegistrationRepository.Setup(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()))
+                                             .ReturnsAsync(updatedRegistration);
+
+            var req = CreateHttpRequestWithStatusBody(newStatus);
+
+            // Act
+            var result = await _function.AdminUpdateDomainRegistrationStatus(req, "test-reg-123");
+
+            // Assert
+            var ok = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, ok.StatusCode);
+            var okValue = ok.Value ?? throw new InvalidOperationException("Expected OkObjectResult.Value to be non-null.");
+            var response = Assert.IsType<DomainRegistrationResponse>(okValue);
+            Assert.Equal(newStatus, response.Status);
+
+            _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.Is<DomainRegistrationEntity>(
+                r => r.Status == newStatus)), Times.Once);
+        }
+
+        [Fact]
+        public async Task AdminUpdateDomainRegistrationStatus_UpdatesLastUpdatedAt()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var beforeUpdate = DateTime.UtcNow.AddDays(-1);
+            var registration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.Pending);
+            registration.LastUpdatedAt = beforeUpdate;
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
+                                             .ReturnsAsync(registration);
+
+            DomainRegistrationEntity? capturedEntity = null;
+            _mockDomainRegistrationRepository.Setup(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()))
+                                             .Callback<DomainRegistrationEntity>(e => capturedEntity = e)
+                                             .ReturnsAsync(CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.Completed));
+
+            var req = CreateHttpRequestWithStatusBody(DomainRegistrationStatus.Completed);
+
+            // Act
+            await _function.AdminUpdateDomainRegistrationStatus(req, "test-reg-123");
+
+            // Assert - LastUpdatedAt was set to a time after beforeUpdate
+            Assert.NotNull(capturedEntity);
+            Assert.True(capturedEntity!.LastUpdatedAt > beforeUpdate);
+        }
+
+        [Fact]
+        public async Task AdminUpdateDomainRegistrationStatus_RepositoryThrowsOnGet_Returns500()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
+                                             .ThrowsAsync(new Exception("Database error"));
+
+            var req = CreateHttpRequestWithStatusBody(DomainRegistrationStatus.Completed);
+
+            // Act
+            var result = await _function.AdminUpdateDomainRegistrationStatus(req, "test-reg-123");
+
+            // Assert
+            var statusResult = Assert.IsType<StatusCodeResult>(result);
+            Assert.Equal(500, statusResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task AdminUpdateDomainRegistrationStatus_RepositoryThrowsOnUpdate_Returns500()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var registration = CreateTestDomainRegistration("test-reg-123", DomainRegistrationStatus.Pending);
+            _mockDomainRegistrationRepository.Setup(x => x.GetByIdCrossPartitionAsync("test-reg-123"))
+                                             .ReturnsAsync(registration);
+            _mockDomainRegistrationRepository.Setup(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()))
+                                             .ThrowsAsync(new Exception("Database error"));
+
+            var req = CreateHttpRequestWithStatusBody(DomainRegistrationStatus.Completed);
+
+            // Act
+            var result = await _function.AdminUpdateDomainRegistrationStatus(req, "test-reg-123");
+
+            // Assert
+            var statusResult = Assert.IsType<StatusCodeResult>(result);
+            Assert.Equal(500, statusResult.StatusCode);
+        }
+
+        // Helper to create an HttpRequest with a JSON body containing the given status
+        private static HttpRequest CreateHttpRequestWithStatusBody(DomainRegistrationStatus status)
+        {
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "Bearer valid-token";
+            var body = System.Text.Json.JsonSerializer.Serialize(new { Status = (int)status });
+            context.Request.Body = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(body));
+            return context.Request;
+        }
+
         #endregion
     }
 }

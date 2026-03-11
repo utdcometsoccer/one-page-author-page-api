@@ -189,5 +189,33 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
 
             return maxResults.HasValue ? results.Take(maxResults.Value) : results;
         }
+
+        public async Task<IEnumerable<DomainRegistration>> GetAllPagedAsync(int page, int pageSize)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 1;
+
+            int offset = (page - 1) * pageSize;
+
+            var query = new QueryDefinition(
+                "SELECT * FROM c ORDER BY c.createdAt DESC OFFSET @offset LIMIT @limit")
+                .WithParameter("@offset", offset)
+                .WithParameter("@limit", pageSize);
+
+            var results = new List<DomainRegistration>();
+
+            using var iterator = _container.GetItemQueryIterator<DomainRegistration>(query);
+
+            while (iterator.HasMoreResults)
+            {
+                var resultPage = await iterator.ReadNextAsync();
+                if (resultPage?.Resource != null)
+                {
+                    results.AddRange(resultPage.Resource);
+                }
+            }
+
+            return results;
+        }
     }
 }

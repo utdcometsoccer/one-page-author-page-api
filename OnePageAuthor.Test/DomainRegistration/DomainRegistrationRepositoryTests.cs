@@ -744,5 +744,100 @@ namespace OnePageAuthor.Test.DomainRegistration
         }
 
         #endregion
+
+        #region GetAllPagedAsync Tests
+
+        [Fact]
+        public async Task GetAllPagedAsync_ReturnsRegistrations()
+        {
+            // Arrange
+            var registrations = new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>
+            {
+                CreateTestDomainRegistration("reg-1"),
+                CreateTestDomainRegistration("reg-2"),
+                CreateTestDomainRegistration("reg-3")
+            };
+
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var mockResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            mockResponse.Setup(r => r.Resource).Returns(registrations);
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(mockResponse.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetAllPagedAsync(1, 20);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(3, result.Count());
+        }
+
+        [Fact]
+        public async Task GetAllPagedAsync_ReturnsEmptyList_WhenNoRegistrations()
+        {
+            // Arrange
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var mockResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            mockResponse.Setup(r => r.Resource).Returns(new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>());
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(mockResponse.Object);
+
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Returns(mockIterator.Object);
+
+            // Act
+            var result = await _repository.GetAllPagedAsync(1, 20);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAllPagedAsync_WithInvalidPageNumber_ClampsToPage1()
+        {
+            // Arrange
+            var registrations = new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>
+            {
+                CreateTestDomainRegistration("reg-1")
+            };
+
+            var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+            var mockResponse = new Mock<FeedResponse<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
+
+            mockResponse.Setup(r => r.Resource).Returns(registrations);
+            mockIterator.SetupSequence(i => i.HasMoreResults)
+                       .Returns(true)
+                       .Returns(false);
+            mockIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(mockResponse.Object);
+
+            QueryDefinition? capturedQuery = null;
+            _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
+                It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
+                         .Callback<QueryDefinition, string?, QueryRequestOptions?>((q, _, _) => capturedQuery = q)
+                         .Returns(mockIterator.Object);
+
+            // Act - page 0 should be clamped to 1 (offset 0)
+            await _repository.GetAllPagedAsync(0, 10);
+
+            // Assert - the query was executed (no exception)
+            Assert.NotNull(capturedQuery);
+        }
+
+        #endregion
     }
 }
