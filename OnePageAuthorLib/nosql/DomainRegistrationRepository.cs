@@ -189,5 +189,42 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
 
             return maxResults.HasValue ? results.Take(maxResults.Value) : results;
         }
+
+        public async Task<IEnumerable<DomainRegistration>> GetAllPagedAsync(int page, int pageSize)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 1;
+
+            int offset = (page - 1) * pageSize;
+            int requiredItemCount = page * pageSize;
+
+            // Use continuation-token iteration instead of OFFSET/LIMIT to avoid the
+            // increasing RU cost of deep OFFSET scans in Cosmos DB.
+            // Trade-off: this approach loads up to page * pageSize items into memory.
+            // The caller (AdminDomainRegistrationFunction) caps page at 100,000 and
+            // pageSize at 100, so the maximum in-memory footprint is 10,000,000 items.
+            var query = new QueryDefinition(
+                "SELECT * FROM c ORDER BY c.createdAt DESC");
+
+            var requestOptions = new QueryRequestOptions { MaxItemCount = pageSize };
+
+            var allUpToRequestedPage = new List<DomainRegistration>();
+
+            using var iterator = _container.GetItemQueryIterator<DomainRegistration>(query, requestOptions: requestOptions);
+
+            while (iterator.HasMoreResults && allUpToRequestedPage.Count < requiredItemCount)
+            {
+                var resultPage = await iterator.ReadNextAsync();
+                if (resultPage?.Resource != null)
+                {
+                    allUpToRequestedPage.AddRange(resultPage.Resource);
+                }
+            }
+
+            return allUpToRequestedPage
+                .Skip(offset)
+                .Take(pageSize)
+                .ToList();
+        }
     }
 }

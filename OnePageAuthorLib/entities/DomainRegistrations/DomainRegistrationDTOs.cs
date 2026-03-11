@@ -42,6 +42,18 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistrations
     }
 
     /// <summary>
+    /// Request body for an administrator to change the status of a domain registration.
+    /// </summary>
+    public class AdminUpdateStatusRequest
+    {
+        /// <summary>
+        /// The new status to set on the domain registration.
+        /// </summary>
+        [Required]
+        public DomainRegistrationStatus? Status { get; set; }
+    }
+
+    /// <summary>
     /// Data transfer object for domain information.
     /// </summary>
     public class DomainDto

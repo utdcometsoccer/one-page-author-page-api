@@ -67,5 +67,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="maxResults">Optional upper bound on items returned. Defaults to unlimited when null.</param>
         /// <returns>List of incomplete domain registrations</returns>
         Task<IEnumerable<DomainRegistration>> GetAllIncompleteAsync(int? maxResults = null);
+
+        /// <summary>
+        /// Gets a paged list of all domain registrations across all users and all statuses (cross-partition query).
+        /// </summary>
+        /// <param name="page">1-based page number.</param>
+        /// <param name="pageSize">Number of items per page.</param>
+        /// <returns>Paged list of domain registrations ordered by creation date descending</returns>
+        Task<IEnumerable<DomainRegistration>> GetAllPagedAsync(int page, int pageSize);
     }
 }
