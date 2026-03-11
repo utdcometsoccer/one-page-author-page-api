@@ -202,9 +202,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 .WithParameter("@offset", offset)
                 .WithParameter("@limit", pageSize);
 
+            var requestOptions = new QueryRequestOptions { MaxItemCount = pageSize };
+
             var results = new List<DomainRegistration>();
 
-            using var iterator = _container.GetItemQueryIterator<DomainRegistration>(query);
+            using var iterator = _container.GetItemQueryIterator<DomainRegistration>(query, requestOptions: requestOptions);
 
             while (iterator.HasMoreResults)
             {

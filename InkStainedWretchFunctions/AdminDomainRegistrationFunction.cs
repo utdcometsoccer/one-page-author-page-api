@@ -231,13 +231,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 
             try
             {
-                var registrations = await _domainRegistrationRepository.GetAllPagedAsync(page, pageSize);
+                var registrations = (await _domainRegistrationRepository.GetAllPagedAsync(page, pageSize)).ToList();
 
                 var validRegistrations = registrations
                     .Where(r => r.Domain != null && r.ContactInformation != null)
                     .ToList();
 
-                var skippedCount = registrations.Count() - validRegistrations.Count;
+                var skippedCount = registrations.Count - validRegistrations.Count;
                 if (skippedCount > 0)
                 {
                     _logger.LogWarning(
