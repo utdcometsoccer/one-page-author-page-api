@@ -1302,6 +1302,52 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Equal(500, statusResult.StatusCode);
         }
 
+        [Fact]
+        public async Task AdminGetAllDomainRegistrationsPaged_PageSizeExceedsMax_ClampsTo100()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>()))
+                                             .ReturnsAsync(Enumerable.Empty<DomainRegistrationEntity>());
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "Bearer valid-token";
+            context.Request.QueryString = new QueryString("?pageSize=9999");
+            var req = context.Request;
+
+            // Act
+            await _function.AdminGetAllDomainRegistrationsPaged(req);
+
+            // Assert - pageSize is clamped to the maximum of 100
+            _mockDomainRegistrationRepository.Verify(x => x.GetAllPagedAsync(1, 100), Times.Once);
+        }
+
+        [Fact]
+        public async Task AdminGetAllDomainRegistrationsPaged_PageExceedsMax_ClampsTo100000()
+        {
+            // Arrange
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            _mockDomainRegistrationRepository.Setup(x => x.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>()))
+                                             .ReturnsAsync(Enumerable.Empty<DomainRegistrationEntity>());
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "Bearer valid-token";
+            context.Request.QueryString = new QueryString("?page=999999999");
+            var req = context.Request;
+
+            // Act
+            await _function.AdminGetAllDomainRegistrationsPaged(req);
+
+            // Assert - page is clamped to the maximum of 100000
+            _mockDomainRegistrationRepository.Verify(x => x.GetAllPagedAsync(100_000, 20), Times.Once);
+        }
+
         #endregion
 
         #region AdminUpdateDomainRegistrationStatus Tests
@@ -1398,6 +1444,33 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal(400, badRequest.StatusCode);
+        }
+
+        [Fact]
+        public async Task AdminUpdateDomainRegistrationStatus_WithMissingStatusField_Returns400()
+        {
+            // Arrange – body is valid JSON but omits the Status field entirely.
+            // With a non-nullable enum this would silently default to Pending (0);
+            // with a nullable Status property the missing field deserialises to null
+            // and the endpoint must reject it with 400.
+            var adminUser = CreateAdminUser();
+            _mockJwtValidationService.Setup(x => x.ValidateTokenAsync(It.IsAny<string>()))
+                                     .ReturnsAsync(adminUser);
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "Bearer valid-token";
+            context.Request.Body = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes("{}"));
+            var req = context.Request;
+
+            // Act
+            var result = await _function.AdminUpdateDomainRegistrationStatus(req, "test-reg-123");
+
+            // Assert
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal(400, badRequest.StatusCode);
+
+            // Repository must not be called when the request is invalid
+            _mockDomainRegistrationRepository.Verify(x => x.UpdateAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
         }
 
         [Fact]

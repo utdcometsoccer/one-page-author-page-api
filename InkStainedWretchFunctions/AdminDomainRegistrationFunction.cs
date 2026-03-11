@@ -214,19 +214,21 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 
             int page = 1;
             int pageSize = 20;
+            const int MaxPage = 100_000;
+            const int MaxPageSize = 100;
 
             if (req.Query.TryGetValue("page", out var pageStr)
                 && int.TryParse(pageStr, out var parsedPage)
                 && parsedPage > 0)
             {
-                page = parsedPage;
+                page = Math.Min(parsedPage, MaxPage);
             }
 
             if (req.Query.TryGetValue("pageSize", out var pageSizeStr)
                 && int.TryParse(pageSizeStr, out var parsedPageSize)
                 && parsedPageSize > 0)
             {
-                pageSize = parsedPageSize;
+                pageSize = Math.Min(parsedPageSize, MaxPageSize);
             }
 
             try
@@ -343,9 +345,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 return new BadRequestObjectResult(new { error = "Request body is required" });
             }
 
-            if (!Enum.IsDefined(typeof(DomainRegistrationStatus), statusRequest.Status))
+            if (!statusRequest.Status.HasValue)
             {
-                return new BadRequestObjectResult(new { error = $"Invalid status value: {statusRequest.Status}" });
+                return new BadRequestObjectResult(new { error = "Status is required" });
+            }
+
+            if (!Enum.IsDefined(typeof(DomainRegistrationStatus), statusRequest.Status.Value))
+            {
+                return new BadRequestObjectResult(new { error = $"Invalid status value: {statusRequest.Status.Value}" });
             }
 
             DomainRegistration? registration;
@@ -366,7 +373,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
             }
 
             var previousStatus = registration.Status;
-            registration.Status = statusRequest.Status;
+            registration.Status = statusRequest.Status.Value;
             registration.LastUpdatedAt = DateTime.UtcNow;
 
             try

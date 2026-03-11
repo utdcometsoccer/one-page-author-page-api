@@ -50,7 +50,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistrations
         /// The new status to set on the domain registration.
         /// </summary>
         [Required]
-        public DomainRegistrationStatus Status { get; set; }
+        public DomainRegistrationStatus? Status { get; set; }
     }
 
     /// <summary>

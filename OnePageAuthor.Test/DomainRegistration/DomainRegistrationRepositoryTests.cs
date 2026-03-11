@@ -812,7 +812,8 @@ namespace OnePageAuthor.Test.DomainRegistration
             // Arrange
             var registrations = new List<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>
             {
-                CreateTestDomainRegistration("reg-1")
+                CreateTestDomainRegistration("reg-1"),
+                CreateTestDomainRegistration("reg-2")
             };
 
             var mockIterator = new Mock<FeedIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>>();
@@ -825,17 +826,16 @@ namespace OnePageAuthor.Test.DomainRegistration
             mockIterator.Setup(i => i.ReadNextAsync(It.IsAny<CancellationToken>()))
                        .ReturnsAsync(mockResponse.Object);
 
-            QueryDefinition? capturedQuery = null;
             _containerMock.Setup(c => c.GetItemQueryIterator<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(
                 It.IsAny<QueryDefinition>(), It.IsAny<string>(), It.IsAny<QueryRequestOptions>()))
-                         .Callback<QueryDefinition, string?, QueryRequestOptions?>((q, _, _) => capturedQuery = q)
                          .Returns(mockIterator.Object);
 
-            // Act - page 0 should be clamped to 1 (offset 0)
-            await _repository.GetAllPagedAsync(0, 10);
+            // Act - page 0 should be clamped to 1 (offset = 0, so first item is returned)
+            var result = (await _repository.GetAllPagedAsync(0, 1)).ToList();
 
-            // Assert - the query was executed (no exception)
-            Assert.NotNull(capturedQuery);
+            // Assert - clamping to page 1 means offset=0 so the first item is returned
+            Assert.Single(result);
+            Assert.Equal("reg-1", result[0].id);
         }
 
         #endregion
