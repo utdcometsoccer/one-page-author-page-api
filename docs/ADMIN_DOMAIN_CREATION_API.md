@@ -9,7 +9,9 @@
 The **Admin Domain Registrations** endpoints let users with the `Admin` role:
 
 1. **`GET /api/management/domain-registrations`** — lists all incomplete domain registrations (Pending, InProgress, Failed) across all users.
-2. **`POST /api/management/domain-registrations/{registrationId}/complete`** — runs the full domain-provisioning workflow for a specific registration, which includes:
+2. **`GET /api/management/domain-registrations/all`** — lists **all** domain registrations across all users and all statuses, with pagination support.
+3. **`PATCH /api/management/domain-registrations/{registrationId}/status`** — changes the status of a domain registration to any valid `DomainRegistrationStatus` value.
+4. **`POST /api/management/domain-registrations/{registrationId}/complete`** — runs the full domain-provisioning workflow for a specific registration, which includes:
    1. WHMCS domain registration
    2. Azure DNS zone creation and name-server retrieval
    3. WHMCS name-server update
@@ -188,6 +190,254 @@ async function listIncompleteDomains(
   }
 
   return response.json();
+}
+```
+
+---
+
+### GET /api/management/domain-registrations/all
+
+Returns a paginated list of **all** domain registrations across all users and all statuses. Use this endpoint for a complete audit view of registrations in any state. Contact information is redacted from results.
+
+| Detail | Value |
+|--------|-------|
+| Method | `GET` |
+| Auth | Bearer JWT with `Admin` role claim |
+| Query param | `page` (optional, integer, default `1`) — 1-based page number |
+| Query param | `pageSize` (optional, integer, default `20`) — items per page |
+| Request body | *(none)* |
+
+#### Response codes
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | Returns array of registration responses (may be empty) |
+| `401 Unauthorized` | Missing or invalid JWT |
+| `403 Forbidden` | Authenticated user does not have the `Admin` role |
+| `500 Internal Server Error` | Unexpected server error |
+
+#### Response body
+
+```typescript
+type DomainRegistrationStatus =
+  | 0  // Pending
+  | 1  // InProgress
+  | 2  // Completed
+  | 3  // Failed
+  | 4; // Cancelled
+
+interface AdminDomainRegistrationResponse {
+  id: string;
+  domain: {
+    topLevelDomain: string;    // e.g. "com"
+    secondLevelDomain: string; // e.g. "mysite"
+  };
+  contactInformation: null;    // always redacted in admin cross-user listing
+  createdAt: string;           // ISO 8601
+  lastUpdatedAt: string;       // ISO 8601
+  status: DomainRegistrationStatus;
+}
+```
+
+Results are ordered by creation date descending (newest first).
+
+#### Example
+
+```typescript
+async function listAllDomainsPaged(
+  adminToken: string,
+  page = 1,
+  pageSize = 20,
+  baseUrl = ""
+): Promise<AdminDomainRegistrationResponse[]> {
+  const url = new URL(`${baseUrl}/api/management/domain-registrations/all`);
+  url.searchParams.set("page", String(page));
+  url.searchParams.set("pageSize", String(pageSize));
+
+  const response = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${adminToken}` },
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`HTTP ${response.status}: ${body}`);
+  }
+
+  return response.json();
+}
+
+// Fetch all registrations across all pages
+async function listAllDomains(adminToken: string): Promise<AdminDomainRegistrationResponse[]> {
+  const all: AdminDomainRegistrationResponse[] = [];
+  let page = 1;
+  const pageSize = 50;
+
+  while (true) {
+    const results = await listAllDomainsPaged(adminToken, page, pageSize);
+    all.push(...results);
+    if (results.length < pageSize) break; // no more pages
+    page++;
+  }
+
+  return all;
+}
+```
+
+---
+
+### PATCH /api/management/domain-registrations/{registrationId}/status
+
+Changes the status of a domain registration. An admin can set the status to any valid `DomainRegistrationStatus` value — for example, to manually mark a registration as Completed, re-open a Cancelled registration, or mark a stuck InProgress registration as Failed.
+
+| Detail | Value |
+|--------|-------|
+| Method | `PATCH` |
+| Auth | Bearer JWT with `Admin` role claim |
+| Path param | `registrationId` — the Cosmos DB document ID of the domain registration |
+| Request body | JSON object with a `status` integer field |
+
+#### Request body
+
+```typescript
+interface AdminUpdateStatusRequest {
+  status: DomainRegistrationStatus; // required — integer value of the new status
+}
+```
+
+```json
+{ "status": 2 }
+```
+
+`DomainRegistrationStatus` values: `0` = Pending, `1` = InProgress, `2` = Completed, `3` = Failed, `4` = Cancelled.
+
+#### Response codes
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | Returns updated `DomainRegistrationResponse` |
+| `400 Bad Request` | Missing/empty `registrationId`, missing/invalid request body, or invalid status value |
+| `401 Unauthorized` | Missing or invalid JWT |
+| `403 Forbidden` | Authenticated user does not have the `Admin` role |
+| `404 Not Found` | No domain registration with the supplied ID |
+| `500 Internal Server Error` | Unexpected server error |
+
+#### Response body
+
+```typescript
+interface DomainRegistrationResponse {
+  id: string;
+  domain: {
+    topLevelDomain: string;    // e.g. "com"
+    secondLevelDomain: string; // e.g. "mysite"
+  };
+  contactInformation: {
+    firstName: string;
+    lastName: string;
+    address: string;
+    address2?: string;
+    city: string;
+    state: string;
+    country: string;
+    zipCode: string;
+    emailAddress: string;
+    telephoneNumber: string;
+  };
+  createdAt: string;       // ISO 8601
+  lastUpdatedAt: string;   // ISO 8601 — updated to the time of this request
+  status: DomainRegistrationStatus;
+}
+```
+
+#### Example
+
+```typescript
+async function updateDomainRegistrationStatus(
+  registrationId: string,
+  newStatus: DomainRegistrationStatus,
+  adminToken: string,
+  baseUrl = ""
+): Promise<DomainRegistrationResponse> {
+  const url = `${baseUrl}/api/management/domain-registrations/${encodeURIComponent(registrationId)}/status`;
+
+  const response = await fetch(url, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status: newStatus }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`HTTP ${response.status}: ${body}`);
+  }
+
+  return response.json() as Promise<DomainRegistrationResponse>;
+}
+
+// Usage examples:
+// Mark a registration as Completed
+await updateDomainRegistrationStatus("reg-guid-here", 2 /* Completed */, adminToken);
+
+// Cancel a registration
+await updateDomainRegistrationStatus("reg-guid-here", 4 /* Cancelled */, adminToken);
+
+// Re-open a failed registration for retry
+await updateDomainRegistrationStatus("reg-guid-here", 0 /* Pending */, adminToken);
+```
+
+#### Full example with error handling
+
+```typescript
+async function setDomainStatus(
+  registrationId: string,
+  newStatus: DomainRegistrationStatus,
+  adminToken: string
+): Promise<void> {
+  const statusNames: Record<number, string> = {
+    0: "Pending",
+    1: "InProgress",
+    2: "Completed",
+    3: "Failed",
+    4: "Cancelled",
+  };
+
+  const response = await fetch(
+    `/api/management/domain-registrations/${encodeURIComponent(registrationId)}/status`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: newStatus }),
+    }
+  );
+
+  switch (response.status) {
+    case 200: {
+      const registration: DomainRegistrationResponse = await response.json();
+      console.log(
+        `✅ Registration ${registrationId} status updated to ${statusNames[registration.status]}`
+      );
+      break;
+    }
+    case 400:
+      console.error("Bad request – check registrationId and request body.");
+      break;
+    case 401:
+      console.error("Unauthorized – obtain a fresh JWT and retry.");
+      break;
+    case 403:
+      console.error("Forbidden – your account does not have the Admin role.");
+      break;
+    case 404:
+      console.error(`Registration ${registrationId} not found.`);
+      break;
+    default:
+      console.error("Unexpected error:", response.status, await response.text());
+  }
 }
 ```
 

@@ -212,6 +212,63 @@ This document provides an exhaustive listing of every API endpoint in the OnePag
 
 ---
 
+#### `AdminGetAllDomainRegistrationsPaged`
+
+| Property | Value |
+|----------|-------|
+| **Source file** | `InkStainedWretchFunctions/AdminDomainRegistrationFunction.cs` |
+| **HTTP method** | GET |
+| **Route** | `/api/management/domain-registrations/all` |
+| **Authorization** | Bearer JWT + `Admin` role required (`IRoleChecker`) |
+| **Query params** | `page` (optional, integer, default 1), `pageSize` (optional, integer, default 20) |
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "guid",
+    "domain": { "topLevelDomain": "com", "secondLevelDomain": "example" },
+    "contactInformation": null,
+    "status": 2,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "lastUpdatedAt": "2024-01-02T00:00:00Z"
+  }
+]
+```
+
+Returns all statuses (Pending, InProgress, Completed, Failed, Cancelled), ordered by `createdAt` descending. Contact information is redacted (`null`).
+
+**Status codes:** 200, 401, 403, 500  
+**Services called:** `IDomainRegistrationRepository`, `IJwtValidationService`, `IRoleChecker`  
+**Unit tests:** `OnePageAuthor.Test/InkStainedWretchFunctions/AdminDomainRegistrationFunctionTests.cs`
+
+---
+
+#### `AdminUpdateDomainRegistrationStatus`
+
+| Property | Value |
+|----------|-------|
+| **Source file** | `InkStainedWretchFunctions/AdminDomainRegistrationFunction.cs` |
+| **HTTP method** | PATCH |
+| **Route** | `/api/management/domain-registrations/{registrationId}/status` |
+| **Authorization** | Bearer JWT + `Admin` role required (`IRoleChecker`) |
+| **Path params** | `registrationId` — Cosmos DB document ID |
+
+**Request body:**
+```json
+{ "status": 2 }
+```
+
+Where `status` is a `DomainRegistrationStatus` integer: 0=Pending, 1=InProgress, 2=Completed, 3=Failed, 4=Cancelled.
+
+**Response (200 OK):** Updated `DomainRegistrationResponse` with the new status.
+
+**Status codes:** 200, 400, 401, 403, 404, 500  
+**Services called:** `IDomainRegistrationRepository`, `IJwtValidationService`, `IRoleChecker`  
+**Unit tests:** `OnePageAuthor.Test/InkStainedWretchFunctions/AdminDomainRegistrationFunctionTests.cs`
+
+---
+
 #### `AdminCompleteDomainRegistration`
 
 | Property | Value |

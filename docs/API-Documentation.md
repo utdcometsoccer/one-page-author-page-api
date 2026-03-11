@@ -313,6 +313,63 @@ See [ADMIN_DOMAIN_CREATION_API.md](ADMIN_DOMAIN_CREATION_API.md) for full docume
 
 ---
 
+##### GET /api/management/domain-registrations/all
+
+**Description:** Returns a paginated list of all domain registrations across all users and **all statuses** (Pending, InProgress, Completed, Failed, and Cancelled). Contact information is redacted from results.
+
+**Query Parameters:**
+
+- `page` (optional): 1-based page number. Defaults to `1`.
+- `pageSize` (optional): Number of items per page. Defaults to `20`.
+
+**Response Codes:**
+
+| Status | Description |
+|--------|-------------|
+| 200 OK | Paged array of domain registration objects (may be empty) |
+| 401 Unauthorized | Missing or invalid JWT |
+| 403 Forbidden | Caller does not have the `Admin` role |
+| 500 Internal Server Error | Unexpected server error |
+
+**Returns:** Array of `DomainRegistrationResponse` objects with `contactInformation` set to `null`, ordered by creation date descending.
+
+See [ADMIN_DOMAIN_CREATION_API.md](ADMIN_DOMAIN_CREATION_API.md) for full documentation, TypeScript interfaces, and usage examples.
+
+---
+
+##### PATCH /api/management/domain-registrations/{registrationId}/status
+
+**Description:** Changes the status of a domain registration. An admin can set the status to any valid `DomainRegistrationStatus` value, including re-opening a registration or marking it as Cancelled.
+
+**Path Parameters:**
+
+- `registrationId`: The Cosmos DB document ID of the registration to update.
+
+**Request Body:**
+
+```json
+{ "status": 2 }
+```
+
+Where `status` is a `DomainRegistrationStatus` integer: `0` = Pending, `1` = InProgress, `2` = Completed, `3` = Failed, `4` = Cancelled.
+
+**Response Codes:**
+
+| Status | Description |
+|--------|-------------|
+| 200 OK | Updated `DomainRegistrationResponse` |
+| 400 Bad Request | Missing registration ID or invalid/missing request body |
+| 401 Unauthorized | Missing or invalid JWT |
+| 403 Forbidden | Caller does not have the `Admin` role |
+| 404 Not Found | No domain registration with the supplied ID |
+| 500 Internal Server Error | Unexpected server error |
+
+**Returns:** Updated `DomainRegistrationResponse` with the new status reflected.
+
+See [ADMIN_DOMAIN_CREATION_API.md](ADMIN_DOMAIN_CREATION_API.md) for full documentation, TypeScript interfaces, and usage examples.
+
+---
+
 ##### POST /api/management/domain-registrations/{registrationId}/complete
 
 **Description:** Completes domain provisioning for a partially registered author site without requiring a Stripe subscription. Executes WHMCS domain registration, DNS zone setup, name-server update, and Azure Front Door configuration.
