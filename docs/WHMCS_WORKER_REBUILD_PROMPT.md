@@ -13,7 +13,7 @@ The `WhmcsWorkerService` is a .NET Worker Service (systemd daemon) deployed to a
 - **Source:** `WhmcsWorkerService/Worker.cs`, `WhmcsWorkerService/Program.cs`
 - **Runtime:** .NET 10, `linux-x64`, framework-dependent (requires `aspnetcore-runtime-10.0` on the VM)
 - **Process manager:** systemd (`whmcs-worker.service` unit file)
-- **Environment variables:** Written to `/etc/whmcs-worker/environment` on the VM
+- **Environment variables:** Read from `/etc/whmcs-worker/environment` on the VM (typically written/updated via `infra/vm.bicep` in CI/CD)
 
 ---
 

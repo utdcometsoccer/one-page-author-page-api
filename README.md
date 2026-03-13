@@ -151,7 +151,7 @@ npm run init-secrets -- -ConfigFile secrets.json
 | `AAD_VALID_ISSUERS` | Comma-separated v2.0 issuer URLs (multi-issuer JWT support) | Optional | For Entra External ID/CIAM, use issuers like `https://{your-ciam-domain}.ciamlogin.com/{your-tenant}/B2C_1_signup_signin/v2.0/` (and other policies as needed); for standard Entra ID tenants you can also include `https://login.microsoftonline.com/{tenant}/v2.0` |
 | `STRIPE_WEBHOOK_SECRET` | Webhook endpoint secret for verification | For webhooks | [Stripe Dashboard](https://dashboard.stripe.com) → Developers → Webhooks → Select endpoint → Signing secret |
 
-**Note (CI/CD overrides):** The GitHub Actions workflow supports per-app overrides via GitHub secrets `APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP` (for `function-app`) and `APPLICATIONINSIGHTS_CONNECTION_STRING_ISW` (for `ImageAPI`, `InkStainedWretchFunctions`, `InkStainedWretchStripe`, `InkStainedWretchesConfig`). If not set, it falls back to `APPLICATIONINSIGHTS_CONNECTION_STRING`.
+**Note:** CI/CD uses a single `APPLICATIONINSIGHTS_CONNECTION_STRING` value for all apps (Functions + WHMCS worker).
 
 ### Why These Settings Are Needed
 

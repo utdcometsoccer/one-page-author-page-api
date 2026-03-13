@@ -294,25 +294,7 @@ $secretDefinitions = @{
     "Observability (Recommended)" = @(
         @{
             Name = "APPLICATIONINSIGHTS_CONNECTION_STRING"
-            Description = "Application Insights / Azure Monitor connection string (used by Azure Monitor OpenTelemetry exporter)"
-            Required = $false
-            Example = "InstrumentationKey=...;IngestionEndpoint=https://...;LiveEndpoint=https://...;ApplicationId=..."
-            Category = "Observability"
-            Sensitive = $true
-        }
-        ,
-        @{
-            Name = "APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP"
-            Description = "Application Insights connection string for the standalone function-app (overrides APPLICATIONINSIGHTS_CONNECTION_STRING)"
-            Required = $false
-            Example = "InstrumentationKey=...;IngestionEndpoint=https://...;LiveEndpoint=https://...;ApplicationId=..."
-            Category = "Observability"
-            Sensitive = $true
-        }
-        ,
-        @{
-            Name = "APPLICATIONINSIGHTS_CONNECTION_STRING_ISW"
-            Description = "Application Insights connection string for Ink Stained Wretches Function Apps (ImageAPI/Functions/Stripe/Config) (overrides APPLICATIONINSIGHTS_CONNECTION_STRING)"
+            Description = "Single source of truth: Application Insights / Azure Monitor connection string used by all apps (Functions + WHMCS Worker)"
             Required = $false
             Example = "InstrumentationKey=...;IngestionEndpoint=https://...;LiveEndpoint=https://...;ApplicationId=..."
             Category = "Observability"
@@ -596,14 +578,6 @@ $secretDefinitions = @{
             Required = $false
             Example = "whmcs-domain-registrations"
             Category = "Worker"
-        },
-        @{
-            Name = "APPLICATIONINSIGHTS_CONNECTION_STRING_WHMCS_WORKER"
-            Description = "Application Insights connection string for the WHMCS Worker Service VM. When set, structured logs are exported to Azure Monitor for KQL querying. Falls back to APPLICATIONINSIGHTS_CONNECTION_STRING if not set."
-            Required = $false
-            Example = "InstrumentationKey=...;IngestionEndpoint=..."
-            Category = "Worker"
-            Sensitive = $true
         },
         @{
             Name = "WHMCS_WORKER_LOG_LEVEL"

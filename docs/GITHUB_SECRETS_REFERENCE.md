@@ -29,8 +29,6 @@ Use this checklist when setting up the deployment workflow:
 ### 📈 Optional Observability Secret
 
 - [ ] `APPLICATIONINSIGHTS_CONNECTION_STRING` - Application Insights / Azure Monitor connection string (enables OpenTelemetry export)
-- [ ] `APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP` - Overrides connection string for the standalone `function-app`
-- [ ] `APPLICATIONINSIGHTS_CONNECTION_STRING_ISW` - Overrides connection string for the Ink Stained Wretches Function Apps (ImageAPI/Functions/Stripe/Config)
 
 ### ➕ Optional Infrastructure Secrets
 

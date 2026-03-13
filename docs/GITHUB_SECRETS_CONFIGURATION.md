@@ -172,15 +172,13 @@ The script intelligently sets only relevant secrets for each project:
 - **InkStainedWretchFunctions**: External APIs, domain management, testing
 - **InkStainedWretchesConfig**: Key Vault configuration
 
-**Application Insights Connection String Overrides**:
+**Application Insights Connection String**:
 
-The configuration system supports both a single connection string for all apps and per-app overrides:
+The configuration system uses a single value for all apps:
 
-- `APPLICATIONINSIGHTS_CONNECTION_STRING` - Generic fallback (works for all apps)
-- `APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP` - Override for the standalone `function-app` project
-- `APPLICATIONINSIGHTS_CONNECTION_STRING_ISW` - Override for the Ink Stained Wretches Function Apps (`ImageAPI`, `InkStainedWretchFunctions`, `InkStainedWretchStripe`, `InkStainedWretchesConfig`)
+- `APPLICATIONINSIGHTS_CONNECTION_STRING` - Used by all apps (Azure Functions + WHMCS worker)
 
-`Set-DotnetUserSecrets.ps1` resolves the correct value per project and sets it as `APPLICATIONINSIGHTS_CONNECTION_STRING` in each project's dotnet user-secrets so the runtime configuration stays consistent across all hosts.
+`Set-DotnetUserSecrets.ps1` sets `APPLICATIONINSIGHTS_CONNECTION_STRING` in each project's dotnet user-secrets so the runtime configuration stays consistent across all hosts.
 
 ### 4. secrets-template.json
 

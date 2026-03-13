@@ -244,7 +244,7 @@ This avoids multiple restarts and is more efficient.
     WHMCS_SB_NAMESPACE_NAME: ${{ secrets.WHMCS_SB_NAMESPACE_NAME }}
     WHMCS_SB_QUEUE_NAME: ${{ secrets.WHMCS_SB_QUEUE_NAME }}
     # Application Insights
-    APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
+    APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
     # Notification Hub (new)
     NOTIFICATION_HUB_CONNECTION_STRING: ${{ secrets.NOTIFICATION_HUB_CONNECTION_STRING }}
     NOTIFICATION_HUB_NAME: ${{ secrets.NOTIFICATION_HUB_NAME }}
@@ -322,9 +322,14 @@ This avoids multiple restarts and is more efficient.
     echo "✓ App settings applied"
 
 ── STEP 11: Deploy WHMCS Worker VM Infrastructure ────────────
-Identical to the current workflow (unchanged).
+Provisions/updates the Linux VM using `infra/vm.bicep`.
+
+This step also applies the WHMCS worker runtime configuration by writing
+`/etc/whmcs-worker/environment` via a VM extension in the Bicep template.
+
 Required secrets: WHMCS_WORKER_RESOURCE_GROUP, WHMCS_WORKER_SSH_PUBLIC_KEY,
-                 DEPLOY_WHMCS_WORKER (must equal "true")
+                 DEPLOY_WHMCS_WORKER (must equal "true"), plus the WHMCS and
+                 Service Bus values listed below.
 Template: infra/vm.bicep
 continue-on-error: true
 
@@ -334,12 +339,6 @@ Steps:
 a. Upload whmcsworker.zip to Azure Blob Storage container "whmcs-worker-deploy"
 b. Generate a 30-minute SAS URL
 c. az vm run-command invoke to download, unzip, install, and start the service
-continue-on-error: true
-
-── STEP 13: Configure WhmcsWorkerService Environment ─────────
-Identical to the current workflow (unchanged).
-Writes /etc/whmcs-worker/environment on the VM with secrets passed as
-protected parameters to az vm run-command invoke.
 continue-on-error: true
 
 REQUIRED GITHUB SECRETS (consolidated list for new architecture)
@@ -366,7 +365,7 @@ SECRETS TO KEEP (required):
   COSMOSDB_ENABLE_FREE_TIER        — "true" or "false"
   COSMOSDB_ENABLE_ZONE_REDUNDANCY  — "true" or "false"
   APPINSIGHTS_NAME                 — Application Insights resource name
-  APPLICATIONINSIGHTS_CONNECTION_STRING_ISW — App Insights connection string
+  APPLICATIONINSIGHTS_CONNECTION_STRING — App Insights connection string
   ISW_RESOURCE_GROUP               — Resource group for the consolidated Function App
   ISW_BASE_NAME                    — Base name for the consolidated Function App
   ISW_LOCATION                     — Azure region for the Function App
@@ -410,8 +409,9 @@ SECRETS TO REMOVE (no longer needed after consolidation):
   DEPLOY_ISW_STRIPE                — Stripe is now in the consolidated app
   DEPLOY_ISW_CONFIG                — InkStainedWretchesConfig is removed
   DEPLOY_COMMUNICATION_SERVICES    — Merged into DEPLOY_ISW_FUNCTIONS
-  APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP — Consolidated to _ISW
-  APPLICATIONINSIGHTS_CONNECTION_STRING (bare) — Use _ISW variant only
+  APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP — Removed (use APPLICATIONINSIGHTS_CONNECTION_STRING)
+  APPLICATIONINSIGHTS_CONNECTION_STRING_ISW — Removed (use APPLICATIONINSIGHTS_CONNECTION_STRING)
+  APPLICATIONINSIGHTS_CONNECTION_STRING_WHMCS_WORKER — Removed (use APPLICATIONINSIGHTS_CONNECTION_STRING)
 
 INFRASTRUCTURE BICEP TEMPLATES TO CREATE/UPDATE
 ================================================

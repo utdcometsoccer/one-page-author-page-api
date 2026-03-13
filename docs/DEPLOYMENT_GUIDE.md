@@ -80,16 +80,13 @@ az ad sp create-for-rbac --name "github-actions-sp" \
 | `STRIPE_API_KEY` | ✅ For Stripe | Stripe secret API key | `sk_test_...` or `sk_live_...` |
 | `AAD_TENANT_ID` | ✅ Yes | Microsoft Entra ID tenant GUID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
 | `AAD_AUDIENCE` | ✅ Yes | API application/client ID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
-| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Optional | Generic Application Insights connection string (fallback) | `InstrumentationKey=...;IngestionEndpoint=...` |
-| `APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP` | Optional | Override for the standalone `function-app` | `InstrumentationKey=...;IngestionEndpoint=...` |
-| `APPLICATIONINSIGHTS_CONNECTION_STRING_ISW` | Optional | Override for Ink Stained Wretches Function Apps | `InstrumentationKey=...;IngestionEndpoint=...` |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Optional | Application Insights connection string used by all apps | `InstrumentationKey=...;IngestionEndpoint=...` |
 
 **How telemetry config is applied:**
 
 - In Azure, each Function App uses the standard app setting `APPLICATIONINSIGHTS_CONNECTION_STRING`.
 - The GitHub Actions workflow sets that app setting after zip deploy using Azure CLI.
-- For `function-app`, it prefers `APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP` (falls back to `APPLICATIONINSIGHTS_CONNECTION_STRING`).
-- For the Ink Stained Wretches apps, it prefers `APPLICATIONINSIGHTS_CONNECTION_STRING_ISW` (falls back to `APPLICATIONINSIGHTS_CONNECTION_STRING`).
+- All apps use the same `APPLICATIONINSIGHTS_CONNECTION_STRING` value.
 
 ### Deployment Control Flags
 
@@ -725,6 +722,10 @@ Azure Functions have dynamic outbound IPs that cannot be added to a WHMCS IP all
 
 6. **Create the environment file on the VM**
 
+   If you are deploying manually, create the environment file as shown below.
+   If you are deploying via the GitHub Actions workflow + `infra/vm.bicep`, this
+   file is created/updated automatically by the VM extension.
+
    ```bash
    sudo tee /etc/whmcs-worker/environment > /dev/null <<'EOF'
    SERVICE_BUS_CONNECTION_STRING=Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=...;SharedAccessKey=...
@@ -732,6 +733,9 @@ Azure Functions have dynamic outbound IPs that cannot be added to a WHMCS IP all
    WHMCS_API_URL=https://your-whmcs.com/includes/api.php
    WHMCS_API_IDENTIFIER=your-api-identifier
    WHMCS_API_SECRET=your-api-secret
+   # Optional:
+   APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=...;IngestionEndpoint=...;
+   WHMCS_WORKER_LOG_LEVEL=Information
    EOF
    sudo chmod 600 /etc/whmcs-worker/environment
    sudo chown root:root /etc/whmcs-worker/environment
@@ -773,8 +777,12 @@ The GitHub Actions workflow automatically builds and deploys the `WhmcsWorkerSer
 
 | Secret Name | Description |
 |-------------|-------------|
-| `WHMCS_VM_RESOURCE_GROUP` | Resource group containing the WHMCS worker VM |
-| `WHMCS_VM_NAME` | Name of the WHMCS worker VM |
+| `DEPLOY_WHMCS_WORKER` | Must be `true` to deploy the worker VM |
+| `WHMCS_WORKER_RESOURCE_GROUP` | Resource group containing the WHMCS worker VM |
+| `WHMCS_WORKER_LOCATION` | Azure region for the worker resources (e.g., `eastus`) |
+| `WHMCS_WORKER_VM_NAME` | Name of the WHMCS worker VM |
+| `WHMCS_WORKER_ADMIN_USERNAME` | Admin username for SSH/login (e.g., `azureuser`) |
+| `WHMCS_WORKER_SSH_PUBLIC_KEY` | SSH public key used for VM provisioning |
 | `WHMCS_WORKER_STORAGE_ACCOUNT` | Storage account used for deployment zip staging |
 | `WHMCS_WORKER_STORAGE_CONTAINER` | Blob container for deployment zip staging |
 | `SERVICE_BUS_CONNECTION_STRING` | Azure Service Bus connection string |
@@ -782,6 +790,8 @@ The GitHub Actions workflow automatically builds and deploys the `WhmcsWorkerSer
 | `WHMCS_API_URL` | WHMCS API endpoint URL |
 | `WHMCS_API_IDENTIFIER` | WHMCS API credential identifier |
 | `WHMCS_API_SECRET` | WHMCS API credential secret |
+| `WHMCS_WORKER_LOG_LEVEL` | Log level override for the worker service |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | App Insights connection string (used by the worker if configured) |
 
 ## 📚 Additional Resources
 
