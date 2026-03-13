@@ -396,14 +396,13 @@ jobs:
           FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
           RESOURCE_GROUP: ${{ secrets.FUNCTION_APP_RESOURCE_GROUP }}
           APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
-          APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP }}
         run: |
-          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_FUNCTION_APP:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+          AI_CONN="$APPLICATIONINSIGHTS_CONNECTION_STRING"
 
           # Validate required secrets are available
           if [ -z "$FUNCTION_APP_NAME" ] || [ -z "$RESOURCE_GROUP" ] || [ -z "$AI_CONN" ]; then
             echo "⚠️ Skipping app setting update for function-app (missing required values)"
-            echo "   Required: AZURE_FUNCTIONAPP_NAME, FUNCTION_APP_RESOURCE_GROUP, APPLICATIONINSIGHTS_CONNECTION_STRING(_FUNCTION_APP)"
+            echo "   Required: AZURE_FUNCTIONAPP_NAME, FUNCTION_APP_RESOURCE_GROUP, APPLICATIONINSIGHTS_CONNECTION_STRING"
             exit 0
           fi
 
@@ -772,7 +771,6 @@ jobs:
           ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
           DEPLOY_IMAGE_API: ${{ secrets.DEPLOY_IMAGE_API }}
           APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
-          APPLICATIONINSIGHTS_CONNECTION_STRING_ISW: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
         run: |
           # Skip if ImageAPI deployment is not enabled
           if [ "$DEPLOY_IMAGE_API" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -791,7 +789,7 @@ jobs:
             --resource-group "$ISW_RESOURCE_GROUP" \
             --src '${{ env.IMAGE_API_PATH }}/imageapi.zip'
 
-          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_ISW:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+          AI_CONN="$APPLICATIONINSIGHTS_CONNECTION_STRING"
           if [ -n "$AI_CONN" ]; then
             echo "🔧 Setting APPLICATIONINSIGHTS_CONNECTION_STRING on $FUNCTION_APP_NAME..."
             az functionapp config appsettings set \
@@ -819,7 +817,6 @@ jobs:
           ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
           DEPLOY_ISW_FUNCTIONS: ${{ secrets.DEPLOY_ISW_FUNCTIONS }}
           APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
-          APPLICATIONINSIGHTS_CONNECTION_STRING_ISW: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
           COSMOSDB_CONNECTION_STRING: ${{ secrets.COSMOSDB_CONNECTION_STRING }}
           WHMCS_CLIENT_ID: ${{ secrets.WHMCS_CLIENT_ID }}
           WHMCS_API_URL: ${{ secrets.WHMCS_API_URL }}
@@ -846,7 +843,7 @@ jobs:
             --resource-group "$ISW_RESOURCE_GROUP" \
             --src '${{ env.INK_STAINED_WRETCH_FUNCTIONS_PATH }}/inkstainedwretchfunctions.zip'
 
-          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_ISW:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+          AI_CONN="$APPLICATIONINSIGHTS_CONNECTION_STRING"
           if [ -n "$AI_CONN" ]; then
             echo "🔧 Setting APPLICATIONINSIGHTS_CONNECTION_STRING on $FUNCTION_APP_NAME..."
             az functionapp config appsettings set \
@@ -978,7 +975,6 @@ jobs:
           ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
           DEPLOY_ISW_STRIPE: ${{ secrets.DEPLOY_ISW_STRIPE }}
           APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
-          APPLICATIONINSIGHTS_CONNECTION_STRING_ISW: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
         run: |
           # Skip if InkStainedWretchStripe deployment is not enabled
           if [ "$DEPLOY_ISW_STRIPE" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -997,7 +993,7 @@ jobs:
             --resource-group "$ISW_RESOURCE_GROUP" \
             --src '${{ env.INK_STAINED_WRETCH_STRIPE_PATH }}/inkstainedwretchstripe.zip'
 
-          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_ISW:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+          AI_CONN="$APPLICATIONINSIGHTS_CONNECTION_STRING"
           if [ -n "$AI_CONN" ]; then
             echo "🔧 Setting APPLICATIONINSIGHTS_CONNECTION_STRING on $FUNCTION_APP_NAME..."
             az functionapp config appsettings set \
@@ -1025,7 +1021,6 @@ jobs:
           ISW_BASE_NAME: ${{ secrets.ISW_BASE_NAME }}
           DEPLOY_ISW_CONFIG: ${{ secrets.DEPLOY_ISW_CONFIG }}
           APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
-          APPLICATIONINSIGHTS_CONNECTION_STRING_ISW: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_ISW }}
         run: |
           # Skip if InkStainedWretchesConfig deployment is not enabled
           if [ "$DEPLOY_ISW_CONFIG" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -1044,7 +1039,7 @@ jobs:
             --resource-group "$ISW_RESOURCE_GROUP" \
             --src '${{ env.INK_STAINED_WRETCHES_CONFIG_PATH }}/inkstainedwretchesconfig.zip'
 
-          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_ISW:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
+          AI_CONN="$APPLICATIONINSIGHTS_CONNECTION_STRING"
           if [ -n "$AI_CONN" ]; then
             echo "🔧 Setting APPLICATIONINSIGHTS_CONNECTION_STRING on $FUNCTION_APP_NAME..."
             az functionapp config appsettings set \
@@ -1072,6 +1067,15 @@ jobs:
           WHMCS_WORKER_VM_NAME: ${{ secrets.WHMCS_WORKER_VM_NAME }}
           WHMCS_WORKER_ADMIN_USERNAME: ${{ secrets.WHMCS_WORKER_ADMIN_USERNAME }}
           WHMCS_WORKER_SSH_PUBLIC_KEY: ${{ secrets.WHMCS_WORKER_SSH_PUBLIC_KEY }}
+          WHMCS_SB_NAMESPACE_NAME: ${{ secrets.WHMCS_SB_NAMESPACE_NAME }}
+          WHMCS_SB_QUEUE_NAME: ${{ secrets.WHMCS_SB_QUEUE_NAME }}
+          SERVICE_BUS_CONNECTION_STRING: ${{ secrets.SERVICE_BUS_CONNECTION_STRING }}
+          SERVICE_BUS_WHMCS_QUEUE_NAME: ${{ secrets.SERVICE_BUS_WHMCS_QUEUE_NAME }}
+          WHMCS_API_URL: ${{ secrets.WHMCS_API_URL }}
+          WHMCS_API_IDENTIFIER: ${{ secrets.WHMCS_API_IDENTIFIER }}
+          WHMCS_API_SECRET: ${{ secrets.WHMCS_API_SECRET }}
+          APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+          WHMCS_WORKER_LOG_LEVEL: ${{ secrets.WHMCS_WORKER_LOG_LEVEL }}
           DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
         run: |
           if [ "$DEPLOY_WHMCS_WORKER" != "true" ] || \
@@ -1082,39 +1086,72 @@ jobs:
             exit 0
           fi
 
+          if [ -z "$WHMCS_API_URL" ] || [ -z "$WHMCS_API_IDENTIFIER" ] || [ -z "$WHMCS_API_SECRET" ]; then
+            echo "❌ WHMCS API secrets not configured; cannot deploy VM environment configuration."
+            echo "   Required: WHMCS_API_URL, WHMCS_API_IDENTIFIER, WHMCS_API_SECRET"
+            exit 1
+          fi
+
           VM_NAME="${WHMCS_WORKER_VM_NAME:-whmcs-worker-vm}"
           LOCATION="${WHMCS_WORKER_LOCATION:-eastus}"
 
-          echo "✓ Checking if VM exists: $VM_NAME"
-          if ! az vm show \
-               --name "$VM_NAME" \
-               --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" &>/dev/null; then
-            echo "📦 VM not found. Deploying infrastructure..."
+          SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-bus}"
+          QUEUE_NAME="${SERVICE_BUS_WHMCS_QUEUE_NAME:-${WHMCS_SB_QUEUE_NAME_DEPLOYED:-${WHMCS_SB_QUEUE_NAME:-whmcs-domain-registrations}}}"
 
-            # SSH public keys contain spaces, so build the parameters as an array
-            # to avoid word-splitting issues during deployment.
-            extraParams=()
-            if [ -n "$WHMCS_WORKER_ADMIN_USERNAME" ]; then
-              extraParams+=( "adminUsername=$WHMCS_WORKER_ADMIN_USERNAME" )
-            fi
+          # Prefer secrets or earlier deployment outputs.
+          SB_CONN="${SERVICE_BUS_CONNECTION_STRING:-${WHMCS_SB_LISTENER_CONNECTION_STRING:-}}"
 
-            az deployment group create \
+          # Fallback: retrieve the WhmcsListener connection string from the Service Bus namespace.
+          if [ -z "$SB_CONN" ]; then
+            SB_CONN=$(az servicebus namespace authorization-rule keys list \
               --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
-              --template-file infra/vm.bicep \
-              --parameters \
-                "vmName=$VM_NAME" \
-                "location=$LOCATION" \
-                "adminSshPublicKey=$WHMCS_WORKER_SSH_PUBLIC_KEY" \
-                "${extraParams[@]}" \
-              --output json > vm-deployment-output.json
-
-            STATIC_IP=$(jq -r '.properties.outputs.staticPublicIpAddress.value // "unknown"' \
-              vm-deployment-output.json)
-            echo "✓ VM infrastructure deployed. Static IP: $STATIC_IP"
-            echo "ℹ️ Add this IP to the WHMCS API credential IP allowlist."
-          else
-            echo "✓ VM already exists. Skipping infrastructure deployment."
+              --namespace-name "$SB_NAMESPACE" \
+              --name WhmcsListener \
+              --query primaryConnectionString \
+              --output tsv 2>/dev/null || echo "")
           fi
+
+          if [ -z "$SB_CONN" ]; then
+            echo "❌ Could not retrieve Service Bus listener connection string from namespace '$SB_NAMESPACE'."
+            echo "   Ensure Service Bus is deployed and the WhmcsListener policy exists, or set SERVICE_BUS_CONNECTION_STRING in GitHub Secrets."
+            exit 1
+          fi
+
+          # Log level defaults to Information if not set.
+          LOG_LEVEL="${WHMCS_WORKER_LOG_LEVEL:-Information}"
+
+          # SSH public keys contain spaces, so build the parameters as an array
+          # to avoid word-splitting issues during deployment.
+          extraParams=()
+          if [ -n "$WHMCS_WORKER_ADMIN_USERNAME" ]; then
+            extraParams+=( "adminUsername=$WHMCS_WORKER_ADMIN_USERNAME" )
+          fi
+
+          echo "✓ Deploying VM infrastructure and environment configuration via Bicep..."
+          echo "::add-mask::$SB_CONN"
+
+          az deployment group create \
+            --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
+            --template-file infra/vm.bicep \
+            --parameters \
+              "vmName=$VM_NAME" \
+              "location=$LOCATION" \
+              "adminSshPublicKey=$WHMCS_WORKER_SSH_PUBLIC_KEY" \
+              "serviceBusConnectionString=$SB_CONN" \
+              "serviceBusWhmcsQueueName=$QUEUE_NAME" \
+              "whmcsApiUrl=$WHMCS_API_URL" \
+              "whmcsApiIdentifier=$WHMCS_API_IDENTIFIER" \
+              "whmcsApiSecret=$WHMCS_API_SECRET" \
+              "applicationInsightsConnectionString=${APPLICATIONINSIGHTS_CONNECTION_STRING:-}" \
+              "whmcsWorkerLogLevel=$LOG_LEVEL" \
+              "environmentConfigTimestamp=${GITHUB_RUN_NUMBER}" \
+              "${extraParams[@]}" \
+            --output json > vm-deployment-output.json
+
+          STATIC_IP=$(jq -r '.properties.outputs.staticPublicIpAddress.value // "unknown"' \
+            vm-deployment-output.json)
+          echo "✓ VM deployed/updated. Static IP: $STATIC_IP"
+          echo "ℹ️ Add this IP to the WHMCS API credential IP allowlist (if required)."
 
       # =========================================
       # Deploy WhmcsWorkerService Binary (Conditional)
@@ -1244,105 +1281,3 @@ jobs:
             --output json
 
           echo "✓ WhmcsWorkerService deployed to VM"
-
-      # =========================================
-      # Configure WhmcsWorkerService Environment (Conditional)
-      # =========================================
-
-      - name: 'Configure WhmcsWorkerService Environment'
-        shell: bash
-        env:
-          WHMCS_WORKER_RESOURCE_GROUP: ${{ secrets.WHMCS_WORKER_RESOURCE_GROUP }}
-          WHMCS_WORKER_VM_NAME: ${{ secrets.WHMCS_WORKER_VM_NAME }}
-          WHMCS_SB_NAMESPACE_NAME: ${{ secrets.WHMCS_SB_NAMESPACE_NAME }}
-          WHMCS_SB_QUEUE_NAME: ${{ secrets.WHMCS_SB_QUEUE_NAME }}
-          SERVICE_BUS_CONNECTION_STRING: ${{ secrets.SERVICE_BUS_CONNECTION_STRING }}
-          SERVICE_BUS_WHMCS_QUEUE_NAME: ${{ secrets.SERVICE_BUS_WHMCS_QUEUE_NAME }}
-          WHMCS_API_URL: ${{ secrets.WHMCS_API_URL }}
-          WHMCS_API_IDENTIFIER: ${{ secrets.WHMCS_API_IDENTIFIER }}
-          WHMCS_API_SECRET: ${{ secrets.WHMCS_API_SECRET }}
-          APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
-          APPLICATIONINSIGHTS_CONNECTION_STRING_WHMCS_WORKER: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING_WHMCS_WORKER }}
-          WHMCS_WORKER_LOG_LEVEL: ${{ secrets.WHMCS_WORKER_LOG_LEVEL }}
-          DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
-        run: |
-          if [ "$DEPLOY_WHMCS_WORKER" != "true" ] || [ -z "$WHMCS_WORKER_RESOURCE_GROUP" ]; then
-            echo "⚠️ Skipping environment configuration: DEPLOY_WHMCS_WORKER not set or WHMCS_WORKER_RESOURCE_GROUP missing"
-            exit 0
-          fi
-
-          if [ -z "$WHMCS_API_URL" ] || [ -z "$WHMCS_API_IDENTIFIER" ] || [ -z "$WHMCS_API_SECRET" ]; then
-            echo "❌ WHMCS API secrets not configured; cannot write environment file."
-            echo "   Required: WHMCS_API_URL, WHMCS_API_IDENTIFIER, WHMCS_API_SECRET"
-            exit 1
-          fi
-
-          VM_NAME="${WHMCS_WORKER_VM_NAME:-whmcs-worker-vm}"
-          SB_NAMESPACE="${WHMCS_SB_NAMESPACE_NAME:-onepageauthor-bus}"
-          QUEUE_NAME="${SERVICE_BUS_WHMCS_QUEUE_NAME:-${WHMCS_SB_QUEUE_NAME_DEPLOYED:-${WHMCS_SB_QUEUE_NAME:-whmcs-domain-registrations}}}"
-
-          # Prefer the listener connection string captured from the Bicep deployment outputs.
-          SB_CONN="${SERVICE_BUS_CONNECTION_STRING:-${WHMCS_SB_LISTENER_CONNECTION_STRING:-}}"
-
-          # Fallback: retrieve the WhmcsListener connection string from the Service Bus namespace.
-          if [ -z "$SB_CONN" ]; then
-            SB_CONN=$(az servicebus namespace authorization-rule keys list \
-              --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
-              --namespace-name "$SB_NAMESPACE" \
-              --name WhmcsListener \
-              --query primaryConnectionString \
-              --output tsv 2>/dev/null || echo "")
-          fi
-
-          if [ -z "$SB_CONN" ]; then
-            echo "❌ Could not retrieve Service Bus listener connection string from namespace '$SB_NAMESPACE'."
-            echo "   Ensure the Service Bus is deployed and the WhmcsListener policy exists."
-            exit 1
-          fi
-
-          # Application Insights: use the worker-specific connection string, falling back to
-          # the shared APPLICATIONINSIGHTS_CONNECTION_STRING if the worker-specific one is not set.
-          AI_CONN="${APPLICATIONINSIGHTS_CONNECTION_STRING_WHMCS_WORKER:-$APPLICATIONINSIGHTS_CONNECTION_STRING}"
-
-          # Log level defaults to Information if not set.
-          LOG_LEVEL="${WHMCS_WORKER_LOG_LEVEL:-Information}"
-
-          # Write the environment file on the VM via run-command.
-          # Secrets are passed as protected --parameters (positional $1-$7 in the script)
-          # so they are not stored in the run-command definition visible in Azure Activity Logs.
-          # Parameter order: $1=SERVICE_BUS_CONNECTION_STRING, $2=SERVICE_BUS_WHMCS_QUEUE_NAME,
-          #                  $3=WHMCS_API_URL, $4=WHMCS_API_IDENTIFIER, $5=WHMCS_API_SECRET,
-          #                  $6=APPLICATIONINSIGHTS_CONNECTION_STRING, $7=WHMCS_WORKER_LOG_LEVEL
-          ENV_SCRIPT=$(cat << 'SCRIPTEOF'
-          set -e
-          mkdir -p /etc/whmcs-worker
-          {
-            printf 'SERVICE_BUS_CONNECTION_STRING=%s\n' "$1"
-            printf 'SERVICE_BUS_WHMCS_QUEUE_NAME=%s\n'  "$2"
-            printf 'WHMCS_API_URL=%s\n'                  "$3"
-            printf 'WHMCS_API_IDENTIFIER=%s\n'           "$4"
-            printf 'WHMCS_API_SECRET=%s\n'               "$5"
-            if [ -n "$6" ]; then
-              printf 'APPLICATIONINSIGHTS_CONNECTION_STRING=%s\n' "$6"
-            fi
-            printf 'WHMCS_WORKER_LOG_LEVEL=%s\n'         "$7"
-          } > /etc/whmcs-worker/environment
-          chmod 600 /etc/whmcs-worker/environment
-          chown root:root /etc/whmcs-worker/environment
-          systemctl restart whmcs-worker 2>/dev/null || true
-          echo "Environment file written and service restarted."
-          SCRIPTEOF
-          )
-
-          echo "🔧 Writing environment file on VM: $VM_NAME"
-          echo "   Log level: $LOG_LEVEL"
-          echo "   Application Insights: $([ -n "$AI_CONN" ] && echo 'configured' || echo 'not configured')"
-          az vm run-command invoke \
-            --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
-            --name "$VM_NAME" \
-            --command-id RunShellScript \
-            --scripts "$ENV_SCRIPT" \
-            --parameters "$SB_CONN" "$QUEUE_NAME" "$WHMCS_API_URL" "$WHMCS_API_IDENTIFIER" "$WHMCS_API_SECRET" "$AI_CONN" "$LOG_LEVEL" \
-            --output json
-
-          echo "✓ Environment configured on VM: $VM_NAME"

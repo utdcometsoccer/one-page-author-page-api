@@ -11,6 +11,34 @@ param adminUsername string = 'azureuser'
 @secure()
 param adminSshPublicKey string
 
+@description('Service Bus connection string used by the WHMCS Worker Service (SERVICE_BUS_CONNECTION_STRING)')
+@secure()
+param serviceBusConnectionString string
+
+@description('Queue name consumed by the WHMCS Worker Service (SERVICE_BUS_WHMCS_QUEUE_NAME)')
+param serviceBusWhmcsQueueName string = 'whmcs-domain-registrations'
+
+@description('WHMCS API endpoint URL (WHMCS_API_URL)')
+param whmcsApiUrl string
+
+@description('WHMCS API identifier (WHMCS_API_IDENTIFIER)')
+@secure()
+param whmcsApiIdentifier string
+
+@description('WHMCS API secret (WHMCS_API_SECRET)')
+@secure()
+param whmcsApiSecret string
+
+@description('Application Insights / Azure Monitor connection string (APPLICATIONINSIGHTS_CONNECTION_STRING). Optional; when empty, telemetry export is disabled.')
+@secure()
+param applicationInsightsConnectionString string = ''
+
+@description('Minimum log level for the WHMCS worker (WHMCS_WORKER_LOG_LEVEL)')
+param whmcsWorkerLogLevel string = 'Information'
+
+@description('Change this value to force the environment configuration extension to re-run (e.g., GitHub Actions run number).')
+param environmentConfigTimestamp int = 0
+
 @description('The name of the virtual network')
 param vnetName string = '${vmName}-vnet'
 
@@ -45,6 +73,25 @@ runcmd:
   - chown -R whmcsworker:whmcsworker /opt/whmcs-worker /var/log/whmcs-worker
   - chown root:root /etc/whmcs-worker
   - chmod 750 /etc/whmcs-worker
+'''
+
+var aiLine = empty(applicationInsightsConnectionString)
+  ? ''
+  : 'APPLICATIONINSIGHTS_CONNECTION_STRING=${applicationInsightsConnectionString}\n'
+
+var envFileContent = 'SERVICE_BUS_CONNECTION_STRING=${serviceBusConnectionString}\nSERVICE_BUS_WHMCS_QUEUE_NAME=${serviceBusWhmcsQueueName}\nWHMCS_API_URL=${whmcsApiUrl}\nWHMCS_API_IDENTIFIER=${whmcsApiIdentifier}\nWHMCS_API_SECRET=${whmcsApiSecret}\n${aiLine}WHMCS_WORKER_LOG_LEVEL=${whmcsWorkerLogLevel}\n'
+
+var configureEnvironmentScript = '''#!/bin/sh
+set -e
+
+mkdir -p /etc/whmcs-worker
+
+echo '%%ENV_FILE_CONTENT_BASE64%%' | base64 -d > /etc/whmcs-worker/environment
+chmod 600 /etc/whmcs-worker/environment
+chown root:root /etc/whmcs-worker/environment
+
+# The service may not be installed yet on first VM provision; restart is best-effort.
+systemctl restart whmcs-worker 2>/dev/null || true
 '''
 
 // Static Public IP for outbound WHMCS API calls (required for IP allowlisting)
@@ -197,6 +244,26 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
       bootDiagnostics: {
         enabled: false
       }
+    }
+  }
+}
+
+// Configure /etc/whmcs-worker/environment securely (systemd EnvironmentFile) via Custom Script Extension.
+// This is the supported way to keep secrets out of clear-text ARM settings (use protectedSettings).
+resource configureWhmcsWorkerEnvironment 'Microsoft.Compute/virtualMachines/extensions@2024-07-01' = {
+  name: 'configure-whmcs-worker-env'
+  parent: vm
+  location: location
+  properties: {
+    publisher: 'Microsoft.Azure.Extensions'
+    type: 'CustomScript'
+    typeHandlerVersion: '2.1'
+    autoUpgradeMinorVersion: true
+    settings: {
+      timestamp: environmentConfigTimestamp
+    }
+    protectedSettings: {
+      script: base64(replace(configureEnvironmentScript, '%%ENV_FILE_CONTENT_BASE64%%', base64(envFileContent)))
     }
   }
 }

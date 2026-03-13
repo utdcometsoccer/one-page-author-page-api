@@ -359,7 +359,9 @@ For the VM worker (production), see [`WhmcsWorkerService/README.md` — Configur
 - [ ] Create `whmcsworker` system user and `/opt/whmcs-worker` directory
 - [ ] Build and publish `WhmcsWorkerService` in Release mode
 - [ ] Copy published output to `/opt/whmcs-worker/`
-- [ ] Create `/etc/whmcs-worker/environment` with all required variables (permissions: `600 root:root`)
+- [ ] Ensure `/etc/whmcs-worker/environment` exists with all required variables (permissions: `600 root:root`)
+   - Manual deployment: create it on the VM
+   - CI/CD deployment: `infra/vm.bicep` writes/updates it via a VM extension
 - [ ] Install and enable `whmcs-worker.service` via systemd
 - [ ] Verify service starts cleanly (`systemctl status whmcs-worker`)
 
