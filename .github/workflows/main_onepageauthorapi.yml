@@ -1270,7 +1270,11 @@ jobs:
 
           # Zips may not preserve executable bit; enforce it for the self-contained binary.
           if [ -f "$INSTALL_DIR/WhmcsWorkerService" ]; then
-            chmod 755 "$INSTALL_DIR/WhmcsWorkerService" || true
+            chmod 755 "$INSTALL_DIR/WhmcsWorkerService"
+            if ! test -x "$INSTALL_DIR/WhmcsWorkerService"; then
+              echo "❌ Failed to set executable bit on $INSTALL_DIR/WhmcsWorkerService"
+              exit 1
+            fi
           else
             echo "❌ Expected self-contained binary not found at $INSTALL_DIR/WhmcsWorkerService"
             echo "Contents of install dir:"
@@ -1292,20 +1296,20 @@ jobs:
           systemctl enable "$SERVICE"
           systemctl start "$SERVICE"
 
-          echo "\n--- PROOF: systemd status ---"
+          printf '\n--- PROOF: systemd status ---\n'
           systemctl --no-pager --full status "$SERVICE" || true
 
-          echo "\n--- PROOF: is-active ---"
+          printf '\n--- PROOF: is-active ---\n'
           if systemctl is-active --quiet "$SERVICE"; then
             echo "PROOF_SERVICE_ACTIVE=active"
           else
             echo "PROOF_SERVICE_ACTIVE=inactive"
-            echo "\n--- PROOF: recent logs (last 200 lines) ---"
+            printf '\n--- PROOF: recent logs (last 200 lines) ---\n'
             journalctl -u "$SERVICE" -n 200 --no-pager || true
             exit 1
           fi
 
-          echo "\n--- PROOF: deployed files ---"
+          printf '\n--- PROOF: deployed files ---\n'
           ls -la "$INSTALL_DIR" || true
           sha256sum "$INSTALL_DIR/WhmcsWorkerService" 2>/dev/null || true
 
