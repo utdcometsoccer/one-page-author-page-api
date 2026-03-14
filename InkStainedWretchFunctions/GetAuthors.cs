@@ -54,6 +54,7 @@ public class GetAuthors
         try
         {
             List<InkStainedWretch.OnePageAuthorAPI.API.AuthorApiResponse> authors;
+            bool isAdminScenario = false;
 
             if (hasDomainParams)
             {
@@ -64,6 +65,7 @@ public class GetAuthors
             else if (_scopeValidationService.HasRequiredScope(user!, "Author.Read"))
             {
                 // Scenario 1: Authenticated with Author.Read scope — return all authors paged.
+                isAdminScenario = true;
                 int page = 1;
                 if (req.Query.TryGetValue("page", out var pageStr) &&
                     int.TryParse(pageStr, out int parsedPage) &&
@@ -85,6 +87,10 @@ public class GetAuthors
             if (authors == null || !authors.Any())
             {
                 _logger.LogInformation("No authors found");
+                if (isAdminScenario)
+                {
+                    return new OkObjectResult(authors ?? new List<AuthorApiResponse>());
+                }
                 return new NotFoundObjectResult(new { error = "No authors found" });
             }
 
