@@ -96,7 +96,7 @@ internal sealed class SystemdWatchdogHostedService : BackgroundService
         }
     }
 
-    private static ValueTask<int> SendNotifyAsync(string notifySocket, string payload, CancellationToken cancellationToken)
+    private static async ValueTask<int> SendNotifyAsync(string notifySocket, string payload, CancellationToken cancellationToken)
     {
         var endpointPath = notifySocket;
         if (endpointPath.StartsWith('@'))
@@ -110,6 +110,6 @@ internal sealed class SystemdWatchdogHostedService : BackgroundService
         using var socket = new Socket(AddressFamily.Unix, SocketType.Dgram, ProtocolType.Unspecified);
         var bytes = Encoding.UTF8.GetBytes(payload);
 
-        return socket.SendToAsync(bytes, SocketFlags.None, endpoint, cancellationToken);
+        return await socket.SendToAsync(bytes, SocketFlags.None, endpoint, cancellationToken).ConfigureAwait(false);
     }
 }
