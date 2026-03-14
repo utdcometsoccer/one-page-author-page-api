@@ -89,7 +89,7 @@ public class GetAuthors
                 _logger.LogInformation("No authors found");
                 if (isAdminScenario)
                 {
-                    return new OkObjectResult(new List<AuthorApiResponse>());
+                    return new OkObjectResult(authors ?? new List<AuthorApiResponse>());
                 }
                 return new NotFoundObjectResult(new { error = "No authors found" });
             }
