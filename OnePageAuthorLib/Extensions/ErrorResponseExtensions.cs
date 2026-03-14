@@ -54,7 +54,7 @@ public static class ErrorResponseExtensions
         bool includeDetails = false)
     {
         var traceId = Guid.NewGuid().ToString();
-        
+
         // Log the exception with trace ID
         logger.LogError(ex, "Error occurred. TraceId: {TraceId}", traceId);
 

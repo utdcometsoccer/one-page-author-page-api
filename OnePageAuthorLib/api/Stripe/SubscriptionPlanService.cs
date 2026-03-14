@@ -55,7 +55,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
 
             var plans = new List<SubscriptionPlan>();
-            
+
             foreach (var priceDto in priceDtos)
             {
                 try
@@ -87,11 +87,11 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             {
                 _logger.LogWarning("ProductId is null or empty, using product name for default features");
                 // Create a mock product with the available information for feature generation
-                var mockProduct = new Product 
-                { 
-                    Id = "mock", 
-                    Name = productName ?? "Default Plan", 
-                    Description = productDescription ?? "A default subscription plan" 
+                var mockProduct = new Product
+                {
+                    Id = "mock",
+                    Name = productName ?? "Default Plan",
+                    Description = productDescription ?? "A default subscription plan"
                 };
                 return GetDefaultFeaturesForProduct(mockProduct);
             }
@@ -123,7 +123,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                             .Select(f => f.Trim())
                             .Where(f => !string.IsNullOrEmpty(f))
                             .ToList();
-                        
+
                         features.AddRange(metadataFeatures);
                     }
                 }
@@ -159,11 +159,11 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             {
                 _logger.LogError(ex, "Stripe API error while retrieving product {ProductId}: {Message}", productId, ex.Message);
                 // Return default features when Stripe API fails, using product name for better defaults
-                var mockProduct = new Product 
-                { 
-                    Id = productId, 
-                    Name = productName ?? "Default Plan", 
-                    Description = productDescription ?? "A default subscription plan" 
+                var mockProduct = new Product
+                {
+                    Id = productId,
+                    Name = productName ?? "Default Plan",
+                    Description = productDescription ?? "A default subscription plan"
                 };
                 return GetDefaultFeaturesForProduct(mockProduct);
             }
@@ -171,11 +171,11 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             {
                 _logger.LogError(ex, "Error retrieving features for product {ProductId}", productId);
                 // Return default features when any error occurs, using product name for better defaults
-                var mockProduct = new Product 
-                { 
-                    Id = productId, 
-                    Name = productName ?? "Default Plan", 
-                    Description = productDescription ?? "A default subscription plan" 
+                var mockProduct = new Product
+                {
+                    Id = productId,
+                    Name = productName ?? "Default Plan",
+                    Description = productDescription ?? "A default subscription plan"
                 };
                 return GetDefaultFeaturesForProduct(mockProduct);
             }
@@ -190,11 +190,11 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
         private List<string> GetDefaultFeaturesBasedOnProductId(string productId)
         {
             // Create a mock product for default feature generation
-            var mockProduct = new Product 
-            { 
-                Id = productId ?? "unknown", 
-                Name = "Default Plan", 
-                Description = "A default subscription plan" 
+            var mockProduct = new Product
+            {
+                Id = productId ?? "unknown",
+                Name = "Default Plan",
+                Description = "A default subscription plan"
             };
             return GetDefaultFeaturesForProduct(mockProduct);
         }
@@ -230,7 +230,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
 
             var name = productName.Trim().ToLowerInvariant();
-            
+
             if (name.Contains("basic") || name.Contains("starter"))
                 return "Basic";
             else if (name.Contains("professional") || name.Contains("pro"))
@@ -428,12 +428,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
 
             // Convert to lowercase and handle common variations
             var normalized = culture.Trim().ToLowerInvariant();
-            
+
             // Map common culture codes
             return normalized switch
             {
                 "en" or "english" => "en-US",
-                "es" or "spanish" => "es-US", 
+                "es" or "spanish" => "es-US",
                 "fr" or "french" => "fr-CA",
                 "en-us" => "en-US",
                 "en-ca" => "en-CA",
@@ -464,7 +464,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 {
                     var cultureIndex = parts[1];
                     var targetKey = $"culture_{cultureIndex}_{contentType}";
-                    
+
                     if (metadata.ContainsKey(targetKey))
                     {
                         return targetKey;

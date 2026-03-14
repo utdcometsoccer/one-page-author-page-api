@@ -16,7 +16,7 @@ public class InvoicePreview
     private readonly IAuthenticatedFunctionTelemetryService _telemetry;
 
     public InvoicePreview(
-        ILogger<InvoicePreview> logger, 
+        ILogger<InvoicePreview> logger,
         IInvoicePreview previewer,
         IAuthenticatedFunctionTelemetryService telemetry)
     {
@@ -66,30 +66,30 @@ public class InvoicePreview
         try
         {
             var result = await _previewer.PreviewAsync(payload);
-            
+
             // Track success with additional context
             var successProperties = new Dictionary<string, string>
             {
                 { "CustomerId", payload.CustomerId },
                 { "SubscriptionId", payload.SubscriptionId ?? "none" }
             };
-            
+
             if (!string.IsNullOrEmpty(payload.PriceId))
             {
                 successProperties.Add("PriceId", payload.PriceId);
             }
-            
+
             _telemetry.TrackAuthenticatedFunctionSuccess(
                 "InvoicePreview",
                 userId,
                 userEmail,
                 successProperties);
-            
+
             _logger.LogInformation(
                 "Successfully generated invoice preview for customer {CustomerId} by user {UserId}",
                 payload.CustomerId,
                 userId ?? "Anonymous");
-            
+
             return new OkObjectResult(result);
         }
         catch (Exception ex)

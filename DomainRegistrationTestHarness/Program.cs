@@ -141,7 +141,7 @@ partial class Program
 
                     // Create or update in Cosmos DB
                     var existing = await repository.GetByIdAsync(registration.id, registration.Upn);
-                    
+
                     if (existing != null)
                     {
                         // Update existing registration

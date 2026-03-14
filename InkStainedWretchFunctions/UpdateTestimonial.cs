@@ -22,7 +22,7 @@ public class UpdateTestimonial
     private readonly IAuthenticatedFunctionTelemetryService _telemetry;
 
     public UpdateTestimonial(
-        ILogger<UpdateTestimonial> logger, 
+        ILogger<UpdateTestimonial> logger,
         ITestimonialRepository repository,
         IAuthenticatedFunctionTelemetryService telemetry)
     {

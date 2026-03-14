@@ -34,7 +34,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         public void Constructor_WithNullLogger_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new GetPersonFacts(null!, _mockWikipediaService.Object));
         }
 
@@ -42,7 +42,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         public void Constructor_WithNullWikipediaService_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new GetPersonFacts(_mockLogger.Object, null!));
         }
 

@@ -41,7 +41,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Retrieving Language with code: {Code}, requestLanguage: {RequestLanguage}", code, requestLanguage);
-            
+
             try
             {
                 return await _repository.GetByCodeAndRequestLanguageAsync(code, requestLanguage);
@@ -75,7 +75,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Retrieving Languages for requestLanguage: {RequestLanguage}", requestLanguage);
-            
+
             try
             {
                 return await _repository.GetByRequestLanguageAsync(normalizedLanguage);
@@ -102,7 +102,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Validating Language code: {Code}, requestLanguage: {RequestLanguage}", code, requestLanguage);
-            
+
             try
             {
                 return await _repository.ExistsByCodeAsync(code, requestLanguage);
@@ -127,7 +127,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Creating new Language with code: {Code}", language.Code);
-            
+
             try
             {
                 language.id = Guid.NewGuid().ToString();
@@ -153,7 +153,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Updating Language with id: {Id}", language.id);
-            
+
             try
             {
                 return await _repository.UpdateAsync(language);
@@ -179,7 +179,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Deleting Language with id: {Id}", id);
-            
+
             try
             {
                 return await _repository.DeleteAsync(id);
@@ -198,7 +198,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         public async Task<IList<Language>> GetAllLanguagesAsync()
         {
             _logger.LogInformation("Retrieving all Languages");
-            
+
             try
             {
                 return await _repository.GetAllAsync();
@@ -217,12 +217,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         public async Task<int> DeleteAllLanguagesAsync()
         {
             _logger.LogWarning("DeleteAllLanguagesAsync called - this will delete all languages");
-            
+
             try
             {
                 var allLanguages = await _repository.GetAllAsync();
                 int count = 0;
-                
+
                 foreach (var language in allLanguages)
                 {
                     if (language.id != null && await _repository.DeleteAsync(language.id))

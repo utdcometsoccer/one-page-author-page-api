@@ -28,8 +28,8 @@ namespace OnePageAuthor.Test.DomainRegistration
             _contactValidationServiceMock = new Mock<IContactInformationValidationService>();
             _subscriptionValidationServiceMock = new Mock<ISubscriptionValidationService>();
             _service = new DomainRegistrationService(
-                _loggerMock.Object, 
-                _repositoryMock.Object, 
+                _loggerMock.Object,
+                _repositoryMock.Object,
                 _userIdentityServiceMock.Object,
                 _domainValidationServiceMock.Object,
                 _contactValidationServiceMock.Object,
@@ -128,7 +128,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                                        .Returns(ValidationResult.Failure("Domain information is required"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateDomainRegistrationAsync(user, null!, contactInfo));
         }
 
@@ -144,7 +144,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                                         .Returns(ValidationResult.Failure("Contact information is required"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateDomainRegistrationAsync(user, domain, null!));
         }
 
@@ -161,7 +161,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                                        .Returns(ValidationResult.Failure("Second level domain is required"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
         }
 
@@ -178,7 +178,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                                        .Returns(ValidationResult.Failure("Top level domain is required"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
         }
 
@@ -196,7 +196,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                                         .Returns(ValidationResult.Failure("First name is required"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
         }
 
@@ -214,7 +214,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                                         .Returns(ValidationResult.Failure("Email address is required"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
         }
 
@@ -232,7 +232,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                                         .Returns(ValidationResult.Failure("Email address format is invalid"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
         }
 
@@ -248,7 +248,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                                    .Throws(new InvalidOperationException("User is not authenticated"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
         }
 
@@ -266,7 +266,7 @@ namespace OnePageAuthor.Test.DomainRegistration
                                    .Throws(new InvalidOperationException("User UPN or email claim is required"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _service.CreateDomainRegistrationAsync(user, domain, contactInfo));
         }
 
@@ -544,7 +544,7 @@ namespace OnePageAuthor.Test.DomainRegistration
 
             // Assert
             Assert.NotNull(capturedRegistration);
-            Assert.True((DateTime.UtcNow - capturedRegistration.LastUpdatedAt).TotalSeconds < 5, 
+            Assert.True((DateTime.UtcNow - capturedRegistration.LastUpdatedAt).TotalSeconds < 5,
                 "LastUpdatedAt should be set to current UTC time");
         }
 
@@ -556,7 +556,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             var registrationId = "test-id-123";
             var domain = CreateTestDomain();
             var contactInfo = CreateTestContactInfo();
-            
+
             var existingRegistration = new InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration
             {
                 id = registrationId,
@@ -572,7 +572,7 @@ namespace OnePageAuthor.Test.DomainRegistration
 
             _repositoryMock.Setup(r => r.GetByIdAsync(registrationId, "test@example.com"))
                           .ReturnsAsync(existingRegistration);
-            
+
             _repositoryMock.Setup(r => r.UpdateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()))
                           .Callback<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(dr => capturedRegistration = dr)
                           .ReturnsAsync((InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration dr) => dr);
@@ -582,7 +582,7 @@ namespace OnePageAuthor.Test.DomainRegistration
 
             // Assert
             Assert.NotNull(capturedRegistration);
-            Assert.True((DateTime.UtcNow - capturedRegistration.LastUpdatedAt).TotalSeconds < 5, 
+            Assert.True((DateTime.UtcNow - capturedRegistration.LastUpdatedAt).TotalSeconds < 5,
                 "LastUpdatedAt should be updated to current UTC time");
             Assert.True(capturedRegistration.LastUpdatedAt > existingRegistration.CreatedAt,
                 "LastUpdatedAt should be more recent than CreatedAt");
@@ -595,7 +595,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             var user = CreateTestUser();
             var registrationId = "test-id-123";
             var newStatus = DomainRegistrationStatus.Completed;
-            
+
             var existingRegistration = new InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration
             {
                 id = registrationId,
@@ -611,7 +611,7 @@ namespace OnePageAuthor.Test.DomainRegistration
 
             _repositoryMock.Setup(r => r.GetByIdAsync(registrationId, "test@example.com"))
                           .ReturnsAsync(existingRegistration);
-            
+
             _repositoryMock.Setup(r => r.UpdateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()))
                           .Callback<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(dr => capturedRegistration = dr)
                           .ReturnsAsync((InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration dr) => dr);
@@ -622,7 +622,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             // Assert
             Assert.NotNull(capturedRegistration);
             Assert.Equal(DomainRegistrationStatus.Completed, capturedRegistration.Status);
-            Assert.True((DateTime.UtcNow - capturedRegistration.LastUpdatedAt).TotalSeconds < 5, 
+            Assert.True((DateTime.UtcNow - capturedRegistration.LastUpdatedAt).TotalSeconds < 5,
                 "LastUpdatedAt should be updated to current UTC time");
         }
 

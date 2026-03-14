@@ -189,7 +189,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: The actual test execution would depend on being able to mock
             // JwtAuthenticationHelper.ValidateJwtTokenAsync which is static
-            
+
             // Assert - Test passes as it demonstrates the setup pattern
             Assert.True(true, "Test demonstrates expected setup pattern for JWT authentication scenarios");
         }
@@ -210,7 +210,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test demonstrates the expected exception handling behavior
             // Actual execution would require JWT authentication mocking
-            
+
             // Assert - Test passes as it demonstrates the setup pattern
             Assert.True(true, "Test demonstrates expected setup pattern for user profile validation scenarios");
         }
@@ -230,7 +230,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test demonstrates the expected exception handling behavior
             // Actual execution would require JWT authentication mocking
-            
+
             // Assert - Test passes as it demonstrates the setup pattern
             Assert.True(true, "Test demonstrates expected setup pattern for service exception handling");
         }
@@ -244,12 +244,12 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             // This test would need to focus on the business logic validation
             // In practice, the registrationId parameter validation happens after JWT auth
-            
+
             // The function checks: if (string.IsNullOrWhiteSpace(registrationId))
             // and returns: new BadRequestObjectResult("Registration ID is required")
-            
+
             // This would be testable with proper JWT mocking or integration testing
-            
+
             // Assert - Test passes as it demonstrates the validation pattern
             Assert.True(true, "Test demonstrates expected validation pattern for registration ID");
         }
@@ -270,7 +270,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test demonstrates the expected behavior for not found scenarios
             // Actual execution would require JWT authentication mocking
-            
+
             // Assert - Test passes as it demonstrates the setup pattern
             Assert.True(true, "Test demonstrates expected setup pattern for not found scenarios");
         }
@@ -291,7 +291,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test demonstrates the expected exception handling behavior
             // Actual execution would require JWT authentication mocking
-            
+
             // Assert - Test passes as it demonstrates the setup pattern
             Assert.True(true, "Test demonstrates expected setup pattern for InvalidOperationException handling");
         }
@@ -312,7 +312,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test demonstrates the expected exception handling behavior
             // Actual execution would require JWT authentication mocking
-            
+
             // Assert - Test passes as it demonstrates the setup pattern
             Assert.True(true, "Test demonstrates expected setup pattern for generic exception handling");
         }
@@ -330,12 +330,12 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // 3. Payload validation passes
             // 4. Domain registration service creates registration successfully
             // 5. Returns CreatedResult with proper location and response DTO
-            
+
             // Implementation would require:
             // - Mocking JwtAuthenticationHelper.ValidateJwtTokenAsync (static method)
             // - Setting up all service mocks for success path
             // - Verifying correct response type and content
-            
+
             // For now, this serves as documentation of the expected behavior
             Assert.True(true, "This test demonstrates the successful path structure");
         }
@@ -348,7 +348,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // 2. User profile validation succeeds
             // 3. Domain registration service returns user's registrations
             // 4. Returns OkObjectResult with list of DomainRegistrationResponse DTOs
-            
+
             Assert.True(true, "This test demonstrates the successful path structure");
         }
 
@@ -361,7 +361,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // 3. Registration ID validation passes
             // 4. Domain registration service finds the registration
             // 5. Returns OkObjectResult with DomainRegistrationResponse DTO
-            
+
             Assert.True(true, "This test demonstrates the successful path structure");
         }
 
@@ -391,7 +391,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test would verify that empty registration ID validation works
             // In practice, this requires proper JWT authentication mocking
-            
+
             Assert.True(true, "Test demonstrates expected validation pattern for empty registration ID");
         }
 
@@ -402,7 +402,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test would verify that null payload validation works
             // In practice, this requires proper JWT authentication mocking
-            
+
             Assert.True(true, "Test demonstrates expected validation pattern for null payload");
         }
 
@@ -414,7 +414,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test would verify that at least one field is required for update
             // In practice, this requires proper JWT authentication mocking
-            
+
             Assert.True(true, "Test demonstrates expected validation pattern for empty update payload");
         }
 
@@ -451,7 +451,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test demonstrates the expected behavior for subscription validation
             // Actual execution would require JWT authentication mocking
-            
+
             Assert.True(true, "Test demonstrates expected setup pattern for subscription validation");
         }
 
@@ -476,7 +476,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test demonstrates the expected behavior for not found scenarios
             // Actual execution would require JWT authentication mocking
-            
+
             Assert.True(true, "Test demonstrates expected setup pattern for not found scenarios");
         }
 
@@ -505,7 +505,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Note: This test demonstrates the expected behavior for validation errors
             // Actual execution would require JWT authentication mocking
-            
+
             Assert.True(true, "Test demonstrates expected setup pattern for validation errors");
         }
 
@@ -519,12 +519,12 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // 4. Payload validation passes
             // 5. Domain registration service updates registration successfully
             // 6. Returns OkObjectResult with updated DomainRegistrationResponse
-            
+
             // Implementation would require:
             // - Mocking JwtAuthenticationHelper.ValidateJwtTokenAsync (static method)
             // - Setting up all service mocks for success path
             // - Verifying correct response type and content
-            
+
             Assert.True(true, "This test demonstrates the successful update path structure");
         }
 
@@ -554,7 +554,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 _mockDomainRegistrationService.Object));
         }
 
-        [Fact] 
+        [Fact]
         public void Constructor_WithNullUserProfileService_ThrowsArgumentNullException()
         {
             // Act & Assert

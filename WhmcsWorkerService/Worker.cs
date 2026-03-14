@@ -45,28 +45,28 @@ namespace WhmcsWorkerService
         // Message processing: 2001–2099
         // Service Bus errors: 3001–3099
         // -----------------------------------------------------------------------
-        private static readonly EventId EvtServiceStarting        = new(1001, "WhmcsWorkerStarting");
-        private static readonly EventId EvtServiceRunning         = new(1002, "WhmcsWorkerRunning");
-        private static readonly EventId EvtServiceStopping        = new(1003, "WhmcsWorkerStopping");
+        private static readonly EventId EvtServiceStarting = new(1001, "WhmcsWorkerStarting");
+        private static readonly EventId EvtServiceRunning = new(1002, "WhmcsWorkerRunning");
+        private static readonly EventId EvtServiceStopping = new(1003, "WhmcsWorkerStopping");
 
-        private static readonly EventId EvtMessageReceived        = new(2001, "MessageReceived");
+        private static readonly EventId EvtMessageReceived = new(2001, "MessageReceived");
         private static readonly EventId EvtMessageDeserializeFail = new(2002, "MessageDeserializeFailed");
-        private static readonly EventId EvtMessageMissingData     = new(2003, "MessageMissingData");
+        private static readonly EventId EvtMessageMissingData = new(2003, "MessageMissingData");
 
-        private static readonly EventId EvtProcessingStarted      = new(2010, "ProcessingStarted");
-        private static readonly EventId EvtRegistrationStarted    = new(2011, "RegistrationStarted");
-        private static readonly EventId EvtRegistrationSucceeded  = new(2012, "RegistrationSucceeded");
-        private static readonly EventId EvtRegistrationFailed     = new(2013, "RegistrationFailed");
-        private static readonly EventId EvtRegistrationException  = new(2014, "RegistrationException");
+        private static readonly EventId EvtProcessingStarted = new(2010, "ProcessingStarted");
+        private static readonly EventId EvtRegistrationStarted = new(2011, "RegistrationStarted");
+        private static readonly EventId EvtRegistrationSucceeded = new(2012, "RegistrationSucceeded");
+        private static readonly EventId EvtRegistrationFailed = new(2013, "RegistrationFailed");
+        private static readonly EventId EvtRegistrationException = new(2014, "RegistrationException");
 
-        private static readonly EventId EvtNsUpdateStarted        = new(2021, "NameServerUpdateStarted");
-        private static readonly EventId EvtNsUpdateSucceeded      = new(2022, "NameServerUpdateSucceeded");
-        private static readonly EventId EvtNsUpdateFailed         = new(2023, "NameServerUpdateFailed");
-        private static readonly EventId EvtNsUpdateException      = new(2024, "NameServerUpdateException");
-        private static readonly EventId EvtNsUpdateSkipped        = new(2025, "NameServerUpdateSkipped");
+        private static readonly EventId EvtNsUpdateStarted = new(2021, "NameServerUpdateStarted");
+        private static readonly EventId EvtNsUpdateSucceeded = new(2022, "NameServerUpdateSucceeded");
+        private static readonly EventId EvtNsUpdateFailed = new(2023, "NameServerUpdateFailed");
+        private static readonly EventId EvtNsUpdateException = new(2024, "NameServerUpdateException");
+        private static readonly EventId EvtNsUpdateSkipped = new(2025, "NameServerUpdateSkipped");
 
-        private static readonly EventId EvtProcessingCompleted    = new(2030, "ProcessingCompleted");
-        private static readonly EventId EvtServiceBusError        = new(3001, "ServiceBusError");
+        private static readonly EventId EvtProcessingCompleted = new(2030, "ProcessingCompleted");
+        private static readonly EventId EvtServiceBusError = new(3001, "ServiceBusError");
 
         public Worker(
             ILogger<Worker> logger,

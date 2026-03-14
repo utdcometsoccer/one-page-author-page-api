@@ -65,13 +65,13 @@ public class GetExperiments
                 Page = page
             };
 
-            _logger.LogInformation("Getting experiments for page: {Page}, userId: {UserId}", 
+            _logger.LogInformation("Getting experiments for page: {Page}, userId: {UserId}",
                 page, userId ?? "(none)");
 
             // Get experiment assignments
             var response = await _experimentService.GetExperimentsAsync(request);
 
-            _logger.LogInformation("Successfully assigned {Count} experiments for session: {SessionId}", 
+            _logger.LogInformation("Successfully assigned {Count} experiments for session: {SessionId}",
                 response.Experiments.Count, response.SessionId);
 
             return new OkObjectResult(response);

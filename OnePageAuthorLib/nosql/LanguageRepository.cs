@@ -28,15 +28,15 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
-            
+
             // Store the wrapper, but we need actual Container for some operations
             // We'll use the wrapper methods instead
             if (container is CosmosContainerWrapper wrapper)
             {
                 // Extract underlying container via reflection
-                var field = wrapper.GetType().GetField("_container", 
+                var field = wrapper.GetType().GetField("_container",
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                _container = (Container?)field?.GetValue(wrapper) 
+                _container = (Container?)field?.GetValue(wrapper)
                     ?? throw new ArgumentException("Could not extract Container from CosmosContainerWrapper");
             }
             else

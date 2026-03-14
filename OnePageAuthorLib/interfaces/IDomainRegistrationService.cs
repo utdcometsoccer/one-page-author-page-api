@@ -16,8 +16,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="contactInformation">Contact information for registration</param>
         /// <returns>The created domain registration</returns>
         Task<DomainRegistration> CreateDomainRegistrationAsync(
-            ClaimsPrincipal user, 
-            Domain domain, 
+            ClaimsPrincipal user,
+            Domain domain,
             ContactInformation contactInformation);
 
         /// <summary>
@@ -43,8 +43,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// <param name="status">The new status</param>
         /// <returns>The updated domain registration if found and belongs to the user, null otherwise</returns>
         Task<DomainRegistration?> UpdateDomainRegistrationStatusAsync(
-            ClaimsPrincipal user, 
-            string registrationId, 
+            ClaimsPrincipal user,
+            string registrationId,
             DomainRegistrationStatus status);
 
         /// <summary>

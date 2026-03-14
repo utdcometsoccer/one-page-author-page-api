@@ -130,8 +130,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 throw new InvalidOperationException("Testimonial id must not be null or empty.");
 
             var response = await _container.ReplaceItemAsync(
-                testimonial, 
-                testimonial.id, 
+                testimonial,
+                testimonial.id,
                 new PartitionKey(testimonial.Locale));
 
             return response.Resource;

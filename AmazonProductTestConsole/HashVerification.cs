@@ -32,10 +32,10 @@ public static class HashVerification
 
         Console.WriteLine("Testing payload hash...");
         Console.WriteLine($"Payload: {payload}");
-        
+
         var hash = ComputeSha256Hash(payload);
         Console.WriteLine($"SHA256 Hash: {hash}");
-        
+
         // Test AWS canonical request components
         var timestamp = "20251024T004509Z";
         var canonicalUri = "/paapi5/searchitems";
@@ -43,10 +43,10 @@ public static class HashVerification
                               $"x-amz-date:{timestamp}\n" +
                               "x-amz-target:com.amazon.paapi5.v1.ProductAdvertisingAPIv1.SearchItems\n";
         var signedHeaders = "host;x-amz-date;x-amz-target";
-        
+
         var canonicalRequest = $"POST\n{canonicalUri}\n\n{canonicalHeaders}\n{signedHeaders}\n{hash}";
         var canonicalRequestHash = ComputeSha256Hash(canonicalRequest);
-        
+
         Console.WriteLine($"Canonical Request Hash: {canonicalRequestHash}");
         Console.WriteLine();
         Console.WriteLine("Components breakdown:");

@@ -218,7 +218,7 @@ public class GetPersonFacts
         string language,
         string personName)
     {
-        _logger.LogInformation("GetPersonFacts function processed a request for person: {PersonName} in language: {Language}", 
+        _logger.LogInformation("GetPersonFacts function processed a request for person: {PersonName} in language: {Language}",
             personName, language);
 
         // Validate parameters
@@ -251,8 +251,8 @@ public class GetPersonFacts
             if (string.IsNullOrEmpty(facts.Title) && string.IsNullOrEmpty(facts.Extract))
             {
                 _logger.LogInformation("No Wikipedia page found for person: {PersonName}", personName);
-                return new NotFoundObjectResult(new 
-                { 
+                return new NotFoundObjectResult(new
+                {
                     message = $"No Wikipedia page found for: {personName}",
                     language = normalizedLanguage,
                     searchTerm = personName

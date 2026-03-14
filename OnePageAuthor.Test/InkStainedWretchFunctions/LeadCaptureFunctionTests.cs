@@ -37,13 +37,13 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             var mockRequest = new Mock<HttpRequest>();
             mockRequest.Setup(r => r.Body).Returns(stream);
-            
+
             var mockConnection = new Mock<ConnectionInfo>();
             mockConnection.Setup(c => c.RemoteIpAddress).Returns(System.Net.IPAddress.Parse(ipAddress));
 
             var mockHttpContext = new Mock<HttpContext>();
             mockHttpContext.Setup(c => c.Connection).Returns(mockConnection.Object);
-            
+
             mockRequest.Setup(r => r.HttpContext).Returns(mockHttpContext.Object);
             mockRequest.Setup(r => r.Headers).Returns(new HeaderDictionary());
 
@@ -362,7 +362,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Equal(StatusCodes.Status201Created, objectResult.StatusCode);
 
             _mockLeadService.Verify(s => s.CreateLeadAsync(
-                It.Is<CreateLeadRequest>(r => 
+                It.Is<CreateLeadRequest>(r =>
                     r.Email == "test@example.com" &&
                     r.FirstName == "Jane" &&
                     r.Source == "exit_intent" &&
@@ -373,7 +373,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     r.Referrer == "https://facebook.com" &&
                     r.Locale == "es-MX" &&
                     r.ConsentGiven == true),
-                It.IsAny<string>()), 
+                It.IsAny<string>()),
                 Times.Once);
         }
     }

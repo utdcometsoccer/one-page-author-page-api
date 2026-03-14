@@ -14,7 +14,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         /// ISO 3166-1 alpha-2 country code (e.g., "US", "CA", "MX").
         /// </summary>
         public string? Code { get; set; }
-        
+
         /// <summary>
         /// The localized name of the country (e.g., "United States").
         /// </summary>

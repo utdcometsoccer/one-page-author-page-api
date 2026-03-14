@@ -15,7 +15,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API.ImageAPI
         /// <param name="user">The authenticated user's claims principal</param>
         /// <returns>The user's image storage tier</returns>
         Task<ImageStorageTier?> GetUserTierAsync(ClaimsPrincipal user);
-        
+
         /// <summary>
         /// Gets the user's image storage tier from their JWT claims.
         /// If the user has no tier role, returns the default tier (Starter or lowest cost tier).

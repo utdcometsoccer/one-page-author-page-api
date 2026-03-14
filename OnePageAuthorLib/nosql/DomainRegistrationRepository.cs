@@ -25,14 +25,14 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         {
             if (string.IsNullOrWhiteSpace(domainRegistration.Upn))
                 throw new InvalidOperationException("DomainRegistration.Upn is required for partition key.");
-            
+
             if (string.IsNullOrWhiteSpace(domainRegistration.id))
             {
                 domainRegistration.id = Guid.NewGuid().ToString();
             }
 
             domainRegistration.CreatedAt = DateTime.UtcNow;
-            
+
             var response = await _container.CreateItemAsync(domainRegistration, new PartitionKey(domainRegistration.Upn));
             return response.Resource;
         }
@@ -63,7 +63,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
 
             var results = new List<DomainRegistration>();
             using var iterator = _container.GetItemQueryIterator<DomainRegistration>(query);
-            
+
             while (iterator.HasMoreResults)
             {
                 var page = await iterator.ReadNextAsync();
@@ -72,7 +72,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                     results.AddRange(page.Resource);
                 }
             }
-            
+
             return results;
         }
 
@@ -84,8 +84,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
                 throw new InvalidOperationException("DomainRegistration.Upn is required for partition key.");
 
             var response = await _container.ReplaceItemAsync(
-                domainRegistration, 
-                domainRegistration.id, 
+                domainRegistration,
+                domainRegistration.id,
                 new PartitionKey(domainRegistration.Upn));
             return response.Resource;
         }
@@ -119,13 +119,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             try
             {
                 using var iterator = _container.GetItemQueryIterator<DomainRegistration>(query);
-                
+
                 if (iterator.HasMoreResults)
                 {
                     var page = await iterator.ReadNextAsync();
                     return page?.Resource?.FirstOrDefault();
                 }
-                
+
                 return null;
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)

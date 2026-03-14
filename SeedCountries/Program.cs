@@ -16,11 +16,11 @@ IConfiguration config = new ConfigurationBuilder()
     .Build();
 
 // Read Cosmos DB settings
-string endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? config["EndpointUri"] 
+string endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? config["EndpointUri"]
     ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
-string primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? config["PrimaryKey"] 
+string primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? config["PrimaryKey"]
     ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
-string databaseId = config["COSMOSDB_DATABASE_ID"] ?? config["DatabaseId"] 
+string databaseId = config["COSMOSDB_DATABASE_ID"] ?? config["DatabaseId"]
     ?? throw new InvalidOperationException("COSMOSDB_DATABASE_ID is required");
 
 // Log configuration (masked for security)
@@ -68,7 +68,7 @@ foreach (var file in jsonFiles)
 {
     var fileName = Path.GetFileName(file);
     Console.WriteLine($"Processing file: {fileName}");
-    
+
     // Extract language from filename (e.g., "countries-en.json" -> "en")
     var languageMatch = System.Text.RegularExpressions.Regex.Match(fileName, @"countries-(.+)\.json");
     if (!languageMatch.Success)
@@ -76,24 +76,24 @@ foreach (var file in jsonFiles)
         Console.WriteLine($"  WARNING: Could not extract language from filename: {fileName}");
         continue;
     }
-    
+
     string language = languageMatch.Groups[1].Value.ToLowerInvariant();
     Console.WriteLine($"  Language: {language}");
-    
+
     try
     {
         // Read and parse JSON file
         string json = File.ReadAllText(file);
         var countries = JsonSerializer.Deserialize<List<CountryData>>(json);
-        
+
         if (countries == null || countries.Count == 0)
         {
             Console.WriteLine($"  WARNING: No countries found in file");
             continue;
         }
-        
+
         Console.WriteLine($"  Found {countries.Count} countries in file");
-        
+
         // Process each country (idempotent - check if exists before creating)
         foreach (var countryData in countries)
         {
@@ -101,7 +101,7 @@ foreach (var file in jsonFiles)
             {
                 // Check if country already exists
                 var existing = await countryService.GetCountryByCodeAndLanguageAsync(countryData.Code, language);
-                
+
                 if (existing != null)
                 {
                     // Country already exists - skip
@@ -116,12 +116,12 @@ foreach (var file in jsonFiles)
                         Name = countryData.Name,
                         Language = language
                     };
-                    
+
                     await countryService.CreateCountryAsync(country);
                     totalCreated++;
                     Console.WriteLine($"    ✓ Created: {country.Code} - {country.Name}");
                 }
-                
+
                 totalProcessed++;
             }
             catch (Exception ex)
@@ -130,7 +130,7 @@ foreach (var file in jsonFiles)
                 Console.WriteLine($"    ✗ Error processing {countryData.Code}: {ex.Message}");
             }
         }
-        
+
         Console.WriteLine($"  Completed processing {fileName}");
         Console.WriteLine();
     }
@@ -166,7 +166,7 @@ public class CountryData
 {
     [System.Text.Json.Serialization.JsonPropertyName("code")]
     public string Code { get; set; } = string.Empty;
-    
+
     [System.Text.Json.Serialization.JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 }

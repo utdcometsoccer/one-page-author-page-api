@@ -183,7 +183,7 @@ namespace OnePageAuthor.Test.Authentication
             // Arrange
             var service = CreateService();
             var customMetadataUrl = "https://custom-authority.com/.well-known/openid-configuration";
-            
+
             _configurationMock.Setup(x => x["AAD_TENANT_ID"]).Returns("test-tenant");
             _configurationMock.Setup(x => x["AAD_AUDIENCE"]).Returns("test-audience");
             _configurationMock.Setup(x => x["OPEN_ID_CONNECT_METADATA_URL"]).Returns(customMetadataUrl);
@@ -195,7 +195,7 @@ namespace OnePageAuthor.Test.Authentication
             // The service will fail to validate because it can't reach the custom URL,
             // but it proves the configuration is being used
             var result = await service.ValidateTokenAsync(validFormatToken);
-            
+
             // Result should be null since we can't actually validate the token
             Assert.Null(result);
         }
@@ -263,7 +263,7 @@ namespace OnePageAuthor.Test.Authentication
             // Arrange
             var service = CreateService();
             SetupConfiguration("test-tenant-id", "test-audience");
-            
+
             // Use a properly formatted JWT token (even though it won't validate)
             var token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InRlc3Qta2lkIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.invalid_signature";
 
@@ -276,7 +276,7 @@ namespace OnePageAuthor.Test.Authentication
             // In a test environment without real Azure AD connectivity, the validation will fail
             // but the service should handle it gracefully
             Assert.Null(result);
-            
+
             // Verify that the service attempted validation (logger was called)
             // Note: In a real scenario with key rotation, the retry logic would be exercised
             // when the first validation throws SecurityTokenSignatureKeyNotFoundException

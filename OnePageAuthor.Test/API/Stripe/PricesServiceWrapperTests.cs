@@ -39,25 +39,25 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
             };
             var subscriptionPlans = new List<SubscriptionPlan>
             {
-                new SubscriptionPlan 
-                { 
-                    Id = "price_1", 
-                    StripePriceId = "price_1", 
-                    Label = "Basic", 
-                    Name = "Basic Plan", 
-                    Description = "Basic plan description", 
-                    Currency = "USD", 
-                    Features = new List<string> { "Basic features" } 
+                new SubscriptionPlan
+                {
+                    Id = "price_1",
+                    StripePriceId = "price_1",
+                    Label = "Basic",
+                    Name = "Basic Plan",
+                    Description = "Basic plan description",
+                    Currency = "USD",
+                    Features = new List<string> { "Basic features" }
                 },
-                new SubscriptionPlan 
-                { 
-                    Id = "price_2", 
-                    StripePriceId = "price_2", 
-                    Label = "Pro", 
-                    Name = "Pro Plan", 
-                    Description = "Pro plan description", 
-                    Currency = "USD", 
-                    Features = new List<string> { "Pro features" } 
+                new SubscriptionPlan
+                {
+                    Id = "price_2",
+                    StripePriceId = "price_2",
+                    Label = "Pro",
+                    Name = "Pro Plan",
+                    Description = "Pro plan description",
+                    Currency = "USD",
+                    Features = new List<string> { "Pro features" }
                 }
             };
 
@@ -88,23 +88,23 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         {
             // Arrange
             var priceId = "price_123";
-            var priceDto = new PriceDto 
-            { 
-                Id = priceId, 
+            var priceDto = new PriceDto
+            {
+                Id = priceId,
                 ProductName = "Test Plan",
                 UnitAmount = 1999,
                 Currency = "usd"
             };
-            var subscriptionPlan = new SubscriptionPlan 
-            { 
-                Id = priceId, 
+            var subscriptionPlan = new SubscriptionPlan
+            {
+                Id = priceId,
                 StripePriceId = priceId,
                 Label = "Test",
-                Name = "Test Plan", 
+                Name = "Test Plan",
                 Description = "Test plan description",
                 Price = 19.99m,
                 Currency = "USD",
-                Features = new List<string> { "Test features" } 
+                Features = new List<string> { "Test features" }
             };
 
             _innerServiceMock.Setup(x => x.GetPriceByIdAsync(priceId))

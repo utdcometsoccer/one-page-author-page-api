@@ -12,7 +12,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         // Placeholder API key for unit tests - no actual API calls are made
         // Tests use empty ProductId to skip Stripe API calls and test mapping logic
         private const string TestApiKey = "sk_test_unit_tests_placeholder_key";
-        
+
         private readonly Mock<ILogger<SubscriptionPlanService>> _loggerMock;
         private readonly StripeClient _stripeClient;
         private readonly SubscriptionPlanService _service;
@@ -60,7 +60,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         public async Task MapToSubscriptionPlanAsync_NullPriceDto_ThrowsArgumentNullException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 _service.MapToSubscriptionPlanAsync(null!));
         }
 
@@ -105,7 +105,7 @@ namespace InkStainedWretch.OnePageAuthor.Test.API.Stripe
         public async Task MapToSubscriptionPlansAsync_NullPriceDtos_ThrowsArgumentNullException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 _service.MapToSubscriptionPlansAsync(null!));
         }
 

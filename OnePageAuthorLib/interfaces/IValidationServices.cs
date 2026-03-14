@@ -82,7 +82,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// </summary>
         /// <param name="errors">The validation errors.</param>
         /// <returns>An invalid ValidationResult with error messages.</returns>
-        public static ValidationResult Failure(params string[] errors) => 
+        public static ValidationResult Failure(params string[] errors) =>
             new ValidationResult { IsValid = false, Errors = errors.ToList() };
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// </summary>
         /// <param name="error">The validation error.</param>
         /// <returns>An invalid ValidationResult with the error message.</returns>
-        public static ValidationResult Failure(string error) => 
+        public static ValidationResult Failure(string error) =>
             new ValidationResult { IsValid = false, Errors = new List<string> { error } };
     }
 }

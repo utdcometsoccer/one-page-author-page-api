@@ -48,8 +48,8 @@ namespace InkStainedWretchesConfig
 
                 _logger.LogInformation("Successfully retrieved Application Insights connection string.");
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                await response.WriteAsJsonAsync(new 
-                { 
+                await response.WriteAsJsonAsync(new
+                {
                     connectionString = connectionString,
                     source = _keyVaultService.IsKeyVaultEnabled() ? "KeyVault" : "Environment"
                 });

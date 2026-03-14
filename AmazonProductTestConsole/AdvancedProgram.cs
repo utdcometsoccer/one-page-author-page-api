@@ -19,7 +19,7 @@ class AdvancedProgram
 
         // Parse command line arguments
         var options = ParseArguments(args);
-        
+
         if (options.ShowHelp)
         {
             ShowHelp();
@@ -51,7 +51,7 @@ class AdvancedProgram
             if (options.ShowConfig)
             {
                 amazonConfig.DisplayConfiguration();
-                
+
                 // Analyze the partner tag
                 Console.WriteLine();
                 PartnerTagValidator.AnalyzePartnerTag(amazonConfig.PartnerTag);
@@ -101,14 +101,14 @@ class AdvancedProgram
 
             Console.WriteLine("📞 Calling Amazon Product API...");
             Console.WriteLine("🔧 Debugging signature generation...");
-            
+
             // Create a test hash to verify our hash functions
             TestHashFunctions();
-            
+
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            
+
             using var result = await service.SearchBooksByAuthorAsync(authorName);
-            
+
             stopwatch.Stop();
             Console.WriteLine($"✅ Success! API call completed in {stopwatch.ElapsedMilliseconds}ms");
             Console.WriteLine();
@@ -145,11 +145,11 @@ class AdvancedProgram
 
     static async Task TestMultipleAuthors(IAmazonProductService service)
     {
-        var authors = new[] 
-        { 
-            "Stephen King", 
-            "J.K. Rowling", 
-            "George R.R. Martin", 
+        var authors = new[]
+        {
+            "Stephen King",
+            "J.K. Rowling",
+            "George R.R. Martin",
             "Agatha Christie",
             "Isaac Asimov"
         };
@@ -168,7 +168,7 @@ class AdvancedProgram
         try
         {
             var root = result.RootElement;
-            
+
             // Check for errors first
             if (root.TryGetProperty("__type", out var errorType))
             {
@@ -194,7 +194,7 @@ class AdvancedProgram
                 {
                     var itemCount = items.GetArrayLength();
                     Console.WriteLine($"📚 Found {itemCount} books for '{authorName}'");
-                    
+
                     if (itemCount > 0)
                     {
                         Console.WriteLine("\n📖 Sample Books:");
@@ -202,26 +202,26 @@ class AdvancedProgram
                         foreach (var item in items.EnumerateArray())
                         {
                             if (count >= 3) break; // Show first 3 books
-                            
+
                             var title = "Unknown";
                             var asin = "Unknown";
-                            
+
                             if (item.TryGetProperty("ASIN", out var asinProp))
                                 asin = asinProp.GetString() ?? "Unknown";
-                                
+
                             if (item.TryGetProperty("ItemInfo", out var itemInfo) &&
                                 itemInfo.TryGetProperty("Title", out var titleInfo) &&
                                 titleInfo.TryGetProperty("DisplayValue", out var titleProp))
                             {
                                 title = titleProp.GetString() ?? "Unknown";
                             }
-                            
+
                             Console.WriteLine($"  {count + 1}. {title} (ASIN: {asin})");
                             count++;
                         }
                     }
                 }
-                
+
                 // Check for pagination info
                 if (searchResult.TryGetProperty("TotalResultCount", out var totalCount))
                 {
@@ -252,7 +252,7 @@ class AdvancedProgram
     static void AnalyzeHttpError(HttpRequestException ex)
     {
         Console.WriteLine("🔧 HTTP Error Analysis:");
-        
+
         if (ex.Message.Contains("404"))
         {
             Console.WriteLine("• 404 Not Found typically indicates:");
@@ -274,7 +274,7 @@ class AdvancedProgram
             Console.WriteLine("  - Invalid request parameters");
             Console.WriteLine("  - Malformed JSON payload");
         }
-        
+
         ShowConfigurationHelp();
     }
 
@@ -284,23 +284,23 @@ class AdvancedProgram
     static void TestHashFunctions()
     {
         Console.WriteLine("🔧 Testing Hash Functions:");
-        
+
         // Test SHA256 hash
         var testString = "Hello World";
         var expectedSha256 = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"; // Known SHA256 of "Hello World"
         var actualSha256 = GetSha256Hash(testString);
-        
+
         Console.WriteLine($"   SHA256 Test: {(actualSha256 == expectedSha256 ? "✅ PASS" : "❌ FAIL")}");
         Console.WriteLine($"   Input: '{testString}'");
         Console.WriteLine($"   Expected: {expectedSha256}");
         Console.WriteLine($"   Actual:   {actualSha256}");
-        
+
         // Test HMAC-SHA256
         var testKey = "key";
         var testData = "The quick brown fox jumps over the lazy dog";
         var expectedHmac = "f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8"; // Known HMAC-SHA256
         var actualHmac = BytesToHex(HmacSha256(System.Text.Encoding.UTF8.GetBytes(testKey), testData));
-        
+
         Console.WriteLine($"   HMAC Test: {(actualHmac == expectedHmac ? "✅ PASS" : "❌ FAIL")}");
         Console.WriteLine($"   Key: '{testKey}', Data: '{testData}'");
         Console.WriteLine($"   Expected: {expectedHmac}");
@@ -351,7 +351,7 @@ class AdvancedProgram
     static TestOptions ParseArguments(string[] args)
     {
         var options = new TestOptions();
-        
+
         for (int i = 0; i < args.Length; i++)
         {
             switch (args[i].ToLower())

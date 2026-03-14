@@ -19,7 +19,7 @@ namespace OnePageAuthor.Test
             _mockRepository = new Mock<IReferralRepository>();
             _mockLogger = new Mock<ILogger<ReferralService>>();
             _mockConfiguration = new Mock<IConfiguration>();
-            
+
             // Setup default configuration
             _mockConfiguration.Setup(c => c["REFERRAL_BASE_URL"])
                 .Returns("https://inkstainedwretches.com");
@@ -169,7 +169,7 @@ namespace OnePageAuthor.Test
 
             Assert.NotNull(result);
             Assert.NotEmpty(result.ReferralCode);
-            
+
             // Should have checked for code collision twice
             _mockRepository.Verify(r => r.GetByReferralCodeAsync(It.IsAny<string>()), Times.Exactly(2));
         }

@@ -32,7 +32,7 @@ namespace OnePageAuthor.Test.Services
             _mockDomainValidationService = new Mock<IDomainValidationService>();
             _mockContactValidationService = new Mock<IContactInformationValidationService>();
             _mockSubscriptionValidationService = new Mock<ISubscriptionValidationService>();
-            
+
             _service = new DomainRegistrationService(
                 _mockLogger.Object,
                 _mockRepository.Object,
@@ -68,7 +68,7 @@ namespace OnePageAuthor.Test.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(expectedUpn, result.Upn);
-            
+
             // Verify subscription validation was called
             _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>()), Times.Once);
             _mockRepository.Verify(x => x.CreateAsync(It.IsAny<DomainRegistrationEntity>()), Times.Once);
@@ -87,17 +87,17 @@ namespace OnePageAuthor.Test.Services
             _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser, domain.FullDomainName)).ReturnsAsync(false);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _service.CreateDomainRegistrationAsync(_testUser, domain, contactInfo));
-            
+
             Assert.Contains("valid subscription is required", exception.Message);
             Assert.Contains(domain.FullDomainName, exception.Message);
-            
+
             // Verify domain validation was called first
             _mockDomainValidationService.Verify(x => x.ValidateDomain(domain), Times.Once);
             // Verify subscription validation was called
             _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser, domain.FullDomainName), Times.Once);
-            
+
             // Verify contact validation and repository were NOT called
             _mockContactValidationService.Verify(x => x.ValidateContactInformation(It.IsAny<ContactInformation>()), Times.Never);
             _mockRepository.Verify(x => x.CreateAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
@@ -116,12 +116,12 @@ namespace OnePageAuthor.Test.Services
             _mockSubscriptionValidationService.Setup(x => x.HasValidSubscriptionAsync(_testUser, domain.FullDomainName)).ReturnsAsync(true);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<ArgumentException>(() => 
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateDomainRegistrationAsync(_testUser, domain, contactInfo));
-            
+
             // Verify domain validation failed first
             Assert.Contains("Domain validation failed", exception.Message);
-            
+
             // Verify subscription validation was NOT called because domain check failed first
             _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>()), Times.Never);
         }

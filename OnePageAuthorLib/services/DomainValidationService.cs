@@ -14,11 +14,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
         // Regex patterns for domain validation
         private static readonly Regex DomainNameRegex = new Regex(
-            @"^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$", 
+            @"^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static readonly Regex TopLevelDomainRegex = new Regex(
-            @"^[a-zA-Z]{2,6}$", 
+            @"^[a-zA-Z]{2,6}$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         // Common reserved domain names that should not be allowed
@@ -90,7 +90,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             }
 
             // Validate full domain length
-            if (!string.IsNullOrWhiteSpace(domain.SecondLevelDomain) && 
+            if (!string.IsNullOrWhiteSpace(domain.SecondLevelDomain) &&
                 !string.IsNullOrWhiteSpace(domain.TopLevelDomain))
             {
                 var fullDomain = domain.FullDomainName;
@@ -102,7 +102,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
             if (errors.Any())
             {
-                _logger.LogWarning("Domain validation failed for {Domain}: {Errors}", 
+                _logger.LogWarning("Domain validation failed for {Domain}: {Errors}",
                     domain.FullDomainName, string.Join(", ", errors));
                 return ValidationResult.Failure(errors.ToArray());
             }

@@ -35,7 +35,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             language = language.ToLowerInvariant();
 
             _logger.LogInformation("Retrieving Countries for language: {Language}", language);
-            
+
             try
             {
                 return await _repository.GetByLanguageAsync(language);
@@ -76,7 +76,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             language = language.ToLowerInvariant();
 
             _logger.LogInformation("Retrieving Country with code: {Code} and language: {Language}", code, language);
-            
+
             try
             {
                 return await _repository.GetByCodeAndLanguageAsync(code, language);
@@ -116,7 +116,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Creating new Country with code: {Code} and language: {Language}", country.Code, country.Language);
-            
+
             try
             {
                 return await _repository.AddAsync(country);
@@ -143,7 +143,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             country.Language = country.Language!.ToLowerInvariant();
 
             _logger.LogInformation("Updating Country with ID: {Id} and code: {Code}", country.id, country.Code);
-            
+
             try
             {
                 return await _repository.UpdateAsync(country);
@@ -167,9 +167,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 throw new ArgumentException("Language cannot be null or empty", nameof(language));
 
             language = language.ToLowerInvariant();
-            
+
             _logger.LogInformation("Deleting Country with ID: {Id} and language: {Language}", id, language);
-            
+
             try
             {
                 return await _repository.DeleteAsync(id, language);
@@ -187,7 +187,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         public async Task<IList<Country>> GetAllCountriesAsync()
         {
             _logger.LogInformation("Retrieving all Countries");
-            
+
             try
             {
                 return await _repository.GetAllAsync();
@@ -205,7 +205,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         public async Task<int> DeleteAllCountriesAsync()
         {
             _logger.LogInformation("Deleting all Countries");
-            
+
             try
             {
                 var allCountries = await _repository.GetAllAsync();

@@ -79,19 +79,19 @@ try
     {
         case "create":
             return await CreateInvitation(args, invitationRepository, emailService, emailConnectionString, logger);
-        
+
         case "list":
             return await ListInvitations(invitationRepository, logger);
-        
+
         case "get":
             return await GetInvitation(args, invitationRepository, logger);
-        
+
         case "update":
             return await UpdateInvitation(args, invitationRepository, logger);
-        
+
         case "resend":
             return await ResendInvitation(args, invitationRepository, emailService, emailConnectionString, logger);
-        
+
         default:
             Console.WriteLine($"❌ Unknown command: {command}");
             PrintUsage();
@@ -230,7 +230,7 @@ static async Task<int> CreateInvitation(
     Console.WriteLine("Creating invitation...");
     var invitation = new AuthorInvitation(emailAddress, domains, notes);
     var savedInvitation = await invitationRepository.AddAsync(invitation);
-    
+
     Console.WriteLine("✅ Invitation created successfully!");
     Console.WriteLine($"   Invitation ID: {savedInvitation.id}");
     Console.WriteLine($"   Email: {savedInvitation.EmailAddress}");
@@ -272,7 +272,7 @@ static async Task<int> CreateInvitation(
     Console.WriteLine("═══════════════════════════════════════════════════════════");
     Console.WriteLine("✅ Operation completed successfully!");
     Console.WriteLine("═══════════════════════════════════════════════════════════");
-    
+
     return 0;
 }
 
@@ -281,9 +281,9 @@ static async Task<int> ListInvitations(
     ILogger logger)
 {
     logger.LogInformation("Listing all pending invitations...");
-    
+
     var invitations = await invitationRepository.GetPendingInvitationsAsync();
-    
+
     if (!invitations.Any())
     {
         Console.WriteLine("No pending invitations found.");
@@ -292,7 +292,7 @@ static async Task<int> ListInvitations(
 
     Console.WriteLine($"Found {invitations.Count} pending invitation(s):");
     Console.WriteLine();
-    
+
     foreach (var invitation in invitations.OrderByDescending(i => i.CreatedAt))
     {
         Console.WriteLine($"ID: {invitation.id}");
@@ -329,9 +329,9 @@ static async Task<int> GetInvitation(
 
     string invitationId = args[1];
     logger.LogInformation("Getting invitation {InvitationId}...", invitationId);
-    
+
     var invitation = await invitationRepository.GetByIdAsync(invitationId);
-    
+
     if (invitation == null)
     {
         Console.WriteLine($"❌ Invitation with ID {invitationId} not found.");
@@ -398,9 +398,9 @@ static async Task<int> UpdateInvitation(
     }
 
     logger.LogInformation("Updating invitation {InvitationId}...", invitationId);
-    
+
     var invitation = await invitationRepository.GetByIdAsync(invitationId);
-    
+
     if (invitation == null)
     {
         Console.WriteLine($"❌ Invitation with ID {invitationId} not found.");
@@ -439,7 +439,7 @@ static async Task<int> UpdateInvitation(
     invitation.LastUpdatedAt = DateTime.UtcNow;
 
     var updatedInvitation = await invitationRepository.UpdateAsync(invitation);
-    
+
     Console.WriteLine("✅ Invitation updated successfully!");
     Console.WriteLine($"  ID: {updatedInvitation.id}");
     Console.WriteLine($"  Email: {updatedInvitation.EmailAddress}");
@@ -470,9 +470,9 @@ static async Task<int> ResendInvitation(
 
     string invitationId = args[1];
     logger.LogInformation("Resending invitation {InvitationId}...", invitationId);
-    
+
     var invitation = await invitationRepository.GetByIdAsync(invitationId);
-    
+
     if (invitation == null)
     {
         Console.WriteLine($"❌ Invitation with ID {invitationId} not found.");

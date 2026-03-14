@@ -43,7 +43,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
         {
             _logger.LogInformation("=== CreateDnsZoneFunction triggered ===");
             _logger.LogInformation("Input received: {InputCount} documents", input?.Count ?? 0);
-            
+
             if (input == null || input.Count == 0)
             {
                 _logger.LogInformation("No domain registrations to process");
@@ -81,7 +81,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                     if (success)
                     {
                         _logger.LogInformation("DNS zone successfully created/verified for domain: {DomainName}", domainName);
-                        
+
                         // Update the domain registration status to completed if it was pending
                         if (domainRegistration.Status == DomainRegistrationStatus.Pending)
                         {

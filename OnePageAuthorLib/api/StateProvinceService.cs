@@ -34,7 +34,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Retrieving StateProvince with code: {Code}", code);
-            
+
             try
             {
                 return await _repository.GetByCodeAsync(code);
@@ -60,7 +60,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Searching StateProvinces with name containing: {Name}", name);
-            
+
             try
             {
                 return await _repository.GetByNameAsync(name);
@@ -93,7 +93,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Retrieving StateProvinces for country: {CountryCode}", countryCode);
-            
+
             try
             {
                 return await _repository.GetByCountryAsync(countryCode);
@@ -126,7 +126,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogDebug("Validating StateProvince code: {Code}", code);
-            
+
             try
             {
                 return await _repository.ExistsByCodeAsync(code);
@@ -164,7 +164,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Creating new StateProvince with code: {Code}", stateProvince.Code);
-            
+
             try
             {
                 return await _repository.AddAsync(stateProvince);
@@ -189,7 +189,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             ValidateStateProvince(stateProvince);
 
             _logger.LogInformation("Updating StateProvince with ID: {Id} and code: {Code}", stateProvince.id, stateProvince.Code);
-            
+
             try
             {
                 return await _repository.UpdateAsync(stateProvince);
@@ -210,10 +210,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException("ID cannot be null or empty", nameof(id));
-            
-            
+
+
             _logger.LogInformation("Deleting StateProvince with ID: {Id}", id);
-            
+
             try
             {
                 return await _repository.DeleteAsync(id);
@@ -259,7 +259,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Retrieving StateProvinces for culture: {Culture}", culture);
-            
+
             try
             {
                 return await _repository.GetByCultureAsync(culture);
@@ -306,7 +306,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Retrieving StateProvinces for country: {CountryCode} and culture: {Culture}", countryCode, culture);
-            
+
             try
             {
                 return await _repository.GetByCountryAndCultureAsync(countryCode, culture);
@@ -360,7 +360,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Retrieving StateProvince for country: {CountryCode}, culture: {Culture}, and code: {Code}", countryCode, culture, code);
-            
+
             try
             {
                 return await _repository.GetByCountryCultureAndCodeAsync(countryCode, culture, code);
@@ -400,7 +400,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             _logger.LogInformation("Retrieving StateProvince for culture: {Culture} and code: {Code}", culture, code);
-            
+
             try
             {
                 return await _repository.GetByCultureAndCodeAsync(culture, code);
@@ -419,7 +419,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         public async Task<IList<StateProvince>> GetAllStateProvincesAsync()
         {
             _logger.LogInformation("Retrieving all StateProvinces");
-            
+
             try
             {
                 return await _repository.GetAllAsync();
@@ -438,7 +438,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         public async Task<int> DeleteAllStateProvincesAsync()
         {
             _logger.LogInformation("Deleting all StateProvinces");
-            
+
             try
             {
                 var allStateProvinces = await _repository.GetAllAsync();

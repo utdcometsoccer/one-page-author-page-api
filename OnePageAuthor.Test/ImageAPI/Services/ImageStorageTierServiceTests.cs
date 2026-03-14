@@ -28,7 +28,7 @@ namespace OnePageAuthor.Test.ImageAPI.Services
             // Arrange
             var userId = "user-123";
             var user = CreateUserWithRoles(userId, "ImageStorageTier.Starter");
-            
+
             var starterTier = new ImageStorageTier
             {
                 id = "tier-1",
@@ -39,7 +39,7 @@ namespace OnePageAuthor.Test.ImageAPI.Services
             };
 
             var allTiers = new List<ImageStorageTier> { starterTier };
-            
+
             _tierRepositoryMock.Setup(x => x.GetAllAsync())
                 .ReturnsAsync(allTiers);
             _tierRepositoryMock.Setup(x => x.GetByNameAsync("Starter"))
@@ -60,7 +60,7 @@ namespace OnePageAuthor.Test.ImageAPI.Services
             // Arrange
             var userId = "user-123";
             var user = CreateUserWithRoles(userId, "ImageStorageTier.Pro");
-            
+
             var proTier = new ImageStorageTier
             {
                 id = "tier-2",
@@ -71,7 +71,7 @@ namespace OnePageAuthor.Test.ImageAPI.Services
             };
 
             var allTiers = new List<ImageStorageTier> { proTier };
-            
+
             _tierRepositoryMock.Setup(x => x.GetAllAsync())
                 .ReturnsAsync(allTiers);
             _tierRepositoryMock.Setup(x => x.GetByNameAsync("Pro"))
@@ -92,7 +92,7 @@ namespace OnePageAuthor.Test.ImageAPI.Services
             // Arrange
             var userId = "user-123";
             var user = CreateUserWithRoles(userId); // No roles
-            
+
             var starterTier = new ImageStorageTier
             {
                 id = "tier-1",
@@ -124,7 +124,7 @@ namespace OnePageAuthor.Test.ImageAPI.Services
             // Arrange
             var userId = "user-123";
             var user = CreateUserWithRoles(userId); // No roles
-            
+
             var basicTier = new ImageStorageTier
             {
                 id = "tier-1",
@@ -165,7 +165,7 @@ namespace OnePageAuthor.Test.ImageAPI.Services
             // Arrange
             var userId = "user-123";
             var user = CreateUserWithRoles(userId, "Admin", "ImageStorageTier.Pro", "ImageStorageTier.Elite");
-            
+
             var proTier = new ImageStorageTier
             {
                 id = "tier-2",
@@ -176,7 +176,7 @@ namespace OnePageAuthor.Test.ImageAPI.Services
             };
 
             var allTiers = new List<ImageStorageTier> { proTier };
-            
+
             _tierRepositoryMock.Setup(x => x.GetAllAsync())
                 .ReturnsAsync(allTiers);
             _tierRepositoryMock.Setup(x => x.GetByNameAsync("Pro"))
@@ -196,7 +196,7 @@ namespace OnePageAuthor.Test.ImageAPI.Services
             // Arrange
             var userId = "user-123";
             var roles = new[] { "ImageStorageTier.Elite" };
-            
+
             var eliteTier = new ImageStorageTier
             {
                 id = "tier-3",
@@ -207,7 +207,7 @@ namespace OnePageAuthor.Test.ImageAPI.Services
             };
 
             var allTiers = new List<ImageStorageTier> { eliteTier };
-            
+
             _tierRepositoryMock.Setup(x => x.GetAllAsync())
                 .ReturnsAsync(allTiers);
             _tierRepositoryMock.Setup(x => x.GetByNameAsync("Elite"))

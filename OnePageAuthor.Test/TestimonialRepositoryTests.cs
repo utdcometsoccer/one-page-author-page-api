@@ -56,17 +56,17 @@ namespace OnePageAuthor.Test
         public async Task GetByIdAsync_ReturnsTestimonial()
         {
             var testimonialId = Guid.NewGuid().ToString();
-            var testimonial1 = new Testimonial 
-            { 
-                id = testimonialId, 
+            var testimonial1 = new Testimonial
+            {
+                id = testimonialId,
                 AuthorName = "John Doe",
                 Quote = "Great service!",
                 Rating = 5,
                 Locale = "en-US"
             };
-            var testimonial2 = new Testimonial 
-            { 
-                id = Guid.NewGuid().ToString(), 
+            var testimonial2 = new Testimonial
+            {
+                id = Guid.NewGuid().ToString(),
                 AuthorName = "Jane Smith",
                 Quote = "Amazing!",
                 Rating = 4,
@@ -277,7 +277,7 @@ namespace OnePageAuthor.Test
 
             // Setup for GetByIdAsync call
             var dataContainer = new TestGetByIdAsyncDataContainer(new List<Testimonial> { testimonial }, testimonialId);
-            
+
             // Setup mock for delete
             var cosmosMock = new Mock<IDataContainer>();
             cosmosMock.Setup(c => c.GetItemQueryIterator<Testimonial>(It.IsAny<QueryDefinition>(), null, null))

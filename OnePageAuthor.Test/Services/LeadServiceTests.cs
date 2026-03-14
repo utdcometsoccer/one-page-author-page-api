@@ -112,7 +112,7 @@ namespace OnePageAuthor.Test.Services
             };
 
             // Act & Assert
-            await Assert.ThrowsAsync<ValidationException>(() => 
+            await Assert.ThrowsAsync<ValidationException>(() =>
                 _leadService.CreateLeadAsync(request, "192.168.1.1"));
         }
 
@@ -131,7 +131,7 @@ namespace OnePageAuthor.Test.Services
             };
 
             // Act & Assert
-            await Assert.ThrowsAsync<ValidationException>(() => 
+            await Assert.ThrowsAsync<ValidationException>(() =>
                 _leadService.CreateLeadAsync(request, "192.168.1.1"));
         }
 
@@ -172,7 +172,7 @@ namespace OnePageAuthor.Test.Services
             _mockLeadRepository
                 .Setup(r => r.AddAsync(It.IsAny<Lead>()))
                 .Callback<Lead>(lead => capturedLead = lead)
-                .ReturnsAsync((Lead lead) => 
+                .ReturnsAsync((Lead lead) =>
                 {
                     lead.id = "lead-123";
                     return lead;
@@ -216,7 +216,7 @@ namespace OnePageAuthor.Test.Services
             _mockLeadRepository
                 .Setup(r => r.AddAsync(It.IsAny<Lead>()))
                 .Callback<Lead>(lead => capturedLead = lead)
-                .ReturnsAsync((Lead lead) => 
+                .ReturnsAsync((Lead lead) =>
                 {
                     lead.id = "lead-456";
                     return lead;
@@ -268,7 +268,7 @@ namespace OnePageAuthor.Test.Services
         public async Task GetLeadsBySourceAsync_WithInvalidSource_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _leadService.GetLeadsBySourceAsync("invalid_source"));
         }
     }

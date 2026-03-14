@@ -22,7 +22,7 @@ public class CreateTestimonial
     private readonly IAuthenticatedFunctionTelemetryService _telemetry;
 
     public CreateTestimonial(
-        ILogger<CreateTestimonial> logger, 
+        ILogger<CreateTestimonial> logger,
         ITestimonialRepository repository,
         IAuthenticatedFunctionTelemetryService telemetry)
     {

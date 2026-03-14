@@ -46,13 +46,13 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                 };
 
                 var session = await service.CreateAsync(options);
-                
+
                 // Track checkout session creation in Application Insights
                 _telemetryService?.TrackCheckoutSessionCreated(
                     session.Id ?? string.Empty,
                     request.CustomerId,
                     request.PriceId);
-                
+
                 return new CreateCheckoutSessionResponse
                 {
                     CheckoutSessionId = session.Id ?? string.Empty,

@@ -15,25 +15,25 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
         // Regex patterns for validation
         private static readonly Regex PhoneNumberRegex = new Regex(
-            @"^[\+]?[1-9][\d]{9,15}$", 
+            @"^[\+]?[1-9][\d]{9,15}$",
             RegexOptions.Compiled);
 
         // US ZIP code pattern (5 digits or 5+4 format)
         private static readonly Regex UsZipCodeRegex = new Regex(
-            @"^\d{5}(-\d{4})?$", 
+            @"^\d{5}(-\d{4})?$",
             RegexOptions.Compiled);
 
         // International postal code pattern (alphanumeric, spaces, hyphens)
         private static readonly Regex InternationalPostalCodeRegex = new Regex(
-            @"^[A-Za-z0-9\s\-]{3,10}$", 
+            @"^[A-Za-z0-9\s\-]{3,10}$",
             RegexOptions.Compiled);
 
         // Valid countries (could be expanded or loaded from configuration)
         private static readonly HashSet<string> ValidCountries = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "US", "USA", "United States", "CA", "Canada", "UK", "United Kingdom", "AU", "Australia", 
-            "DE", "Germany", "FR", "France", "IT", "Italy", "ES", "Spain", "NL", "Netherlands", 
-            "BE", "Belgium", "CH", "Switzerland", "AT", "Austria", "SE", "Sweden", "NO", "Norway", 
+            "US", "USA", "United States", "CA", "Canada", "UK", "United Kingdom", "AU", "Australia",
+            "DE", "Germany", "FR", "France", "IT", "Italy", "ES", "Spain", "NL", "Netherlands",
+            "BE", "Belgium", "CH", "Switzerland", "AT", "Austria", "SE", "Sweden", "NO", "Norway",
             "DK", "Denmark", "FI", "Finland", "IE", "Ireland", "PT", "Portugal", "GR", "Greece",
             "JP", "Japan", "KR", "South Korea", "SG", "Singapore", "HK", "Hong Kong", "NZ", "New Zealand"
         };
@@ -182,7 +182,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
             if (errors.Any())
             {
-                _logger.LogWarning("Contact information validation failed for {Email}: {Errors}", 
+                _logger.LogWarning("Contact information validation failed for {Email}: {Errors}",
                     contactInfo.EmailAddress, string.Join(", ", errors));
                 return ValidationResult.Failure(errors.ToArray());
             }
@@ -254,7 +254,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
             // Remove common formatting characters for validation
             var cleanedNumber = phoneNumber.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "").Replace(".", "");
-            
+
             return PhoneNumberRegex.IsMatch(cleanedNumber);
         }
 

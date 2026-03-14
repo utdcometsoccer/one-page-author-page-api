@@ -35,7 +35,7 @@ partial class Program
                 string apiUrl = config["WHMCS_API_URL"] ?? throw new InvalidOperationException("WHMCS_API_URL is required");
                 string apiIdentifier = config["WHMCS_API_IDENTIFIER"] ?? throw new InvalidOperationException("WHMCS_API_IDENTIFIER is required");
                 string apiSecret = config["WHMCS_API_SECRET"] ?? throw new InvalidOperationException("WHMCS_API_SECRET is required");
-                
+
                 // Cosmos DB Configuration (for reading test data)
                 string endpointUri = config["COSMOSDB_ENDPOINT_URI"] ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required");
                 string primaryKey = config["COSMOSDB_PRIMARY_KEY"] ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required");
@@ -147,10 +147,10 @@ partial class Program
         Console.WriteLine("Interactive Mode: Select domain registrations from database");
         Console.WriteLine(new string('-', 60));
         Console.WriteLine();
-        
+
         Console.Write("Enter User Principal Name (UPN/email) to search: ");
         string? upn = Console.ReadLine();
-        
+
         if (string.IsNullOrWhiteSpace(upn))
         {
             Console.WriteLine("Error: UPN is required.");
@@ -172,7 +172,7 @@ partial class Program
         try
         {
             var registrations = (await domainRepository.GetByUserAsync(upn)).ToList();
-            
+
             if (registrations == null || !registrations.Any())
             {
                 Console.WriteLine($"No domain registrations found for UPN: {upn}");
@@ -212,12 +212,12 @@ partial class Program
         try
         {
             var registration = await domainRepository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
-            
+
             if (registration == null)
             {
                 Console.WriteLine($"Domain {secondLevelDomain}.{topLevelDomain} not found in database.");
                 Console.WriteLine("Creating test registration from command line parameters...");
-                
+
                 // Create a minimal test registration
                 registration = new DomainRegistration
                 {
@@ -321,7 +321,7 @@ partial class Program
 
             // Step 1: Validate registration parameters
             Console.WriteLine($"  Step 1: Validating registration parameters for {domainName}...");
-            
+
             // Validate contact information
             if (registration.ContactInformation == null)
             {
@@ -336,9 +336,9 @@ partial class Program
 
             // Step 2: Attempt WHMCS registration (DRY RUN)
             Console.WriteLine($"  Step 2: Testing WHMCS registration for {domainName}...");
-            
+
             bool registrationResult = await whmcsService.RegisterDomainAsync(registration);
-            
+
             if (registrationResult)
             {
                 Console.WriteLine($"  ✅ WHMCS API registration call succeeded");
@@ -350,10 +350,10 @@ partial class Program
 
             // Step 3: Verify database record could be created
             Console.WriteLine($"  Step 3: Verifying database compatibility...");
-            
+
             // Check if record already exists in DB
             var existing = await domainRepository.GetByDomainAsync(
-                registration.Domain.TopLevelDomain, 
+                registration.Domain.TopLevelDomain,
                 registration.Domain.SecondLevelDomain);
             if (existing != null)
             {

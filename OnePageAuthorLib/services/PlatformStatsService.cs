@@ -18,7 +18,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
         private readonly IGenericRepository<Entities.Book> _bookRepository;
         private readonly ICountryRepository _countryRepository;
         private readonly ILogger<PlatformStatsService> _logger;
-        
+
         // Static in-memory cache shared across all service instances (intentional design for simplicity)
         private static PlatformStats? _cachedStats;
         private static DateTime _cacheTimestamp = DateTime.MinValue;
@@ -48,7 +48,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             // Check cache without lock first for performance
             if (_cachedStats != null && DateTime.UtcNow - _cacheTimestamp < CacheDuration)
             {
-                _logger.LogInformation("Returning cached platform stats (age: {Age} minutes)", 
+                _logger.LogInformation("Returning cached platform stats (age: {Age} minutes)",
                     (DateTime.UtcNow - _cacheTimestamp).TotalMinutes);
                 return _cachedStats;
             }
@@ -60,7 +60,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 // Double-check cache after acquiring lock
                 if (_cachedStats != null && DateTime.UtcNow - _cacheTimestamp < CacheDuration)
                 {
-                    _logger.LogInformation("Returning cached platform stats after lock (age: {Age} minutes)", 
+                    _logger.LogInformation("Returning cached platform stats after lock (age: {Age} minutes)",
                         (DateTime.UtcNow - _cacheTimestamp).TotalMinutes);
                     return _cachedStats;
                 }
@@ -70,7 +70,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 try
                 {
                     var stats = await _statsRepository.GetCurrentStatsAsync();
-                    
+
                     if (stats == null)
                     {
                         _logger.LogWarning("No platform stats found in database, returning default values");
@@ -85,7 +85,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error fetching platform stats from database");
-                    
+
                     // Return cached stats if available, even if expired
                     if (_cachedStats != null)
                     {
@@ -186,13 +186,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
                 if (containerField == null)
                 {
-                    _logger.LogWarning("Cannot access _container field from {RepositoryType}, returning 0", 
+                    _logger.LogWarning("Cannot access _container field from {RepositoryType}, returning 0",
                         repository?.GetType().Name ?? "null");
                     return 0;
                 }
 
                 var containerValue = containerField.GetValue(repository);
-                
+
                 // Handle both IDataContainer and Container types
                 Container? container = null;
                 if (containerValue is IDataContainer dataContainer)
@@ -209,7 +209,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
                 if (container == null)
                 {
-                    _logger.LogWarning("Cannot extract Container from {RepositoryType}, returning 0", 
+                    _logger.LogWarning("Cannot extract Container from {RepositoryType}, returning 0",
                         repository?.GetType().Name ?? "null");
                     return 0;
                 }
@@ -222,7 +222,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                     var response = await iterator.ReadNextAsync();
                     return response.FirstOrDefault();
                 }
-                
+
                 return 0;
             }
             catch (Exception ex)
@@ -265,7 +265,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                         countries.Add(code);
                     }
                 }
-                
+
                 return countries.Count;
             }
             catch (Exception ex)

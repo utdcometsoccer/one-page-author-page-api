@@ -48,8 +48,8 @@ namespace InkStainedWretchesConfig
 
                 _logger.LogInformation("Successfully retrieved Penguin Random House API key.");
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                await response.WriteAsJsonAsync(new 
-                { 
+                await response.WriteAsJsonAsync(new
+                {
                     apiKey = apiKey,
                     source = _keyVaultService.IsKeyVaultEnabled() ? "KeyVault" : "Environment"
                 });

@@ -44,14 +44,14 @@ namespace InkStainedWretch.StripeProductManager
                 .ConfigureServices((context, services) =>
                 {
                     services.AddLogging();
-                    
+
                     // Configure Stripe settings
                     var stripeSettings = new StripeSettings();
                     context.Configuration.GetSection("Stripe").Bind(stripeSettings);
                     services.AddSingleton(stripeSettings);
-                    
+
                     services.AddSingleton<StripeProductManager>();
-                    
+
                     // Configure Stripe API key
                     if (string.IsNullOrEmpty(stripeSettings.SecretKey))
                     {
@@ -89,7 +89,7 @@ namespace InkStainedWretch.StripeProductManager
             {
                 _logger.LogInformation("Processing product: {ProductName}", productDef.Name);
                 Console.WriteLine($"\n🔄 Processing: {productDef.Name}");
-                
+
                 // Show culture information
                 var productConfig = _stripeSettings.Products.FirstOrDefault(p => p.Name == productDef.Name);
                 if (productConfig != null)
@@ -131,7 +131,7 @@ namespace InkStainedWretch.StripeProductManager
             if (existingProduct != null)
             {
                 _logger.LogInformation("Updating existing product: {ProductId}", existingProduct.Id);
-                
+
                 var updateOptions = new ProductUpdateOptions
                 {
                     Description = productDef.Description,
@@ -143,7 +143,7 @@ namespace InkStainedWretch.StripeProductManager
             else
             {
                 _logger.LogInformation("Creating new product: {ProductName}", productDef.Name);
-                
+
                 var createOptions = new ProductCreateOptions
                 {
                     Name = productDef.Name,
@@ -172,7 +172,7 @@ namespace InkStainedWretch.StripeProductManager
             if (existingPrice != null)
             {
                 _logger.LogInformation("Updating existing price: {PriceId}", existingPrice.Id);
-                
+
                 var updateOptions = new PriceUpdateOptions
                 {
                     Nickname = productDef.PriceNickname,
@@ -184,7 +184,7 @@ namespace InkStainedWretch.StripeProductManager
             else
             {
                 _logger.LogInformation("Creating new price for product: {ProductId}", productId);
-                
+
                 var createOptions = new PriceCreateOptions
                 {
                     Product = productId,
@@ -259,7 +259,7 @@ namespace InkStainedWretch.StripeProductManager
             foreach (var cultureCode in productConfig.SupportedCultures.Take(8)) // Limit due to metadata constraints
             {
                 metadata[$"culture_{cultureIndex:D2}_code"] = cultureCode;
-                
+
                 if (defaultCultureData.ContainsKey(cultureCode))
                 {
                     metadata[$"culture_{cultureIndex:D2}_name"] = defaultCultureData[cultureCode];
@@ -269,8 +269,8 @@ namespace InkStainedWretch.StripeProductManager
                 if (productConfig.CultureSpecificInfo.ContainsKey(cultureCode))
                 {
                     var cultureInfo = productConfig.CultureSpecificInfo[cultureCode];
-                    metadata[$"culture_{cultureIndex:D2}_localized_name"] = cultureInfo.LocalizedName.Length > 50 
-                        ? cultureInfo.LocalizedName.Substring(0, 47) + "..." 
+                    metadata[$"culture_{cultureIndex:D2}_localized_name"] = cultureInfo.LocalizedName.Length > 50
+                        ? cultureInfo.LocalizedName.Substring(0, 47) + "..."
                         : cultureInfo.LocalizedName;
                     metadata[$"culture_{cultureIndex:D2}_localized_nickname"] = cultureInfo.LocalizedNickname;
                 }

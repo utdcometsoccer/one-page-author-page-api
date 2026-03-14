@@ -16,7 +16,7 @@ public class UpdateSubscription
     private readonly IAuthenticatedFunctionTelemetryService _telemetry;
 
     public UpdateSubscription(
-        ILogger<UpdateSubscription> logger, 
+        ILogger<UpdateSubscription> logger,
         IUpdateSubscription updater,
         IAuthenticatedFunctionTelemetryService telemetry)
     {
@@ -68,7 +68,7 @@ public class UpdateSubscription
         try
         {
             var result = await _updater.UpdateAsync(subscriptionId, payload);
-            
+
             // Track success with additional context
             var successProperties = new Dictionary<string, string>
             {
@@ -76,23 +76,23 @@ public class UpdateSubscription
                 { "PriceId", payload.PriceId ?? "unchanged" },
                 { "CancelAtPeriodEnd", payload.CancelAtPeriodEnd?.ToString() ?? "unchanged" }
             };
-            
+
             if (payload.Quantity.HasValue)
             {
                 successProperties.Add("NewQuantity", payload.Quantity.Value.ToString());
             }
-            
+
             _telemetry.TrackAuthenticatedFunctionSuccess(
                 "UpdateSubscription",
                 userId,
                 userEmail,
                 successProperties);
-            
+
             _logger.LogInformation(
                 "Successfully updated subscription {SubscriptionId} by user {UserId}",
                 subscriptionId,
                 userId ?? "Anonymous");
-            
+
             return new OkObjectResult(result);
         }
         catch (Exception ex)

@@ -18,7 +18,7 @@ public class GetAuthors
     private readonly IScopeValidationService _scopeValidationService;
 
     public GetAuthors(
-        ILogger<GetAuthors> logger, 
+        ILogger<GetAuthors> logger,
         InkStainedWretch.OnePageAuthorAPI.API.IAuthorDataService authorDataService,
         IJwtValidationService jwtValidationService,
         IUserIdentityService userIdentityService,

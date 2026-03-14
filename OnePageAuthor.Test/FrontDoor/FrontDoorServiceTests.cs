@@ -65,7 +65,7 @@ namespace OnePageAuthor.Test.FrontDoor
         public void Constructor_ThrowsException_NullLogger()
         {
             // Arrange & Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new FrontDoorService(null!, _configurationMock.Object));
         }
 
@@ -73,7 +73,7 @@ namespace OnePageAuthor.Test.FrontDoor
         public void Constructor_ThrowsException_NullConfiguration()
         {
             // Arrange & Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new FrontDoorService(_loggerMock.Object, null!));
         }
 
@@ -124,7 +124,7 @@ namespace OnePageAuthor.Test.FrontDoor
             var service = CreateServiceWithConfig();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 service.DomainExistsAsync(null!));
         }
 
@@ -135,7 +135,7 @@ namespace OnePageAuthor.Test.FrontDoor
             var service = CreateServiceWithConfig();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 service.DomainExistsAsync(string.Empty));
         }
 
@@ -146,7 +146,7 @@ namespace OnePageAuthor.Test.FrontDoor
             var service = CreateServiceWithConfig();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 service.DomainExistsAsync("   "));
         }
 
@@ -157,7 +157,7 @@ namespace OnePageAuthor.Test.FrontDoor
             var service = CreateServiceWithConfig();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 service.AddDomainToFrontDoorAsync(null!));
         }
 
@@ -175,7 +175,7 @@ namespace OnePageAuthor.Test.FrontDoor
             };
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 service.AddDomainToFrontDoorAsync(registration));
         }
 

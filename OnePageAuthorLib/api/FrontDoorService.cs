@@ -75,7 +75,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
                 var subscription = await _armClient!.GetSubscriptionResource(
                     new ResourceIdentifier($"/subscriptions/{_subscriptionId}")).GetAsync();
-                
+
                 var resourceGroups = subscription.Value.GetResourceGroups();
                 var resourceGroup = await resourceGroups.GetAsync(_resourceGroupName);
 
@@ -83,7 +83,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 var profile = await profiles.GetAsync(_frontDoorProfileName);
 
                 var customDomains = profile.Value.GetFrontDoorCustomDomains();
-                
+
                 await foreach (var domain in customDomains.GetAllAsync())
                 {
                     if (domain.Data.HostName?.Equals(domainName, StringComparison.OrdinalIgnoreCase) == true)
@@ -140,7 +140,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 // Get the Front Door profile
                 var subscription = await _armClient!.GetSubscriptionResource(
                     new ResourceIdentifier($"/subscriptions/{_subscriptionId}")).GetAsync();
-                
+
                 var resourceGroups = subscription.Value.GetResourceGroups();
                 var resourceGroup = await resourceGroups.GetAsync(_resourceGroupName);
 
@@ -149,10 +149,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
                 // Create custom domain
                 var customDomains = profile.Value.GetFrontDoorCustomDomains();
-                
+
                 // Create a safe name for the domain (Azure resource names have restrictions)
                 var safeDomainName = domainName.Replace(".", "-");
-                
+
                 var customDomainData = new FrontDoorCustomDomainData
                 {
                     HostName = domainName,
@@ -162,12 +162,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                     }
                 };
 
-                _logger.LogInformation("Creating custom domain {DomainName} in Front Door with resource name {SafeName}", 
+                _logger.LogInformation("Creating custom domain {DomainName} in Front Door with resource name {SafeName}",
                     domainName, safeDomainName);
 
                 var operation = await customDomains.CreateOrUpdateAsync(
-                    WaitUntil.Started, 
-                    safeDomainName, 
+                    WaitUntil.Started,
+                    safeDomainName,
                     customDomainData);
 
                 _logger.LogInformation("Successfully initiated creation of domain {DomainName} in Front Door", domainName);
@@ -175,7 +175,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
             catch (RequestFailedException ex)
             {
-                _logger.LogError(ex, "Azure request failed while adding domain {DomainName} to Front Door. Status: {Status}, ErrorCode: {ErrorCode}", 
+                _logger.LogError(ex, "Azure request failed while adding domain {DomainName} to Front Door. Status: {Status}, ErrorCode: {ErrorCode}",
                     domainName, ex.Status, ex.ErrorCode);
                 return false;
             }

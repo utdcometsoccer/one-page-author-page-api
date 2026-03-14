@@ -21,9 +21,9 @@ namespace OnePageAuthor.Test.DomainRegistration
             // Arrange
             var mockContainer = new Mock<Container>();
             var mockResponse = new Mock<ContainerResponse>();
-            
+
             mockResponse.Setup(r => r.Container).Returns(mockContainer.Object);
-            
+
             _databaseMock.Setup(d => d.CreateContainerIfNotExistsAsync(
                 "DomainRegistrations",
                 "/upn",
@@ -38,7 +38,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             // Assert
             Assert.NotNull(result);
             Assert.Equal(mockContainer.Object, result);
-            
+
             _databaseMock.Verify(d => d.CreateContainerIfNotExistsAsync(
                 "DomainRegistrations",
                 "/upn",

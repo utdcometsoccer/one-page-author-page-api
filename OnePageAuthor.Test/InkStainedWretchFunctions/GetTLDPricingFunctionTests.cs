@@ -29,7 +29,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockJwtValidationService = new Mock<IJwtValidationService>();
             _mockUserProfileService = new Mock<IUserProfileService>();
             _mockConfiguration = new Mock<IConfiguration>();
-            
+
             _function = new GetTLDPricingFunction(
                 _mockWhmcsService.Object,
                 _mockLogger.Object,
@@ -41,17 +41,17 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         private HttpRequest CreateMockRequest(string? clientId = null, int? currencyId = null, bool addAuthHeader = true)
         {
             var mockRequest = new Mock<HttpRequest>();
-            
+
             // Setup query parameters
             var queryDict = new Dictionary<string, StringValues>();
             if (clientId != null)
                 queryDict["clientId"] = clientId;
             if (currencyId.HasValue)
                 queryDict["currencyId"] = currencyId.ToString();
-            
+
             var queryCollection = new QueryCollection(queryDict);
             mockRequest.Setup(r => r.Query).Returns(queryCollection);
-            
+
             // Setup headers with Authorization
             var headers = new HeaderDictionary();
             if (addAuthHeader)
@@ -59,7 +59,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                 headers["Authorization"] = "Bearer valid-token";
             }
             mockRequest.Setup(r => r.Headers).Returns(headers);
-            
+
             return mockRequest.Object;
         }
 
@@ -75,13 +75,13 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockJwtValidationService
                 .Setup(s => s.ValidateTokenAsync(It.IsAny<string>()))
                 .ReturnsAsync(claimsPrincipal);
-            
+
             var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile
             {
                 id = "test-user@example.com",
                 Upn = "test-user@example.com"
             };
-            
+
             _mockUserProfileService
                 .Setup(s => s.EnsureUserProfileAsync(It.IsAny<ClaimsPrincipal>()))
                 .ReturnsAsync(userProfile);
@@ -172,7 +172,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             // Arrange
             SetupValidAuthentication();
-            
+
             var pricingJson = @"{
                 ""result"": ""success"",
                 ""pricing"": {
@@ -199,7 +199,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Equal("application/json", contentResult.ContentType);
             Assert.Contains("success", contentResult.Content);
             Assert.Contains("pricing", contentResult.Content);
-            
+
             _mockWhmcsService.Verify(s => s.GetTLDPricingAsync(null, null), Times.Once);
         }
 
@@ -208,7 +208,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             // Arrange
             SetupValidAuthentication();
-            
+
             var pricingJson = @"{""result"": ""success"", ""pricing"": {}}";
             var jsonDocument = JsonDocument.Parse(pricingJson);
 
@@ -231,7 +231,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             // Arrange
             SetupValidAuthentication();
-            
+
             var pricingJson = @"{""result"": ""success"", ""pricing"": {}}";
             var jsonDocument = JsonDocument.Parse(pricingJson);
 
@@ -254,7 +254,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             // Arrange
             SetupValidAuthentication();
-            
+
             var pricingJson = @"{""result"": ""success"", ""pricing"": {}}";
             var jsonDocument = JsonDocument.Parse(pricingJson);
 
@@ -302,7 +302,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             _mockJwtValidationService
                 .Setup(s => s.ValidateTokenAsync(It.IsAny<string>()))
                 .ReturnsAsync(claimsPrincipal);
-            
+
             _mockUserProfileService
                 .Setup(s => s.EnsureUserProfileAsync(It.IsAny<ClaimsPrincipal>()))
                 .ThrowsAsync(new InvalidOperationException("User profile validation failed"));
@@ -323,7 +323,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             // Arrange
             SetupValidAuthentication();
-            
+
             _mockWhmcsService
                 .Setup(s => s.GetTLDPricingAsync(It.IsAny<string>(), It.IsAny<int?>()))
                 .ThrowsAsync(new InvalidOperationException("WHMCS integration is not configured"));
@@ -343,7 +343,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             // Arrange
             SetupValidAuthentication();
-            
+
             _mockWhmcsService
                 .Setup(s => s.GetTLDPricingAsync(It.IsAny<string>(), It.IsAny<int?>()))
                 .ThrowsAsync(new HttpRequestException("Network error"));
@@ -363,7 +363,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         {
             // Arrange
             SetupValidAuthentication();
-            
+
             _mockWhmcsService
                 .Setup(s => s.GetTLDPricingAsync(It.IsAny<string>(), It.IsAny<int?>()))
                 .ThrowsAsync(new Exception("Unexpected error"));
