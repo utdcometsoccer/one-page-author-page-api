@@ -294,6 +294,11 @@ SERVICE_BUS_WHMCS_QUEUE_NAME=whmcs-domain-registrations
 WHMCS_API_URL=https://your-whmcs-instance.com/includes/api.php
 WHMCS_API_IDENTIFIER=your-api-identifier
 WHMCS_API_SECRET=your-api-secret
+
+# systemd watchdog defaults (used ONLY if systemd-provided NOTIFY_SOCKET/WATCHDOG_* are missing or blank)
+# These values are safe to include in /etc/whmcs-worker/environment because they do NOT override systemd's vars.
+WHMCS_SYSTEMD_NOTIFY_SOCKET=/run/systemd/notify
+WHMCS_SYSTEMD_WATCHDOG_USEC=30000000
 EOF
 
 # Lock down permissions
