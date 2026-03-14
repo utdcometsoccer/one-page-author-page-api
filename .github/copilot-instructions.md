@@ -82,6 +82,7 @@ The platform serves as a backend for author profile management, content publishi
 - Use **C# 12 / .NET 9 features** when they improve clarity and maintainability
 - Enable **nullable reference types** (`<Nullable>enable</Nullable>`)
 - Enable **implicit usings** (`<ImplicitUsings>enable</ImplicitUsings>`)
+- **Remove unused `using` statements** from every file you create or modify; run `dotnet format --diagnostics IDE0005` before committing to clean up the entire solution
 
 ### Architecture Patterns
 - **Keep Azure Functions thin** - Put orchestration and core logic in `OnePageAuthorLib`
