@@ -212,7 +212,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
-        public async Task Run_WithAuthorReadScope_NoDomainParams_NoAuthors_ReturnsNotFound()
+        public async Task Run_WithAuthorReadScope_NoDomainParams_NoAuthors_ReturnsEmptyArray()
         {
             var req = CreateRequest(authToken: "valid-token");
             var user = CreateUserWithScope();
@@ -225,7 +225,9 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             var result = await _function.Run(req, null, null);
 
-            Assert.IsType<NotFoundObjectResult>(result);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var authors = Assert.IsAssignableFrom<List<AuthorApiResponse>>(okResult.Value);
+            Assert.Empty(authors);
         }
 
         // --- Scenario 3: Authenticated without Author.Read scope, no domain params — return by email ---
@@ -290,7 +292,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
         }
 
         [Fact]
-        public async Task Run_PartialDomainParams_WithAuthorReadScope_ReturnsAllAuthorsPaged()
+        public async Task Run_PartialDomainParams_WithAuthorReadScope_ReturnsEmptyArray()
         {
             // Only one route param provided — hasDomainParams is false, falls back to paged lookup
             const string userEmail = "admin@example.com";
@@ -305,8 +307,10 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             var result = await _function.Run(req, "example", null);
 
-            // Incomplete domain → authenticated path → Author.Read scope → paged → no authors → 404
-            Assert.IsType<NotFoundObjectResult>(result);
+            // Incomplete domain → authenticated path → Author.Read scope → paged → no authors → 200 empty array
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var authors = Assert.IsAssignableFrom<List<AuthorApiResponse>>(okResult.Value);
+            Assert.Empty(authors);
             _mockAuthorDataService.Verify(s => s.GetAllAuthorsPagedAsync(1, 10), Times.Once);
         }
     }
