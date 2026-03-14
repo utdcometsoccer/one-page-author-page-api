@@ -31,12 +31,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             if (string.IsNullOrWhiteSpace(request.Page))
                 throw new ArgumentException("Page cannot be null or empty.", nameof(request));
 
-            _logger.LogInformation("Getting experiments for page: {Page}, userId: {UserId}", 
+            _logger.LogInformation("Getting experiments for page: {Page}, userId: {UserId}",
                 request.Page, request.UserId ?? "(none)");
 
             // Generate or use existing session ID for consistent bucketing
-            var sessionId = string.IsNullOrWhiteSpace(request.UserId) 
-                ? Guid.NewGuid().ToString() 
+            var sessionId = string.IsNullOrWhiteSpace(request.UserId)
+                ? Guid.NewGuid().ToString()
                 : request.UserId;
 
             var bucketingKey = request.UserId ?? sessionId;
@@ -44,7 +44,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             // Get active experiments for the page
             var experiments = await _repository.GetActiveExperimentsByPageAsync(request.Page);
 
-            _logger.LogInformation("Found {Count} active experiments for page: {Page}", 
+            _logger.LogInformation("Found {Count} active experiments for page: {Page}",
                 experiments.Count, request.Page);
 
             // Assign variants for each experiment
@@ -60,7 +60,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 };
             }).ToList();
 
-            _logger.LogInformation("Assigned {Count} experiments for session: {SessionId}", 
+            _logger.LogInformation("Assigned {Count} experiments for session: {SessionId}",
                 assignedExperiments.Count, sessionId);
 
             return new GetExperimentsResponse
@@ -84,18 +84,18 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             var totalPercentage = experiment.Variants.Sum(v => v.TrafficPercentage);
             if (totalPercentage != 100)
             {
-                _logger.LogWarning("Experiment {ExperimentId} has invalid traffic allocation: {Total}%. Normalizing to 100%.", 
+                _logger.LogWarning("Experiment {ExperimentId} has invalid traffic allocation: {Total}%. Normalizing to 100%.",
                     experiment.id, totalPercentage);
             }
 
             // Create a deterministic hash from experiment ID + bucketing key
             var hashInput = $"{experiment.id}:{bucketingKey}";
             var hash = ComputeHash(hashInput);
-            
+
             // Convert hash to a number between 0 and 99 (representing percentage)
             var bucketValue = Math.Abs(hash % 100);
 
-            _logger.LogDebug("Bucket value for experiment {ExperimentId}, key {BucketingKey}: {BucketValue}", 
+            _logger.LogDebug("Bucket value for experiment {ExperimentId}, key {BucketingKey}: {BucketValue}",
                 experiment.id, bucketingKey, bucketValue);
 
             // Assign variant based on traffic percentage ranges
@@ -105,7 +105,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 cumulativePercentage += variant.TrafficPercentage;
                 if (bucketValue < cumulativePercentage)
                 {
-                    _logger.LogInformation("Assigned variant {VariantId} to experiment {ExperimentId} for key {BucketingKey}", 
+                    _logger.LogInformation("Assigned variant {VariantId} to experiment {ExperimentId} for key {BucketingKey}",
                         variant.Id, experiment.id, bucketingKey);
                     return variant;
                 }
@@ -113,7 +113,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
             // Fallback to last variant if rounding causes issues
             var fallbackVariant = experiment.Variants.Last();
-            _logger.LogWarning("Fallback to variant {VariantId} for experiment {ExperimentId}", 
+            _logger.LogWarning("Fallback to variant {VariantId} for experiment {ExperimentId}",
                 fallbackVariant.Id, experiment.id);
             return fallbackVariant;
         }
@@ -125,7 +125,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
         {
             using var sha256 = SHA256.Create();
             var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
-            
+
             // Convert first 4 bytes to integer
             return BitConverter.ToInt32(hashBytes, 0);
         }

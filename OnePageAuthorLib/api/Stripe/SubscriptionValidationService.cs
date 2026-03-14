@@ -44,24 +44,24 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
             }
 
             var upn = _userIdentityService.GetUserUpn(user);
-            
+
             _logger.LogInformation("Validating subscription for user {Upn} and domain {DomainName}", upn, domainName);
-            
+
             // Get user profile to retrieve Stripe customer ID
             var userProfile = await _userProfileRepository.GetByUpnAsync(upn);
-            
+
             if (userProfile == null)
             {
                 _logger.LogWarning("User profile not found for {Upn}", upn);
                 return false;
             }
-            
+
             if (string.IsNullOrWhiteSpace(userProfile.StripeCustomerId))
             {
                 _logger.LogWarning("User {Upn} has no Stripe customer ID", upn);
                 return false;
             }
-            
+
             try
             {
                 // Get all subscriptions for the customer
@@ -69,7 +69,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     customerId: userProfile.StripeCustomerId,
                     status: "all",
                     limit: 100);
-                
+
                 // Check if any subscription is active/trialing AND matches the domain in metadata
                 var hasValidSubscription = false;
                 if (subscriptionsResponse.Subscriptions?.Data != null)
@@ -78,12 +78,12 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     {
                         // Check if subscription is active or trialing
                         var isActiveStatus = subscription.Status == "active" || subscription.Status == "trialing";
-                        
+
                         // Check if domain name matches metadata
                         var domainMatches = subscription.Metadata != null &&
                                           subscription.Metadata.TryGetValue("domain_name", out var metadataDomain) &&
                                           string.Equals(metadataDomain, domainName, StringComparison.OrdinalIgnoreCase);
-                        
+
                         if (isActiveStatus && domainMatches)
                         {
                             hasValidSubscription = true;
@@ -94,19 +94,19 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                         }
                     }
                 }
-                
+
                 if (!hasValidSubscription)
                 {
                     _logger.LogWarning(
                         "User {Upn} has no valid subscription for domain {DomainName} (customer: {CustomerId})",
                         upn, domainName, userProfile.StripeCustomerId);
                 }
-                
+
                 return hasValidSubscription;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, 
+                _logger.LogError(ex,
                     "Error validating subscriptions for user {Upn} and domain {DomainName} (customer: {CustomerId})",
                     upn, domainName, userProfile.StripeCustomerId);
                 throw;

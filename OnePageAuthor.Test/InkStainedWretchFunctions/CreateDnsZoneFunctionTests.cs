@@ -46,7 +46,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
-            
+
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
         }
 
@@ -68,7 +68,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
-            
+
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
         }
 
@@ -96,7 +96,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration), Times.Once);
-            
+
             _mockLogger.Verify(
                 x => x.Log(
                     LogLevel.Information,
@@ -140,7 +140,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration), Times.Once);
-            
+
             _mockLogger.Verify(
                 x => x.Log(
                     LogLevel.Information,
@@ -175,7 +175,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
-            
+
             _mockLogger.Verify(
                 x => x.Log(
                     LogLevel.Information,
@@ -210,7 +210,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration), Times.Once);
-            
+
             _mockLogger.Verify(
                 x => x.Log(
                     LogLevel.Error,
@@ -258,7 +258,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration1), Times.Once);
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration2), Times.Once);
-            
+
             _mockLogger.Verify(
                 x => x.Log(
                     LogLevel.Error,
@@ -289,7 +289,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
-            
+
             _mockLogger.Verify(
                 x => x.Log(
                     LogLevel.Warning,
@@ -317,7 +317,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Assert
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
-            
+
             _mockLogger.Verify(
                 x => x.Log(
                     LogLevel.Warning,
@@ -363,7 +363,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Assert
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration1), Times.Once);
             _mockDnsZoneService.Verify(x => x.EnsureDnsZoneExistsAsync(domainRegistration2), Times.Once);
-            
+
             _mockLogger.Verify(
                 x => x.Log(
                     LogLevel.Information,

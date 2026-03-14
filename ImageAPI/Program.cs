@@ -50,11 +50,11 @@ builder.Services
         {
             options.Audience = audience;
         }
-        
+
         // Enable automatic metadata refresh when signing key is not found
         // This helps prevent SecurityTokenSignatureKeyNotFoundException when Azure AD rotates keys
         options.RefreshOnIssuerKeyNotFound = true;
-        
+
         // Configure automatic refresh of signing keys from OpenID Connect metadata
         // Prefer an explicit OPEN_ID_CONNECT_METADATA_URL if provided; otherwise derive from authority
         var metadataAddress = config["OPEN_ID_CONNECT_METADATA_URL"];
@@ -76,7 +76,7 @@ builder.Services
                 RefreshInterval = TimeSpan.FromMinutes(30)
             };
         }
-        
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -149,10 +149,10 @@ builder.Services
 builder.Services.AddSingleton(sp =>
 {
     var connectionString = config["AZURE_STORAGE_CONNECTION_STRING"] ?? throw new InvalidOperationException("AZURE_STORAGE_CONNECTION_STRING is required");
-    
+
     // Log Azure Storage configuration (masked for security)
     Console.WriteLine($"Azure Storage Connection String configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(connectionString)}");
-    
+
     return new Azure.Storage.Blobs.BlobServiceClient(connectionString);
 });
 

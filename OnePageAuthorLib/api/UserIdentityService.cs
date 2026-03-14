@@ -22,7 +22,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 throw new InvalidOperationException("User is not authenticated");
 
             // Try to get UPN first, then fall back to email if UPN is missing or empty
-            var upn = GetNonEmptyClaimValue(user, "upn") 
+            var upn = GetNonEmptyClaimValue(user, "upn")
                      ?? GetNonEmptyClaimValue(user, "email")
                      ?? GetNonEmptyClaimValue(user, nameClaimType)
                      ?? GetNonEmptyClaimValue(user, emailClaimType)

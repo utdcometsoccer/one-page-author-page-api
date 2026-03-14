@@ -30,7 +30,7 @@ namespace OnePageAuthor.Test
                 LastUpdated = DateTime.UtcNow.ToString("O")
             };
             cosmosMock.Setup(c => c.ReadItemAsync<PlatformStats>(
-                It.IsAny<string>(), 
+                It.IsAny<string>(),
                 It.IsAny<PartitionKey>()))
                 .ReturnsAsync(stats);
 
@@ -47,7 +47,7 @@ namespace OnePageAuthor.Test
             Assert.Equal(stats.AverageRating, result.AverageRating);
             Assert.Equal(stats.CountriesServed, result.CountriesServed);
             cosmosMock.Verify(c => c.ReadItemAsync<PlatformStats>(
-                "current", 
+                "current",
                 It.IsAny<PartitionKey>()), Times.Once);
         }
 
@@ -57,7 +57,7 @@ namespace OnePageAuthor.Test
             // Arrange
             var cosmosMock = new Mock<IDataContainer>();
             cosmosMock.Setup(c => c.ReadItemAsync<PlatformStats>(
-                It.IsAny<string>(), 
+                It.IsAny<string>(),
                 It.IsAny<PartitionKey>()))
                 .ThrowsAsync(new CosmosException("Not found", System.Net.HttpStatusCode.NotFound, 0, "", 0));
 

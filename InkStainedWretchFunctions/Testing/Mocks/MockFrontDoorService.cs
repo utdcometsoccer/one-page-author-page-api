@@ -22,7 +22,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.Mocks
         {
             if (_testConfig.EnableTestLogging)
             {
-                _logger.LogInformation("[MOCK] AddDomainToFrontDoorAsync called for domain: {DomainName} in scenario: {TestScenario}", 
+                _logger.LogInformation("[MOCK] AddDomainToFrontDoorAsync called for domain: {DomainName} in scenario: {TestScenario}",
                     domainRegistration.Domain?.FullDomainName, _testConfig.TestScenario);
             }
 
@@ -39,7 +39,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.Mocks
                     await Task.Delay(5000); // Simulate timeout
                     return false;
                 default:
-                    _logger.LogInformation("[MOCK] Successfully added domain {DomainName} to Front Door", 
+                    _logger.LogInformation("[MOCK] Successfully added domain {DomainName} to Front Door",
                         domainRegistration.Domain?.FullDomainName);
                     return true;
             }
@@ -76,7 +76,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.Mocks
             }
 
             await Task.Delay(50);
-            
+
             // Simulate domain existence based on test scenario
             switch (_testConfig.TestScenario.ToLower())
             {

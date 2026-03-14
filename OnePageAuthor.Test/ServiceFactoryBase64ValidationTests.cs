@@ -37,8 +37,8 @@ namespace OnePageAuthor.Test
         }
 
         [Theory]
-        [InlineData(null)] 
-        [InlineData("")] 
+        [InlineData(null)]
+        [InlineData("")]
         [InlineData("   ")]
         public void AddCosmosClient_InvalidEndpoint_Throws(string? endpoint)
         {
@@ -49,12 +49,12 @@ namespace OnePageAuthor.Test
         }
 
         [Theory]
-        [InlineData("Zg=")] 
-        [InlineData("Zg===")] 
-        [InlineData("Z g==")] 
+        [InlineData("Zg=")]
+        [InlineData("Zg===")]
+        [InlineData("Z g==")]
         // Note: leading/trailing whitespace is sanitized; internal whitespace remains invalid 
-        [InlineData("Zg==?")] 
-        [InlineData("Zm")] 
+        [InlineData("Zg==?")]
+        [InlineData("Zm")]
         public void CreateProvider_InvalidBase64_Throws(string invalidKey)
         {
             var ex = Assert.Throws<ArgumentException>(() =>

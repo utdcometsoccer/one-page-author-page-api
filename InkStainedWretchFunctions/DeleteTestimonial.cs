@@ -20,7 +20,7 @@ public class DeleteTestimonial
     private readonly IAuthenticatedFunctionTelemetryService _telemetry;
 
     public DeleteTestimonial(
-        ILogger<DeleteTestimonial> logger, 
+        ILogger<DeleteTestimonial> logger,
         ITestimonialRepository repository,
         IAuthenticatedFunctionTelemetryService telemetry)
     {

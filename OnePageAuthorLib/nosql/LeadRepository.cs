@@ -124,7 +124,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         public async Task<IList<Lead>> GetBySourceAsync(string source, DateTime? startDate = null, DateTime? endDate = null)
         {
             var queryText = "SELECT * FROM c WHERE c.source = @source";
-            
+
             if (startDate.HasValue)
             {
                 queryText += " AND c.createdAt >= @startDate";
@@ -150,7 +150,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
 
             var results = new List<Lead>();
             using var iterator = _container.GetItemQueryIterator<Lead>(query);
-            
+
             while (iterator.HasMoreResults)
             {
                 var response = await iterator.ReadNextAsync();

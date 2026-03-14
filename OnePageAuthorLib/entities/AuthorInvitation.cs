@@ -9,16 +9,16 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
 
         private void SetLegacyDomainName(string? domainName)
         {
-    #pragma warning disable CS0618 // 'DomainName' is obsolete
+#pragma warning disable CS0618 // 'DomainName' is obsolete
             DomainName = domainName ?? string.Empty;
-    #pragma warning restore CS0618
+#pragma warning restore CS0618
         }
 
         private string GetLegacyDomainName()
         {
-    #pragma warning disable CS0618 // 'DomainName' is obsolete
+#pragma warning disable CS0618 // 'DomainName' is obsolete
             return DomainName;
-    #pragma warning restore CS0618
+#pragma warning restore CS0618
         }
 
         /// <summary>
@@ -40,8 +40,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         /// <summary>
         /// The domain names that will be linked to the author's account (e.g., ["example.com", "author-site.com"]).
         /// </summary>
-        public List<string> DomainNames 
-        { 
+        public List<string> DomainNames
+        {
             get => _domainNames;
             set => _domainNames = value ?? new List<string>();
         }

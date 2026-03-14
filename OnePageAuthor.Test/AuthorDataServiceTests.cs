@@ -130,9 +130,9 @@ namespace OnePageAuthor.Test
         {
             _authorRepoMock.Setup(r => r.GetByDomainAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new List<Author>());
-            
+
             var result = await _service.GetAuthorsByDomainAsync("com", "example");
-            
+
             Assert.NotNull(result);
             Assert.Empty(result);
         }
@@ -142,7 +142,7 @@ namespace OnePageAuthor.Test
         {
             var authorId1 = Guid.NewGuid().ToString();
             var authorId2 = Guid.NewGuid().ToString();
-            
+
             var authors = new List<Author>
             {
                 new Author
@@ -177,7 +177,7 @@ namespace OnePageAuthor.Test
 
             _authorRepoMock.Setup(r => r.GetByDomainAsync("com", "example"))
                 .ReturnsAsync(authors);
-            
+
             _bookRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(new List<InkStainedWretch.OnePageAuthorAPI.Entities.Book>());
             _articleRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
@@ -189,10 +189,10 @@ namespace OnePageAuthor.Test
 
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
-            
+
             var author1 = result.FirstOrDefault(a => a.id == authorId1);
             var author2 = result.FirstOrDefault(a => a.id == authorId2);
-            
+
             Assert.NotNull(author1);
             Assert.Equal("Test Author 1", author1.AuthorName);
             Assert.Equal("en", author1.LanguageName);
@@ -200,7 +200,7 @@ namespace OnePageAuthor.Test
             Assert.Equal("author1@example.com", author1.EmailAddress);
             Assert.Equal("com", author1.TopLevelDomain);
             Assert.Equal("example", author1.SecondLevelDomain);
-            
+
             Assert.NotNull(author2);
             Assert.Equal("Test Author 2", author2.AuthorName);
             Assert.Equal("es", author2.LanguageName);

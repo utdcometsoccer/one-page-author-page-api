@@ -145,18 +145,18 @@ namespace OnePageAuthor.Test.DomainRegistration
         /// Note: Tests for authentication flows require integration testing due to static JwtAuthenticationHelper usage.
         /// The tests below focus on what can be unit tested - constructor validation and service dependencies.
         /// </summary>
-        
+
         [Fact]
         public void DomainRegistrationFunction_ValidatesDependencies()
         {
             // This test ensures the function is properly constructed and dependencies are wired
             // The actual HTTP endpoint testing requires integration tests due to static helper methods
-            
+
             // Assert - Constructor succeeded without exceptions
             Assert.NotNull(_function);
         }
 
-        [Fact] 
+        [Fact]
         public void CreateDomainRegistrationRequest_CanBeInstantiated()
         {
             // Arrange & Act

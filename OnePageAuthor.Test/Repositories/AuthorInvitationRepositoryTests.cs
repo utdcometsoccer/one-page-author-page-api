@@ -43,7 +43,7 @@ namespace OnePageAuthor.Test.Repositories
 
             _mockContainer
                 .Setup(c => c.CreateItemAsync(
-                    It.IsAny<AuthorInvitation>(), 
+                    It.IsAny<AuthorInvitation>(),
                     It.IsAny<PartitionKey>()))
                 .ReturnsAsync(mockResponse.Object);
 
@@ -55,10 +55,10 @@ namespace OnePageAuthor.Test.Repositories
             Assert.Equal("test@example.com", result.EmailAddress);
             Assert.Equal("example.com", result.GetPrimaryDomainName());
             Assert.Equal("Pending", result.Status);
-            
+
             _mockContainer.Verify(c => c.CreateItemAsync(
                 It.Is<AuthorInvitation>(i => i.EmailAddress == "test@example.com"),
-                It.Is<PartitionKey>(pk => pk.Equals(new PartitionKey("test@example.com")))), 
+                It.Is<PartitionKey>(pk => pk.Equals(new PartitionKey("test@example.com")))),
                 Times.Once);
         }
 
@@ -140,7 +140,7 @@ namespace OnePageAuthor.Test.Repositories
         {
             // Arrange
             var invitation = new AuthorInvitation("test@example.com", "example.com");
-            
+
             // Act - Accept invitation
             invitation.Status = "Accepted";
             invitation.AcceptedAt = DateTime.UtcNow;

@@ -241,7 +241,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             }
 
             var culture = parts[1];
-            
+
             try
             {
                 var response = await _container.ReadItemAsync<StateProvince>(id, new PartitionKey(culture));

@@ -31,7 +31,7 @@ namespace OnePageAuthor.Test.Services
             _mockDomainValidationService = new Mock<IDomainValidationService>();
             _mockContactValidationService = new Mock<IContactInformationValidationService>();
             _mockSubscriptionValidationService = new Mock<ISubscriptionValidationService>();
-            
+
             _service = new DomainRegistrationService(
                 _mockLogger.Object,
                 _mockRepository.Object,
@@ -146,7 +146,7 @@ namespace OnePageAuthor.Test.Services
             Assert.NotNull(result);
             Assert.Equal(expectedUpn, result.Upn);
             Assert.Equal(domain.FullDomainName, result.Domain.FullDomainName);
-            
+
             _mockDomainValidationService.Verify(x => x.ValidateDomain(domain), Times.Once);
             _mockContactValidationService.Verify(x => x.ValidateContactInformation(contactInfo), Times.Once);
             _mockRepository.Verify(x => x.CreateAsync(It.IsAny<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>()), Times.Once);
@@ -165,12 +165,12 @@ namespace OnePageAuthor.Test.Services
             _mockDomainValidationService.Setup(x => x.ValidateDomain(domain)).Returns(validationResult);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<ArgumentException>(() => 
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateDomainRegistrationAsync(_testUser, domain, contactInfo));
-            
+
             Assert.Contains("Domain validation failed", exception.Message);
             Assert.Contains("Invalid domain", exception.Message);
-            
+
             // Domain validation happens first, so subscription validation should NOT be called
             _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>()), Times.Never);
             _mockDomainValidationService.Verify(x => x.ValidateDomain(domain), Times.Once);
@@ -193,12 +193,12 @@ namespace OnePageAuthor.Test.Services
             _mockContactValidationService.Setup(x => x.ValidateContactInformation(contactInfo)).Returns(validationResult);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<ArgumentException>(() => 
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateDomainRegistrationAsync(_testUser, domain, contactInfo));
-            
+
             Assert.Contains("Contact information validation failed", exception.Message);
             Assert.Contains("Invalid contact info", exception.Message);
-            
+
             _mockSubscriptionValidationService.Verify(x => x.HasValidSubscriptionAsync(_testUser, It.IsAny<string>()), Times.Once);
             _mockDomainValidationService.Verify(x => x.ValidateDomain(domain), Times.Once);
             _mockContactValidationService.Verify(x => x.ValidateContactInformation(contactInfo), Times.Once);
@@ -225,7 +225,7 @@ namespace OnePageAuthor.Test.Services
             Assert.NotNull(result);
             Assert.Single(result);
             Assert.Equal(expectedUpn, result.First().Upn);
-            
+
             _mockUserIdentityService.Verify(x => x.GetUserUpn(_testUser), Times.Once);
             _mockRepository.Verify(x => x.GetByUserAsync(expectedUpn), Times.Once);
         }
@@ -247,7 +247,7 @@ namespace OnePageAuthor.Test.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(expectedUpn, result.Upn);
-            
+
             _mockUserIdentityService.Verify(x => x.GetUserUpn(_testUser), Times.Once);
             _mockRepository.Verify(x => x.GetByIdAsync(registrationId, expectedUpn), Times.Once);
         }
@@ -267,7 +267,7 @@ namespace OnePageAuthor.Test.Services
 
             // Assert
             Assert.Null(result);
-            
+
             _mockUserIdentityService.Verify(x => x.GetUserUpn(_testUser), Times.Once);
             _mockRepository.Verify(x => x.GetByIdAsync(registrationId, expectedUpn), Times.Once);
         }

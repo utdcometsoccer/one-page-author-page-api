@@ -62,11 +62,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
             var key = GetKey(ipAddress, endpoint);
             var tracker = _requestTrackers.GetOrAdd(key, _ => new RequestTracker());
-            
+
             tracker.AddRequest(DateTime.UtcNow);
-            
+
             _logger.LogDebug("Recorded request for IP: {IpAddress}, Endpoint: {Endpoint}", ipAddress, endpoint);
-            
+
             return Task.CompletedTask;
         }
 
@@ -79,7 +79,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 return _maxRequestsPerMinute;
 
             var key = GetKey(ipAddress, endpoint);
-            
+
             if (!_requestTrackers.TryGetValue(key, out var tracker))
                 return _maxRequestsPerMinute;
 
@@ -117,7 +117,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 {
                     // Get current requests and filter out old ones
                     var validRequests = _requests.Where(t => t >= cutoffTime).ToList();
-                    
+
                     // Clear and rebuild the bag with only valid requests
                     while (_requests.TryTake(out _)) { }
                     foreach (var request in validRequests)

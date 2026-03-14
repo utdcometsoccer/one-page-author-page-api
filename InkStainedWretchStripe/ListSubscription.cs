@@ -16,7 +16,7 @@ public class ListSubscription
     private readonly IAuthenticatedFunctionTelemetryService _telemetry;
 
     public ListSubscription(
-        ILogger<ListSubscription> logger, 
+        ILogger<ListSubscription> logger,
         IListSubscriptions listSubscriptions,
         IAuthenticatedFunctionTelemetryService telemetry)
     {
@@ -80,7 +80,7 @@ public class ListSubscription
                 limit: limit,
                 startingAfter: startingAfter,
                 expandLatestInvoicePaymentIntent: expandPI);
-            
+
             // Track success with additional context
             var successProperties = new Dictionary<string, string>
             {
@@ -88,26 +88,26 @@ public class ListSubscription
                 { "Status", status ?? "all" },
                 { "ExpandPaymentIntent", expandPI.ToString() }
             };
-            
+
             var successMetrics = new Dictionary<string, double>
             {
                 { "SubscriptionCount", result.Subscriptions?.Data?.Count ?? 0 },
                 { "HasMore", result.Subscriptions?.HasMore ?? false ? 1 : 0 }
             };
-            
+
             _telemetry.TrackAuthenticatedFunctionSuccess(
                 "ListSubscription",
                 userId,
                 userEmail,
                 successProperties,
                 successMetrics);
-            
+
             _logger.LogInformation(
                 "Successfully listed {Count} subscriptions for customer {CustomerId} by user {UserId}",
                 result.Subscriptions?.Data?.Count ?? 0,
                 customerId,
                 userId ?? "Anonymous");
-            
+
             return new OkObjectResult(result);
         }
         catch (Exception ex)

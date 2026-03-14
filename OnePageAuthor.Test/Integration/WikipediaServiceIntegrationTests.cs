@@ -51,7 +51,7 @@ namespace OnePageAuthor.Test.Integration
             _output.WriteLine($"Extract: {result.Extract?.Substring(0, Math.Min(100, result.Extract.Length))}...");
             _output.WriteLine($"Lead Paragraph: {result.LeadParagraph?.Substring(0, Math.Min(100, result.LeadParagraph.Length))}...");
             _output.WriteLine($"Canonical URL: {result.CanonicalUrl}");
-            
+
             if (result.Thumbnail != null)
             {
                 _output.WriteLine($"Thumbnail: {result.Thumbnail.Source} ({result.Thumbnail.Width}x{result.Thumbnail.Height})");
@@ -75,7 +75,7 @@ namespace OnePageAuthor.Test.Integration
             Assert.NotNull(result);
             Assert.Equal(language, result.Language);
             Assert.NotEmpty(result.Title);
-            
+
             _output.WriteLine($"[{language}] Title: {result.Title}");
             _output.WriteLine($"[{language}] Description: {result.Description}");
         }

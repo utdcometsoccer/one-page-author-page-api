@@ -108,7 +108,7 @@ namespace OnePageAuthor.Test
         {
             // Arrange
             PlatformStatsService.ClearCache(); // Clear static cache for test isolation
-            
+
             var statsRepoMock = new Mock<IPlatformStatsRepository>();
             var authorRepoMock = new Mock<IAuthorRepository>();
             var bookRepoMock = new Mock<IGenericRepository<BookEntity>>();
@@ -152,7 +152,7 @@ namespace OnePageAuthor.Test
         {
             // Arrange
             PlatformStatsService.ClearCache(); // Clear static cache for test isolation
-            
+
             var statsRepoMock = new Mock<IPlatformStatsRepository>();
             var authorRepoMock = new Mock<IAuthorRepository>();
             var bookRepoMock = new Mock<IGenericRepository<BookEntity>>();
@@ -175,7 +175,7 @@ namespace OnePageAuthor.Test
             Assert.NotNull(result);
             // Verify the repository was called
             statsRepoMock.Verify(r => r.GetCurrentStatsAsync(), Times.Once);
-            
+
             // Verify error was logged
             loggerMock.Verify(
                 l => l.Log(

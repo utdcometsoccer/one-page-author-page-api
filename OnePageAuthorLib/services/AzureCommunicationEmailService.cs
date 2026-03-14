@@ -21,10 +21,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             string senderAddress)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            
+
             if (string.IsNullOrWhiteSpace(connectionString))
                 throw new ArgumentException("Connection string cannot be null, empty, or whitespace.", nameof(connectionString));
-            
+
             if (string.IsNullOrWhiteSpace(senderAddress))
                 throw new ArgumentException("Sender address cannot be null, empty, or whitespace.", nameof(senderAddress));
 
@@ -37,11 +37,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             // Validate input parameters
             if (string.IsNullOrWhiteSpace(toEmail))
                 throw new ArgumentException("Recipient email address cannot be null or empty.", nameof(toEmail));
-            
+
             // Validate email format
             if (!IsValidEmail(toEmail))
                 throw new ArgumentException($"Invalid email address format: {toEmail}", nameof(toEmail));
-            
+
             if (string.IsNullOrWhiteSpace(domainName))
                 throw new ArgumentException("Domain name cannot be null or empty.", nameof(domainName));
             if (string.IsNullOrWhiteSpace(invitationId))
@@ -64,7 +64,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                     recipients: new EmailRecipients(new List<EmailAddress> { new EmailAddress(toEmail) }));
 
                 _logger.LogInformation("Sending email via Azure Communication Services to {Email}", toEmail);
-                
+
                 EmailSendOperation emailSendOperation = await _emailClient.SendAsync(
                     WaitUntil.Completed,
                     emailMessage);
@@ -75,7 +75,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             }
             catch (RequestFailedException ex)
             {
-                _logger.LogError(ex, "Azure Communication Services request failed for {Email}. StatusCode: {StatusCode}, ErrorCode: {ErrorCode}", 
+                _logger.LogError(ex, "Azure Communication Services request failed for {Email}. StatusCode: {StatusCode}, ErrorCode: {ErrorCode}",
                     toEmail, ex.Status, ex.ErrorCode);
                 return false;
             }

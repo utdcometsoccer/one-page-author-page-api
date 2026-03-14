@@ -71,7 +71,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                 result.Success = result.Steps.All(s => s.Success);
                 result.TotalCost = 0; // No actual costs in scenario 1
 
-                _logger.LogInformation("[E2E TEST] Scenario 1 completed. Success: {Success}, Duration: {Duration}ms", 
+                _logger.LogInformation("[E2E TEST] Scenario 1 completed. Success: {Success}, Duration: {Duration}ms",
                     result.Success, result.Duration.TotalMilliseconds);
 
                 return new OkObjectResult(result);
@@ -155,7 +155,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                 result.Success = result.Steps.All(s => s.Success);
                 result.TotalCost = result.Steps.Sum(s => s.Cost);
 
-                _logger.LogWarning("[E2E TEST] Scenario 3 completed. Success: {Success}, Total Cost: ${Cost:F2}, Duration: {Duration}ms", 
+                _logger.LogWarning("[E2E TEST] Scenario 3 completed. Success: {Success}, Total Cost: ${Cost:F2}, Duration: {Duration}ms",
                     result.Success, result.TotalCost, result.Duration.TotalMilliseconds);
 
                 return new OkObjectResult(result);
@@ -194,7 +194,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
             step.EndTime = DateTime.UtcNow;
             step.Duration = step.EndTime - step.StartTime;
 
-            _logger.LogInformation("[E2E TEST] Step {StepName}: {Success} - {Message} (${Cost:F2}) [{Duration}ms]", 
+            _logger.LogInformation("[E2E TEST] Step {StepName}: {Success} - {Message} (${Cost:F2}) [{Duration}ms]",
                 stepName, step.Success ? "SUCCESS" : "FAILED", step.Message, step.Cost, step.Duration.TotalMilliseconds);
 
             return step;

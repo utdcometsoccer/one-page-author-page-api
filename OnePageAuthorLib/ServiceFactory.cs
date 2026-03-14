@@ -790,7 +790,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         public static IServiceCollection AddWikipediaServices(this IServiceCollection services)
         {
             // Register HTTP client and service
-            services.AddHttpClient<InkStainedWretch.OnePageAuthorLib.API.Wikipedia.IWikipediaService, 
+            services.AddHttpClient<InkStainedWretch.OnePageAuthorLib.API.Wikipedia.IWikipediaService,
                                    InkStainedWretch.OnePageAuthorLib.API.Wikipedia.WikipediaService>();
 
             return services;
@@ -1059,7 +1059,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
             return services;
         }
 
-         /// <summary>
+        /// <summary>
         /// Registers PlatformStats repository for managing platform statistics.
         /// Call this after registering a singleton Database in DI.
         /// </summary>
@@ -1079,7 +1079,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
             });
 
             return services;
-        }        
+        }
 
         /// <summary>
         /// Registers PlatformStats service for managing and caching platform statistics.
@@ -1110,7 +1110,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
             return services;
         }
 
-         /// <summary>
+        /// <summary>
         /// Registers Lead services for lead capture and management.
         /// </summary>
         public static IServiceCollection AddLeadServices(this IServiceCollection services)
@@ -1156,7 +1156,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
             return services;
         }
 
-        
+
         /// <summary>
         /// Registers Referral repository services for managing referral program data.
         /// Call this after registering a singleton Database in DI.

@@ -45,7 +45,7 @@ namespace InkStainedWretch.OnePageAuthorLib.Entities.Stripe
             ? $"{RecurringIntervalCount} {RecurringInterval}{(RecurringIntervalCount > 1 ? "s" : "")}"
             : "One-time";
         public DateTime CreatedDate { get; set; }
-        
+
         /// <summary>
         /// Indicates if both the price and its associated product are active.
         /// For subscription plans to be truly available, both must be active.

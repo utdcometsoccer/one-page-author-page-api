@@ -23,8 +23,8 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
 
             // Check feature flag
             var useKeyVault = _configuration["USE_KEY_VAULT"];
-            _isEnabled = !string.IsNullOrWhiteSpace(useKeyVault) && 
-                        (useKeyVault.Equals("true", StringComparison.OrdinalIgnoreCase) || 
+            _isEnabled = !string.IsNullOrWhiteSpace(useKeyVault) &&
+                        (useKeyVault.Equals("true", StringComparison.OrdinalIgnoreCase) ||
                          useKeyVault.Equals("1", StringComparison.OrdinalIgnoreCase));
 
             if (_isEnabled)
@@ -73,7 +73,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
                 // Convert environment variable naming to Key Vault naming convention
                 // Replace underscores with hyphens for Key Vault secret names
                 var keyVaultSecretName = secretName.Replace("_", "-");
-                
+
                 var response = await _secretClient!.GetSecretAsync(keyVaultSecretName);
                 _logger.LogDebug("Successfully retrieved secret from Key Vault: {SecretName}", secretName);
                 return response.Value.Value;

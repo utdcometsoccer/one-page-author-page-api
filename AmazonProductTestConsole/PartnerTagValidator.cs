@@ -56,7 +56,7 @@ public static class PartnerTagValidator
             return "Unknown";
 
         var suffix = partnerTag.Split('-').Last();
-        
+
         return suffix switch
         {
             "03" => "Germany (amazon.de)",
@@ -86,7 +86,7 @@ public static class PartnerTagValidator
         Console.WriteLine("3. ✅ Verify the format:");
         Console.WriteLine("   • Should be: storename-XX (e.g., 'mybooks-20')");
         Console.WriteLine("   • US/Canada: ends with -20");
-        Console.WriteLine("   • UK/France: ends with -21"); 
+        Console.WriteLine("   • UK/France: ends with -21");
         Console.WriteLine("   • Germany: ends with -03");
         Console.WriteLine("   • Japan: ends with -22");
         Console.WriteLine();
@@ -108,9 +108,9 @@ public static class PartnerTagValidator
         Console.WriteLine("🔍 Partner Tag Analysis");
         Console.WriteLine(new string('-', 30));
         Console.WriteLine($"Current Tag: '{partnerTag}'");
-        
+
         var (isValid, message) = ValidatePartnerTag(partnerTag);
-        
+
         if (isValid)
         {
             Console.WriteLine($"✅ Validation: {message}");

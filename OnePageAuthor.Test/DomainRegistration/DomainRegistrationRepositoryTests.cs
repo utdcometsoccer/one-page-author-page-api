@@ -66,7 +66,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             Assert.NotNull(result);
             Assert.NotNull(result.id);
             Assert.Equal("test@example.com", result.Upn);
-            _containerMock.Verify(c => c.CreateItemAsync(It.Is<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(dr => 
+            _containerMock.Verify(c => c.CreateItemAsync(It.Is<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(dr =>
                 !string.IsNullOrWhiteSpace(dr.id)), It.IsAny<PartitionKey>()), Times.Once);
         }
 
@@ -88,7 +88,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             // Assert
             Assert.NotNull(result);
             Assert.Equal("existing-id", result.id);
-            _containerMock.Verify(c => c.CreateItemAsync(It.Is<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(dr => 
+            _containerMock.Verify(c => c.CreateItemAsync(It.Is<InkStainedWretch.OnePageAuthorAPI.Entities.DomainRegistration>(dr =>
                 dr.id == "existing-id"), It.IsAny<PartitionKey>()), Times.Once);
         }
 
@@ -100,7 +100,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             domainRegistration.Upn = "";
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _repository.CreateAsync(domainRegistration));
         }
 
@@ -251,7 +251,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             domainRegistration.id = "";
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _repository.UpdateAsync(domainRegistration));
         }
 
@@ -263,7 +263,7 @@ namespace OnePageAuthor.Test.DomainRegistration
             domainRegistration.Upn = "";
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _repository.UpdateAsync(domainRegistration));
         }
 

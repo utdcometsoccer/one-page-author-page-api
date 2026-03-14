@@ -77,13 +77,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                     }
 
                     var domainName = registration.Domain.FullDomainName;
-                    _logger.LogInformation("Processing domain registration {Id} for domain {DomainName}", 
+                    _logger.LogInformation("Processing domain registration {Id} for domain {DomainName}",
                         registration.id, domainName);
 
                     // Only process pending registrations
                     if (registration.Status != DomainRegistrationStatus.Pending)
                     {
-                        _logger.LogInformation("Skipping domain {DomainName} - status is {Status}, expected Pending", 
+                        _logger.LogInformation("Skipping domain {DomainName} - status is {Status}, expected Pending",
                             domainName, registration.Status);
                         continue;
                     }
@@ -101,7 +101,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 
                         if (nameServers.Length >= MinNameServersForWhmcs && nameServers.Length <= MaxNameServersForWhmcs)
                         {
-                            _logger.LogInformation("Retrieved {Count} name servers for domain {DomainName}", 
+                            _logger.LogInformation("Retrieved {Count} name servers for domain {DomainName}",
                                 nameServers.Length, domainName);
                         }
                         else if (nameServers.Length == 0)

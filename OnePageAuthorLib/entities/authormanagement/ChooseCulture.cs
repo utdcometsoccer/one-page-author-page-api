@@ -1,7 +1,7 @@
 namespace InkStainedWretch.OnePageAuthorAPI.Entities.Authormanagement
 {
     public class ChooseCulture : AuthorManagementBase
-    {    
+    {
         public string title { get; set; } = string.Empty;
         public string subtitle { get; set; } = string.Empty;
         public string legend { get; set; } = string.Empty;

@@ -229,7 +229,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         {
             var query = new QueryDefinition("SELECT * FROM c");
             var results = new List<StateProvince>();
-            
+
             using var iterator = _container.GetItemQueryIterator<StateProvince>(query);
             while (iterator.HasMoreResults)
             {

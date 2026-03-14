@@ -14,7 +14,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         /// State or province code (e.g., "CA" for California, "ON" for Ontario).
         /// </summary>
         public string? Code { get; set; }
-        
+
         /// <summary>
         /// The name of the state or province (e.g., "California").
         /// </summary>

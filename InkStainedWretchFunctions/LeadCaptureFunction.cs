@@ -96,10 +96,10 @@ public class LeadCaptureFunction
             if (!LeadSource.IsValid(request.Source))
             {
                 _logger.LogWarning("Invalid source: {Source}", request.Source);
-                return new BadRequestObjectResult(new 
-                { 
-                    error = "Invalid source", 
-                    details = $"Source must be one of: {string.Join(", ", LeadSource.ValidSources)}" 
+                return new BadRequestObjectResult(new
+                {
+                    error = "Invalid source",
+                    details = $"Source must be one of: {string.Join(", ", LeadSource.ValidSources)}"
                 });
             }
 
@@ -113,8 +113,8 @@ public class LeadCaptureFunction
                 "Lead {Status}: {LeadId} for email: {Email}",
                 response.Status, response.Id, request.Email);
 
-            var statusCode = response.Status == LeadCreationStatus.Created 
-                ? StatusCodes.Status201Created 
+            var statusCode = response.Status == LeadCreationStatus.Created
+                ? StatusCodes.Status201Created
                 : StatusCodes.Status200OK;
 
             return new ObjectResult(response)

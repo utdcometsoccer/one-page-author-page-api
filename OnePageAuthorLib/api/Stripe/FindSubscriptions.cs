@@ -97,7 +97,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API.Stripe
                     {
                         var subscriptionDto = MapSubscription(subscription);
                         response.Subscriptions.Add(subscriptionDto);
-                        
+
                         _logger.LogInformation(
                             "Matched subscription {SubscriptionId} with domain {DomainName}",
                             subscription.Id, domainName);

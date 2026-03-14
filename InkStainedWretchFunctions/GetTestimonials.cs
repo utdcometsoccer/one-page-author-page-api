@@ -43,7 +43,7 @@ public class GetTestimonials
         {
             // Parse query parameters
             var queryParams = System.Web.HttpUtility.ParseQueryString(req.Url.Query);
-            
+
             int limit = 5;
             if (queryParams["limit"] != null && int.TryParse(queryParams["limit"], out var parsedLimit))
             {
@@ -68,10 +68,10 @@ public class GetTestimonials
             };
 
             var response = req.CreateResponse(HttpStatusCode.OK);
-            
+
             // Add caching header (15 minutes)
             response.Headers.Add("Cache-Control", "public, max-age=900");
-            
+
             await response.WriteAsJsonAsync(result);
             return response;
         }

@@ -13,13 +13,13 @@ namespace OnePageAuthor.Test.Integration
         {
             // Arrange
             var services = new ServiceCollection();
-            
+
             // Add logging (required by DomainRegistrationService)
             services.AddLogging();
-            
+
             // Add the domain registration services (which should include IUserIdentityService)
             services.AddDomainRegistrationServices();
-            
+
             // Build the service provider
             var serviceProvider = services.BuildServiceProvider();
 
@@ -38,13 +38,13 @@ namespace OnePageAuthor.Test.Integration
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddDomainRegistrationServices();
-            
+
             var serviceProvider = services.BuildServiceProvider();
 
             // Act - Create two scopes and get services from each
             using var scope1 = serviceProvider.CreateScope();
             using var scope2 = serviceProvider.CreateScope();
-            
+
             var service1a = scope1.ServiceProvider.GetRequiredService<IUserIdentityService>();
             var service1b = scope1.ServiceProvider.GetRequiredService<IUserIdentityService>();
             var service2 = scope2.ServiceProvider.GetRequiredService<IUserIdentityService>();
@@ -60,21 +60,21 @@ namespace OnePageAuthor.Test.Integration
             // Arrange
             var services = new ServiceCollection();
             services.AddLogging();
-            
+
             // Mock the repository dependency
             var mockRepo = new Moq.Mock<IDomainRegistrationRepository>();
             services.AddSingleton(mockRepo.Object);
-            
+
             // Mock the subscription validation service dependency
             var mockSubscriptionValidationService = new Moq.Mock<ISubscriptionValidationService>();
             services.AddSingleton(mockSubscriptionValidationService.Object);
-            
+
             // Mock user profile repository (needed by SubscriptionValidationService)
             var mockUserProfileRepo = new Moq.Mock<IUserProfileRepository>();
             services.AddSingleton(mockUserProfileRepo.Object);
-            
+
             services.AddDomainRegistrationServices();
-            
+
             var serviceProvider = services.BuildServiceProvider();
 
             // Act
@@ -91,10 +91,10 @@ namespace OnePageAuthor.Test.Integration
             // Arrange
             var services = new ServiceCollection();
             services.AddLogging();
-            
+
             // Add domain registration services only (no Stripe services)
             services.AddDomainRegistrationServices();
-            
+
             var serviceProvider = services.BuildServiceProvider();
 
             // Act
@@ -111,14 +111,14 @@ namespace OnePageAuthor.Test.Integration
             // Arrange - Simulate the configuration without Stripe API key
             var services = new ServiceCollection();
             services.AddLogging();
-            
+
             // Mock the repository dependency
             var mockRepo = new Moq.Mock<IDomainRegistrationRepository>();
             services.AddSingleton(mockRepo.Object);
-            
+
             // Add domain registration services (which includes NoOp subscription validation)
             services.AddDomainRegistrationServices();
-            
+
             var serviceProvider = services.BuildServiceProvider();
 
             // Act - Should not throw InvalidOperationException

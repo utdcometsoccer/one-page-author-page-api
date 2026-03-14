@@ -71,7 +71,7 @@ try
         {
             config.QueryParameters.Filter = $"appId eq '{targetClientId}'";
         });
-    
+
     var application = applications?.Value?.FirstOrDefault();
     if (application == null)
     {
@@ -89,11 +89,11 @@ try
     }
 
     logger.LogInformation("Step 2: Verifying Personal Microsoft Account limitations...");
-    
+
     // Personal Microsoft Account apps cannot have app roles at all
     // This is a platform limitation - not just that users can't be assigned to roles,
     // but that the roles themselves cannot exist on Personal Microsoft Account apps
-    
+
     if (application.SignInAudience == "PersonalMicrosoftAccount")
     {
         logger.LogInformation("✓ Application is configured for Personal Microsoft Account users");
@@ -107,12 +107,12 @@ try
     }
 
     logger.LogInformation("Step 3: Verifying Cosmos DB tier memberships...");
-    
+
     // Get all memberships from Cosmos DB
     var allMemberships = new List<ImageStorageTierMembership>();
     var membershipContainer = app.Services.GetRequiredService<IContainerManager<ImageStorageTierMembership>>();
     var cosmosContainer = await membershipContainer.EnsureContainerAsync();
-    
+
     var query = new Microsoft.Azure.Cosmos.QueryDefinition("SELECT * FROM c");
     using var iterator = cosmosContainer.GetItemQueryIterator<ImageStorageTierMembership>(query);
     while (iterator.HasMoreResults)
@@ -122,13 +122,13 @@ try
     }
 
     logger.LogInformation("Found {Count} existing tier memberships", allMemberships.Count);
-    
+
     // Show tier distribution
     var tierDistribution = allMemberships
         .GroupBy(m => m.TierId)
         .Select(g => new { TierId = g.Key, Count = g.Count() })
         .ToList();
-        
+
     foreach (var dist in tierDistribution)
     {
         var tier = tiers.FirstOrDefault(t => t.id == dist.TierId);
@@ -142,7 +142,7 @@ try
     logger.LogInformation("Summary:");
     logger.LogInformation("  - Target Application: {AppName} ({ClientId})", application.DisplayName, targetClientId);
     logger.LogInformation("  - Sign-in Audience: {SignInAudience}", application.SignInAudience);
-    logger.LogInformation("  - Available Tiers: {TierCount} ({TierNames})", 
+    logger.LogInformation("  - Available Tiers: {TierCount} ({TierNames})",
         tiers.Count, string.Join(", ", tiers.Select(t => t.Name)));
     logger.LogInformation("  - User Memberships: {Count} users with tier assignments", allMemberships.Count);
     logger.LogInformation("");

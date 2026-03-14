@@ -62,11 +62,11 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
 
             _jwtValidationServiceMock.Setup(x => x.ValidateTokenAsync("valid-jwt-token"))
                 .ReturnsAsync(principal);
-                
-            var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile 
-            { 
-                Oid = userProfileId, 
-                Upn = $"{userProfileId}@test.com" 
+
+            var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile
+            {
+                Oid = userProfileId,
+                Upn = $"{userProfileId}@test.com"
             };
             _userProfileServiceMock.Setup(x => x.EnsureUserProfileAsync(principal))
                 .ReturnsAsync(userProfile);
@@ -102,9 +102,9 @@ namespace OnePageAuthor.Test.ImageAPI.Functions
             _jwtValidationServiceMock.Setup(x => x.ValidateTokenAsync("valid-jwt-token"))
                 .ReturnsAsync(principal);
 
-            var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile 
-            { 
-                Upn = "test@test.com" 
+            var userProfile = new InkStainedWretch.OnePageAuthorAPI.Entities.UserProfile
+            {
+                Upn = "test@test.com"
             };
             _userProfileServiceMock.Setup(x => x.EnsureUserProfileAsync(principal))
                 .ReturnsAsync(userProfile);

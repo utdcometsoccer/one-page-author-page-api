@@ -36,7 +36,7 @@ public class ErrorResponseExtensionsTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(statusCode, result.StatusCode);
-        
+
         var errorResponse = result.Value as ErrorResponse;
         Assert.NotNull(errorResponse);
         Assert.Equal(statusCode, errorResponse!.StatusCode);
@@ -74,7 +74,7 @@ public class ErrorResponseExtensionsTests
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
-        
+
         var errorResponse = result.Value as ErrorResponse;
         Assert.NotNull(errorResponse);
         Assert.Equal("Invalid request parameters", errorResponse!.Error);
@@ -92,7 +92,7 @@ public class ErrorResponseExtensionsTests
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
-        
+
         var errorResponse = result.Value as ErrorResponse;
         Assert.NotNull(errorResponse);
         Assert.Equal("Required parameter is missing", errorResponse!.Error);
@@ -109,7 +109,7 @@ public class ErrorResponseExtensionsTests
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
-        
+
         var errorResponse = result.Value as ErrorResponse;
         Assert.NotNull(errorResponse);
         Assert.Equal("Invalid operation", errorResponse!.Error);
@@ -126,7 +126,7 @@ public class ErrorResponseExtensionsTests
 
         // Assert
         Assert.Equal(StatusCodes.Status401Unauthorized, result.StatusCode);
-        
+
         var errorResponse = result.Value as ErrorResponse;
         Assert.NotNull(errorResponse);
         Assert.Equal("Unauthorized access", errorResponse!.Error);
@@ -143,7 +143,7 @@ public class ErrorResponseExtensionsTests
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
-        
+
         var errorResponse = result.Value as ErrorResponse;
         Assert.NotNull(errorResponse);
         Assert.Equal("Resource not found", errorResponse!.Error);
@@ -160,7 +160,7 @@ public class ErrorResponseExtensionsTests
 
         // Assert
         Assert.Equal(StatusCodes.Status500InternalServerError, result.StatusCode);
-        
+
         var errorResponse = result.Value as ErrorResponse;
         Assert.NotNull(errorResponse);
         Assert.Equal("An unexpected error occurred", errorResponse!.Error);
@@ -195,7 +195,7 @@ public class ErrorResponseExtensionsTests
         var errorResponse = result.Value as ErrorResponse;
         Assert.NotNull(errorResponse);
         Assert.NotNull(errorResponse!.TraceId);
-        
+
         // Verify logger was called
         _mockLogger.Verify(
             x => x.Log(

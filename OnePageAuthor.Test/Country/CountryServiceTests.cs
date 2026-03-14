@@ -23,7 +23,7 @@ namespace OnePageAuthor.Test.Country
         public void Constructor_WithNullRepository_ThrowsArgumentNullException()
         {
             // Act & Assert
-            var exception = Assert.Throws<ArgumentNullException>(() => 
+            var exception = Assert.Throws<ArgumentNullException>(() =>
                 new CountryService(null!, _loggerMock.Object));
             Assert.Equal("repository", exception.ParamName);
         }
@@ -32,7 +32,7 @@ namespace OnePageAuthor.Test.Country
         public void Constructor_WithNullLogger_ThrowsArgumentNullException()
         {
             // Act & Assert
-            var exception = Assert.Throws<ArgumentNullException>(() => 
+            var exception = Assert.Throws<ArgumentNullException>(() =>
                 new CountryService(_repositoryMock.Object, null!));
             Assert.Equal("logger", exception.ParamName);
         }
@@ -74,11 +74,11 @@ namespace OnePageAuthor.Test.Country
         public async Task GetCountryByCodeAndLanguageAsync_WithValidParameters_ReturnsCountry()
         {
             // Arrange
-            var country = new InkStainedWretch.OnePageAuthorAPI.Entities.Country 
-            { 
-                Code = "US", 
-                Name = "United States", 
-                Language = "en" 
+            var country = new InkStainedWretch.OnePageAuthorAPI.Entities.Country
+            {
+                Code = "US",
+                Name = "United States",
+                Language = "en"
             };
             _repositoryMock.Setup(x => x.GetByCodeAndLanguageAsync("US", "en"))
                 .ReturnsAsync(country);
@@ -107,11 +107,11 @@ namespace OnePageAuthor.Test.Country
         public async Task CreateCountryAsync_WithValidCountry_CreatesCountry()
         {
             // Arrange
-            var country = new InkStainedWretch.OnePageAuthorAPI.Entities.Country 
-            { 
-                Code = "US", 
-                Name = "United States", 
-                Language = "en" 
+            var country = new InkStainedWretch.OnePageAuthorAPI.Entities.Country
+            {
+                Code = "US",
+                Name = "United States",
+                Language = "en"
             };
             _repositoryMock.Setup(x => x.ExistsByCodeAndLanguageAsync("US", "en"))
                 .ReturnsAsync(false);
@@ -131,17 +131,17 @@ namespace OnePageAuthor.Test.Country
         public async Task CreateCountryAsync_WithExistingCountry_ThrowsInvalidOperationException()
         {
             // Arrange
-            var country = new InkStainedWretch.OnePageAuthorAPI.Entities.Country 
-            { 
-                Code = "US", 
-                Name = "United States", 
-                Language = "en" 
+            var country = new InkStainedWretch.OnePageAuthorAPI.Entities.Country
+            {
+                Code = "US",
+                Name = "United States",
+                Language = "en"
             };
             _repositoryMock.Setup(x => x.ExistsByCodeAndLanguageAsync("US", "en"))
                 .ReturnsAsync(true);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _service.CreateCountryAsync(country));
         }
 
@@ -149,7 +149,7 @@ namespace OnePageAuthor.Test.Country
         public async Task CreateCountryAsync_WithNullCountry_ThrowsArgumentNullException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 _service.CreateCountryAsync(null!));
         }
 
@@ -157,15 +157,15 @@ namespace OnePageAuthor.Test.Country
         public async Task CreateCountryAsync_WithInvalidCode_ThrowsArgumentException()
         {
             // Arrange
-            var country = new InkStainedWretch.OnePageAuthorAPI.Entities.Country 
-            { 
+            var country = new InkStainedWretch.OnePageAuthorAPI.Entities.Country
+            {
                 Code = "USA", // Invalid - should be 2 characters
-                Name = "United States", 
-                Language = "en" 
+                Name = "United States",
+                Language = "en"
             };
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _service.CreateCountryAsync(country));
         }
 

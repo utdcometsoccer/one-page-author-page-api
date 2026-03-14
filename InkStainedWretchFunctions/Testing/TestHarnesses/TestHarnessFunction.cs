@@ -37,7 +37,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                     return new BadRequestObjectResult("Missing domainName in request body");
                 }
 
-                _logger.LogInformation("[TEST HARNESS] Testing Front Door operation: {Operation} for domain: {DomainName}", 
+                _logger.LogInformation("[TEST HARNESS] Testing Front Door operation: {Operation} for domain: {DomainName}",
                     testRequest.Operation, testRequest.DomainName);
 
                 var result = new TestResult
@@ -100,7 +100,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.TestHarnesses
                     return new BadRequestObjectResult("Missing domainName in request body");
                 }
 
-                _logger.LogInformation("[TEST HARNESS] Testing DNS Zone operation: {Operation} for domain: {DomainName}", 
+                _logger.LogInformation("[TEST HARNESS] Testing DNS Zone operation: {Operation} for domain: {DomainName}",
                     testRequest.Operation, testRequest.DomainName);
 
                 var result = new TestResult

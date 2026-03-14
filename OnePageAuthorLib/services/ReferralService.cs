@@ -60,7 +60,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             var retries = 0;
             const int maxRetries = 5;
             var codeExists = await _referralRepository.GetByReferralCodeAsync(referralCode);
-            
+
             while (codeExists != null && retries < maxRetries)
             {
                 referralCode = GenerateReferralCode();
@@ -125,7 +125,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
             using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
             var bytes = new byte[8];
             rng.GetBytes(bytes);
-            
+
             var code = new string(bytes.Select(b => chars[b % chars.Length]).ToArray());
             return code;
         }

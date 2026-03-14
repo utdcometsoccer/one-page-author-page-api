@@ -27,7 +27,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            
+
             if (configuration == null)
             {
                 throw new ArgumentNullException(nameof(configuration));
@@ -36,12 +36,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             _apiUrl = configuration["WHMCS_API_URL"];
             _apiIdentifier = configuration["WHMCS_API_IDENTIFIER"];
             _apiSecret = configuration["WHMCS_API_SECRET"];
-            
+
             // Check if WHMCS is configured
             _isConfigured = !string.IsNullOrWhiteSpace(_apiUrl) &&
                            !string.IsNullOrWhiteSpace(_apiIdentifier) &&
                            !string.IsNullOrWhiteSpace(_apiSecret);
-            
+
             if (!_isConfigured)
             {
                 _logger.LogWarning("WHMCS integration is not configured. Domain registration via WHMCS will be skipped.");
@@ -69,7 +69,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 _logger.LogInformation("WHMCS integration is not configured, skipping domain registration");
                 return false;
             }
-            
+
             if (domainRegistration?.Domain == null)
             {
                 _logger.LogWarning("Domain registration or domain is null");
@@ -95,34 +95,34 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 if (domainRegistration.ContactInformation != null)
                 {
                     var contact = domainRegistration.ContactInformation;
-                    
+
                     if (!string.IsNullOrWhiteSpace(contact.FirstName))
                         requestData["firstname"] = contact.FirstName;
-                    
+
                     if (!string.IsNullOrWhiteSpace(contact.LastName))
                         requestData["lastname"] = contact.LastName;
-                    
+
                     if (!string.IsNullOrWhiteSpace(contact.EmailAddress))
                         requestData["email"] = contact.EmailAddress;
-                    
+
                     if (!string.IsNullOrWhiteSpace(contact.Address))
                         requestData["address1"] = contact.Address;
-                    
+
                     if (!string.IsNullOrWhiteSpace(contact.Address2))
                         requestData["address2"] = contact.Address2;
-                    
+
                     if (!string.IsNullOrWhiteSpace(contact.City))
                         requestData["city"] = contact.City;
-                    
+
                     if (!string.IsNullOrWhiteSpace(contact.State))
                         requestData["state"] = contact.State;
-                    
+
                     if (!string.IsNullOrWhiteSpace(contact.ZipCode))
                         requestData["postcode"] = contact.ZipCode;
-                    
+
                     if (!string.IsNullOrWhiteSpace(contact.Country))
                         requestData["country"] = contact.Country;
-                    
+
                     if (!string.IsNullOrWhiteSpace(contact.TelephoneNumber))
                         requestData["phonenumber"] = contact.TelephoneNumber;
                 }
@@ -134,7 +134,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogWarning("WHMCS API returned error status {StatusCode} for domain {DomainName}", 
+                    _logger.LogWarning("WHMCS API returned error status {StatusCode} for domain {DomainName}",
                         response.StatusCode, domainName);
                     return false;
                 }
@@ -150,7 +150,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 else
                 {
                     var errorMessage = jsonResponse?.Message ?? "Unknown error";
-                    _logger.LogWarning("WHMCS API returned non-success result for domain {DomainName}: {Message}", 
+                    _logger.LogWarning("WHMCS API returned non-success result for domain {DomainName}: {Message}",
                         domainName, errorMessage);
                     return false;
                 }
@@ -407,7 +407,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         {
             [JsonPropertyName("result")]
             public string? Result { get; set; }
-            
+
             [JsonPropertyName("message")]
             public string? Message { get; set; }
         }

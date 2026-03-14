@@ -40,15 +40,15 @@ public class GetPlatformStats
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "stats/platform")] HttpRequestData req)
     {
         _logger.LogInformation("Received request for platform statistics");
-        
+
         // Service handles errors gracefully and never throws
         var stats = await _platformStatsService.GetPlatformStatsAsync();
-        
+
         var response = req.CreateResponse(HttpStatusCode.OK);
-        
+
         // Add cache control header to enable browser caching for 1 hour
         response.Headers.Add("Cache-Control", "public, max-age=3600");
-        
+
         await response.WriteAsJsonAsync(new
         {
             activeAuthors = stats.ActiveAuthors,
@@ -58,7 +58,7 @@ public class GetPlatformStats
             countriesServed = stats.CountriesServed,
             lastUpdated = stats.LastUpdated
         });
-        
+
         _logger.LogInformation("Successfully returned platform statistics");
         return response;
     }

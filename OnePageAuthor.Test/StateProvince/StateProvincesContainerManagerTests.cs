@@ -31,12 +31,12 @@ namespace OnePageAuthor.Test.StateProvince
             // Arrange
             var containerResponse = new Mock<ContainerResponse>();
             containerResponse.SetupGet(x => x.Container).Returns(_containerMock.Object);
-            
+
             _databaseMock.Setup(x => x.CreateContainerIfNotExistsAsync(
-                It.IsAny<string>(), 
-                It.IsAny<string>(), 
-                null, 
-                null, 
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                null,
+                null,
                 CancellationToken.None))
                 .ReturnsAsync(containerResponse.Object);
 
@@ -46,10 +46,10 @@ namespace OnePageAuthor.Test.StateProvince
             // Assert
             Assert.Equal(_containerMock.Object, result);
             _databaseMock.Verify(x => x.CreateContainerIfNotExistsAsync(
-                It.IsAny<string>(), 
-                It.IsAny<string>(), 
-                null, 
-                null, 
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                null,
+                null,
                 CancellationToken.None), Times.Once);
         }
     }

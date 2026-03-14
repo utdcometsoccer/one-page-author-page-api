@@ -53,7 +53,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API.ImageServices
 
             // Personal Microsoft Account apps cannot have app roles, so we skip JWT role checking
             // and go directly to Cosmos DB membership lookup
-            
+
             try
             {
                 var membership = await _membershipRepository.GetForUserAsync(userProfileId);
@@ -78,7 +78,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API.ImageServices
 
             // No existing membership found - assign default tier for new users
             _logger.LogInformation("User {UserProfileId} has no tier assignment, creating default membership", userProfileId);
-            
+
             // Try to find "Starter" tier first
             var defaultTier = await _tierRepository.GetByNameAsync("Starter");
             if (defaultTier == null)

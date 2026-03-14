@@ -22,7 +22,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.Mocks
         {
             if (_testConfig.EnableTestLogging)
             {
-                _logger.LogInformation("[MOCK] CreateDnsZoneAsync called for domain: {DomainName} in scenario: {TestScenario}", 
+                _logger.LogInformation("[MOCK] CreateDnsZoneAsync called for domain: {DomainName} in scenario: {TestScenario}",
                     domainRegistration.Domain?.FullDomainName, _testConfig.TestScenario);
             }
 
@@ -39,13 +39,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.Mocks
                     await Task.Delay(10000); // Simulate timeout
                     return false;
                 default:
-                    _logger.LogInformation("[MOCK] Successfully created DNS zone for domain {DomainName}", 
+                    _logger.LogInformation("[MOCK] Successfully created DNS zone for domain {DomainName}",
                         domainRegistration.Domain?.FullDomainName);
-                    
+
                     // Log estimated cost for testing
                     var estimatedCost = 0.50m; // Azure DNS zone cost
                     _logger.LogInformation("[MOCK] Estimated cost for DNS zone: ${Cost:F2}", estimatedCost);
-                    
+
                     return true;
             }
         }
@@ -70,7 +70,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.Mocks
             }
 
             await Task.Delay(50);
-            
+
             // Simulate DNS zone existence based on test scenario
             switch (_testConfig.TestScenario.ToLower())
             {
@@ -92,7 +92,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.Mocks
             }
 
             await Task.Delay(100);
-            
+
             // Return mock name servers
             return new[]
             {
@@ -107,20 +107,20 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.Testing.Mocks
         {
             if (_testConfig.EnableTestLogging)
             {
-                _logger.LogInformation("[MOCK] EnsureDnsZoneExistsAsync called for domain: {DomainName}", 
+                _logger.LogInformation("[MOCK] EnsureDnsZoneExistsAsync called for domain: {DomainName}",
                     domainRegistration.Domain?.FullDomainName);
             }
 
             // Check if DNS zone exists first
             var exists = await DnsZoneExistsAsync(domainRegistration.Domain?.FullDomainName ?? "");
-            
+
             if (!exists)
             {
                 // Create DNS zone if it doesn't exist
                 return await CreateDnsZoneAsync(domainRegistration);
             }
 
-            _logger.LogInformation("[MOCK] DNS zone already exists for domain {DomainName}", 
+            _logger.LogInformation("[MOCK] DNS zone already exists for domain {DomainName}",
                 domainRegistration.Domain?.FullDomainName);
             return true;
         }

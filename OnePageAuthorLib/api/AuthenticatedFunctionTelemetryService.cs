@@ -150,7 +150,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API
         public static string? ExtractUserId(ClaimsPrincipal? user)
         {
             if (user == null) return null;
-            
+
             // Try common claim types for user ID
             return user.FindFirst(ClaimTypes.NameIdentifier)?.Value
                 ?? user.FindFirst("sub")?.Value
@@ -164,7 +164,7 @@ namespace InkStainedWretch.OnePageAuthorLib.API
         public static string? ExtractUserEmail(ClaimsPrincipal? user)
         {
             if (user == null) return null;
-            
+
             // Try common claim types for email
             return user.FindFirst(ClaimTypes.Email)?.Value
                 ?? user.FindFirst("email")?.Value

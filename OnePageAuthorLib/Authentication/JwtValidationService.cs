@@ -131,7 +131,7 @@ public class JwtValidationService : IJwtValidationService, IDisposable
                 throw new InvalidOperationException("OpenID Connect metadata URL is not configured. Set AAD_TENANT_ID or OPEN_ID_CONNECT_METADATA_URL.");
             }
 
-            _logger.LogInformation("Initializing ConfigurationManager with metadata URL: {MetadataUrl}", 
+            _logger.LogInformation("Initializing ConfigurationManager with metadata URL: {MetadataUrl}",
                 Utility.MaskUrl(openIdMetadataUrl));
 
             // Create configuration manager with automatic refresh settings
@@ -228,7 +228,7 @@ public class JwtValidationService : IJwtValidationService, IDisposable
         catch (SecurityTokenSignatureKeyNotFoundException ex)
         {
             _logger.LogWarning(ex, "Signing key not found in current configuration. Attempting to refresh metadata and retry validation.");
-            
+
             // Force refresh the configuration to get latest signing keys
             // This handles the case where Azure AD has rotated keys
             // Note: Only one retry attempt is made. If the refreshed metadata still doesn't contain

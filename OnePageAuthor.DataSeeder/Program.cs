@@ -49,16 +49,16 @@ namespace OnePageAuthorAPI.DataSeeder
 
                     // Get configuration from user secrets, environment variables, or appsettings
                     // Standardize configuration keys and require explicit configuration for production safety
-                    var cosmosEndpoint = configuration["COSMOSDB_ENDPOINT_URI"] 
+                    var cosmosEndpoint = configuration["COSMOSDB_ENDPOINT_URI"]
                         ?? configuration["CosmosDb:Endpoint"]
                         ?? Environment.GetEnvironmentVariable("COSMOS_DB_ENDPOINT")
                         ?? throw new InvalidOperationException("COSMOSDB_ENDPOINT_URI is required. For development, you can use the emulator endpoint: https://localhost:8081");
-                    
+
                     var cosmosKey = configuration["COSMOSDB_PRIMARY_KEY"]
                         ?? configuration["CosmosDb:Key"]
                         ?? Environment.GetEnvironmentVariable("COSMOS_DB_KEY")
                         ?? throw new InvalidOperationException("COSMOSDB_PRIMARY_KEY is required. For development, you can use the emulator key: C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==");
-                    
+
                     var databaseId = configuration["COSMOSDB_DATABASE_ID"]
                         ?? configuration["CosmosDb:Database"]
                         ?? Environment.GetEnvironmentVariable("COSMOS_DB_DATABASE")
@@ -130,11 +130,11 @@ namespace OnePageAuthorAPI.DataSeeder
                 try
                 {
                     // Skip entries with missing required data
-                    if (string.IsNullOrWhiteSpace(stateProvince.Country) || 
-                        string.IsNullOrWhiteSpace(stateProvince.Culture) || 
+                    if (string.IsNullOrWhiteSpace(stateProvince.Country) ||
+                        string.IsNullOrWhiteSpace(stateProvince.Culture) ||
                         string.IsNullOrWhiteSpace(stateProvince.Code))
                     {
-                        _logger.LogWarning("Skipping entry with missing data: Country={Country}, Culture={Culture}, Code={Code}", 
+                        _logger.LogWarning("Skipping entry with missing data: Country={Country}, Culture={Culture}, Code={Code}",
                             stateProvince.Country, stateProvince.Culture, stateProvince.Code);
                         errorCount++;
                         continue;
@@ -149,14 +149,14 @@ namespace OnePageAuthorAPI.DataSeeder
                         // If it already exists, CosmosException with Conflict status will be thrown
                         await _repository.AddAsync(stateProvince);
                         createdCount++;
-                        _logger.LogDebug("Created: {Code} - {Name} ({Culture})", 
+                        _logger.LogDebug("Created: {Code} - {Name} ({Culture})",
                             stateProvince.Code, stateProvince.Name, stateProvince.Culture);
                     }
                     catch (Microsoft.Azure.Cosmos.CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
                     {
                         // Entry already exists, skip it (this makes the operation idempotent)
                         skippedCount++;
-                        _logger.LogDebug("Skipped (already exists): {Code} - {Name} ({Culture})", 
+                        _logger.LogDebug("Skipped (already exists): {Code} - {Name} ({Culture})",
                             stateProvince.Code, stateProvince.Name, stateProvince.Culture);
                     }
                 }
@@ -168,7 +168,7 @@ namespace OnePageAuthorAPI.DataSeeder
                 }
             }
 
-            _logger.LogInformation("Idempotent data seeding completed. Created: {CreatedCount}, Skipped: {SkippedCount}, Errors: {ErrorCount}", 
+            _logger.LogInformation("Idempotent data seeding completed. Created: {CreatedCount}, Skipped: {SkippedCount}, Errors: {ErrorCount}",
                 createdCount, skippedCount, errorCount);
         }
 

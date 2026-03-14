@@ -78,9 +78,9 @@ namespace OnePageAuthor.Test.API
         public void GetUserUpn_ThrowsException_NullUser()
         {
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => 
+            var exception = Assert.Throws<InvalidOperationException>(() =>
                 _service.GetUserUpn(null!));
-            
+
             Assert.Equal("User is not authenticated", exception.Message);
         }
 
@@ -96,9 +96,9 @@ namespace OnePageAuthor.Test.API
             var user = new ClaimsPrincipal(identity);
 
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => 
+            var exception = Assert.Throws<InvalidOperationException>(() =>
                 _service.GetUserUpn(user));
-            
+
             Assert.Equal("User is not authenticated", exception.Message);
         }
 
@@ -114,9 +114,9 @@ namespace OnePageAuthor.Test.API
             var user = new ClaimsPrincipal(identity);
 
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => 
+            var exception = Assert.Throws<InvalidOperationException>(() =>
                 _service.GetUserUpn(user));
-            
+
             Assert.Equal("User UPN or email claim is required", exception.Message);
         }
 
@@ -133,9 +133,9 @@ namespace OnePageAuthor.Test.API
             var user = new ClaimsPrincipal(identity);
 
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => 
+            var exception = Assert.Throws<InvalidOperationException>(() =>
                 _service.GetUserUpn(user));
-            
+
             Assert.Equal("User UPN or email claim is required", exception.Message);
         }
 
@@ -152,9 +152,9 @@ namespace OnePageAuthor.Test.API
             var user = new ClaimsPrincipal(identity);
 
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => 
+            var exception = Assert.Throws<InvalidOperationException>(() =>
                 _service.GetUserUpn(user));
-            
+
             Assert.Equal("User UPN or email claim is required", exception.Message);
         }
 

@@ -65,7 +65,7 @@ public class FindSubscription
     private readonly IAuthenticatedFunctionTelemetryService _telemetry;
 
     public FindSubscription(
-        ILogger<FindSubscription> logger, 
+        ILogger<FindSubscription> logger,
         IFindSubscriptions findSubscriptions,
         IAuthenticatedFunctionTelemetryService telemetry)
     {
@@ -127,7 +127,7 @@ public class FindSubscription
         try
         {
             var result = await _findSubscriptions.FindByEmailAndDomainAsync(email, domain);
-            
+
             // Track success with additional context
             var successProperties = new Dictionary<string, string>
             {
@@ -136,26 +136,26 @@ public class FindSubscription
                 { "CustomerFound", result.CustomerFound.ToString() },
                 { "SubscriptionsFound", result.SubscriptionsFound.ToString() }
             };
-            
+
             var successMetrics = new Dictionary<string, double>
             {
                 { "SubscriptionCount", result.Subscriptions?.Count ?? 0 }
             };
-            
+
             _telemetry.TrackAuthenticatedFunctionSuccess(
                 "FindSubscription",
                 userId,
                 userEmail,
                 successProperties,
                 successMetrics);
-            
+
             _logger.LogInformation(
                 "Successfully found {Count} subscriptions for email {Email} and domain {Domain} by user {UserId}",
                 result.Subscriptions?.Count ?? 0,
                 email,
                 domain,
                 userId ?? "Anonymous");
-            
+
             return new OkObjectResult(result);
         }
         catch (ArgumentException ex)

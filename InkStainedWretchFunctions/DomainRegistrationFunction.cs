@@ -336,7 +336,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 // Convert to response DTOs
                 var response = domainRegistrations.Select(DomainRegistrationResponse.FromEntity).ToList();
 
-                _logger.LogInformation("Retrieved {Count} domain registrations for user: {Upn}", 
+                _logger.LogInformation("Retrieved {Count} domain registrations for user: {Upn}",
                     response.Count, userProfile.Upn);
 
                 return new OkObjectResult(response);
@@ -390,7 +390,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
 
                 if (domainRegistration == null)
                 {
-                    _logger.LogInformation("Domain registration {RegistrationId} not found for user: {Upn}", 
+                    _logger.LogInformation("Domain registration {RegistrationId} not found for user: {Upn}",
                         registrationId, userProfile.Upn);
                     return new NotFoundObjectResult($"Domain registration {registrationId} not found");
                 }
@@ -398,7 +398,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions
                 // Convert to response DTO
                 var response = DomainRegistrationResponse.FromEntity(domainRegistration);
 
-                _logger.LogInformation("Retrieved domain registration {RegistrationId} for user: {Upn}", 
+                _logger.LogInformation("Retrieved domain registration {RegistrationId} for user: {Upn}",
                     registrationId, userProfile.Upn);
 
                 return new OkObjectResult(response);

@@ -140,16 +140,16 @@ namespace OnePageAuthor.Test.FunctionApp
             Assert.IsType<ContentResult>(result);
             var contentResult = result as ContentResult;
             Assert.NotNull(contentResult);
-            
+
             // Verify XML declaration
             Assert.Contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", contentResult.Content);
-            
+
             // Verify correct domain URL
             Assert.Contains("https://testsite.org", contentResult.Content);
-            
+
             // Verify lastmod format (should be yyyy-MM-dd)
             Assert.Contains("<lastmod>2024-06-15</lastmod>", contentResult.Content);
-            
+
             // Verify all required sitemap elements
             Assert.Contains("<url>", contentResult.Content);
             Assert.Contains("<loc>", contentResult.Content);

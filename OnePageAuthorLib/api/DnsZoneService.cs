@@ -26,7 +26,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             IConfiguration configuration)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            
+
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
 
@@ -63,7 +63,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
 
             var domainName = domainRegistration.Domain.FullDomainName;
-            
+
             if (string.IsNullOrWhiteSpace(domainName))
             {
                 _logger.LogWarning("Domain name is empty");
@@ -205,7 +205,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 }
 
                 var nameServers = dnsZone.Value.Data.NameServers.ToArray();
-                _logger.LogInformation("Retrieved {Count} name servers for domain {DomainName}: {NameServers}", 
+                _logger.LogInformation("Retrieved {Count} name servers for domain {DomainName}: {NameServers}",
                     nameServers.Length, domainName, string.Join(", ", nameServers));
 
                 return nameServers;

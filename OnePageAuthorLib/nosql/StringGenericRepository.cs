@@ -45,7 +45,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
         {
             var query = new QueryDefinition("SELECT * FROM c");
             var results = new List<TEntity>();
-            
+
             using var iterator = _container.GetItemQueryIterator<TEntity>(query);
             while (iterator.HasMoreResults)
             {
@@ -69,7 +69,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             // Use reflection to get the id property for partitioning
             var idProperty = entity.GetType().GetProperty("id");
             var id = idProperty?.GetValue(entity)?.ToString();
-            
+
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException("Entity must have a non-empty id property");
 
@@ -90,7 +90,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             // Use reflection to get the id property for partitioning
             var idProperty = entity.GetType().GetProperty("id");
             var id = idProperty?.GetValue(entity)?.ToString();
-            
+
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException("Entity must have a non-empty id property");
 

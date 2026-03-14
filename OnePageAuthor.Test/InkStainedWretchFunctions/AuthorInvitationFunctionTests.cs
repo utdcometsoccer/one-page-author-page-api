@@ -513,7 +513,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
 
             // Act - Serialize to JSON (simulating Cosmos DB write)
             var json = System.Text.Json.JsonSerializer.Serialize(invitation);
-            
+
             // Deserialize from JSON (simulating Cosmos DB read)
             var deserialized = System.Text.Json.JsonSerializer.Deserialize<AuthorInvitation>(json);
 
@@ -522,7 +522,7 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             Assert.Equal(2, deserialized.DomainNames.Count);
             Assert.Equal("whoisidaho.com", deserialized.DomainNames[0]);
             Assert.Equal("edokpayi.com", deserialized.DomainNames[1]);
-            
+
             // Verify no duplicates by checking distinct count
             Assert.Equal(deserialized.DomainNames.Count, deserialized.DomainNames.Distinct().Count());
         }
@@ -536,10 +536,10 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             invitation.DomainName = "oldsite.com";
 #pragma warning restore CS0618
             invitation.EmailAddress = "old@example.com";
-            
+
             // Act - Call migration method (what repository does)
             invitation.EnsureDomainNamesMigrated();
-            
+
             // Assert - DomainNames should be populated from DomainName
             Assert.Single(invitation.DomainNames);
             Assert.Equal("oldsite.com", invitation.DomainNames[0]);
@@ -551,10 +551,10 @@ namespace OnePageAuthor.Test.InkStainedWretchFunctions
             // Arrange - Create invitation with domains already set
             var domains = new List<string> { "example.com", "site.com" };
             var invitation = new AuthorInvitation("test@example.com", domains, "test");
-            
+
             // Act - Call migration method (should not modify existing data)
             invitation.EnsureDomainNamesMigrated();
-            
+
             // Assert - DomainNames should remain unchanged
             Assert.Equal(2, invitation.DomainNames.Count);
             Assert.Equal("example.com", invitation.DomainNames[0]);

@@ -31,7 +31,7 @@ public class GetSitemap
         {
             // Get domain registration to retrieve last update information
             var domainRegistration = await _domainRegistrationRepository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
-            
+
             if (domainRegistration == null)
             {
                 _logger.LogWarning($"Domain registration not found for {secondLevelDomain}.{topLevelDomain}");
@@ -40,10 +40,10 @@ public class GetSitemap
 
             // Build the full domain URL
             var domainUrl = $"https://{secondLevelDomain}.{topLevelDomain}";
-            
+
             // Generate sitemap XML
             var sitemapXml = GenerateSitemap(domainUrl, domainRegistration.LastUpdatedAt);
-            
+
             // Return with appropriate content type
             return new ContentResult
             {
@@ -62,7 +62,7 @@ public class GetSitemap
     private static string GenerateSitemap(string domainUrl, DateTime lastUpdated)
     {
         XNamespace ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
-        
+
         var urlset = new XElement(ns + "urlset",
             new XElement(ns + "url",
                 new XElement(ns + "loc", domainUrl),

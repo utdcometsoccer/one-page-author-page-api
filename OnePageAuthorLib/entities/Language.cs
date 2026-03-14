@@ -14,7 +14,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         /// ISO 639-1 two-letter language code (e.g., "en", "es", "fr", "ar", "zh").
         /// </summary>
         public string? Code { get; set; }
-        
+
         /// <summary>
         /// The name of the language in the requested language (e.g., "English" for en-US, "Inglés" for es-MX).
         /// </summary>

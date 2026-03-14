@@ -43,7 +43,7 @@ class Program
             Console.WriteLine("=========");
 
             // Pretty print the JSON response
-            var jsonString = JsonSerializer.Serialize(result, new JsonSerializerOptions 
+            var jsonString = JsonSerializer.Serialize(result, new JsonSerializerOptions
             {
                 WriteIndented = true
             });
@@ -110,7 +110,7 @@ class Program
                 // Register Amazon Product API services
                 services.AddSingleton<IAmazonProductConfig, AmazonProductConfig>();
                 services.AddHttpClient<IAmazonProductService, AmazonProductService>();
-                
+
                 // Alternative registration if you prefer transient
                 // services.AddTransient<IAmazonProductService, AmazonProductService>();
             });
@@ -133,7 +133,7 @@ public static class AmazonServiceExtensions
             {
                 using var result = await service.SearchBooksByAuthorAsync(author);
                 Console.WriteLine($"✅ Success for {author}");
-                
+
                 // Extract some basic info from the response
                 if (result.RootElement.TryGetProperty("SearchResult", out var searchResult) &&
                     searchResult.TryGetProperty("Items", out var items) &&
@@ -168,7 +168,7 @@ public static class AmazonServiceExtensions
     {
         if (string.IsNullOrEmpty(secret) || secret.Length <= 8)
             return "[HIDDEN]";
-        
+
         return secret.Substring(0, 4) + "****" + secret.Substring(secret.Length - 4);
     }
 }
