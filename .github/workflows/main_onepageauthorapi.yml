@@ -184,11 +184,13 @@ jobs:
           echo "Version: ${{ env.VERSION }}"
           echo "Informational Version: ${{ env.INFORMATIONAL_VERSION }}"
           pushd '${{ env.WHMCS_WORKER_SERVICE_PATH }}'
-          # -r linux-x64 with --self-contained false produces a framework-dependent
-          # publish trimmed for the Linux x64 target (excludes Windows/macOS binaries).
+          # Produce a self-contained Linux x64 publish output so the VM does NOT
+          # need a preinstalled .NET runtime.
           dotnet publish --configuration Release \
             -r linux-x64 \
-            --self-contained false \
+            --self-contained true \
+            /p:PublishSingleFile=true \
+            /p:IncludeNativeLibrariesForSelfExtract=true \
             --output ./output \
             /p:Version=${{ env.VERSION }} \
             /p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
@@ -1165,6 +1167,8 @@ jobs:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
           DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
         run: |
+          set -euo pipefail
+
           if [ "$DEPLOY_WHMCS_WORKER" != "true" ] || \
              [ -z "$WHMCS_WORKER_RESOURCE_GROUP" ] || \
              [ -z "$AZURE_STORAGE_CONNECTION_STRING" ]; then
@@ -1205,14 +1209,31 @@ jobs:
             --full-uri \
             --output tsv)
 
+          if [ -z "$SAS_URL" ]; then
+            echo "❌ Failed to generate SAS URL for blob '$BLOB'"
+            exit 1
+          fi
+
+          # Mask the raw SAS URL in logs and pass a base64-encoded value to the VM
+          # to avoid quoting/shell-special-character issues (e.g., '&', '?', '=').
+          echo "::add-mask::$SAS_URL"
+          SAS_URL_B64=$(printf '%s' "$SAS_URL" | base64 -w0)
+          echo "::add-mask::$SAS_URL_B64"
+
           # Define the deployment script as a variable to avoid quoting issues.
           # The script is self-contained: it installs any missing prerequisites
-          # (unzip, aspnetcore-runtime-10.0, whmcsworker system user, directories)
+          # (wget, unzip, whmcsworker system user, directories)
           # so that it works on both a freshly provisioned VM (where cloud-init may
           # have already run) and on an existing VM that predates the cloud-init changes.
           DEPLOY_SCRIPT=$(cat << 'SCRIPTEOF'
-          set -e
-          DOWNLOAD_URL="$1"
+          set -euo pipefail
+
+          if [ -z "${downloadUrlB64:-}" ]; then
+            echo "❌ Missing required parameter: downloadUrlB64"
+            exit 1
+          fi
+
+          DOWNLOAD_URL="$(printf '%s' "${downloadUrlB64}" | base64 -d)"
           DEPLOY_ZIP="/tmp/whmcs-worker-deploy.zip"
           DEPLOY_DIR="/tmp/whmcs-worker-stage"
           INSTALL_DIR="/opt/whmcs-worker"
@@ -1220,16 +1241,12 @@ jobs:
 
           # ---- Ensure prerequisites ----
           # set -e is active, so any unhandled failure here will abort the script.
-          if ! command -v unzip &>/dev/null || ! command -v dotnet &>/dev/null; then
-            echo "Installing prerequisites..."
-            if ! dpkg -s 'packages-microsoft-prod' &>/dev/null; then
-              wget -q https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb \
-                -O /tmp/packages-microsoft-prod.deb
-              dpkg -i /tmp/packages-microsoft-prod.deb
-              rm /tmp/packages-microsoft-prod.deb
-              apt-get update -y
-            fi
-            apt-get install -y --no-install-recommends aspnetcore-runtime-10.0 unzip
+          echo "Ensuring prerequisites..."
+
+          if ! command -v wget &>/dev/null || ! command -v unzip &>/dev/null; then
+            # Always refresh package lists before installing.
+            apt-get update -y
+            apt-get install -y --no-install-recommends ca-certificates wget unzip
           fi
 
           # ---- Ensure service user and directories ----
@@ -1251,6 +1268,16 @@ jobs:
           echo "Installing application files..."
           cp -r "$DEPLOY_DIR"/. "$INSTALL_DIR/"
 
+          # Zips may not preserve executable bit; enforce it for the self-contained binary.
+          if [ -f "$INSTALL_DIR/WhmcsWorkerService" ]; then
+            chmod 755 "$INSTALL_DIR/WhmcsWorkerService" || true
+          else
+            echo "❌ Expected self-contained binary not found at $INSTALL_DIR/WhmcsWorkerService"
+            echo "Contents of install dir:"
+            ls -la "$INSTALL_DIR" || true
+            exit 1
+          fi
+
           echo "Setting ownership..."
           chown -R whmcsworker:whmcsworker "$INSTALL_DIR" /var/log/whmcs-worker || \
             echo "⚠️ chown failed for $INSTALL_DIR and/or /var/log/whmcs-worker; check permissions"
@@ -1265,19 +1292,46 @@ jobs:
           systemctl enable "$SERVICE"
           systemctl start "$SERVICE"
 
+          echo "\n--- PROOF: systemd status ---"
+          systemctl --no-pager --full status "$SERVICE" || true
+
+          echo "\n--- PROOF: is-active ---"
+          if systemctl is-active --quiet "$SERVICE"; then
+            echo "PROOF_SERVICE_ACTIVE=active"
+          else
+            echo "PROOF_SERVICE_ACTIVE=inactive"
+            echo "\n--- PROOF: recent logs (last 200 lines) ---"
+            journalctl -u "$SERVICE" -n 200 --no-pager || true
+            exit 1
+          fi
+
+          echo "\n--- PROOF: deployed files ---"
+          ls -la "$INSTALL_DIR" || true
+          sha256sum "$INSTALL_DIR/WhmcsWorkerService" 2>/dev/null || true
+
           rm -f "$DEPLOY_ZIP" && rm -rf "$DEPLOY_DIR"
-          echo "Deployment complete."
-          systemctl status "$SERVICE" --no-pager || true
+          echo "PROOF_DEPLOYMENT=OK"
           SCRIPTEOF
           )
 
           echo "🚀 Deploying to VM: $VM_NAME"
-          az vm run-command invoke \
+          VM_MESSAGE=$(az vm run-command invoke \
             --resource-group "$WHMCS_WORKER_RESOURCE_GROUP" \
             --name "$VM_NAME" \
             --command-id RunShellScript \
             --scripts "$DEPLOY_SCRIPT" \
-            --parameters "$SAS_URL" \
-            --output json
+            --parameters "downloadUrlB64=$SAS_URL_B64" \
+            --query "value[0].message" \
+            --output tsv)
 
-          echo "✓ WhmcsWorkerService deployed to VM"
+          # Print VM stdout/stderr into the GitHub Actions log.
+          echo "$VM_MESSAGE"
+
+          # Hard gate: require an explicit proof marker so the pipeline can't
+          # silently pass when the extension succeeds but the script fails.
+          echo "$VM_MESSAGE" | grep -q "PROOF_DEPLOYMENT=OK" || {
+            echo "❌ Worker deployment did not produce proof marker. Failing step."
+            exit 1
+          }
+
+          echo "✓ WhmcsWorkerService deployed to VM (proof verified)"
