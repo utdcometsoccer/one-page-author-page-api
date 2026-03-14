@@ -736,6 +736,9 @@ Azure Functions have dynamic outbound IPs that cannot be added to a WHMCS IP all
    # Optional:
    APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=...;IngestionEndpoint=...;
    WHMCS_WORKER_LOG_LEVEL=Information
+   # systemd watchdog defaults (used ONLY if systemd-provided NOTIFY_SOCKET/WATCHDOG_* are missing or blank)
+   WHMCS_SYSTEMD_NOTIFY_SOCKET=/run/systemd/notify
+   WHMCS_SYSTEMD_WATCHDOG_USEC=30000000
    EOF
    sudo chmod 600 /etc/whmcs-worker/environment
    sudo chown root:root /etc/whmcs-worker/environment

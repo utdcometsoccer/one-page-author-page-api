@@ -36,6 +36,12 @@ param applicationInsightsConnectionString string = ''
 @description('Minimum log level for the WHMCS worker (WHMCS_WORKER_LOG_LEVEL)')
 param whmcsWorkerLogLevel string = 'Information'
 
+@description('Default systemd notify socket path used by the worker only when NOTIFY_SOCKET is missing/blank (WHMCS_SYSTEMD_NOTIFY_SOCKET).')
+param whmcsSystemdNotifySocket string = '/run/systemd/notify'
+
+@description('Default systemd watchdog interval in microseconds used by the worker only when WATCHDOG_USEC is missing/blank (WHMCS_SYSTEMD_WATCHDOG_USEC).')
+param whmcsSystemdWatchdogUsec string = '30000000'
+
 @description('Change this value to force the environment configuration extension to re-run (e.g., GitHub Actions run number).')
 param environmentConfigTimestamp int = 0
 
@@ -79,7 +85,7 @@ var aiLine = empty(applicationInsightsConnectionString)
   ? ''
   : 'APPLICATIONINSIGHTS_CONNECTION_STRING=${applicationInsightsConnectionString}\n'
 
-var envFileContent = 'SERVICE_BUS_CONNECTION_STRING=${serviceBusConnectionString}\nSERVICE_BUS_WHMCS_QUEUE_NAME=${serviceBusWhmcsQueueName}\nWHMCS_API_URL=${whmcsApiUrl}\nWHMCS_API_IDENTIFIER=${whmcsApiIdentifier}\nWHMCS_API_SECRET=${whmcsApiSecret}\n${aiLine}WHMCS_WORKER_LOG_LEVEL=${whmcsWorkerLogLevel}\n'
+var envFileContent = 'SERVICE_BUS_CONNECTION_STRING=${serviceBusConnectionString}\nSERVICE_BUS_WHMCS_QUEUE_NAME=${serviceBusWhmcsQueueName}\nWHMCS_API_URL=${whmcsApiUrl}\nWHMCS_API_IDENTIFIER=${whmcsApiIdentifier}\nWHMCS_API_SECRET=${whmcsApiSecret}\n${aiLine}WHMCS_WORKER_LOG_LEVEL=${whmcsWorkerLogLevel}\nWHMCS_SYSTEMD_NOTIFY_SOCKET=${whmcsSystemdNotifySocket}\nWHMCS_SYSTEMD_WATCHDOG_USEC=${whmcsSystemdWatchdogUsec}\n'
 
 var configureEnvironmentScript = '''#!/bin/sh
 set -e
