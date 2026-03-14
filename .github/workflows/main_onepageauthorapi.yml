@@ -1226,7 +1226,7 @@ jobs:
           # so that it works on both a freshly provisioned VM (where cloud-init may
           # have already run) and on an existing VM that predates the cloud-init changes.
           DEPLOY_SCRIPT=$(cat << 'SCRIPTEOF'
-          set -euo pipefail
+          set -eu
 
           if [ -z "${downloadUrlB64:-}" ]; then
             echo "❌ Missing required parameter: downloadUrlB64"
@@ -1243,7 +1243,7 @@ jobs:
           # set -e is active, so any unhandled failure here will abort the script.
           echo "Ensuring prerequisites..."
 
-          if ! command -v wget &>/dev/null || ! command -v unzip &>/dev/null; then
+          if ! command -v wget >/dev/null 2>&1 || ! command -v unzip >/dev/null 2>&1; then
             # Always refresh package lists before installing.
             apt-get update -y
             apt-get install -y --no-install-recommends ca-certificates wget unzip
