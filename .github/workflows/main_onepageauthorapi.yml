@@ -1197,9 +1197,12 @@ jobs:
             --overwrite \
             --output none
 
-          # Generate a time-limited SAS URL (valid 30 minutes) for the VM to download.
+          # Generate a time-limited SAS URL (valid 90 minutes) for the VM to download.
+          # A longer window is required because apt-get update on a VM with a failing
+          # Microsoft packages repo can take 50+ minutes due to TLS retries; a 30-minute
+          # window expired before wget could download the artifact (GitHub issue).
           # date -u -d requires GNU date, which is available on ubuntu-latest runners.
-          EXPIRY=$(date -u -d "+30 minutes" '+%Y-%m-%dT%H:%MZ')
+          EXPIRY=$(date -u -d "+90 minutes" '+%Y-%m-%dT%H:%MZ')
           SAS_URL=$(az storage blob generate-sas \
             --container-name "$CONTAINER" \
             --name "$BLOB" \
@@ -1244,9 +1247,17 @@ jobs:
           echo "Ensuring prerequisites..."
 
           if ! command -v wget >/dev/null 2>&1 || ! command -v unzip >/dev/null 2>&1; then
-            # Always refresh package lists before installing.
-            apt-get update -y
-            apt-get install -y --no-install-recommends ca-certificates wget unzip
+            # Refresh package lists. Apply a per-source HTTP/HTTPS timeout (30 s) so
+            # a failing repo (e.g. packages.microsoft.com TLS error) does not block
+            # the update for 50+ minutes and cause the SAS download URL to expire.
+            # Suppress interactive debconf prompts that appear without a TTY.
+            DEBIAN_FRONTEND=noninteractive \
+              apt-get -o Acquire::http::Timeout=30 \
+                      -o Acquire::https::Timeout=30 \
+                      -o Acquire::Retries=1 \
+                      update -y || true
+            DEBIAN_FRONTEND=noninteractive \
+              apt-get install -y --no-install-recommends ca-certificates wget unzip
           fi
 
           # ---- Ensure service user and directories ----
