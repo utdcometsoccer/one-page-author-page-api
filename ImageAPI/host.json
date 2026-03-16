@@ -3,7 +3,8 @@
     "telemetryMode": "OpenTelemetry",
     "logging": {
         "logLevel": {
-            "default": "Debug"
+            "default": "Debug",
+            "Microsoft.Extensions.Diagnostics.HealthChecks": "None"
         }
     }
 }
