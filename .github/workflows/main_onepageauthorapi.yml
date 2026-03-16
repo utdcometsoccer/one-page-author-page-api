@@ -827,6 +827,8 @@ jobs:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           AZURE_RESOURCE_GROUP_NAME: ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
           AZURE_FRONTDOOR_PROFILE_NAME: ${{ secrets.AZURE_FRONTDOOR_PROFILE_NAME }}
+          SERVICE_BUS_CONNECTION_STRING: ${{ secrets.SERVICE_BUS_CONNECTION_STRING }}
+          SERVICE_BUS_WHMCS_QUEUE_NAME: ${{ secrets.SERVICE_BUS_WHMCS_QUEUE_NAME }}
         run: |
           # Skip if InkStainedWretchFunctions deployment is not enabled
           if [ "$DEPLOY_ISW_FUNCTIONS" != "true" ] || [ -z "$ISW_RESOURCE_GROUP" ] || [ -z "$ISW_BASE_NAME" ]; then
@@ -961,6 +963,32 @@ jobs:
             echo "✓ AZURE_FRONTDOOR_PROFILE_NAME app setting applied to $FUNCTION_APP_NAME"
           else
             echo "⚠️ AZURE_FRONTDOOR_PROFILE_NAME not configured; skipping app setting update"
+          fi
+
+          if [ -n "$SERVICE_BUS_CONNECTION_STRING" ]; then
+            echo "🔧 Setting SERVICE_BUS_CONNECTION_STRING on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "SERVICE_BUS_CONNECTION_STRING=$SERVICE_BUS_CONNECTION_STRING" \
+              --only-show-errors \
+              --output none
+            echo "✓ SERVICE_BUS_CONNECTION_STRING app setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ SERVICE_BUS_CONNECTION_STRING not configured; skipping app setting update"
+          fi
+
+          if [ -n "$SERVICE_BUS_WHMCS_QUEUE_NAME" ]; then
+            echo "🔧 Setting SERVICE_BUS_WHMCS_QUEUE_NAME on $FUNCTION_APP_NAME..."
+            az functionapp config appsettings set \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$ISW_RESOURCE_GROUP" \
+              --settings "SERVICE_BUS_WHMCS_QUEUE_NAME=$SERVICE_BUS_WHMCS_QUEUE_NAME" \
+              --only-show-errors \
+              --output none
+            echo "✓ SERVICE_BUS_WHMCS_QUEUE_NAME app setting applied to $FUNCTION_APP_NAME"
+          else
+            echo "⚠️ SERVICE_BUS_WHMCS_QUEUE_NAME not configured; skipping app setting update"
           fi
 
           echo "✓ InkStainedWretchFunctions deployed successfully"

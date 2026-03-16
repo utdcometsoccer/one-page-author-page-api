@@ -575,7 +575,7 @@ $secretDefinitions = @{
         },
         @{
             Name = "SERVICE_BUS_CONNECTION_STRING"
-            Description = "Service Bus connection string used by the WHMCS Worker Service (overrides the workflow's automatic lookup when set)"
+            Description = "Service Bus connection string used by both InkStainedWretchFunctions (to enqueue domain registrations) and the WHMCS Worker Service (to dequeue and call WHMCS). Required for domain registration to work end-to-end."
             Required = $false
             Example = "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=WhmcsListener;SharedAccessKey=..."
             Category = "Worker"
@@ -583,7 +583,7 @@ $secretDefinitions = @{
         },
         @{
             Name = "SERVICE_BUS_WHMCS_QUEUE_NAME"
-            Description = "Queue name consumed by the WHMCS Worker Service (overrides default 'whmcs-domain-registrations' when set)"
+            Description = "Queue name used by both InkStainedWretchFunctions (to enqueue) and the WHMCS Worker Service (to dequeue). Defaults to 'whmcs-domain-registrations' when not set."
             Required = $false
             Example = "whmcs-domain-registrations"
             Category = "Worker"
