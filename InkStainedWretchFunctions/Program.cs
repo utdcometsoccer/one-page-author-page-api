@@ -63,6 +63,9 @@ if (string.IsNullOrWhiteSpace(configuration["COSMOSDB_CONNECTION_STRING"]))
 
     var synthesizedConnectionString = $"AccountEndpoint={sanitizedEndpoint};AccountKey={sanitizedPrimaryKey};";
     Environment.SetEnvironmentVariable("COSMOSDB_CONNECTION_STRING", synthesizedConnectionString);
+    // Reload IConfigurationRoot so the synthesized value is also visible via IConfiguration
+    // (updating the process environment after config is built does not automatically flow back in).
+    (configuration as IConfigurationRoot)?.Reload();
 }
 
 if (!string.IsNullOrWhiteSpace(stripeApiKey))
