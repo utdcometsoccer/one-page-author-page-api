@@ -50,6 +50,24 @@ var sanitizationApplied =
     (!string.Equals(databaseId, sanitizedDatabaseId, StringComparison.Ordinal));
 Console.WriteLine($"Config sanitization applied: {(sanitizationApplied ? "yes" : "no")}");
 
+// Synthesize COSMOSDB_CONNECTION_STRING from endpoint URI and primary key if not already set.
+// The CosmosDB trigger bindings (DomainRegistrationTrigger, CreateDnsZone) require this setting.
+// Sanitized values are used to strip any surrounding quotes/whitespace that may exist in local config.
+if (string.IsNullOrWhiteSpace(configuration["COSMOSDB_CONNECTION_STRING"]))
+{
+    if (string.IsNullOrWhiteSpace(sanitizedEndpoint) || string.IsNullOrWhiteSpace(sanitizedPrimaryKey))
+    {
+        throw new InvalidOperationException(
+            "COSMOSDB_ENDPOINT_URI and COSMOSDB_PRIMARY_KEY must both be non-empty to synthesize COSMOSDB_CONNECTION_STRING for CosmosDB trigger bindings.");
+    }
+
+    var synthesizedConnectionString = $"AccountEndpoint={sanitizedEndpoint};AccountKey={sanitizedPrimaryKey};";
+    Environment.SetEnvironmentVariable("COSMOSDB_CONNECTION_STRING", synthesizedConnectionString);
+    // Reload IConfigurationRoot so the synthesized value is also visible via IConfiguration
+    // (updating the process environment after config is built does not automatically flow back in).
+    (configuration as IConfigurationRoot)?.Reload();
+}
+
 if (!string.IsNullOrWhiteSpace(stripeApiKey))
 {
     Console.WriteLine($"Stripe API key configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(stripeApiKey)}");

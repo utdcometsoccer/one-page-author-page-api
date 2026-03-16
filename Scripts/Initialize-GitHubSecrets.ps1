@@ -32,11 +32,20 @@
     Prompts for each secret value interactively.
 
 .EXAMPLE
+    .\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.config.json
+    Sets secrets from a JSON configuration file (the recommended local dev file name).
+
+.EXAMPLE
     .\Initialize-GitHubSecrets.ps1 -ConfigFile secrets.json
     Sets secrets from a JSON configuration file.
 
 .EXAMPLE
-    npm run init:secrets:interactive
+    npm run init-secrets
+    Run via NPM script wrapper. Auto-detects secrets.config.json (or secrets.json) in
+    the current directory; no -ConfigFile argument required.
+
+.EXAMPLE
+    npm run init-secrets:interactive
     Run via NPM script wrapper (optional - PowerShell can be used directly).
 
 .NOTES
@@ -1024,9 +1033,42 @@ function Invoke-SecretInitialization {
         Write-Success "Loaded $($secretsToSet.Count) secrets from text file"
     }
     else {
-        Write-Error "No input method specified. Use -Interactive, -ConfigFile, or -SecretsFile"
-        Write-Info "Run with -Help for more information"
-        exit 1
+        # Auto-detect the local secrets file: prefer secrets.config.json, fall back to secrets.json
+        $autoConfigFile = $null
+        foreach ($candidate in @("secrets.config.json", "secrets.json")) {
+            if (Test-Path $candidate) {
+                $autoConfigFile = $candidate
+                break
+            }
+        }
+
+        if ($autoConfigFile) {
+            Write-Info "No input method specified; using auto-detected config file: $autoConfigFile"
+            $config = Get-SecretsFromConfigFile -FilePath $autoConfigFile
+
+            if ($null -eq $config) {
+                exit 1
+            }
+
+            foreach ($category in $secretDefinitions.Keys) {
+                foreach ($secret in $secretDefinitions[$category]) {
+                    $value = $config.($secret.Name)
+                    if (-not [string]::IsNullOrWhiteSpace($value)) {
+                        $secretsToSet[$secret.Name] = @{
+                            Value = $value
+                            Sensitive = $secret.Sensitive -eq $true
+                        }
+                    }
+                }
+            }
+
+            Write-Success "Loaded $($secretsToSet.Count) secrets from $autoConfigFile"
+        }
+        else {
+            Write-Error "No input method specified. Use -Interactive, -ConfigFile, or -SecretsFile"
+            Write-Info "Run with -Help for more information"
+            exit 1
+        }
     }
     
     # Confirmation
