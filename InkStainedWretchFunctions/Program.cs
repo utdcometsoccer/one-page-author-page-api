@@ -34,6 +34,20 @@ var stripeApiKey = configuration["STRIPE_API_KEY"];
 var emailConnectionString = configuration["ACS_CONNECTION_STRING"];
 var emailSenderAddress = configuration["ACS_SENDER_ADDRESS"] ?? "DoNotReply@onepageauthor.com";
 
+// Synthesize COSMOSDB_CONNECTION_STRING from endpoint URI and primary key if not already set.
+// The CosmosDB trigger bindings (DomainRegistrationTrigger, CreateDnsZone) require this setting.
+if (string.IsNullOrWhiteSpace(configuration["COSMOSDB_CONNECTION_STRING"]))
+{
+    if (string.IsNullOrWhiteSpace(endpointUri) || string.IsNullOrWhiteSpace(primaryKey))
+    {
+        throw new InvalidOperationException(
+            "COSMOSDB_ENDPOINT_URI and COSMOSDB_PRIMARY_KEY must both be non-empty to synthesize COSMOSDB_CONNECTION_STRING for CosmosDB trigger bindings.");
+    }
+
+    var synthesizedConnectionString = $"AccountEndpoint={endpointUri};AccountKey={primaryKey};";
+    Environment.SetEnvironmentVariable("COSMOSDB_CONNECTION_STRING", synthesizedConnectionString);
+}
+
 // Log Cosmos DB configuration (masked for security)
 Console.WriteLine($"Cosmos DB Endpoint configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(endpointUri)}");
 Console.WriteLine($"Cosmos DB Primary Key configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskSensitiveValue(primaryKey)}");
