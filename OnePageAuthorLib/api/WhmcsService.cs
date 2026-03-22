@@ -134,8 +134,13 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogWarning("WHMCS API returned error status {StatusCode} for domain {DomainName}",
-                        response.StatusCode, domainName);
+                    _logger.LogError(
+                        "WHMCS domain registration request failed with HTTP status {StatusCode} for domain {DomainName}. " +
+                        "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}, ContactEmail={ContactEmail}",
+                        response.StatusCode, domainName,
+                        domainRegistration.id, domainRegistration.Upn,
+                        Utility.MaskSensitiveValue(_apiIdentifier),
+                        Utility.MaskSensitiveValue(domainRegistration.ContactInformation?.EmailAddress));
                     return false;
                 }
 
@@ -150,24 +155,44 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 else
                 {
                     var errorMessage = jsonResponse?.Message ?? "Unknown error";
-                    _logger.LogWarning("WHMCS API returned non-success result for domain {DomainName}: {Message}",
-                        domainName, errorMessage);
+                    _logger.LogError(
+                        "WHMCS API returned non-success result for domain {DomainName}: {Message}. " +
+                        "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}, ContactEmail={ContactEmail}",
+                        domainName, errorMessage,
+                        domainRegistration.id, domainRegistration.Upn,
+                        Utility.MaskSensitiveValue(_apiIdentifier),
+                        Utility.MaskSensitiveValue(domainRegistration.ContactInformation?.EmailAddress));
                     return false;
                 }
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "HTTP request failed while registering domain {DomainName}", domainName);
+                _logger.LogError(ex,
+                    "HTTP request failed while registering domain {DomainName}. " +
+                    "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}",
+                    domainName,
+                    domainRegistration.id, domainRegistration.Upn,
+                    Utility.MaskSensitiveValue(_apiIdentifier));
                 return false;
             }
             catch (JsonException ex)
             {
-                _logger.LogError(ex, "Failed to parse WHMCS API response for domain {DomainName}", domainName);
+                _logger.LogError(ex,
+                    "Failed to parse WHMCS API response for domain {DomainName}. " +
+                    "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}",
+                    domainName,
+                    domainRegistration.id, domainRegistration.Upn,
+                    Utility.MaskSensitiveValue(_apiIdentifier));
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error while registering domain {DomainName}", domainName);
+                _logger.LogError(ex,
+                    "Unexpected error while registering domain {DomainName}. " +
+                    "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}",
+                    domainName,
+                    domainRegistration.id, domainRegistration.Upn,
+                    Utility.MaskSensitiveValue(_apiIdentifier));
                 return false;
             }
         }
@@ -264,10 +289,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogWarning(
-                        "WHMCS API returned error status {StatusCode} for domain {DomainName} name server update",
+                    _logger.LogError(
+                        "WHMCS domain name server update request failed with HTTP status {StatusCode} for domain {DomainName}. " +
+                        "ApiIdentifier={ApiIdentifier}",
                         response.StatusCode,
-                        domainName);
+                        domainName,
+                        Utility.MaskSensitiveValue(_apiIdentifier));
                     return false;
                 }
 
@@ -281,25 +308,39 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 }
 
                 var errorMessage = jsonResponse?.Message ?? "Unknown error";
-                _logger.LogWarning(
-                    "WHMCS API returned non-success result for domain {DomainName} name server update: {Message}",
+                _logger.LogError(
+                    "WHMCS API returned non-success result for domain {DomainName} name server update: {Message}. " +
+                    "ApiIdentifier={ApiIdentifier}",
                     domainName,
-                    errorMessage);
+                    errorMessage,
+                    Utility.MaskSensitiveValue(_apiIdentifier));
                 return false;
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "HTTP request failed while updating name servers for domain {DomainName}", domainName);
+                _logger.LogError(ex,
+                    "HTTP request failed while updating name servers for domain {DomainName}. " +
+                    "ApiIdentifier={ApiIdentifier}",
+                    domainName,
+                    Utility.MaskSensitiveValue(_apiIdentifier));
                 return false;
             }
             catch (JsonException ex)
             {
-                _logger.LogError(ex, "Failed to parse WHMCS API response for domain {DomainName} name server update", domainName);
+                _logger.LogError(ex,
+                    "Failed to parse WHMCS API response for domain {DomainName} name server update. " +
+                    "ApiIdentifier={ApiIdentifier}",
+                    domainName,
+                    Utility.MaskSensitiveValue(_apiIdentifier));
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error while updating name servers for domain {DomainName}", domainName);
+                _logger.LogError(ex,
+                    "Unexpected error while updating name servers for domain {DomainName}. " +
+                    "ApiIdentifier={ApiIdentifier}",
+                    domainName,
+                    Utility.MaskSensitiveValue(_apiIdentifier));
                 return false;
             }
         }

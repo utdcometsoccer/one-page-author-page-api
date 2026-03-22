@@ -297,6 +297,95 @@ namespace OnePageAuthor.Test.Services
             Assert.False(result);
         }
 
+        [Fact]
+        public async Task RegisterDomainAsync_WithHttpErrorStatus_LogsErrorWithClientIdAndAttendantInfo()
+        {
+            // Arrange
+            SetupHttpResponse(HttpStatusCode.InternalServerError, "Server error");
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            await service.RegisterDomainAsync(registration);
+
+            // Assert – the error log must contain the masked API identifier (client ID),
+            // the registration document ID, the UPN, and the masked contact email.
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) =>
+                        v.ToString()!.Contains("test****fier") &&           // masked ApiIdentifier
+                        v.ToString()!.Contains("test-id-123") &&            // RegistrationId
+                        v.ToString()!.Contains("testuser@example.com") &&   // Upn
+                        v.ToString()!.Contains("john****.com")),             // masked ContactEmail
+                    It.IsAny<Exception?>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task RegisterDomainAsync_WithErrorResponse_LogsErrorWithClientIdAndAttendantInfo()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"error\",\"message\":\"Domain already registered\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            await service.RegisterDomainAsync(registration);
+
+            // Assert – the error log must contain the masked API identifier (client ID),
+            // the registration document ID, the UPN, and the masked contact email.
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) =>
+                        v.ToString()!.Contains("test****fier") &&           // masked ApiIdentifier
+                        v.ToString()!.Contains("test-id-123") &&            // RegistrationId
+                        v.ToString()!.Contains("testuser@example.com") &&   // Upn
+                        v.ToString()!.Contains("john****.com")),             // masked ContactEmail
+                    It.IsAny<Exception?>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task RegisterDomainAsync_WithHttpRequestException_LogsErrorWithClientIdAndAttendantInfo()
+        {
+            // Arrange
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ThrowsAsync(new HttpRequestException("Network error"));
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            await service.RegisterDomainAsync(registration);
+
+            // Assert – the error log must contain the masked API identifier (client ID),
+            // the registration document ID and the UPN.
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) =>
+                        v.ToString()!.Contains("test****fier") &&          // masked ApiIdentifier
+                        v.ToString()!.Contains("test-id-123") &&           // RegistrationId
+                        v.ToString()!.Contains("testuser@example.com")),   // Upn
+                    It.IsAny<Exception?>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
         #endregion
 
         #region UpdateNameServersAsync Tests
@@ -604,6 +693,57 @@ namespace OnePageAuthor.Test.Services
 
             // Assert
             Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithHttpErrorStatus_LogsErrorWithClientId()
+        {
+            // Arrange
+            SetupHttpResponse(HttpStatusCode.InternalServerError, "Server error");
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net" };
+
+            // Act
+            await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert – the error log must contain the masked API identifier (client ID).
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) =>
+                        v.ToString()!.Contains("test****fier") &&   // masked ApiIdentifier
+                        v.ToString()!.Contains("testdomain.com")),  // domain name
+                    It.IsAny<Exception?>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task UpdateNameServersAsync_WithErrorResponse_LogsErrorWithClientId()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"error\",\"message\":\"Invalid domain\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var nameServers = new[] { "ns1-04.azure-dns.com", "ns2-04.azure-dns.net" };
+
+            // Act
+            await service.UpdateNameServersAsync("testdomain.com", nameServers);
+
+            // Assert – the error log must contain the masked API identifier (client ID).
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) =>
+                        v.ToString()!.Contains("test****fier") &&   // masked ApiIdentifier
+                        v.ToString()!.Contains("testdomain.com")),  // domain name
+                    It.IsAny<Exception?>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
         }
 
         #endregion
