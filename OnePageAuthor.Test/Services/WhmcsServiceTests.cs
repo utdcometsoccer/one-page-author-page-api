@@ -1082,5 +1082,418 @@ namespace OnePageAuthor.Test.Services
         }
 
         #endregion
+
+        #region CheckDomainAvailabilityAsync Tests
+
+        [Fact]
+        public async Task CheckDomainAvailabilityAsync_WithMissingConfiguration_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(c => c["WHMCS_API_URL"]).Returns((string?)null);
+            mockConfig.Setup(c => c["WHMCS_API_IDENTIFIER"]).Returns((string?)null);
+            mockConfig.Setup(c => c["WHMCS_API_SECRET"]).Returns((string?)null);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, mockConfig.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.CheckDomainAvailabilityAsync("test.name.ng"));
+        }
+
+        [Fact]
+        public async Task CheckDomainAvailabilityAsync_WithNullDomainName_ThrowsArgumentException()
+        {
+            // Arrange
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                service.CheckDomainAvailabilityAsync(null!));
+        }
+
+        [Fact]
+        public async Task CheckDomainAvailabilityAsync_WithEmptyDomainName_ThrowsArgumentException()
+        {
+            // Arrange
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                service.CheckDomainAvailabilityAsync(""));
+        }
+
+        [Fact]
+        public async Task CheckDomainAvailabilityAsync_WhenStatusIsAvailable_ReturnsTrue()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\",\"status\":\"available\",\"whois\":\"No match for domain test.name.ng.\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            var result = await service.CheckDomainAvailabilityAsync("test.name.ng");
+
+            // Assert
+            Assert.True(result);
+            VerifyHttpRequestMade();
+        }
+
+        [Fact]
+        public async Task CheckDomainAvailabilityAsync_WhenStatusIsUnavailable_ReturnsFalse()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\",\"status\":\"unavailable\",\"whois\":\"Domain is registered.\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            var result = await service.CheckDomainAvailabilityAsync("test.name.ng");
+
+            // Assert — only confirmed-unavailable returns false; no exception
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task CheckDomainAvailabilityAsync_WhenResultIsError_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"error\",\"message\":\"Invalid domain\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert — non-success result is a transient failure, not a confirmed unavailability
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.CheckDomainAvailabilityAsync("test.name.ng"));
+        }
+
+        [Fact]
+        public async Task CheckDomainAvailabilityAsync_WithHttpErrorStatus_ThrowsHttpRequestException()
+        {
+            // Arrange
+            SetupHttpResponse(HttpStatusCode.InternalServerError, "Server error");
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<HttpRequestException>(() =>
+                service.CheckDomainAvailabilityAsync("test.name.ng"));
+        }
+
+        [Fact]
+        public async Task CheckDomainAvailabilityAsync_WithInvalidJson_ThrowsJsonException()
+        {
+            // Arrange
+            SetupHttpResponse(HttpStatusCode.OK, "invalid-json");
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAnyAsync<JsonException>(() =>
+                service.CheckDomainAvailabilityAsync("test.name.ng"));
+        }
+
+        [Fact]
+        public async Task CheckDomainAvailabilityAsync_WithHttpRequestException_PropagatesException()
+        {
+            // Arrange
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ThrowsAsync(new HttpRequestException("Network error"));
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<HttpRequestException>(() =>
+                service.CheckDomainAvailabilityAsync("test.name.ng"));
+        }
+
+        [Fact]
+        public async Task CheckDomainAvailabilityAsync_SendsCorrectFormData()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\",\"status\":\"available\",\"whois\":\"No match for domain test.name.ng.\"}";
+            string? capturedFormContent = null;
+
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Returns<HttpRequestMessage, CancellationToken>((req, ct) =>
+                {
+                    if (req.Content != null)
+                        capturedFormContent = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    return Task.FromResult(new HttpResponseMessage
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                    });
+                });
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            var result = await service.CheckDomainAvailabilityAsync("test.name.ng");
+
+            // Assert
+            Assert.True(result);
+            Assert.NotNull(capturedFormContent);
+            Assert.Contains("action=DomainWhois", capturedFormContent);
+            Assert.Contains("identifier=test-identifier", capturedFormContent);
+            Assert.Contains("secret=test-secret", capturedFormContent);
+            Assert.Contains("domain=test.name.ng", capturedFormContent);
+            Assert.Contains("responsetype=json", capturedFormContent);
+        }
+
+        #endregion
+
+        #region AddOrderAsync Tests
+
+        [Fact]
+        public async Task AddOrderAsync_WithMissingConfiguration_ReturnsFalse()
+        {
+            // Arrange
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(c => c["WHMCS_API_URL"]).Returns((string?)null);
+            mockConfig.Setup(c => c["WHMCS_API_IDENTIFIER"]).Returns((string?)null);
+            mockConfig.Setup(c => c["WHMCS_API_SECRET"]).Returns((string?)null);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, mockConfig.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            var result = await service.AddOrderAsync(registration, [], clientId: "181");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task AddOrderAsync_WithNullRegistration_ReturnsFalse()
+        {
+            // Arrange
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+
+            // Act
+            var result = await service.AddOrderAsync(null!, [], clientId: "181");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task AddOrderAsync_WithNullDomain_ReturnsFalse()
+        {
+            // Arrange
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = new DomainRegistrationEntity { id = "test-id", Domain = null! };
+
+            // Act
+            var result = await service.AddOrderAsync(registration, [], clientId: "181");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task AddOrderAsync_WithSuccessResponse_ReturnsTrue()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\",\"orderid\":264,\"domainids\":\"104\",\"invoiceid\":299}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            var result = await service.AddOrderAsync(registration, [], clientId: "181");
+
+            // Assert
+            Assert.True(result);
+            VerifyHttpRequestMade();
+        }
+
+        [Fact]
+        public async Task AddOrderAsync_WithErrorResponse_ReturnsFalse()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"error\",\"message\":\"Insufficient funds\"}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            var result = await service.AddOrderAsync(registration, [], clientId: "181");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task AddOrderAsync_WithHttpErrorStatus_ReturnsFalse()
+        {
+            // Arrange
+            SetupHttpResponse(HttpStatusCode.InternalServerError, "Server error");
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            var result = await service.AddOrderAsync(registration, [], clientId: "181");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task AddOrderAsync_WithInvalidJson_ReturnsFalse()
+        {
+            // Arrange
+            SetupHttpResponse(HttpStatusCode.OK, "invalid-json");
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            var result = await service.AddOrderAsync(registration, [], clientId: "181");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task AddOrderAsync_WithHttpRequestException_ReturnsFalse()
+        {
+            // Arrange
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ThrowsAsync(new HttpRequestException("Network error"));
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            var result = await service.AddOrderAsync(registration, [], clientId: "181");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task AddOrderAsync_SendsCorrectFormData_WithClientIdAndNameServers()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\",\"orderid\":264,\"domainids\":\"104\",\"invoiceid\":299}";
+            string? capturedFormContent = null;
+
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Returns<HttpRequestMessage, CancellationToken>((req, ct) =>
+                {
+                    if (req.Content != null)
+                        capturedFormContent = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    return Task.FromResult(new HttpResponseMessage
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                    });
+                });
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+            var nameServers = new[] { "ns1.azure.com", "ns2.azure.net", "ns3.azure.org", "ns4.azure.info" };
+
+            // Act
+            var result = await service.AddOrderAsync(registration, nameServers, clientId: "181");
+
+            // Assert
+            Assert.True(result);
+            Assert.NotNull(capturedFormContent);
+
+            // Verify required WHMCS AddOrder parameters
+            Assert.Contains("action=AddOrder", capturedFormContent);
+            Assert.Contains("identifier=test-identifier", capturedFormContent);
+            Assert.Contains("secret=test-secret", capturedFormContent);
+            Assert.Contains("domain%5B0%5D=testdomain.com", capturedFormContent); // domain[0] URL-encoded
+            Assert.Contains("domaintype%5B0%5D=register", capturedFormContent);   // domaintype[0] URL-encoded
+            Assert.Contains("regperiod%5B0%5D=1", capturedFormContent);           // regperiod[0] URL-encoded
+            Assert.Contains("paymentmethod=stripe", capturedFormContent);
+            Assert.Contains("responsetype=json", capturedFormContent);
+            Assert.Contains("clientid=181", capturedFormContent);
+
+            // Verify name servers
+            Assert.Contains("nameserver1=ns1.azure.com", capturedFormContent);
+            Assert.Contains("nameserver2=ns2.azure.net", capturedFormContent);
+            Assert.Contains("nameserver3=ns3.azure.org", capturedFormContent);
+            Assert.Contains("nameserver4=ns4.azure.info", capturedFormContent);
+        }
+
+        [Fact]
+        public async Task AddOrderAsync_WithoutClientId_OmitsClientIdFromRequest()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\",\"orderid\":265,\"domainids\":\"105\",\"invoiceid\":300}";
+            string? capturedFormContent = null;
+
+            _mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Returns<HttpRequestMessage, CancellationToken>((req, ct) =>
+                {
+                    if (req.Content != null)
+                        capturedFormContent = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    return Task.FromResult(new HttpResponseMessage
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                    });
+                });
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act
+            var result = await service.AddOrderAsync(registration, []);
+
+            // Assert
+            Assert.True(result);
+            Assert.NotNull(capturedFormContent);
+            Assert.DoesNotContain("clientid", capturedFormContent);
+        }
+
+        [Fact]
+        public async Task AddOrderAsync_WithNullNameServers_SucceedsWithoutNameServers()
+        {
+            // Arrange
+            var responseJson = "{\"result\":\"success\",\"orderid\":266,\"domainids\":\"106\",\"invoiceid\":301}";
+            SetupHttpResponse(HttpStatusCode.OK, responseJson);
+
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            // Act — passing null for nameServers should not throw
+            var result = await service.AddOrderAsync(registration, null!, clientId: "181");
+
+            // Assert
+            Assert.True(result);
+        }
+
+        #endregion
     }
 }

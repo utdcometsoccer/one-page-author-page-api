@@ -56,6 +56,7 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
             {
                 ["SERVICE_BUS_CONNECTION_STRING"] = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=dGVzdA==",
                 ["SERVICE_BUS_WHMCS_QUEUE_NAME"] = "test-queue",
+                ["WHMCS_CLIENT_ID"] = "181",
             };
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(configData)
@@ -74,7 +75,8 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
 
             // Assert
             Assert.Equal(Outcome.DeadLetterInvalidJson, outcome);
-            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+            _mockWhmcsService.Verify(x => x.CheckDomainAvailabilityAsync(It.IsAny<string>()), Times.Never);
+            _mockWhmcsService.Verify(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>(), It.IsAny<string>()), Times.Never);
         }
 
         #endregion
@@ -91,7 +93,7 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
 
             // Assert
             Assert.Equal(Outcome.DeadLetterMissingData, outcome);
-            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+            _mockWhmcsService.Verify(x => x.CheckDomainAvailabilityAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -104,18 +106,58 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
 
             // Assert
             Assert.Equal(Outcome.DeadLetterMissingData, outcome);
-            _mockWhmcsService.Verify(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()), Times.Never);
+            _mockWhmcsService.Verify(x => x.CheckDomainAvailabilityAsync(It.IsAny<string>()), Times.Never);
         }
 
         #endregion
 
-        #region Abandon: WHMCS registration failure
+        #region Dead-letter: Domain unavailable
 
         [Fact]
-        public async Task ProcessWhmcsMessageAsync_WhenRegistrationReturnsFalse_ReturnsAbandon()
+        public async Task ProcessWhmcsMessageAsync_WhenDomainUnavailable_ReturnsDeadLetterDomainUnavailable()
         {
             var json = MakeMessageJson();
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()))
+            _mockWhmcsService.Setup(x => x.CheckDomainAvailabilityAsync("example.com"))
+                .ReturnsAsync(false);
+
+            // Act
+            var outcome = await _worker.ProcessWhmcsMessageAsync(json, "msg-unavail");
+
+            // Assert
+            Assert.Equal(Outcome.DeadLetterDomainUnavailable, outcome);
+            _mockWhmcsService.Verify(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>(), It.IsAny<string>()), Times.Never);
+        }
+
+        #endregion
+
+        #region Abandon: WhoisCheck failure
+
+        [Fact]
+        public async Task ProcessWhmcsMessageAsync_WhenWhoisCheckThrows_ReturnsAbandon()
+        {
+            var json = MakeMessageJson();
+            _mockWhmcsService.Setup(x => x.CheckDomainAvailabilityAsync(It.IsAny<string>()))
+                .ThrowsAsync(new HttpRequestException("WHMCS unavailable"));
+
+            // Act
+            var outcome = await _worker.ProcessWhmcsMessageAsync(json, "msg-whois-exc");
+
+            // Assert
+            Assert.Equal(Outcome.Abandon, outcome);
+            _mockWhmcsService.Verify(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>(), It.IsAny<string>()), Times.Never);
+        }
+
+        #endregion
+
+        #region Abandon: AddOrder failure
+
+        [Fact]
+        public async Task ProcessWhmcsMessageAsync_WhenAddOrderReturnsFalse_ReturnsAbandon()
+        {
+            var json = MakeMessageJson();
+            _mockWhmcsService.Setup(x => x.CheckDomainAvailabilityAsync("example.com"))
+                .ReturnsAsync(true);
+            _mockWhmcsService.Setup(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>(), It.IsAny<string>()))
                 .ReturnsAsync(false);
 
             // Act
@@ -123,14 +165,15 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
 
             // Assert
             Assert.Equal(Outcome.Abandon, outcome);
-            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync(It.IsAny<string>(), It.IsAny<string[]>()), Times.Never);
         }
 
         [Fact]
-        public async Task ProcessWhmcsMessageAsync_WhenRegistrationThrows_ReturnsAbandon()
+        public async Task ProcessWhmcsMessageAsync_WhenAddOrderThrows_ReturnsAbandon()
         {
             var json = MakeMessageJson();
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()))
+            _mockWhmcsService.Setup(x => x.CheckDomainAvailabilityAsync(It.IsAny<string>()))
+                .ReturnsAsync(true);
+            _mockWhmcsService.Setup(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>(), It.IsAny<string>()))
                 .ThrowsAsync(new HttpRequestException("WHMCS unavailable"));
 
             // Act
@@ -142,13 +185,15 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
 
         #endregion
 
-        #region Complete: Successful registration
+        #region Complete: Successful order
 
         [Fact]
-        public async Task ProcessWhmcsMessageAsync_SuccessfulRegistrationWithNoNameServers_ReturnsComplete()
+        public async Task ProcessWhmcsMessageAsync_SuccessfulOrderWithNoNameServers_ReturnsComplete()
         {
             var json = MakeMessageJson(nameServers: []);
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()))
+            _mockWhmcsService.Setup(x => x.CheckDomainAvailabilityAsync("example.com"))
+                .ReturnsAsync(true);
+            _mockWhmcsService.Setup(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
             // Act
@@ -156,17 +201,18 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
 
             // Assert
             Assert.Equal(Outcome.Complete, outcome);
-            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync(It.IsAny<string>(), It.IsAny<string[]>()), Times.Never);
         }
 
         [Fact]
-        public async Task ProcessWhmcsMessageAsync_SuccessfulRegistrationWithNullNameServers_ReturnsComplete()
+        public async Task ProcessWhmcsMessageAsync_SuccessfulOrderWithNullNameServers_ReturnsComplete()
         {
             // JSON where NameServers is explicitly null
             var raw = new { MessageId = "msg-7", DomainRegistration = new { id = "reg-1", Domain = new { SecondLevelDomain = "example", TopLevelDomain = "com" } }, NameServers = (string[]?)null, EnqueuedAt = DateTime.UtcNow };
             var json = JsonSerializer.Serialize(raw);
 
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()))
+            _mockWhmcsService.Setup(x => x.CheckDomainAvailabilityAsync("example.com"))
+                .ReturnsAsync(true);
+            _mockWhmcsService.Setup(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
             // Act — should not throw NullReferenceException
@@ -177,13 +223,16 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
         }
 
         [Fact]
-        public async Task ProcessWhmcsMessageAsync_SuccessfulRegistrationWithValidNameServers_UpdatesAndReturnsComplete()
+        public async Task ProcessWhmcsMessageAsync_SuccessfulOrderWithNameServers_ReturnsComplete()
         {
             var ns = new[] { "ns1.azure.com", "ns2.azure.net", "ns3.azure.org", "ns4.azure.info" };
             var json = MakeMessageJson(nameServers: ns);
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()))
+            _mockWhmcsService.Setup(x => x.CheckDomainAvailabilityAsync("example.com"))
                 .ReturnsAsync(true);
-            _mockWhmcsService.Setup(x => x.UpdateNameServersAsync("example.com", ns))
+            _mockWhmcsService.Setup(x => x.AddOrderAsync(
+                    It.IsAny<DomainRegistrationEntity>(),
+                    It.Is<string[]>(arr => arr.SequenceEqual(ns)),
+                    "181"))
                 .ReturnsAsync(true);
 
             // Act
@@ -191,84 +240,32 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
 
             // Assert
             Assert.Equal(Outcome.Complete, outcome);
-            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync("example.com", ns), Times.Once);
+            _mockWhmcsService.Verify(x => x.AddOrderAsync(
+                It.IsAny<DomainRegistrationEntity>(),
+                It.Is<string[]>(arr => arr.SequenceEqual(ns)),
+                "181"), Times.Once);
         }
 
         [Fact]
-        public async Task ProcessWhmcsMessageAsync_WhenNameServerUpdateFails_StillReturnsComplete()
+        public async Task ProcessWhmcsMessageAsync_PassesClientIdFromConfiguration()
         {
-            var ns = new[] { "ns1.azure.com", "ns2.azure.net" };
-            var json = MakeMessageJson(nameServers: ns);
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()))
+            var json = MakeMessageJson();
+            _mockWhmcsService.Setup(x => x.CheckDomainAvailabilityAsync("example.com"))
                 .ReturnsAsync(true);
-            _mockWhmcsService.Setup(x => x.UpdateNameServersAsync(It.IsAny<string>(), It.IsAny<string[]>()))
-                .ReturnsAsync(false);
+            _mockWhmcsService.Setup(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>(), "181"))
+                .ReturnsAsync(true);
 
             // Act
-            var outcome = await _worker.ProcessWhmcsMessageAsync(json, "msg-9");
+            var outcome = await _worker.ProcessWhmcsMessageAsync(json, "msg-clientid");
 
-            // Assert – registration succeeded; NS update failure should not abandon
+            // Assert
             Assert.Equal(Outcome.Complete, outcome);
-        }
-
-        [Fact]
-        public async Task ProcessWhmcsMessageAsync_WhenNameServerUpdateThrows_StillReturnsComplete()
-        {
-            var ns = new[] { "ns1.azure.com", "ns2.azure.net" };
-            var json = MakeMessageJson(nameServers: ns);
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()))
-                .ReturnsAsync(true);
-            _mockWhmcsService.Setup(x => x.UpdateNameServersAsync(It.IsAny<string>(), It.IsAny<string[]>()))
-                .ThrowsAsync(new HttpRequestException("WHMCS NS error"));
-
-            // Act
-            var outcome = await _worker.ProcessWhmcsMessageAsync(json, "msg-10");
-
-            // Assert – registration succeeded; NS update exception should not abandon
-            Assert.Equal(Outcome.Complete, outcome);
+            _mockWhmcsService.Verify(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>(), "181"), Times.Once);
         }
 
         #endregion
 
-        #region Name server count validation
-
-        [Theory]
-        [InlineData(1)]   // below minimum
-        [InlineData(6)]   // above maximum
-        public async Task ProcessWhmcsMessageAsync_WithInvalidNameServerCount_SkipsNsUpdateAndReturnsComplete(int count)
-        {
-            var ns = Enumerable.Range(1, count).Select(i => $"ns{i}.azure.com").ToArray();
-            var json = MakeMessageJson(nameServers: ns);
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()))
-                .ReturnsAsync(true);
-
-            // Act
-            var outcome = await _worker.ProcessWhmcsMessageAsync(json, $"msg-ns-{count}");
-
-            // Assert
-            Assert.Equal(Outcome.Complete, outcome);
-            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync(It.IsAny<string>(), It.IsAny<string[]>()), Times.Never);
-        }
-
-        [Theory]
-        [InlineData(2)]   // minimum valid
-        [InlineData(5)]   // maximum valid
-        public async Task ProcessWhmcsMessageAsync_WithValidNameServerCount_CallsUpdateNameServers(int count)
-        {
-            var ns = Enumerable.Range(1, count).Select(i => $"ns{i}.azure.com").ToArray();
-            var json = MakeMessageJson(nameServers: ns);
-            _mockWhmcsService.Setup(x => x.RegisterDomainAsync(It.IsAny<DomainRegistrationEntity>()))
-                .ReturnsAsync(true);
-            _mockWhmcsService.Setup(x => x.UpdateNameServersAsync(It.IsAny<string>(), ns))
-                .ReturnsAsync(true);
-
-            // Act
-            var outcome = await _worker.ProcessWhmcsMessageAsync(json, $"msg-ns-valid-{count}");
-
-            // Assert
-            Assert.Equal(Outcome.Complete, outcome);
-            _mockWhmcsService.Verify(x => x.UpdateNameServersAsync("example.com", ns), Times.Once);
-        }
+        #region Worker constants
 
         [Fact]
         public void Worker_Constants_AreCorrect()

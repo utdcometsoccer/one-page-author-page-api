@@ -67,6 +67,14 @@ partial class Program
         var whmcsService = host.Services.GetRequiredService<IWhmcsService>();
         var domainRepository = host.Services.GetRequiredService<IDomainRegistrationRepository>();
         var logger = host.Services.GetRequiredService<ILogger<Program>>();
+        var configuration = host.Services.GetRequiredService<IConfiguration>();
+        string? clientId = configuration["WHMCS_CLIENT_ID"];
+
+        if (!string.IsNullOrWhiteSpace(clientId))
+            Console.WriteLine($"Using WHMCS client ID: {clientId}");
+        else
+            Console.WriteLine("WHMCS_CLIENT_ID not configured; AddOrder will be called without a clientId.");
+        Console.WriteLine();
 
         try
         {
@@ -76,22 +84,22 @@ partial class Program
                 if (args[0] == "--interactive" || args[0] == "-i")
                 {
                     // Interactive mode: select from database
-                    await RunInteractiveTestsAsync(whmcsService, domainRepository, logger);
+                    await RunInteractiveTestsAsync(whmcsService, domainRepository, logger, clientId);
                 }
                 else if (args[0] == "--upn" && args.Length > 1)
                 {
                     // Filter by UPN from database
-                    await RunTestsFromDatabaseAsync(whmcsService, domainRepository, logger, args[1]);
+                    await RunTestsFromDatabaseAsync(whmcsService, domainRepository, logger, args[1], clientId);
                 }
                 else if (args[0] == "--domain" && args.Length > 2)
                 {
                     // Specify TLD and SLD from command line
-                    await RunSingleDomainTestAsync(whmcsService, domainRepository, logger, args[1], args[2]);
+                    await RunSingleDomainTestAsync(whmcsService, domainRepository, logger, args[1], args[2], clientId);
                 }
                 else if (File.Exists(args[0]))
                 {
                     // Use specified JSON file
-                    await RunTestsFromFileAsync(whmcsService, domainRepository, logger, args[0]);
+                    await RunTestsFromFileAsync(whmcsService, domainRepository, logger, args[0], clientId);
                 }
                 else
                 {
@@ -107,7 +115,7 @@ partial class Program
                 string defaultFile = Path.Combine(dataRoot, "test-domains.json");
                 if (File.Exists(defaultFile))
                 {
-                    await RunTestsFromFileAsync(whmcsService, domainRepository, logger, defaultFile);
+                    await RunTestsFromFileAsync(whmcsService, domainRepository, logger, defaultFile, clientId);
                 }
                 else
                 {
@@ -142,7 +150,8 @@ partial class Program
     static async Task RunInteractiveTestsAsync(
         IWhmcsService whmcsService,
         IDomainRegistrationRepository domainRepository,
-        ILogger logger)
+        ILogger logger,
+        string? clientId)
     {
         Console.WriteLine("Interactive Mode: Select domain registrations from database");
         Console.WriteLine(new string('-', 60));
@@ -157,14 +166,15 @@ partial class Program
             return;
         }
 
-        await RunTestsFromDatabaseAsync(whmcsService, domainRepository, logger, upn);
+        await RunTestsFromDatabaseAsync(whmcsService, domainRepository, logger, upn, clientId);
     }
 
     static async Task RunTestsFromDatabaseAsync(
         IWhmcsService whmcsService,
         IDomainRegistrationRepository domainRepository,
         ILogger logger,
-        string upn)
+        string upn,
+        string? clientId)
     {
         Console.WriteLine($"Retrieving domain registrations for UPN: {upn}");
         Console.WriteLine(new string('-', 60));
@@ -184,7 +194,7 @@ partial class Program
             int testNumber = 1;
             foreach (var registration in registrations)
             {
-                await RunSingleTestAsync(whmcsService, domainRepository, logger, registration, testNumber++);
+                await RunSingleTestAsync(whmcsService, domainRepository, logger, registration, testNumber++, clientId);
             }
 
             Console.WriteLine("\n" + new string('=', 60));
@@ -204,7 +214,8 @@ partial class Program
         IDomainRegistrationRepository domainRepository,
         ILogger logger,
         string topLevelDomain,
-        string secondLevelDomain)
+        string secondLevelDomain,
+        string? clientId)
     {
         Console.WriteLine($"Testing domain: {secondLevelDomain}.{topLevelDomain}");
         Console.WriteLine(new string('-', 60));
@@ -242,7 +253,7 @@ partial class Program
                 };
             }
 
-            await RunSingleTestAsync(whmcsService, domainRepository, logger, registration, 1);
+            await RunSingleTestAsync(whmcsService, domainRepository, logger, registration, 1, clientId);
         }
         catch (Exception ex)
         {
@@ -255,7 +266,8 @@ partial class Program
         IWhmcsService whmcsService,
         IDomainRegistrationRepository domainRepository,
         ILogger logger,
-        string jsonFilePath)
+        string jsonFilePath,
+        string? clientId)
     {
         Console.WriteLine($"Processing test file: {Path.GetFileName(jsonFilePath)}");
         Console.WriteLine(new string('-', 60));
@@ -276,7 +288,7 @@ partial class Program
             int testNumber = 1;
             foreach (var registration in registrations)
             {
-                await RunSingleTestAsync(whmcsService, domainRepository, logger, registration, testNumber++);
+                await RunSingleTestAsync(whmcsService, domainRepository, logger, registration, testNumber++, clientId);
             }
 
             Console.WriteLine("\n" + new string('=', 60));
@@ -301,7 +313,8 @@ partial class Program
         IDomainRegistrationRepository domainRepository,
         ILogger logger,
         DomainRegistration registration,
-        int testNumber)
+        int testNumber,
+        string? clientId)
     {
         Console.WriteLine($"\nTest {testNumber}: {registration.Domain?.FullDomainName ?? "Unknown"}");
         Console.WriteLine(new string('-', 60));
@@ -322,7 +335,6 @@ partial class Program
             // Step 1: Validate registration parameters
             Console.WriteLine($"  Step 1: Validating registration parameters for {domainName}...");
 
-            // Validate contact information
             if (registration.ContactInformation == null)
             {
                 Console.WriteLine("  ❌ FAILED: Missing contact information");
@@ -334,24 +346,74 @@ partial class Program
             Console.WriteLine($"  Location: {registration.ContactInformation.City}, {registration.ContactInformation.State}");
             Console.WriteLine($"  ✓ Registration parameters validated");
 
-            // Step 2: Attempt WHMCS registration (DRY RUN)
-            Console.WriteLine($"  Step 2: Testing WHMCS registration for {domainName}...");
+            // Step 2: Check domain availability via WHMCS DomainWhois
+            Console.WriteLine($"  Step 2: Checking domain availability for {domainName} (DomainWhois)...");
 
-            bool registrationResult = await whmcsService.RegisterDomainAsync(registration);
+            bool isAvailable = await whmcsService.CheckDomainAvailabilityAsync(domainName);
 
-            if (registrationResult)
+            if (isAvailable)
             {
-                Console.WriteLine($"  ✅ WHMCS API registration call succeeded");
+                Console.WriteLine($"  ✅ Domain {domainName} is available");
             }
             else
             {
-                Console.WriteLine($"  ⚠️  WHMCS API registration call returned false (check logs for details)");
+                Console.WriteLine($"  ⚠️  Domain {domainName} is not available or check failed (check logs for details)");
+                Console.WriteLine($"  ⚠️  TEST COMPLETED WITH WARNINGS: domain availability check returned false");
+                return;
             }
 
-            // Step 3: Verify database record could be created
-            Console.WriteLine($"  Step 3: Verifying database compatibility...");
+            // Step 3: Get TLD pricing via WHMCS GetTLDPricing
+            Console.WriteLine($"  Step 3: Retrieving TLD pricing for {registration.Domain.TopLevelDomain} (GetTLDPricing)...");
 
-            // Check if record already exists in DB
+            try
+            {
+                using var pricingDoc = await whmcsService.GetTLDPricingAsync();
+                if (pricingDoc.RootElement.TryGetProperty("pricing", out var pricingProp))
+                {
+                    if (pricingProp.TryGetProperty(registration.Domain.TopLevelDomain, out var tldPricing))
+                    {
+                        Console.WriteLine($"  ✅ TLD pricing retrieved for {registration.Domain.TopLevelDomain}");
+                        if (tldPricing.TryGetProperty("register", out var registerPricing))
+                        {
+                            Console.WriteLine($"  Registration pricing: {registerPricing}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"  ℹ️  TLD '{registration.Domain.TopLevelDomain}' not found in pricing response");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"  ℹ️  Pricing data not present in response");
+                }
+            }
+            catch (Exception pricingEx)
+            {
+                Console.WriteLine($"  ⚠️  TLD pricing check failed: {pricingEx.Message} (continuing with order)");
+            }
+
+            // Step 4: Place domain order via WHMCS AddOrder
+            // Empty nameservers are intentional here: the diagnostic harness does not manage DNS zones,
+            // so WHMCS will use the registrar's default nameservers for the test order.
+            Console.WriteLine($"  Step 4: Placing domain order for {domainName} (AddOrder)...");
+
+            bool orderResult = await whmcsService.AddOrderAsync(registration, [], clientId);
+
+            if (orderResult)
+            {
+                Console.WriteLine($"  ✅ WHMCS API order placed successfully for {domainName}");
+                Console.WriteLine($"  ✅ TEST PASSED: {domainName} order completed successfully");
+            }
+            else
+            {
+                Console.WriteLine($"  ⚠️  WHMCS API order returned false for {domainName} (check logs for details)");
+                Console.WriteLine($"  ⚠️  TEST COMPLETED WITH WARNINGS: {domainName} order returned false");
+            }
+
+            // Step 5: Verify database record
+            Console.WriteLine($"  Step 5: Verifying database compatibility...");
+
             var existing = await domainRepository.GetByDomainAsync(
                 registration.Domain.TopLevelDomain,
                 registration.Domain.SecondLevelDomain);
@@ -363,15 +425,6 @@ partial class Program
             {
                 Console.WriteLine($"  ✓ Domain is new and ready for database insertion");
             }
-
-            if (registrationResult)
-            {
-                Console.WriteLine($"  ✅ TEST PASSED: {domainName} registration completed successfully");
-            }
-            else
-            {
-                Console.WriteLine($"  ⚠️  TEST COMPLETED WITH WARNINGS: {domainName} registration returned false");
-            }
         }
         catch (Exception ex)
         {
@@ -380,6 +433,3 @@ partial class Program
         }
     }
 }
-
-// Program class needed for User Secrets generic type parameter
-public partial class Program { }
