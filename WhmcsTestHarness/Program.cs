@@ -322,7 +322,6 @@ partial class Program
             // Step 1: Validate registration parameters
             Console.WriteLine($"  Step 1: Validating registration parameters for {domainName}...");
 
-            // Validate contact information
             if (registration.ContactInformation == null)
             {
                 Console.WriteLine("  ❌ FAILED: Missing contact information");
@@ -334,24 +333,74 @@ partial class Program
             Console.WriteLine($"  Location: {registration.ContactInformation.City}, {registration.ContactInformation.State}");
             Console.WriteLine($"  ✓ Registration parameters validated");
 
-            // Step 2: Attempt WHMCS registration (DRY RUN)
-            Console.WriteLine($"  Step 2: Testing WHMCS registration for {domainName}...");
+            // Step 2: Check domain availability via WHMCS DomainWhois
+            Console.WriteLine($"  Step 2: Checking domain availability for {domainName} (DomainWhois)...");
 
-            bool registrationResult = await whmcsService.RegisterDomainAsync(registration);
+            bool isAvailable = await whmcsService.CheckDomainAvailabilityAsync(domainName);
 
-            if (registrationResult)
+            if (isAvailable)
             {
-                Console.WriteLine($"  ✅ WHMCS API registration call succeeded");
+                Console.WriteLine($"  ✅ Domain {domainName} is available");
             }
             else
             {
-                Console.WriteLine($"  ⚠️  WHMCS API registration call returned false (check logs for details)");
+                Console.WriteLine($"  ⚠️  Domain {domainName} is not available or check failed (check logs for details)");
+                Console.WriteLine($"  ⚠️  TEST COMPLETED WITH WARNINGS: domain availability check returned false");
+                return;
             }
 
-            // Step 3: Verify database record could be created
-            Console.WriteLine($"  Step 3: Verifying database compatibility...");
+            // Step 3: Get TLD pricing via WHMCS GetTLDPricing
+            Console.WriteLine($"  Step 3: Retrieving TLD pricing for {registration.Domain.TopLevelDomain} (GetTLDPricing)...");
 
-            // Check if record already exists in DB
+            try
+            {
+                using var pricingDoc = await whmcsService.GetTLDPricingAsync();
+                if (pricingDoc.RootElement.TryGetProperty("pricing", out var pricingProp))
+                {
+                    if (pricingProp.TryGetProperty(registration.Domain.TopLevelDomain, out var tldPricing))
+                    {
+                        Console.WriteLine($"  ✅ TLD pricing retrieved for {registration.Domain.TopLevelDomain}");
+                        if (tldPricing.TryGetProperty("register", out var registerPricing))
+                        {
+                            Console.WriteLine($"  Registration pricing: {registerPricing}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"  ℹ️  TLD '{registration.Domain.TopLevelDomain}' not found in pricing response");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"  ℹ️  Pricing data not present in response");
+                }
+            }
+            catch (Exception pricingEx)
+            {
+                Console.WriteLine($"  ⚠️  TLD pricing check failed: {pricingEx.Message} (continuing with order)");
+            }
+
+            // Step 4: Place domain order via WHMCS AddOrder
+            // Empty nameservers are intentional here: the diagnostic harness does not manage DNS zones,
+            // so WHMCS will use the registrar's default nameservers for the test order.
+            Console.WriteLine($"  Step 4: Placing domain order for {domainName} (AddOrder)...");
+
+            bool orderResult = await whmcsService.AddOrderAsync(registration, []);
+
+            if (orderResult)
+            {
+                Console.WriteLine($"  ✅ WHMCS API order placed successfully for {domainName}");
+                Console.WriteLine($"  ✅ TEST PASSED: {domainName} order completed successfully");
+            }
+            else
+            {
+                Console.WriteLine($"  ⚠️  WHMCS API order returned false for {domainName} (check logs for details)");
+                Console.WriteLine($"  ⚠️  TEST COMPLETED WITH WARNINGS: {domainName} order returned false");
+            }
+
+            // Step 5: Verify database record
+            Console.WriteLine($"  Step 5: Verifying database compatibility...");
+
             var existing = await domainRepository.GetByDomainAsync(
                 registration.Domain.TopLevelDomain,
                 registration.Domain.SecondLevelDomain);
@@ -363,15 +412,6 @@ partial class Program
             {
                 Console.WriteLine($"  ✓ Domain is new and ready for database insertion");
             }
-
-            if (registrationResult)
-            {
-                Console.WriteLine($"  ✅ TEST PASSED: {domainName} registration completed successfully");
-            }
-            else
-            {
-                Console.WriteLine($"  ⚠️  TEST COMPLETED WITH WARNINGS: {domainName} registration returned false");
-            }
         }
         catch (Exception ex)
         {
@@ -380,6 +420,3 @@ partial class Program
         }
     }
 }
-
-// Program class needed for User Secrets generic type parameter
-public partial class Program { }

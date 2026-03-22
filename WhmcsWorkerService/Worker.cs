@@ -23,6 +23,8 @@ namespace WhmcsWorkerService
         DeadLetterInvalidJson,
         /// <summary>Message is missing required domain data; move to dead-letter sub-queue.</summary>
         DeadLetterMissingData,
+        /// <summary>Domain is not available for registration; move to dead-letter sub-queue.</summary>
+        DeadLetterDomainUnavailable,
     }
 
     /// <summary>
@@ -38,6 +40,7 @@ namespace WhmcsWorkerService
         private readonly ILogger<Worker> _logger;
         private readonly IWhmcsService _whmcsService;
         private readonly IConfiguration _configuration;
+        private readonly string? _clientId;
 
         // -----------------------------------------------------------------------
         // Structured EventIds — used to filter and correlate log entries in KQL.
@@ -66,6 +69,17 @@ namespace WhmcsWorkerService
         private static readonly EventId EvtNsUpdateSkipped = new(2025, "NameServerUpdateSkipped");
 
         private static readonly EventId EvtProcessingCompleted = new(2030, "ProcessingCompleted");
+
+        private static readonly EventId EvtWhoisCheckStarted = new(2040, "WhoisCheckStarted");
+        private static readonly EventId EvtWhoisCheckAvailable = new(2041, "WhoisCheckAvailable");
+        private static readonly EventId EvtWhoisCheckUnavailable = new(2042, "WhoisCheckUnavailable");
+        private static readonly EventId EvtWhoisCheckException = new(2043, "WhoisCheckException");
+
+        private static readonly EventId EvtAddOrderStarted = new(2050, "AddOrderStarted");
+        private static readonly EventId EvtAddOrderSucceeded = new(2051, "AddOrderSucceeded");
+        private static readonly EventId EvtAddOrderFailed = new(2052, "AddOrderFailed");
+        private static readonly EventId EvtAddOrderException = new(2053, "AddOrderException");
+
         private static readonly EventId EvtServiceBusError = new(3001, "ServiceBusError");
 
         public Worker(
@@ -76,6 +90,7 @@ namespace WhmcsWorkerService
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _whmcsService = whmcsService ?? throw new ArgumentNullException(nameof(whmcsService));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _clientId = _configuration["WHMCS_CLIENT_ID"];
         }
 
         /// <inheritdoc/>
@@ -171,6 +186,12 @@ namespace WhmcsWorkerService
                         deadLetterErrorDescription: "DomainRegistration or Domain is null",
                         cancellationToken: args.CancellationToken);
                     break;
+                case MessageProcessingOutcome.DeadLetterDomainUnavailable:
+                    await args.DeadLetterMessageAsync(args.Message,
+                        deadLetterReason: "DomainUnavailable",
+                        deadLetterErrorDescription: "Domain is not available for registration",
+                        cancellationToken: args.CancellationToken);
+                    break;
             }
         }
 
@@ -232,112 +253,90 @@ namespace WhmcsWorkerService
                     domainName, string.Join(", ", nameServers));
             }
 
-            // Step 1: Register domain via WHMCS API
-            bool registrationSuccess;
-            var registrationStopwatch = Stopwatch.StartNew();
+            // Step 1: Check domain availability via WHMCS DomainWhois API
+            bool isAvailable;
+            var whoisStopwatch = Stopwatch.StartNew();
 
-            _logger.LogDebug(EvtRegistrationStarted,
-                "Calling WHMCS RegisterDomainAsync for domain {Domain} (message ID {MessageId})",
+            _logger.LogInformation(EvtWhoisCheckStarted,
+                "Checking availability of domain {Domain} via WHMCS DomainWhois (message ID {MessageId})",
                 domainName, messageId);
 
             try
             {
-                registrationSuccess = await _whmcsService.RegisterDomainAsync(message.DomainRegistration);
-                registrationStopwatch.Stop();
+                isAvailable = await _whmcsService.CheckDomainAvailabilityAsync(domainName);
+                whoisStopwatch.Stop();
             }
             catch (Exception ex)
             {
-                registrationStopwatch.Stop();
-                _logger.LogError(EvtRegistrationException, ex,
-                    "Exception while registering domain {Domain} via WHMCS API. " +
-                    "Message will be abandoned for retry.",
-                    domainName);
-                _logger.LogDebug(EvtRegistrationException,
-                    "WHMCS RegisterDomainAsync threw after {ElapsedMs}ms for domain {Domain}",
-                    registrationStopwatch.ElapsedMilliseconds, domainName);
-                return MessageProcessingOutcome.Abandon;
-            }
-
-            _logger.LogDebug(EvtRegistrationStarted,
-                "WHMCS RegisterDomainAsync completed in {RegistrationElapsedMs}ms for domain {Domain}, Result={Result}",
-                registrationStopwatch.ElapsedMilliseconds, domainName, registrationSuccess);
-
-            if (!registrationSuccess)
-            {
-                _logger.LogWarning(EvtRegistrationFailed,
-                    "WHMCS domain registration returned false for domain {Domain}. " +
+                whoisStopwatch.Stop();
+                _logger.LogError(EvtWhoisCheckException, ex,
+                    "Exception while checking domain availability for {Domain} via WHMCS DomainWhois. " +
                     "Message will be abandoned for retry.",
                     domainName);
                 return MessageProcessingOutcome.Abandon;
             }
 
-            _logger.LogInformation(EvtRegistrationSucceeded,
-                "Successfully registered domain {Domain} via WHMCS API", domainName);
+            _logger.LogDebug(EvtWhoisCheckStarted,
+                "WHMCS DomainWhois completed in {WhoisElapsedMs}ms for domain {Domain}, Available={Available}",
+                whoisStopwatch.ElapsedMilliseconds, domainName, isAvailable);
 
-            // Step 2: Update name servers in WHMCS if available
-            if (nameServers.Length >= MinNameServers && nameServers.Length <= MaxNameServers)
+            if (!isAvailable)
             {
-                _logger.LogInformation(EvtNsUpdateStarted,
-                    "Updating {Count} name servers for domain {Domain} in WHMCS",
-                    nameServers.Length, domainName);
+                _logger.LogWarning(EvtWhoisCheckUnavailable,
+                    "Domain {Domain} is not available for registration (message ID {MessageId}). " +
+                    "Dead-lettering message.",
+                    domainName, messageId);
+                return MessageProcessingOutcome.DeadLetterDomainUnavailable;
+            }
 
-                _logger.LogTrace(EvtNsUpdateStarted,
-                    "Name servers to set for domain {Domain}: [{NameServers}]",
+            _logger.LogInformation(EvtWhoisCheckAvailable,
+                "Domain {Domain} is available for registration", domainName);
+
+            // Step 2: Place domain order via WHMCS AddOrder API (includes name servers)
+            bool orderSuccess;
+            var orderStopwatch = Stopwatch.StartNew();
+
+            _logger.LogDebug(EvtAddOrderStarted,
+                "Calling WHMCS AddOrderAsync for domain {Domain} (message ID {MessageId})",
+                domainName, messageId);
+
+            if (nameServers.Length > 0)
+            {
+                _logger.LogTrace(EvtAddOrderStarted,
+                    "Name servers to include in order for domain {Domain}: [{NameServers}]",
                     domainName, string.Join(", ", nameServers));
-
-                bool nsUpdateSuccess;
-                var nsStopwatch = Stopwatch.StartNew();
-
-                try
-                {
-                    nsUpdateSuccess = await _whmcsService.UpdateNameServersAsync(domainName, nameServers);
-                    nsStopwatch.Stop();
-                }
-                catch (Exception ex)
-                {
-                    nsStopwatch.Stop();
-                    _logger.LogError(EvtNsUpdateException, ex,
-                        "Exception while updating name servers for domain {Domain} in WHMCS. " +
-                        "Registration was already completed; completing message anyway.",
-                        domainName);
-                    _logger.LogDebug(EvtNsUpdateException,
-                        "WHMCS UpdateNameServersAsync threw after {NsElapsedMs}ms for domain {Domain}",
-                        nsStopwatch.ElapsedMilliseconds, domainName);
-                    // Don't abandon – the registration succeeded; only NS update failed
-                    return MessageProcessingOutcome.Complete;
-                }
-
-                if (nsUpdateSuccess)
-                {
-                    _logger.LogDebug(EvtNsUpdateSucceeded,
-                        "WHMCS UpdateNameServersAsync completed in {NsElapsedMs}ms for domain {Domain}, Result={Result}",
-                        nsStopwatch.ElapsedMilliseconds, domainName, nsUpdateSuccess);
-                    _logger.LogInformation(EvtNsUpdateSucceeded,
-                        "Successfully updated name servers for domain {Domain} in WHMCS", domainName);
-                }
-                else
-                {
-                    _logger.LogDebug(EvtNsUpdateFailed,
-                        "WHMCS UpdateNameServersAsync completed in {NsElapsedMs}ms for domain {Domain}, Result={Result}",
-                        nsStopwatch.ElapsedMilliseconds, domainName, nsUpdateSuccess);
-                    _logger.LogWarning(EvtNsUpdateFailed,
-                        "WHMCS name server update returned false for domain {Domain}. " +
-                        "Registration was already completed; completing message anyway.",
-                        domainName);
-                }
             }
-            else if (nameServers.Length > MaxNameServers
-                     || (nameServers.Length > 0 && nameServers.Length < MinNameServers))
+
+            try
             {
-                _logger.LogWarning(EvtNsUpdateSkipped,
-                    "Received {Count} name server(s) for domain {Domain}; WHMCS requires {Min}–{Max}. Skipping name server update.",
-                    nameServers.Length, domainName, MinNameServers, MaxNameServers);
+                orderSuccess = await _whmcsService.AddOrderAsync(message.DomainRegistration, nameServers, _clientId);
+                orderStopwatch.Stop();
             }
-            else
+            catch (Exception ex)
             {
-                _logger.LogInformation(EvtNsUpdateSkipped,
-                    "No name servers provided for domain {Domain}; skipping WHMCS name server update", domainName);
+                orderStopwatch.Stop();
+                _logger.LogError(EvtAddOrderException, ex,
+                    "Exception while placing domain order for {Domain} via WHMCS AddOrder. " +
+                    "Message will be abandoned for retry.",
+                    domainName);
+                return MessageProcessingOutcome.Abandon;
             }
+
+            _logger.LogDebug(EvtAddOrderStarted,
+                "WHMCS AddOrderAsync completed in {OrderElapsedMs}ms for domain {Domain}, Result={Result}",
+                orderStopwatch.ElapsedMilliseconds, domainName, orderSuccess);
+
+            if (!orderSuccess)
+            {
+                _logger.LogWarning(EvtAddOrderFailed,
+                    "WHMCS domain order returned false for domain {Domain}. " +
+                    "Message will be abandoned for retry.",
+                    domainName);
+                return MessageProcessingOutcome.Abandon;
+            }
+
+            _logger.LogInformation(EvtAddOrderSucceeded,
+                "Successfully placed domain order for {Domain} via WHMCS API", domainName);
 
             totalStopwatch.Stop();
 

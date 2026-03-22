@@ -401,12 +401,226 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         }
 
         /// <summary>
+        /// Checks domain availability using the WHMCS DomainWhois API.
+        /// </summary>
+        /// <param name="domainName">The fully qualified domain name to check</param>
+        /// <returns>True if the domain is available for registration, false if unavailable or the check failed</returns>
+        public async Task<bool> CheckDomainAvailabilityAsync(string domainName)
+        {
+            if (!_isConfigured)
+            {
+                _logger.LogInformation("WHMCS integration is not configured, skipping domain availability check");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(domainName))
+            {
+                _logger.LogWarning("Domain name is null or empty");
+                return false;
+            }
+
+            _logger.LogInformation("Checking availability of domain {DomainName} via WHMCS DomainWhois API", domainName);
+
+            try
+            {
+                var requestData = new Dictionary<string, string>
+                {
+                    { "action", "DomainWhois" },
+                    { "identifier", _apiIdentifier! }, // Guaranteed non-null by _isConfigured check
+                    { "secret", _apiSecret! }, // Guaranteed non-null by _isConfigured check
+                    { "domain", domainName },
+                    { "responsetype", "json" }
+                };
+
+                using var content = new FormUrlEncodedContent(requestData);
+                using var response = await _httpClient.PostAsync(_apiUrl!, content); // Guaranteed non-null by _isConfigured check
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("WHMCS API returned error status {StatusCode} for DomainWhois check on {DomainName}",
+                        response.StatusCode, domainName);
+                    return false;
+                }
+
+                var jsonResponse = JsonSerializer.Deserialize<WhmcsDomainWhoisResponse>(responseContent);
+
+                if (jsonResponse?.Result != "success")
+                {
+                    var errorMessage = jsonResponse?.Message ?? "Unknown error";
+                    _logger.LogWarning("WHMCS DomainWhois returned non-success result for {DomainName}: {Message}",
+                        domainName, errorMessage);
+                    return false;
+                }
+
+                var isAvailable = string.Equals(jsonResponse.Status, "available", StringComparison.OrdinalIgnoreCase);
+                _logger.LogInformation("Domain {DomainName} availability check result: {Status}",
+                    domainName, jsonResponse.Status ?? "unknown");
+                return isAvailable;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while checking availability of domain {DomainName}", domainName);
+                return false;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse WHMCS DomainWhois response for domain {DomainName}", domainName);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while checking availability of domain {DomainName}", domainName);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Places a domain registration order using the WHMCS AddOrder API.
+        /// AddOrder automatically triggers domain registration; no separate DomainRegister call is needed.
+        /// Name servers may be included in the same request.
+        /// </summary>
+        /// <param name="domainRegistration">The domain registration information</param>
+        /// <param name="nameServers">Name servers to configure on the domain (0–5 entries)</param>
+        /// <param name="clientId">The WHMCS client ID to place the order for (optional)</param>
+        /// <returns>True if the order was placed successfully, false otherwise</returns>
+        public async Task<bool> AddOrderAsync(DomainRegistration domainRegistration, string[] nameServers, string? clientId = null)
+        {
+            if (!_isConfigured)
+            {
+                _logger.LogInformation("WHMCS integration is not configured, skipping domain order");
+                return false;
+            }
+
+            if (domainRegistration?.Domain == null)
+            {
+                _logger.LogWarning("Domain registration or domain is null");
+                return false;
+            }
+
+            var domainName = domainRegistration.Domain.FullDomainName;
+            _logger.LogInformation("Placing domain order for {DomainName} via WHMCS AddOrder API", domainName);
+
+            try
+            {
+                var requestData = new Dictionary<string, string>
+                {
+                    { "action", "AddOrder" },
+                    { "identifier", _apiIdentifier! }, // Guaranteed non-null by _isConfigured check
+                    { "secret", _apiSecret! }, // Guaranteed non-null by _isConfigured check
+                    { "domain[0]", domainName },
+                    { "domaintype[0]", "register" },
+                    { "regperiod[0]", "1" },
+                    { "paymentmethod", "stripe" },
+                    { "responsetype", "json" }
+                };
+
+                if (!string.IsNullOrWhiteSpace(clientId))
+                {
+                    requestData["clientid"] = clientId;
+                }
+
+                // Add name servers (up to 5, skipping blank entries)
+                var validNameServers = (nameServers ?? [])
+                    .Where(ns => !string.IsNullOrWhiteSpace(ns))
+                    .Take(5)
+                    .ToArray();
+
+                for (int i = 0; i < validNameServers.Length; i++)
+                {
+                    requestData[$"nameserver{i + 1}"] = validNameServers[i].Trim();
+                }
+
+                using var content = new FormUrlEncodedContent(requestData);
+                using var response = await _httpClient.PostAsync(_apiUrl!, content); // Guaranteed non-null by _isConfigured check
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("WHMCS API returned error status {StatusCode} for AddOrder on {DomainName}",
+                        response.StatusCode, domainName);
+                    return false;
+                }
+
+                var jsonResponse = JsonSerializer.Deserialize<WhmcsAddOrderResponse>(responseContent);
+
+                if (jsonResponse?.Result == "success")
+                {
+                    _logger.LogInformation(
+                        "Successfully placed domain order for {DomainName} via WHMCS API. " +
+                        "OrderId={OrderId}, DomainId={DomainId}, InvoiceId={InvoiceId}",
+                        domainName, jsonResponse.OrderId, jsonResponse.DomainIds, jsonResponse.InvoiceId);
+                    return true;
+                }
+
+                var errorMessage = jsonResponse?.Message ?? "Unknown error";
+                _logger.LogWarning("WHMCS AddOrder returned non-success result for {DomainName}: {Message}",
+                    domainName, errorMessage);
+                return false;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while placing domain order for {DomainName}", domainName);
+                return false;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse WHMCS AddOrder response for domain {DomainName}", domainName);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while placing domain order for {DomainName}", domainName);
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Represents the WHMCS API response structure.
         /// </summary>
         private class WhmcsResponse
         {
             [JsonPropertyName("result")]
             public string? Result { get; set; }
+
+            [JsonPropertyName("message")]
+            public string? Message { get; set; }
+        }
+
+        /// <summary>
+        /// Represents the WHMCS DomainWhois API response structure.
+        /// </summary>
+        private class WhmcsDomainWhoisResponse
+        {
+            [JsonPropertyName("result")]
+            public string? Result { get; set; }
+
+            [JsonPropertyName("status")]
+            public string? Status { get; set; }
+
+            [JsonPropertyName("whois")]
+            public string? Whois { get; set; }
+
+            [JsonPropertyName("message")]
+            public string? Message { get; set; }
+        }
+
+        /// <summary>
+        /// Represents the WHMCS AddOrder API response structure.
+        /// </summary>
+        private class WhmcsAddOrderResponse
+        {
+            [JsonPropertyName("result")]
+            public string? Result { get; set; }
+
+            [JsonPropertyName("orderid")]
+            public long? OrderId { get; set; }
+
+            [JsonPropertyName("domainids")]
+            public string? DomainIds { get; set; }
+
+            [JsonPropertyName("invoiceid")]
+            public long? InvoiceId { get; set; }
 
             [JsonPropertyName("message")]
             public string? Message { get; set; }
