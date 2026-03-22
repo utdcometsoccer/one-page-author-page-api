@@ -6,7 +6,7 @@
 //       additional fields such as BodyBytes, DeliveryCount, and RegistrationId.
 
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(24h)
 | where customDimensions["EventId.Name"] in (
     "ProcessingStarted",

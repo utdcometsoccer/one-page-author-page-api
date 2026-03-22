@@ -4,7 +4,7 @@
 // Use this for incident response and troubleshooting all non-nominal conditions.
 
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(24h)
 | where severityLevel >= 2  // 2=Warning, 3=Error, 4=Critical
 | extend
