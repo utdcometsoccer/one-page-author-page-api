@@ -169,30 +169,33 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             {
                 _logger.LogError(ex,
                     "HTTP request failed while registering domain {DomainName}. " +
-                    "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}",
+                    "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}, ContactEmail={ContactEmail}",
                     domainName,
                     domainRegistration.id, domainRegistration.Upn,
-                    Utility.MaskSensitiveValue(_apiIdentifier));
+                    Utility.MaskSensitiveValue(_apiIdentifier),
+                    Utility.MaskSensitiveValue(domainRegistration.ContactInformation?.EmailAddress));
                 return false;
             }
             catch (JsonException ex)
             {
                 _logger.LogError(ex,
                     "Failed to parse WHMCS API response for domain {DomainName}. " +
-                    "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}",
+                    "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}, ContactEmail={ContactEmail}",
                     domainName,
                     domainRegistration.id, domainRegistration.Upn,
-                    Utility.MaskSensitiveValue(_apiIdentifier));
+                    Utility.MaskSensitiveValue(_apiIdentifier),
+                    Utility.MaskSensitiveValue(domainRegistration.ContactInformation?.EmailAddress));
                 return false;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex,
                     "Unexpected error while registering domain {DomainName}. " +
-                    "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}",
+                    "RegistrationId={RegistrationId}, Upn={Upn}, ApiIdentifier={ApiIdentifier}, ContactEmail={ContactEmail}",
                     domainName,
                     domainRegistration.id, domainRegistration.Upn,
-                    Utility.MaskSensitiveValue(_apiIdentifier));
+                    Utility.MaskSensitiveValue(_apiIdentifier),
+                    Utility.MaskSensitiveValue(domainRegistration.ContactInformation?.EmailAddress));
                 return false;
             }
         }
