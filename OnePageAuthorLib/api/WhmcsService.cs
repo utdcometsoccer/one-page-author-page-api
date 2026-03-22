@@ -404,75 +404,64 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         /// Checks domain availability using the WHMCS DomainWhois API.
         /// </summary>
         /// <param name="domainName">The fully qualified domain name to check</param>
-        /// <returns>True if the domain is available for registration, false if unavailable or the check failed</returns>
+        /// <returns>True if the domain is available for registration, false if WHMCS explicitly reports the domain as unavailable.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when WHMCS integration is not configured, or when the WHMCS API returns a non-success result.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="domainName"/> is null or empty.</exception>
+        /// <exception cref="HttpRequestException">Thrown when the HTTP request to the WHMCS API fails or returns a non-2xx status code.</exception>
+        /// <exception cref="System.Text.Json.JsonException">Thrown when the WHMCS API response cannot be parsed as JSON.</exception>
         public async Task<bool> CheckDomainAvailabilityAsync(string domainName)
         {
             if (!_isConfigured)
             {
-                _logger.LogInformation("WHMCS integration is not configured, skipping domain availability check");
-                return false;
+                throw new InvalidOperationException("WHMCS integration is not configured");
             }
 
             if (string.IsNullOrWhiteSpace(domainName))
             {
-                _logger.LogWarning("Domain name is null or empty");
-                return false;
+                throw new ArgumentException("Domain name must not be null or empty", nameof(domainName));
             }
 
             _logger.LogInformation("Checking availability of domain {DomainName} via WHMCS DomainWhois API", domainName);
 
-            try
+            var requestData = new Dictionary<string, string>
             {
-                var requestData = new Dictionary<string, string>
-                {
-                    { "action", "DomainWhois" },
-                    { "identifier", _apiIdentifier! }, // Guaranteed non-null by _isConfigured check
-                    { "secret", _apiSecret! }, // Guaranteed non-null by _isConfigured check
-                    { "domain", domainName },
-                    { "responsetype", "json" }
-                };
+                { "action", "DomainWhois" },
+                { "identifier", _apiIdentifier! }, // Guaranteed non-null by _isConfigured check
+                { "secret", _apiSecret! }, // Guaranteed non-null by _isConfigured check
+                { "domain", domainName },
+                { "responsetype", "json" }
+            };
 
-                using var content = new FormUrlEncodedContent(requestData);
-                using var response = await _httpClient.PostAsync(_apiUrl!, content); // Guaranteed non-null by _isConfigured check
-                var responseContent = await response.Content.ReadAsStringAsync();
+            using var content = new FormUrlEncodedContent(requestData);
+            using var response = await _httpClient.PostAsync(_apiUrl!, content); // Guaranteed non-null by _isConfigured check
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    _logger.LogWarning("WHMCS API returned error status {StatusCode} for DomainWhois check on {DomainName}",
-                        response.StatusCode, domainName);
-                    return false;
-                }
-
-                var jsonResponse = JsonSerializer.Deserialize<WhmcsDomainWhoisResponse>(responseContent);
-
-                if (jsonResponse?.Result != "success")
-                {
-                    var errorMessage = jsonResponse?.Message ?? "Unknown error";
-                    _logger.LogWarning("WHMCS DomainWhois returned non-success result for {DomainName}: {Message}",
-                        domainName, errorMessage);
-                    return false;
-                }
-
-                var isAvailable = string.Equals(jsonResponse.Status, "available", StringComparison.OrdinalIgnoreCase);
-                _logger.LogInformation("Domain {DomainName} availability check result: {Status}",
-                    domainName, jsonResponse.Status ?? "unknown");
-                return isAvailable;
-            }
-            catch (HttpRequestException ex)
+            if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError(ex, "HTTP request failed while checking availability of domain {DomainName}", domainName);
-                return false;
+                throw new HttpRequestException(
+                    $"WHMCS API returned error status {(int)response.StatusCode} for DomainWhois check on {domainName}");
             }
-            catch (JsonException ex)
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var jsonResponse = JsonSerializer.Deserialize<WhmcsDomainWhoisResponse>(responseContent);
+
+            if (jsonResponse is null)
             {
-                _logger.LogError(ex, "Failed to parse WHMCS DomainWhois response for domain {DomainName}", domainName);
-                return false;
+                throw new JsonException($"WHMCS DomainWhois response for domain {domainName} deserialized to null");
             }
-            catch (Exception ex)
+
+            if (jsonResponse.Result != "success")
             {
-                _logger.LogError(ex, "Unexpected error while checking availability of domain {DomainName}", domainName);
-                return false;
+                var errorMessage = jsonResponse.Message ?? "Unknown error";
+                _logger.LogWarning("WHMCS DomainWhois returned non-success result for {DomainName}: {Message}",
+                    domainName, errorMessage);
+                throw new InvalidOperationException(
+                    $"WHMCS DomainWhois API error for domain {domainName}: {errorMessage}");
             }
+
+            var isAvailable = string.Equals(jsonResponse.Status, "available", StringComparison.OrdinalIgnoreCase);
+            _logger.LogInformation("Domain {DomainName} availability check result: {Status}",
+                domainName, jsonResponse.Status ?? "unknown");
+            return isAvailable;
         }
 
         /// <summary>

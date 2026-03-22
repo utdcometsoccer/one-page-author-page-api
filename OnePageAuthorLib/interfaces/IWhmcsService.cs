@@ -35,7 +35,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// Checks domain availability using the WHMCS DomainWhois API.
         /// </summary>
         /// <param name="domainName">The fully qualified domain name to check</param>
-        /// <returns>True if the domain is available for registration, false if unavailable or the check failed</returns>
+        /// <returns>True if the domain is available for registration, false if the domain is already registered or otherwise unavailable.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when WHMCS integration is not configured, or when the WHMCS API returns a non-success result.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="domainName"/> is null or empty.</exception>
+        /// <exception cref="HttpRequestException">Thrown when the HTTP request to the WHMCS API fails or returns a non-2xx status code.</exception>
+        /// <exception cref="System.Text.Json.JsonException">Thrown when the WHMCS API response cannot be parsed as JSON.</exception>
         Task<bool> CheckDomainAvailabilityAsync(string domainName);
 
         /// <summary>

@@ -229,7 +229,10 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
             var json = MakeMessageJson(nameServers: ns);
             _mockWhmcsService.Setup(x => x.CheckDomainAvailabilityAsync("example.com"))
                 .ReturnsAsync(true);
-            _mockWhmcsService.Setup(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), ns, "181"))
+            _mockWhmcsService.Setup(x => x.AddOrderAsync(
+                    It.IsAny<DomainRegistrationEntity>(),
+                    It.Is<string[]>(arr => arr.SequenceEqual(ns)),
+                    "181"))
                 .ReturnsAsync(true);
 
             // Act
@@ -237,7 +240,10 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
 
             // Assert
             Assert.Equal(Outcome.Complete, outcome);
-            _mockWhmcsService.Verify(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), ns, "181"), Times.Once);
+            _mockWhmcsService.Verify(x => x.AddOrderAsync(
+                It.IsAny<DomainRegistrationEntity>(),
+                It.Is<string[]>(arr => arr.SequenceEqual(ns)),
+                "181"), Times.Once);
         }
 
         [Fact]

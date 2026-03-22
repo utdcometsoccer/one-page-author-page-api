@@ -864,7 +864,7 @@ namespace OnePageAuthor.Test.Services
         #region CheckDomainAvailabilityAsync Tests
 
         [Fact]
-        public async Task CheckDomainAvailabilityAsync_WithMissingConfiguration_ReturnsFalse()
+        public async Task CheckDomainAvailabilityAsync_WithMissingConfiguration_ThrowsInvalidOperationException()
         {
             // Arrange
             var mockConfig = new Mock<IConfiguration>();
@@ -874,37 +874,31 @@ namespace OnePageAuthor.Test.Services
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, mockConfig.Object);
 
-            // Act
-            var result = await service.CheckDomainAvailabilityAsync("test.name.ng");
-
-            // Assert
-            Assert.False(result);
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.CheckDomainAvailabilityAsync("test.name.ng"));
         }
 
         [Fact]
-        public async Task CheckDomainAvailabilityAsync_WithNullDomainName_ReturnsFalse()
+        public async Task CheckDomainAvailabilityAsync_WithNullDomainName_ThrowsArgumentException()
         {
             // Arrange
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
 
-            // Act
-            var result = await service.CheckDomainAvailabilityAsync(null!);
-
-            // Assert
-            Assert.False(result);
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                service.CheckDomainAvailabilityAsync(null!));
         }
 
         [Fact]
-        public async Task CheckDomainAvailabilityAsync_WithEmptyDomainName_ReturnsFalse()
+        public async Task CheckDomainAvailabilityAsync_WithEmptyDomainName_ThrowsArgumentException()
         {
             // Arrange
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
 
-            // Act
-            var result = await service.CheckDomainAvailabilityAsync("");
-
-            // Assert
-            Assert.False(result);
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                service.CheckDomainAvailabilityAsync(""));
         }
 
         [Fact]
@@ -936,12 +930,12 @@ namespace OnePageAuthor.Test.Services
             // Act
             var result = await service.CheckDomainAvailabilityAsync("test.name.ng");
 
-            // Assert
+            // Assert — only confirmed-unavailable returns false; no exception
             Assert.False(result);
         }
 
         [Fact]
-        public async Task CheckDomainAvailabilityAsync_WhenResultIsError_ReturnsFalse()
+        public async Task CheckDomainAvailabilityAsync_WhenResultIsError_ThrowsInvalidOperationException()
         {
             // Arrange
             var responseJson = "{\"result\":\"error\",\"message\":\"Invalid domain\"}";
@@ -949,45 +943,39 @@ namespace OnePageAuthor.Test.Services
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
 
-            // Act
-            var result = await service.CheckDomainAvailabilityAsync("test.name.ng");
-
-            // Assert
-            Assert.False(result);
+            // Act & Assert — non-success result is a transient failure, not a confirmed unavailability
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.CheckDomainAvailabilityAsync("test.name.ng"));
         }
 
         [Fact]
-        public async Task CheckDomainAvailabilityAsync_WithHttpErrorStatus_ReturnsFalse()
+        public async Task CheckDomainAvailabilityAsync_WithHttpErrorStatus_ThrowsHttpRequestException()
         {
             // Arrange
             SetupHttpResponse(HttpStatusCode.InternalServerError, "Server error");
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
 
-            // Act
-            var result = await service.CheckDomainAvailabilityAsync("test.name.ng");
-
-            // Assert
-            Assert.False(result);
+            // Act & Assert
+            await Assert.ThrowsAsync<HttpRequestException>(() =>
+                service.CheckDomainAvailabilityAsync("test.name.ng"));
         }
 
         [Fact]
-        public async Task CheckDomainAvailabilityAsync_WithInvalidJson_ReturnsFalse()
+        public async Task CheckDomainAvailabilityAsync_WithInvalidJson_ThrowsJsonException()
         {
             // Arrange
             SetupHttpResponse(HttpStatusCode.OK, "invalid-json");
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
 
-            // Act
-            var result = await service.CheckDomainAvailabilityAsync("test.name.ng");
-
-            // Assert
-            Assert.False(result);
+            // Act & Assert
+            await Assert.ThrowsAnyAsync<JsonException>(() =>
+                service.CheckDomainAvailabilityAsync("test.name.ng"));
         }
 
         [Fact]
-        public async Task CheckDomainAvailabilityAsync_WithHttpRequestException_ReturnsFalse()
+        public async Task CheckDomainAvailabilityAsync_WithHttpRequestException_PropagatesException()
         {
             // Arrange
             _mockHttpMessageHandler.Protected()
@@ -999,11 +987,9 @@ namespace OnePageAuthor.Test.Services
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
 
-            // Act
-            var result = await service.CheckDomainAvailabilityAsync("test.name.ng");
-
-            // Assert
-            Assert.False(result);
+            // Act & Assert
+            await Assert.ThrowsAsync<HttpRequestException>(() =>
+                service.CheckDomainAvailabilityAsync("test.name.ng"));
         }
 
         [Fact]
@@ -1018,15 +1004,15 @@ namespace OnePageAuthor.Test.Services
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .Callback<HttpRequestMessage, CancellationToken>(async (req, ct) =>
+                .Returns<HttpRequestMessage, CancellationToken>((req, ct) =>
                 {
                     if (req.Content != null)
-                        capturedFormContent = await req.Content.ReadAsStringAsync();
-                })
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                        capturedFormContent = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    return Task.FromResult(new HttpResponseMessage
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                    });
                 });
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
@@ -1194,15 +1180,15 @@ namespace OnePageAuthor.Test.Services
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .Callback<HttpRequestMessage, CancellationToken>(async (req, ct) =>
+                .Returns<HttpRequestMessage, CancellationToken>((req, ct) =>
                 {
                     if (req.Content != null)
-                        capturedFormContent = await req.Content.ReadAsStringAsync();
-                })
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                        capturedFormContent = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    return Task.FromResult(new HttpResponseMessage
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                    });
                 });
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
@@ -1246,15 +1232,15 @@ namespace OnePageAuthor.Test.Services
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .Callback<HttpRequestMessage, CancellationToken>(async (req, ct) =>
+                .Returns<HttpRequestMessage, CancellationToken>((req, ct) =>
                 {
                     if (req.Content != null)
-                        capturedFormContent = await req.Content.ReadAsStringAsync();
-                })
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                        capturedFormContent = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    return Task.FromResult(new HttpResponseMessage
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                    });
                 });
 
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
