@@ -5,7 +5,7 @@
 // and investigate Service Bus connectivity issues.
 
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(7d)
 | where customDimensions["EventId.Name"] in (
     "WhmcsWorkerStarting",

@@ -6,7 +6,7 @@
 //       Set WHMCS_WORKER_LOG_LEVEL=Debug to capture these fields.
 
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(24h)
 | where customDimensions["EventId.Name"] == "ProcessingCompleted"
 | extend

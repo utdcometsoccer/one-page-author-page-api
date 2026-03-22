@@ -613,7 +613,7 @@ APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=...;IngestionEndpoint=.
 
 Once configured, logs appear in the `traces` table in Log Analytics with:
 
-- `cloud_RoleName` = `WhmcsWorkerService`
+- `cloud_RoleName` = `unknown_service:WhmcsWorkerService`
 - `customDimensions["EventId"]` = numeric EventId (e.g. `2012`)
 - `customDimensions["EventId.Name"]` = EventId name (e.g. `RegistrationSucceeded`)
 - `customDimensions["Domain"]` = domain name (e.g. `example.com`)
@@ -624,14 +624,14 @@ Once configured, logs appear in the `traces` table in Log Analytics with:
 
 ### KQL queries for worker service activity
 
-All queries use `cloud_RoleName == "WhmcsWorkerService"` to scope results to this service. These queries are also available as `.kql` files in the [`/kql`](../kql/) directory.
+All queries use `cloud_RoleName == "unknown_service:WhmcsWorkerService"` to scope results to this service. These queries are also available as `.kql` files in the [`/kql`](../kql/) directory.
 
 #### Service health
 
 ```kql
 // Worker service lifecycle events (starts, stops, Service Bus errors)
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(24h)
 | where customDimensions["EventId.Name"] in (
     "WhmcsWorkerStarting",
@@ -652,7 +652,7 @@ traces
 ```kql
 // All warning, error, and critical events
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(24h)
 | where severityLevel >= 2  // 2=Warning, 3=Error, 4=Critical
 | extend
@@ -668,7 +668,7 @@ traces
 ```kql
 // Full lifecycle of each domain registration message
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(24h)
 | where customDimensions["EventId.Name"] in (
     "ProcessingStarted",
@@ -692,7 +692,7 @@ traces
 ```kql
 // Hourly registration success/failure/exception counts with success rate
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(7d)
 | where customDimensions["EventId.Name"] in (
     "RegistrationSucceeded",
@@ -716,7 +716,7 @@ traces
 ```kql
 // All dead-lettered messages (bad JSON or missing domain data)
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(7d)
 | where customDimensions["EventId.Name"] in (
     "MessageDeserializeFailed",
@@ -739,7 +739,7 @@ traces
 ```kql
 // Hourly P95, max, avg processing durations
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(24h)
 | where customDimensions["EventId.Name"] == "ProcessingCompleted"
 | extend
@@ -761,7 +761,7 @@ traces
 ```kql
 // Name server update success/failure/skip counts over time
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(7d)
 | where customDimensions["EventId.Name"] in (
     "NameServerUpdateSucceeded",
@@ -788,13 +788,13 @@ traces
 // Useful for measuring end-to-end latency from enqueue to completion
 let enqueuedMessages =
     traces
-    | where cloud_RoleName != "WhmcsWorkerService"
+    | where cloud_RoleName != "unknown_service:WhmcsWorkerService"
     | where message contains "Enqueued WHMCS"
     | extend Domain = extract(@"domain ([^\s,]+)", 1, message)
     | project EnqueuedAt = timestamp, Domain;
 let processedMessages =
     traces
-    | where cloud_RoleName == "WhmcsWorkerService"
+    | where cloud_RoleName == "unknown_service:WhmcsWorkerService"
     | where customDimensions["EventId.Name"] == "ProcessingCompleted"
     | extend Domain = tostring(customDimensions["Domain"])
     | project ProcessedAt = timestamp, Domain;

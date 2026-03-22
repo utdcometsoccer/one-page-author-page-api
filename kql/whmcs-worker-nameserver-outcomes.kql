@@ -5,7 +5,7 @@
 // or to identify domains where NS updates were skipped due to bad counts.
 
 traces
-| where cloud_RoleName == "WhmcsWorkerService"
+| where cloud_RoleName == "unknown_service:WhmcsWorkerService"
 | where timestamp > ago(7d)
 | where customDimensions["EventId.Name"] in (
     "NameServerUpdateSucceeded",
