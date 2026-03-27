@@ -127,6 +127,7 @@ var sbConnection = config["SERVICE_BUS_CONNECTION_STRING"];
 var sbQueue = config["SERVICE_BUS_WHMCS_QUEUE_NAME"] ?? "whmcs-domain-registrations";
 var whmcsUrl = config["WHMCS_API_URL"];
 var whmcsId = config["WHMCS_API_IDENTIFIER"];
+var whmcsClientId = config["WHMCS_CLIENT_ID"];
 var logLevelValue = config["WHMCS_WORKER_LOG_LEVEL"] ?? "Information";
 var aiConfigured = !string.IsNullOrWhiteSpace(config["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
 
@@ -134,6 +135,13 @@ logger.LogInformation("Service Bus connection configured: {Status}", !string.IsN
 logger.LogInformation("Service Bus queue: {Queue}", sbQueue);
 logger.LogInformation("WHMCS API URL configured: {Status}", !string.IsNullOrWhiteSpace(whmcsUrl) ? "yes" : "NO");
 logger.LogInformation("WHMCS API Identifier configured: {Status}", !string.IsNullOrWhiteSpace(whmcsId) ? "yes" : "NO");
+logger.LogInformation("WHMCS client ID configured: {Status}", !string.IsNullOrWhiteSpace(whmcsClientId) ? "yes" : "NO");
+if (!string.IsNullOrWhiteSpace(whmcsClientId) && (!int.TryParse(whmcsClientId, out var parsedClientId) || parsedClientId <= 0))
+{
+    logger.LogCritical(
+        "WHMCS_CLIENT_ID is invalid. It must be a positive integer WHMCS client ID. Received: '{WhmcsClientId}'",
+        whmcsClientId);
+}
 logger.LogInformation("Log level: {LogLevel}", logLevelValue);
 logger.LogInformation("Application Insights telemetry: {Status}", aiConfigured ? "enabled" : "disabled (set APPLICATIONINSIGHTS_CONNECTION_STRING to enable)");
 

@@ -50,8 +50,15 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
         /// </summary>
         /// <param name="domainRegistration">The domain registration information</param>
         /// <param name="nameServers">Name servers to configure on the domain (0–5 entries; blank entries are ignored)</param>
-        /// <param name="clientId">The WHMCS client ID to place the order for (optional)</param>
+        /// <param name="clientId">
+        /// The WHMCS client ID to place the order for. Must be a non-empty string containing a positive integer.
+        /// This is a required configuration value (set via <c>WHMCS_CLIENT_ID</c>).
+        /// </param>
         /// <returns>True if the order was placed successfully, false otherwise</returns>
-        Task<bool> AddOrderAsync(DomainRegistration domainRegistration, string[] nameServers, string? clientId = null);
+        /// <exception cref="InkStainedWretch.OnePageAuthorAPI.API.WhmcsConfigurationException">
+        /// Thrown when <paramref name="clientId"/> is null, empty, or not a valid positive integer.
+        /// This is a non-retryable configuration failure.
+        /// </exception>
+        Task<bool> AddOrderAsync(DomainRegistration domainRegistration, string[] nameServers, string clientId);
     }
 }

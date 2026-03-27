@@ -1443,38 +1443,24 @@ namespace OnePageAuthor.Test.Services
         }
 
         [Fact]
-        public async Task AddOrderAsync_WithoutClientId_OmitsClientIdFromRequest()
+        public async Task AddOrderAsync_WithEmptyClientId_ThrowsWhmcsConfigurationException()
         {
-            // Arrange
-            var responseJson = "{\"result\":\"success\",\"orderid\":265,\"domainids\":\"105\",\"invoiceid\":300}";
-            string? capturedFormContent = null;
-
-            _mockHttpMessageHandler.Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>())
-                .Returns<HttpRequestMessage, CancellationToken>((req, ct) =>
-                {
-                    if (req.Content != null)
-                        capturedFormContent = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                    return Task.FromResult(new HttpResponseMessage
-                    {
-                        StatusCode = HttpStatusCode.OK,
-                        Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
-                    });
-                });
-
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
             var registration = CreateTestDomainRegistration();
 
             // Act
-            var result = await service.AddOrderAsync(registration, []);
+            await Assert.ThrowsAsync<InkStainedWretch.OnePageAuthorAPI.API.WhmcsConfigurationException>(
+                () => service.AddOrderAsync(registration, [], ""));
+        }
 
-            // Assert
-            Assert.True(result);
-            Assert.NotNull(capturedFormContent);
-            Assert.DoesNotContain("clientid", capturedFormContent);
+        [Fact]
+        public async Task AddOrderAsync_WithNonNumericClientId_ThrowsWhmcsConfigurationException()
+        {
+            var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
+            var registration = CreateTestDomainRegistration();
+
+            await Assert.ThrowsAsync<InkStainedWretch.OnePageAuthorAPI.API.WhmcsConfigurationException>(
+                () => service.AddOrderAsync(registration, [], clientId: "not-an-int"));
         }
 
         [Fact]

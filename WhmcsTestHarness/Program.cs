@@ -398,7 +398,7 @@ partial class Program
             // so WHMCS will use the registrar's default nameservers for the test order.
             Console.WriteLine($"  Step 4: Placing domain order for {domainName} (AddOrder)...");
 
-            bool orderResult = await whmcsService.AddOrderAsync(registration, [], clientId);
+            bool orderResult = await whmcsService.AddOrderAsync(registration, [], clientId ?? string.Empty);
 
             if (orderResult)
             {
