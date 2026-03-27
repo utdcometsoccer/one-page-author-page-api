@@ -45,7 +45,7 @@ namespace WhmcsWorkerService
         private readonly ILogger<Worker> _logger;
         private readonly IWhmcsService _whmcsService;
         private readonly IConfiguration _configuration;
-        private readonly string? _clientId;
+        private readonly string _clientId;
 
         // -----------------------------------------------------------------------
         // Structured EventIds — used to filter and correlate log entries in KQL.
@@ -95,7 +95,7 @@ namespace WhmcsWorkerService
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _whmcsService = whmcsService ?? throw new ArgumentNullException(nameof(whmcsService));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _clientId = _configuration["WHMCS_CLIENT_ID"];
+            _clientId = _configuration["WHMCS_CLIENT_ID"] ?? string.Empty;
         }
 
         /// <inheritdoc/>
@@ -326,10 +326,10 @@ namespace WhmcsWorkerService
             catch (InkStainedWretch.OnePageAuthorAPI.API.WhmcsConfigurationException ex)
             {
                 orderStopwatch.Stop();
-                _logger.LogCritical(EvtAddOrderFailed,
-                    "Non-transient WHMCS configuration error while placing domain order for {Domain}: {Message}. " +
+                _logger.LogCritical(EvtAddOrderFailed, ex,
+                    "Non-transient WHMCS configuration error while placing domain order for {Domain}. " +
                     "Message will be dead-lettered.",
-                    domainName, ex.Message);
+                    domainName);
                 return MessageProcessingOutcome.DeadLetterConfigurationError;
             }
             catch (Exception ex)

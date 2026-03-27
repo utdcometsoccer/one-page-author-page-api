@@ -1443,14 +1443,14 @@ namespace OnePageAuthor.Test.Services
         }
 
         [Fact]
-        public async Task AddOrderAsync_WithoutClientId_ThrowsWhmcsConfigurationException()
+        public async Task AddOrderAsync_WithEmptyClientId_ThrowsWhmcsConfigurationException()
         {
             var service = new WhmcsService(_mockLogger.Object, _httpClient, _mockConfiguration.Object);
             var registration = CreateTestDomainRegistration();
 
             // Act
             await Assert.ThrowsAsync<InkStainedWretch.OnePageAuthorAPI.API.WhmcsConfigurationException>(
-                () => service.AddOrderAsync(registration, []));
+                () => service.AddOrderAsync(registration, [], ""));
         }
 
         [Fact]
