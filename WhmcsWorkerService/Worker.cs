@@ -25,6 +25,11 @@ namespace WhmcsWorkerService
         DeadLetterMissingData,
         /// <summary>Domain is not available for registration; move to dead-letter sub-queue.</summary>
         DeadLetterDomainUnavailable,
+
+        /// <summary>
+        /// Non-transient configuration error (eg invalid WHMCS client ID); move to dead-letter sub-queue.
+        /// </summary>
+        DeadLetterConfigurationError,
     }
 
     /// <summary>
@@ -192,6 +197,12 @@ namespace WhmcsWorkerService
                         deadLetterErrorDescription: "Domain is not available for registration",
                         cancellationToken: args.CancellationToken);
                     break;
+                case MessageProcessingOutcome.DeadLetterConfigurationError:
+                    await args.DeadLetterMessageAsync(args.Message,
+                        deadLetterReason: "ConfigurationError",
+                        deadLetterErrorDescription: "WHMCS configuration error (eg invalid/missing WHMCS_CLIENT_ID)",
+                        cancellationToken: args.CancellationToken);
+                    break;
             }
         }
 
@@ -311,6 +322,15 @@ namespace WhmcsWorkerService
             {
                 orderSuccess = await _whmcsService.AddOrderAsync(message.DomainRegistration, nameServers, _clientId);
                 orderStopwatch.Stop();
+            }
+            catch (InkStainedWretch.OnePageAuthorAPI.API.WhmcsConfigurationException ex)
+            {
+                orderStopwatch.Stop();
+                _logger.LogCritical(EvtAddOrderFailed,
+                    "Non-transient WHMCS configuration error while placing domain order for {Domain}: {Message}. " +
+                    "Message will be dead-lettered.",
+                    domainName, ex.Message);
+                return MessageProcessingOutcome.DeadLetterConfigurationError;
             }
             catch (Exception ex)
             {

@@ -534,6 +534,18 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             var domainName = domainRegistration.Domain.FullDomainName;
             _logger.LogInformation("Placing domain order for {DomainName} via WHMCS AddOrder API", domainName);
 
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                throw new WhmcsConfigurationException(
+                    "WHMCS AddOrder requires a configured client ID. Set WHMCS_CLIENT_ID to a valid WHMCS client ID.");
+            }
+
+            if (!int.TryParse(clientId, out var parsedClientId) || parsedClientId <= 0)
+            {
+                throw new WhmcsConfigurationException(
+                    $"WHMCS_CLIENT_ID must be a positive integer WHMCS client ID. Received '{clientId}'.");
+            }
+
             try
             {
                 var requestData = new Dictionary<string, string>
@@ -548,10 +560,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                     { "responsetype", "json" }
                 };
 
-                if (!string.IsNullOrWhiteSpace(clientId))
-                {
-                    requestData["clientid"] = clientId;
-                }
+                requestData["clientid"] = parsedClientId.ToString();
 
                 // Add name servers (up to 5, skipping blank entries)
                 var validNameServers = (nameServers ?? [])
@@ -587,8 +596,17 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 }
 
                 var errorMessage = jsonResponse?.Message ?? "Unknown error";
-                _logger.LogWarning("WHMCS AddOrder returned non-success result for {DomainName}: {Message}",
-                    domainName, errorMessage);
+
+                if (string.Equals(errorMessage, "Client ID Not Found", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new WhmcsConfigurationException(
+                        $"WHMCS AddOrder failed: Client ID Not Found (clientid={parsedClientId}). " +
+                        "Verify WHMCS_CLIENT_ID points to an existing client in the target WHMCS environment.");
+                }
+
+                _logger.LogWarning(
+                    "WHMCS AddOrder returned non-success result for {DomainName}: {Message}. ClientId={ClientId}",
+                    domainName, errorMessage, parsedClientId);
                 return false;
             }
             catch (HttpRequestException ex)
@@ -600,6 +618,11 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             {
                 _logger.LogError(ex, "Failed to parse WHMCS AddOrder response for domain {DomainName}", domainName);
                 return false;
+            }
+            catch (WhmcsConfigurationException)
+            {
+                // Non-transient; allow caller to decide disposition.
+                throw;
             }
             catch (Exception ex)
             {

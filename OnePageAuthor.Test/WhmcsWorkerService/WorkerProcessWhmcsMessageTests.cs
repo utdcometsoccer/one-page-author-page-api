@@ -183,6 +183,22 @@ namespace OnePageAuthor.Test.WhmcsWorkerService
             Assert.Equal(Outcome.Abandon, outcome);
         }
 
+        [Fact]
+        public async Task ProcessWhmcsMessageAsync_WhenAddOrderThrowsConfigurationException_ReturnsDeadLetterConfigurationError()
+        {
+            var json = MakeMessageJson();
+            _mockWhmcsService.Setup(x => x.CheckDomainAvailabilityAsync(It.IsAny<string>()))
+                .ReturnsAsync(true);
+            _mockWhmcsService.Setup(x => x.AddOrderAsync(It.IsAny<DomainRegistrationEntity>(), It.IsAny<string[]>(), It.IsAny<string>()))
+                .ThrowsAsync(new InkStainedWretch.OnePageAuthorAPI.API.WhmcsConfigurationException("Client ID Not Found"));
+
+            // Act
+            var outcome = await _worker.ProcessWhmcsMessageAsync(json, "msg-config");
+
+            // Assert
+            Assert.Equal(Outcome.DeadLetterConfigurationError, outcome);
+        }
+
         #endregion
 
         #region Complete: Successful order
