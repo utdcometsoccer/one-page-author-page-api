@@ -733,6 +733,7 @@ Azure Functions have dynamic outbound IPs that cannot be added to a WHMCS IP all
    WHMCS_API_URL=https://your-whmcs.com/includes/api.php
    WHMCS_API_IDENTIFIER=your-api-identifier
    WHMCS_API_SECRET=your-api-secret
+   WHMCS_CLIENT_ID=123
    # Optional:
    APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=...;IngestionEndpoint=...;
    WHMCS_WORKER_LOG_LEVEL=Information
@@ -765,7 +766,8 @@ Azure Functions have dynamic outbound IPs that cannot be added to a WHMCS IP all
        SERVICE_BUS_WHMCS_QUEUE_NAME="whmcs-domain-registrations" \
        WHMCS_API_URL="https://your-whmcs.com/includes/api.php" \
        WHMCS_API_IDENTIFIER="your-identifier" \
-       WHMCS_API_SECRET="your-secret"
+       WHMCS_API_SECRET="your-secret" \
+       WHMCS_CLIENT_ID="123"
    ```
 
 9. **Verify end-to-end**: Create a `Pending` domain registration in Cosmos DB and watch the worker logs:
@@ -793,6 +795,7 @@ The GitHub Actions workflow automatically builds and deploys the `WhmcsWorkerSer
 | `WHMCS_API_URL` | WHMCS API endpoint URL |
 | `WHMCS_API_IDENTIFIER` | WHMCS API credential identifier |
 | `WHMCS_API_SECRET` | WHMCS API credential secret |
+| `WHMCS_CLIENT_ID` | WHMCS client ID used by the worker for AddOrder |
 | `WHMCS_WORKER_LOG_LEVEL` | Log level override for the worker service |
 | `APPLICATIONINSIGHTS_CONNECTION_STRING` | App Insights connection string (used by the worker if configured) |
 

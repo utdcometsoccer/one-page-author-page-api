@@ -29,6 +29,10 @@ param whmcsApiIdentifier string
 @secure()
 param whmcsApiSecret string
 
+@description('WHMCS client ID used for AddOrder (WHMCS_CLIENT_ID)')
+@secure()
+param whmcsClientId string
+
 @description('Application Insights / Azure Monitor connection string (APPLICATIONINSIGHTS_CONNECTION_STRING). Optional; when empty, telemetry export is disabled.')
 @secure()
 param applicationInsightsConnectionString string = ''
@@ -85,7 +89,20 @@ var aiLine = empty(applicationInsightsConnectionString)
   ? ''
   : 'APPLICATIONINSIGHTS_CONNECTION_STRING=${applicationInsightsConnectionString}\n'
 
-var envFileContent = 'SERVICE_BUS_CONNECTION_STRING=${serviceBusConnectionString}\nSERVICE_BUS_WHMCS_QUEUE_NAME=${serviceBusWhmcsQueueName}\nWHMCS_API_URL=${whmcsApiUrl}\nWHMCS_API_IDENTIFIER=${whmcsApiIdentifier}\nWHMCS_API_SECRET=${whmcsApiSecret}\n${aiLine}WHMCS_WORKER_LOG_LEVEL=${whmcsWorkerLogLevel}\nWHMCS_SYSTEMD_NOTIFY_SOCKET=${whmcsSystemdNotifySocket}\nWHMCS_SYSTEMD_WATCHDOG_USEC=${whmcsSystemdWatchdogUsec}\n'
+// Keep this environment file content in sync with the keys read by WhmcsWorkerService and OnePageAuthorLib WHMCS components.
+// Required for core worker operation:
+// - SERVICE_BUS_CONNECTION_STRING
+// - SERVICE_BUS_WHMCS_QUEUE_NAME
+// - WHMCS_API_URL
+// - WHMCS_API_IDENTIFIER
+// - WHMCS_API_SECRET
+// - WHMCS_CLIENT_ID
+// Optional/operational:
+// - APPLICATIONINSIGHTS_CONNECTION_STRING
+// - WHMCS_WORKER_LOG_LEVEL
+// - WHMCS_SYSTEMD_NOTIFY_SOCKET
+// - WHMCS_SYSTEMD_WATCHDOG_USEC
+var envFileContent = 'SERVICE_BUS_CONNECTION_STRING=${serviceBusConnectionString}\nSERVICE_BUS_WHMCS_QUEUE_NAME=${serviceBusWhmcsQueueName}\nWHMCS_API_URL=${whmcsApiUrl}\nWHMCS_API_IDENTIFIER=${whmcsApiIdentifier}\nWHMCS_API_SECRET=${whmcsApiSecret}\nWHMCS_CLIENT_ID=${whmcsClientId}\n${aiLine}WHMCS_WORKER_LOG_LEVEL=${whmcsWorkerLogLevel}\nWHMCS_SYSTEMD_NOTIFY_SOCKET=${whmcsSystemdNotifySocket}\nWHMCS_SYSTEMD_WATCHDOG_USEC=${whmcsSystemdWatchdogUsec}\n'
 
 var configureEnvironmentScript = '''#!/bin/sh
 set -e

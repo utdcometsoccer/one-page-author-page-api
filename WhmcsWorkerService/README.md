@@ -294,6 +294,7 @@ SERVICE_BUS_WHMCS_QUEUE_NAME=whmcs-domain-registrations
 WHMCS_API_URL=https://your-whmcs-instance.com/includes/api.php
 WHMCS_API_IDENTIFIER=your-api-identifier
 WHMCS_API_SECRET=your-api-secret
+WHMCS_CLIENT_ID=123
 
 # systemd watchdog defaults (used ONLY if systemd-provided NOTIFY_SOCKET/WATCHDOG_* are missing or blank)
 # These values are safe to include in /etc/whmcs-worker/environment because they do NOT override systemd's vars.
@@ -401,6 +402,7 @@ All configuration is loaded from `/etc/whmcs-worker/environment` (and optionally
 | `WHMCS_API_URL` | **Yes** | — | Full URL to the WHMCS API (e.g., `https://your-whmcs.com/includes/api.php`) |
 | `WHMCS_API_IDENTIFIER` | **Yes** | — | WHMCS API credential identifier |
 | `WHMCS_API_SECRET` | **Yes** | — | WHMCS API credential secret |
+| `WHMCS_CLIENT_ID` | **Yes** | — | WHMCS client ID used when placing AddOrder domain registrations |
 
 ### Telemetry and logging variables
 

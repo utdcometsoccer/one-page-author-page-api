@@ -624,6 +624,7 @@ WHMCS → Domain Registrar
 | `WHMCS_API_URL` | WHMCS API endpoint (e.g., `https://your-whmcs.com/includes/api.php`) |
 | `WHMCS_API_IDENTIFIER` | WHMCS API credential identifier |
 | `WHMCS_API_SECRET` | WHMCS API credential secret |
+| `WHMCS_CLIENT_ID` | WHMCS client ID used for AddOrder domain registrations |
 
 > ⚠️ **Security**: `/etc/whmcs-worker/environment` contains credentials — keep permissions as `600 root:root`. Never commit credentials to source control.
 
