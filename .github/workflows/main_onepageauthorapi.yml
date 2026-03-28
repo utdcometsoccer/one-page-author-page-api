@@ -1104,6 +1104,7 @@ jobs:
           WHMCS_API_URL: ${{ secrets.WHMCS_API_URL }}
           WHMCS_API_IDENTIFIER: ${{ secrets.WHMCS_API_IDENTIFIER }}
           WHMCS_API_SECRET: ${{ secrets.WHMCS_API_SECRET }}
+          WHMCS_CLIENT_ID: ${{ secrets.WHMCS_CLIENT_ID }}
           APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
           WHMCS_WORKER_LOG_LEVEL: ${{ secrets.WHMCS_WORKER_LOG_LEVEL }}
           DEPLOY_WHMCS_WORKER: ${{ secrets.DEPLOY_WHMCS_WORKER }}
@@ -1116,9 +1117,9 @@ jobs:
             exit 0
           fi
 
-          if [ -z "$WHMCS_API_URL" ] || [ -z "$WHMCS_API_IDENTIFIER" ] || [ -z "$WHMCS_API_SECRET" ]; then
-            echo "❌ WHMCS API secrets not configured; cannot deploy VM environment configuration."
-            echo "   Required: WHMCS_API_URL, WHMCS_API_IDENTIFIER, WHMCS_API_SECRET"
+          if [ -z "$WHMCS_API_URL" ] || [ -z "$WHMCS_API_IDENTIFIER" ] || [ -z "$WHMCS_API_SECRET" ] || [ -z "$WHMCS_CLIENT_ID" ]; then
+            echo "❌ WHMCS secrets not configured; cannot deploy VM environment configuration."
+            echo "   Required: WHMCS_API_URL, WHMCS_API_IDENTIFIER, WHMCS_API_SECRET, WHMCS_CLIENT_ID"
             exit 1
           fi
 
@@ -1172,6 +1173,7 @@ jobs:
               "whmcsApiUrl=$WHMCS_API_URL" \
               "whmcsApiIdentifier=$WHMCS_API_IDENTIFIER" \
               "whmcsApiSecret=$WHMCS_API_SECRET" \
+              "whmcsClientId=$WHMCS_CLIENT_ID" \
               "applicationInsightsConnectionString=${APPLICATIONINSIGHTS_CONNECTION_STRING:-}" \
               "whmcsWorkerLogLevel=$LOG_LEVEL" \
               "environmentConfigTimestamp=${GITHUB_RUN_NUMBER}" \
