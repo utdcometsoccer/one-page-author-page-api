@@ -766,8 +766,8 @@ Azure Functions have dynamic outbound IPs that cannot be added to a WHMCS IP all
        SERVICE_BUS_WHMCS_QUEUE_NAME="whmcs-domain-registrations" \
        WHMCS_API_URL="https://your-whmcs.com/includes/api.php" \
        WHMCS_API_IDENTIFIER="your-identifier" \
-         WHMCS_API_SECRET="your-secret" \
-         WHMCS_CLIENT_ID="123"
+       WHMCS_API_SECRET="your-secret" \
+       WHMCS_CLIENT_ID="123"
    ```
 
 9. **Verify end-to-end**: Create a `Pending` domain registration in Cosmos DB and watch the worker logs:

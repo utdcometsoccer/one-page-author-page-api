@@ -249,7 +249,7 @@ az functionapp config appsettings set \
     WHMCS_API_URL="https://whmcs.example.com/includes/api.php" \
     WHMCS_API_IDENTIFIER="your-api-identifier" \
     WHMCS_API_SECRET="your-api-secret" \
-      WHMCS_CLIENT_ID="123" \
+    WHMCS_CLIENT_ID="123" \
     SERVICE_BUS_CONNECTION_STRING="Endpoint=sb://..." \
     SERVICE_BUS_WHMCS_QUEUE_NAME="whmcs-domain-registrations"
 ```
