@@ -56,8 +56,8 @@ This executive summary references a complete suite of launch planning documents:
 - ✅ Azure Blob Storage (image management)
 - ✅ Penguin Random House API (book catalog)
 - ✅ Amazon Product Advertising API (affiliate links)
-- ✅ Azure DNS Zones (implemented and validated 2026-03-30)
-- ✅ Azure Front Door (implemented and validated 2026-03-30)
+- ✅ Azure DNS Zones (implemented and validated as of 2026-03-30)
+- ✅ Azure Front Door (implemented and validated as of 2026-03-30)
 
 ### Feature Completeness
 

@@ -44,9 +44,9 @@ The OnePageAuthor API Platform is **100% ready for North America launch**. All v
 | **JWT Authentication** | ✅ Complete | 🟢 High | No | None - validated 2025-12-30 |
 | **Author Profile API** | ✅ Complete | 🟢 High | No | None - operational |
 | **Image Upload/Storage** | ✅ Complete | 🟢 High | No | None - tiered storage working |
-| **Domain Registration API** | ✅ Complete | 🟢 High | No | Validated E2E (2026-03-30) |
-| **Azure DNS Automation** | ✅ Complete | 🟢 High | No | Validated (2026-03-30) |
-| **Front Door Integration** | ✅ Complete | 🟢 High | No | Validated (2026-03-30) |
+| **Domain Registration API** | ✅ Complete | 🟢 High | No | Validated E2E as of 2026-03-30 |
+| **Azure DNS Automation** | ✅ Complete | 🟢 High | No | Validated as of 2026-03-30 |
+| **Front Door Integration** | ✅ Complete | 🟢 High | No | Validated as of 2026-03-30 |
 | **Multi-language Support** | ✅ Complete | 🟢 High | No | EN, ES, FR ready for NA |
 
 ### Important Features (Should Have)

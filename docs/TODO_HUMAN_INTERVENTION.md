@@ -503,6 +503,12 @@ End-to-end validation of domain registration workflow with WHMCS and test domain
 
 ---
 
+### 7. Configure Azure DNS Resources ✅ **COMPLETE**
+
+**Status:** ✅ Complete — Azure DNS resources configured and validated.
+
+---
+
 ### 10. Test Front Door Domain Addition Workflow ✅ **COMPLETE (2026-03-30)**
 
 **Status:** ✅ **COMPLETE (2026-03-30)**  
@@ -513,28 +519,6 @@ End-to-end validation of domain registration workflow with WHMCS and test domain
 - Custom domain addition after DNS zone creation confirmed working
 - HTTPS certificate provisioning confirmed
 - Routing rules directing traffic to author pages confirmed
-
----
-
-### 9. Test DNS Zone Creation Workflow ✅ **COMPLETE (2026-03-30)**
-
-**Status:** ✅ **COMPLETE (2026-03-30)**
-
-**Summary:** DNS zone creation validated in real Azure environment. All scenarios confirmed working.
-
----
-
-### 7. Configure Azure DNS Resources ✅ **COMPLETE**
-
-**Status:** ✅ Complete — Azure DNS resources configured and validated.
-
----
-
-### 10. Test Front Door Domain Addition Workflow ✅ **COMPLETE (2026-03-30)**
-
-**Status:** ✅ **COMPLETE (2026-03-30)**
-
-**Summary:** Front Door integration validated in real Azure environment. Domain addition, HTTPS certificate provisioning, and routing all confirmed working.
 
 ---
 
