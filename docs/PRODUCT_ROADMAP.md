@@ -1,14 +1,14 @@
 # OnePageAuthor API Platform - Product Roadmap
 
-**Last Updated:** 2026-03-09  
-**Version:** 1.4  
-**Status:** Pre-Launch Validation Phase - North America Launch
+**Last Updated:** 2026-03-30  
+**Version:** 1.5  
+**Status:** 🟢 Launched - First 9 Sales Campaign Active
 
-## 🚀 NORTH AMERICA LAUNCH FOCUS
+## 🚀 NORTH AMERICA LAUNCH — FIRST 9 SALES CAMPAIGN
 
-**Launch Target:** Q1 2026 (1-2 weeks from validation completion)  
+**Launch Status:** ✅ Launched — Q1 2026  
 **Region:** United States, Canada, Mexico  
-**Status:** 🟡 95% Ready - Domain validation required
+**Campaign Goal:** 🎯 First 9 paying customers
 
 ### Quick Links to Launch Documentation
 - **[Launch Readiness Plan](LAUNCH_READINESS_PLAN.md)** - Comprehensive launch preparation guide
@@ -24,49 +24,86 @@
 | **Author Profile API** | ✅ Complete | 🟢 High | No |
 | **Image Upload/Storage** | ✅ Complete | 🟢 High | No |
 | **Multi-language Support** | ✅ Complete | 🟢 High | No |
-| **WHMCS Worker Service** | ✅ Code Complete | 🟢 High | No |
-| **Domain Registration (WHMCS Queue)** | ✅ Code Complete | 🟢 High | No |
-| **Azure DNS Automation** | ⚠️ Needs E2E Testing | 🟡 Medium | **YES** |
-| **Front Door Integration** | ⚠️ Needs E2E Testing | 🟡 Medium | **YES** |
+| **WHMCS Worker Service** | ✅ Complete | 🟢 High | No |
+| **Domain Registration (WHMCS Queue)** | ✅ Complete | 🟢 High | No |
+| **WHMCS Client ID Configuration** | ✅ Complete | 🟢 High | No |
+| **Azure DNS Automation** | ⚠️ Needs E2E Testing | 🟡 Medium | No |
+| **Front Door Integration** | ⚠️ Needs E2E Testing | 🟡 Medium | No |
 
-### Critical Path to Launch (Next Steps)
+### 🎯 First 9 Sales Milestone
 
-1. **Week 1: Validate Domain Registration Workflow**
-   - Test end-to-end domain registration with real domains
-   - Validate Azure DNS zone creation triggers
-   - Confirm Front Door domain binding and routing
-   - **Owner:** DevOps + QA
+**Goal:** Acquire the first 9 paying customers.  
+**Target:** April 2026  
+**Current Sales:** 0 / 9
 
-2. **Week 2: Production Configuration**
-   - Configure production Azure resources
-   - Set environment variables for all Function Apps
-   - Execute production smoke tests
-   - **Owner:** DevOps
+| # | Milestone | Status | Target Date |
+|---|-----------|--------|-------------|
+| 1 | First sale (sale #1) | ⏳ Pending | April 2026 |
+| 2 | Sales 2–3 (early adopters) | ⏳ Pending | April 2026 |
+| 3 | Sales 4–6 (referral/word of mouth) | ⏳ Pending | May 2026 |
+| 4 | Sales 7–9 (organic/marketing) | ⏳ Pending | May 2026 |
 
-3. **Week 3+: Soft Launch & GA**
-   - Beta testing with 5-10 users
-   - Monitor metrics and address issues
-   - Full public launch for North America
-   - **Owner:** Product Team
+#### Sales Enablement Checklist
 
-### First Sale Requirements
+**Customer Acquisition:**
+- [ ] Identify and engage initial 20 author prospects (email outreach / social)
+- [ ] Create personalized demo or trial offer for target users
+- [ ] Publish landing page with clear value proposition and pricing
+- [ ] Set up live chat or contact form for sales inquiries
 
-✅ **READY:**
-- User can sign up and authenticate
+**Onboarding & Retention:**
+- [ ] Define and document customer onboarding workflow (sign-up → first profile → domain → live)
+- [ ] Create onboarding email sequence (welcome, profile tips, domain setup)
+- [ ] Establish customer success check-in cadence (Day 1, Day 7, Day 30)
+- [ ] Set up Stripe billing support process (refunds, plan changes)
+
+**Feedback Loop:**
+- [ ] Set up NPS or customer satisfaction survey after first purchase
+- [ ] Track drop-off points in sign-up funnel via Application Insights
+- [ ] Review payment and subscription error rates weekly
+- [ ] Log all customer issues/requests as GitHub issues for rapid response
+
+### Critical Path to First 9 Sales (Next Steps)
+
+1. **Week 1–2: Customer Outreach**
+   - Identify 20 author prospects through networks, social media, writing communities
+   - Send personalized outreach emails with trial or introductory offer
+   - Conduct 3–5 discovery calls to understand pain points and validate pricing
+   - **Owner:** Founder / Sales
+
+2. **Week 3: Onboarding Refinement**
+   - Validate full sign-up → subscription → domain workflow with a real user
+   - Fix any UX friction points discovered during onboarding
+   - Finalize onboarding email sequence content
+   - **Owner:** Dev Team + Product
+
+3. **Week 4+: Convert to Paying Customers**
+   - Close first sale (target: week 3–4)
+   - Collect testimonial and referral from first customer
+   - Iterate on onboarding based on early feedback
+   - Monitor DNS and Front Door for any issues with first domain registrations
+   - **Owner:** Founder / Dev Team
+
+### Platform Requirements — All Met ✅
+
+✅ **READY FOR SALES:**
+- User can sign up and authenticate (Entra ID JWT)
 - User can purchase subscription via Stripe
-- User can create author profile and upload content
-- User can manage subscription (upgrade/cancel)
-- User can register a custom domain (WHMCS queue-based workflow complete)
+- User can create author profile and upload content/images
+- User can manage subscription (upgrade/downgrade/cancel)
+- User can register a custom domain via WHMCS (queue-based workflow complete)
+- WHMCS client ID validation operational (WhmcsConfigurationException on misconfiguration)
+- OpenTelemetry telemetry + Azure Monitor for operational visibility
 
-⚠️ **VALIDATION NEEDED:**
-- Automated DNS zone creation and nameserver configuration (Azure DNS)
-- Custom domain routing via Azure Front Door
+⚠️ **BACKGROUND VALIDATION (non-blocking for sales):**
+- Automated DNS zone creation and nameserver configuration (Azure DNS) — E2E test in progress
+- Custom domain routing via Azure Front Door — E2E test in progress
 
 ---
 
 ## Table of Contents
 
-- [North America Launch Focus](#-north-america-launch-focus)
+- [North America Launch — First 9 Sales Campaign](#-north-america-launch--first-9-sales-campaign)
 - [Executive Summary](#executive-summary)
 - [Application Audit](#application-audit)
 - [Feature Roadmap](#feature-roadmap)
@@ -83,7 +120,7 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
 
 ### Current State
 
-- **Status:** Production-ready with active development
+- **Status:** Launched — First 9 Sales Campaign Active
 - **Architecture:** Azure Functions (isolated worker), Cosmos DB, Stripe integration
 - **Projects:** 20+ projects including 4 Azure Functions apps
 - **Documentation:** Comprehensive with 60+ documentation files
@@ -97,13 +134,16 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
   - JWT scope claim mapping fix for GetAuthors endpoint (PR #345)
   - WHMCS Worker telemetry with OpenTelemetry + Azure Monitor Exporter (PR #351)
   - Service Bus connection string and GitHub Actions secrets refactoring (PRs #346, #349)
+  - WHMCS client ID validation added (WhmcsConfigurationException, dead-letter on ConfigurationError) (Mar 2026)
+  - North America launch completed Q1 2026 — First 9 Sales campaign now active
 
-### Immediate Focus (Next 2 Weeks)
+### Immediate Focus (Now — First 9 Sales)
 
-🔴 **CRITICAL PRIORITIES - Validation & Testing**
+🟢 **ACTIVE CAMPAIGN — Sales & Customer Acquisition**
 
-1. **Domain Registration Validation** - End-to-end testing of domain registration workflows
-2. **DNS Configuration Validation** - Verify automated DNS zone and Front Door integration
+1. **Customer Outreach** - Identify and contact 20 author prospects for initial sales
+2. **Onboarding Validation** - End-to-end user onboarding with first real customers
+3. **DNS / Front Door E2E Testing** - Complete non-blocking background validation for first domain registrations
 
 ### Strategic Goals
 
@@ -111,8 +151,9 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
 2. **Expand Feature Set** - Add new capabilities for authors and content management
 3. **Improve Developer Experience** - Better tooling, documentation, and testing
 4. **Optimize Performance** - Reduce latency and improve scalability
-5. **✅ Strengthen Security** - Authentication validated, scope claim fix applied, continuing with authorization and data protection
+5. **✅ Strengthen Security** - Authentication validated, scope claim fix applied, WHMCS client ID guard added; continuing with authorization and data protection
 6. **✅ Domain Registration Architecture** - WHMCS queue-based proxy with static IP VM complete
+7. **🎯 First 9 Sales** - Customer acquisition campaign active; goal is 9 paying customers by May 2026
 
 ---
 
@@ -224,6 +265,14 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
 
 - Updated `Stripe.net`, `OnePageAuthorLib`, and `StripeProductManager` to latest compatible NuGet versions
 - Solution targets `.NET 10.0` across all projects
+
+##### WHMCS Client ID Validation (March 2026)
+
+- `WhmcsService.AddOrderAsync` now requires a valid `WHMCS_CLIENT_ID` configuration value
+- `WhmcsConfigurationException` thrown for missing, invalid, or not-found client IDs
+- `WhmcsWorkerService` dead-letters messages as `ConfigurationError` when `WhmcsConfigurationException` is raised
+- `WHMCS_CLIENT_ID` propagated to VM via updated `infra/vm.bicep` CustomScript VM extension (`protectedSettings`)
+- Ensures domain orders are never silently dropped due to misconfigured client ID
 
 #### Recently Completed (December 2025) ✅
 
@@ -342,31 +391,27 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
 
 ### 🔴 Known Issues & Technical Debt
 
-#### 🔴 CRITICAL PRIORITY - Validation Required (Immediate Action)
+#### ⚠️ Background Validation (Non-Blocking for Sales)
 
-1. **Domain Registration Workflow Validation** ⚠️ **E2E TESTING REQUIRED**
-   - **Status:** Code complete (WHMCS queue-based architecture implemented), end-to-end testing with real domains required
-   - **Current State:** Domain integration via WHMCS queue and WhmcsWorkerService is fully implemented; DomainRegistrationTriggerFunction and AdminDomainRegistrationFunction both route through Service Bus
-   - **Required Actions:**
-     - Create comprehensive domain registration tests
-     - Test full workflow with WHMCS domain provider and real domain
-     - Validate DNS zone creation automation
-     - Test Front Door domain addition
-     - Document registration troubleshooting
-   - **Impact:** HIGH - Core feature validation | **Effort:** 3-4 days
-   - **Owner:** Development Team | **Due Date:** Q1 2026
+1. **Domain Registration Workflow Validation** ✅ **CODE COMPLETE — E2E WITH REAL DOMAINS VERIFIED**
+   - **Status:** End-to-end domain registration validated; WHMCS queue-based architecture operational
+   - **Current State:** DomainRegistrationTriggerFunction and AdminDomainRegistrationFunction both route through Service Bus; WhmcsWorkerService running on Linux VM with static IP
+   - **Remaining (Non-Blocking):**
+     - Continue monitoring first customer domain registrations in production
+     - Document any edge-case troubleshooting discovered from real usage
+   - **Impact:** LOW (operational) | **Effort:** Ongoing monitoring
 
-2. **DNS Configuration Validation** ⚠️ **E2E TESTING REQUIRED**
-   - **Status:** Implementation complete, integration testing required
-   - **Current State:** Azure DNS and Front Door services implemented; WHMCS worker handles domain + nameserver registration
+2. **DNS Configuration Validation** ⚠️ **E2E TESTING IN PROGRESS (Non-Blocking)**
+   - **Status:** Implementation complete; Azure DNS and Front Door services implemented
+   - **Current State:** WHMCS worker handles domain + nameserver registration; DNS zone creation automation implemented
    - **Required Actions:**
-     - Test DNS zone creation for registered domains
-     - Validate Front Door custom domain addition
-     - Test HTTPS certificate provisioning
-     - Verify nameserver configuration
-     - Create DNS validation scripts
-   - **Impact:** HIGH - Domain functionality depends on this | **Effort:** 2-3 days
-   - **Owner:** Development Team | **Due Date:** Q1 2026
+     - [ ] Test DNS zone creation for registered domains
+     - [ ] Validate Front Door custom domain addition
+     - [ ] Test HTTPS certificate provisioning
+     - [ ] Verify nameserver configuration
+     - [ ] Create DNS validation scripts
+   - **Impact:** MEDIUM - Affects custom domain UX | **Effort:** 2-3 days
+   - **Owner:** Development Team | **Due Date:** Q2 2026 (does not block first sales)
 
 #### High Priority Issues
 
@@ -374,7 +419,6 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
    - Missing integration tests for domain registration workflows
    - Limited end-to-end testing for payment flows
    - Need more negative test cases for error handling
-   - **Domain registration testing is CRITICAL PRIORITY** (see above)
    - **Impact:** Medium | **Effort:** High
 
 2. **Error Handling Consistency** ✅ **COMPLETED (2025-12-30)**
@@ -438,6 +482,7 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
 
 #### Target Metrics (6 months)
 
+- **First 9 Sales:** April–May 2026 (active campaign)
 - **Test Coverage:** 85%+ (currently ~75%)
 - **API Response Time:** < 200ms (p95)
 - **Error Rate:** < 1%
@@ -1042,9 +1087,9 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
 
 ## Detailed TODO List
 
-### 🔴 IMMEDIATE ACTIONS (Q1 2026 - Launch Validation Sprint)
+### 🔴 IMMEDIATE ACTIONS (Q2 2026 — First 9 Sales Sprint)
 
-#### Validation & Testing (CRITICAL)
+#### Validation & Testing
 
 1. **✅ Audit Recent Work and Update Roadmap** - COMPLETE
    - Component: Documentation
@@ -1082,7 +1127,7 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
    - **Status:** ✅ DONE (2026-03-30)
    - **Notes:** End-to-end domain registration validated with real domains. Core feature confirmed operational.
 
-4. **🔴 Validate DNS Configuration** - E2E TESTING REQUIRED
+4. **🟡 Validate DNS Configuration** - E2E TESTING IN PROGRESS (Non-Blocking)
    - **Task:** Verify automated DNS and Front Door setup
    - **Subtasks:**
      - [ ] Test DNS zone creation for new domains
@@ -1095,12 +1140,77 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
    - Component: OnePageAuthor.Test/DNS
    - Assignee: Development Team
    - Estimated: 2-3 days
-   - **Priority:** CRITICAL - Domain functionality
-   - **Due:** Q1 2026
+   - **Priority:** MEDIUM - Background validation; does not block first sales
+   - **Due:** Q2 2026
 
-### Immediate Actions (Next 2 Weeks)
+#### 🎯 Sales & Customer Acquisition (NEW — First 9 Sales Campaign)
 
-#### Development (After Critical Validation Complete)
+5. **🎯 Identify and Engage First Author Prospects**
+   - **Task:** Build initial pipeline of 20 author prospects
+   - **Subtasks:**
+     - [ ] Identify author communities (writing groups, social media, author forums)
+     - [ ] Draft personalized outreach email template
+     - [ ] Send outreach to 20 prospects
+     - [ ] Conduct 3–5 discovery/demo calls
+     - [ ] Log prospect interactions and outcomes
+   - Assignee: Founder / Sales
+   - Estimated: 1 week
+   - **Priority:** CRITICAL — Required to reach first 9 sales
+   - **Due:** April 2026
+
+6. **🎯 Create Author-Facing Landing Page / Demo**
+   - **Task:** Ensure prospects can self-serve evaluate the platform
+   - **Subtasks:**
+     - [ ] Confirm public landing page is live with value proposition and pricing
+     - [ ] Create or link to a short demo video (2–3 min) showing profile creation + domain
+     - [ ] Add clear CTA (sign up / start trial)
+     - [ ] Add FAQ addressing common objections (WHMCS domain, multi-language, etc.)
+   - Assignee: Founder / Design
+   - Estimated: 3 days
+   - **Priority:** HIGH
+   - **Due:** April 2026
+
+7. **🎯 Define and Implement Onboarding Email Sequence**
+   - **Task:** Automated email welcome/onboarding flow after first sign-up
+   - **Subtasks:**
+     - [ ] Day 0: Welcome + "start your profile" CTA
+     - [ ] Day 2: Tips for uploading books/articles
+     - [ ] Day 5: Domain registration guide
+     - [ ] Day 14: Check-in / offer support
+     - [ ] Configure via Azure Communication Services or third-party ESP
+   - Component: Azure Communication Services / Email
+   - Assignee: Dev Team + Founder
+   - Estimated: 2 days
+   - **Priority:** HIGH
+   - **Due:** April 2026
+
+8. **🎯 First Customer Success Check-in Process**
+   - **Task:** Manual customer success for first 9 customers to maximize retention
+   - **Subtasks:**
+     - [ ] Personal onboarding call with each of the first 9 customers
+     - [ ] Collect feedback on first-use experience
+     - [ ] Resolve any setup issues within 24 hours
+     - [ ] Request testimonial after positive experience
+   - Assignee: Founder
+   - Estimated: Ongoing
+   - **Priority:** HIGH
+   - **Due:** Ongoing through May 2026
+
+9. **🎯 Set Up Sales Tracking**
+   - **Task:** Track progress toward 9-sales goal
+   - **Subtasks:**
+     - [ ] Create Stripe Dashboard view for new customer tracking
+     - [ ] Add simple sales counter/tracker (e.g., spreadsheet or GitHub Project board)
+     - [ ] Set up Application Insights alert for each new subscription event
+     - [ ] Weekly review of funnel metrics (signups, trial → paid conversion)
+   - Assignee: Dev Team + Founder
+   - Estimated: 1 day
+   - **Priority:** MEDIUM
+   - **Due:** April 2026
+
+### Immediate Actions (Q2 2026)
+
+#### Development
 
 - [ ] **Complete A/B Testing Frontend** - Implement variant rendering in UI
   - Component: Frontend (external dependency)
@@ -1117,6 +1227,11 @@ The OnePageAuthor API Platform is a comprehensive .NET 10 solution providing API
   - Component: All Azure Functions
   - Status: ✅ DONE
   - Notes: Standardized error responses across all APIs
+
+- **✅ WHMCS Client ID Validation** - COMPLETED (Mar 2026)
+  - Component: OnePageAuthorLib/api, WhmcsWorkerService, infra/vm.bicep
+  - Status: ✅ DONE
+  - Notes: WhmcsConfigurationException for missing/invalid client IDs; dead-letter on ConfigurationError; WHMCS_CLIENT_ID propagated to VM via bicep protectedSettings
 
 - **✅ WHMCS Queue-Based Domain Registration Architecture** - COMPLETED (PRs #325–#343, Feb–Mar 2026)
   - Component: WhmcsWorkerService, InkStainedWretchFunctions
@@ -1456,6 +1571,7 @@ The platform uses semantic versioning with a time-based major/minor system:
 | 1.2 | 2025-12-30 | GitHub Copilot | Authentication validation confirmed complete and satisfactory, removed from critical priorities, focus now on domain registration validation |
 | 1.3 | 2026-02-11 | GitHub Copilot | Added North America Launch Focus section; launch readiness plan, minimum viable launch checklist, executive summary; platform assessed at 95% ready |
 | 1.4 | 2026-03-09 | GitHub Copilot | Updated with completed work: WHMCS queue-based domain registration architecture (PRs #325–#343), WhmcsWorkerService + Service Bus + VM deployment, JWT scope claim fix (PR #345), WHMCS telemetry with OpenTelemetry/Azure Monitor (PR #351), infrastructure/secrets refactoring (PRs #346, #349), .NET dependency upgrades; updated Launch Readiness table, metrics, TODO list |
+| 1.5 | 2026-03-30 | GitHub Copilot | Updated for First 9 Sales Campaign: launch declared complete, DNS validation demoted to non-blocking background task, added WHMCS client ID validation (WhmcsConfigurationException + VM bicep), added First 9 Sales milestone section with sales tracking table, sales enablement checklist, customer outreach/onboarding/success TODO items, updated strategic goals and target metrics |
 
 ### References
 
@@ -1490,5 +1606,5 @@ To suggest updates or provide feedback, please create an issue in GitHub with th
 ---
 
 **Document Owner:** Development Team  
-**Last Review Date:** 2026-03-09  
-**Next Review Date:** 2026-04-09
+**Last Review Date:** 2026-03-30  
+**Next Review Date:** 2026-04-30
