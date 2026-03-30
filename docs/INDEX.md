@@ -155,8 +155,11 @@ Documentation for specific feature improvements:
 
 Guides for migrating systems and testing:
 
+- [**MONOREPO_MIGRATION_PLAN**](MONOREPO_MIGRATION_PLAN.md) ⭐ — **Monorepo consolidation plan** — team roles, GitHub issues, and step-by-step plan for uniting this repo with `ink-stained-wretch` and `one-page-author-page` under a single monorepo owned by the new Ink Stained Wretches legal entity
 - [**MIGRATION_GUIDE_ENTRA_ID_ROLES**](MIGRATION_GUIDE_ENTRA_ID_ROLES.md) - Entra ID migration
 - [**KEY_VAULT_MIGRATION_GUIDE**](KEY_VAULT_MIGRATION_GUIDE.md) - Key Vault migration
+- [**MIGRATION_CHECKLIST_ONE_PAGE_AUTHOR_TO_INK_STAINED_WRETCHES**](MIGRATION_CHECKLIST_ONE_PAGE_AUTHOR_TO_INK_STAINED_WRETCHES.md) - Detailed API rename checklist
+- [**MIGRATION_ONE_PAGE_AUTHOR_TO_INK_STAINED_WRETCHES**](MIGRATION_ONE_PAGE_AUTHOR_TO_INK_STAINED_WRETCHES.md) - Comprehensive API rename migration guide
 - [**TESTING_SCENARIOS_GUIDE**](TESTING_SCENARIOS_GUIDE.md) - Testing scenarios and strategies
 - [**SECURITY_AUDIT_REPORT**](SECURITY_AUDIT_REPORT.md) - Security audit findings
 
