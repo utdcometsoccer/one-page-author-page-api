@@ -147,4 +147,4 @@ After running this tool:
 
 - [Author Invitation API Documentation](../InkStainedWretchFunctions/AUTHOR_INVITATION_API.md)
 - [Author Invitation Tool README](../AuthorInvitationTool/README.md)
-- [Implementation Summary](../IMPLEMENTATION_SUMMARY_MULTI_DOMAIN_INVITATIONS.md)
+- [Implementation Summary](../docs/IMPLEMENTATION_SUMMARY_MULTI_DOMAIN_INVITATIONS.md)

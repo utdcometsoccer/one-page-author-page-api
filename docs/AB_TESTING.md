@@ -1,4 +1,6 @@
-# A/B Testing Configuration API Documentation
+# A/B Testing
+
+> This document consolidates `AB_TESTING_API.md`, `AB_TESTING_IMPLEMENTATION_SUMMARY.md`, and `AB_TESTING_QUICK_REFERENCE.md` into a single reference.
 
 ## Overview
 
@@ -12,7 +14,77 @@ The A/B Testing Configuration API enables frontend applications to retrieve expe
 - **Traffic Control**: Configure traffic allocation percentages for each variant
 - **Session Tracking**: Generate session IDs for anonymous users or use provided user IDs
 
-## API Endpoint
+---
+
+## Quick Reference
+
+### Endpoint
+
+```
+GET /api/experiments?page={page}&userId={userId}
+```
+
+### Parameters
+
+- **page** (required): Page identifier (e.g., `"landing"`, `"pricing"`)
+- **userId** (optional): User ID for consistent bucketing
+
+### Response
+
+```json
+{
+  "experiments": [
+    {
+      "id": "string",
+      "name": "string",
+      "variant": "string",
+      "config": { }
+    }
+  ],
+  "sessionId": "string"
+}
+```
+
+### Quick Start
+
+#### 1. Seed Sample Data
+
+```bash
+cd SeedExperiments
+export COSMOSDB_ENDPOINT_URI="your-endpoint"
+export COSMOSDB_PRIMARY_KEY="your-key"
+dotnet run
+```
+
+#### 2. Test API
+
+```bash
+# Anonymous user
+curl "http://localhost:7071/api/experiments?page=landing"
+
+# Authenticated user
+curl "http://localhost:7071/api/experiments?page=pricing&userId=user-123"
+```
+
+#### 3. Frontend Integration
+
+```typescript
+const response = await fetch(`/api/experiments?page=landing&userId=${userId}`);
+const { experiments, sessionId } = await response.json();
+
+const config = experiments.find(e => e.id === 'my-experiment-id')?.config;
+```
+
+### Test Coverage
+
+23/23 tests passing ✅
+
+- `ExperimentServiceTests`: 14 tests
+- `GetExperimentsTests`: 9 tests
+
+---
+
+## Full API Reference
 
 ### GET /api/experiments
 
@@ -22,7 +94,7 @@ Retrieves experiment assignments for a user/session on a specific page.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `page` | string | Yes | Page identifier (e.g., 'landing', 'pricing', 'signup') |
+| `page` | string | Yes | Page identifier (e.g., `'landing'`, `'pricing'`, `'signup'`) |
 | `userId` | string | No | User ID for consistent bucketing across sessions. If not provided, a session ID will be generated. |
 
 #### Request Examples
@@ -130,30 +202,28 @@ interface AssignedExperiment {
 }
 ```
 
-## Consistent Bucketing
+### Consistent Bucketing
 
 The API uses SHA256 hashing to ensure consistent variant assignment:
 
 1. A bucketing key is created: `experimentId + ":" + (userId || sessionId)`
 2. SHA256 hash is computed from the bucketing key
-3. Hash is converted to a number between 0-99 (percentage)
+3. Hash is converted to a number between 0–99 (percentage)
 4. Variant is selected based on traffic allocation ranges
 
-### Example
+**Example** — for a 50/50 traffic split:
 
-For an experiment with 50/50 traffic split:
+- Control: 0–49 (50%)
+- Variant A: 50–99 (50%)
 
-- Control: 0-49 (50%)
-- Variant A: 50-99 (50%)
-
-A user with hash value 23 → Control
+A user with hash value 23 → Control  
 A user with hash value 67 → Variant A
 
 **Key Property**: Same `userId` + `experimentId` always produces the same hash, ensuring consistent variant assignment.
 
-## Frontend Integration
+### Frontend Integration
 
-### React Example
+#### React Example
 
 ```typescript
 import { useEffect, useState } from 'react';
@@ -179,10 +249,10 @@ function useExperiments(page: string, userId?: string) {
       try {
         const params = new URLSearchParams({ page });
         if (userId) params.append('userId', userId);
-        
+
         const response = await fetch(`/api/experiments?${params}`);
         const data = await response.json();
-        
+
         setExperiments(data.experiments);
         setSessionId(data.sessionId);
       } catch (error) {
@@ -195,7 +265,6 @@ function useExperiments(page: string, userId?: string) {
     fetchExperiments();
   }, [page, userId]);
 
-  // Helper to get config for a specific experiment
   const getExperimentConfig = (experimentId: string): ExperimentConfig | null => {
     const experiment = experiments.find(e => e.id === experimentId);
     return experiment?.config || null;
@@ -210,12 +279,10 @@ function LandingPage() {
 
   if (loading) return <div>Loading...</div>;
 
-  // Get button color from experiment
   const buttonConfig = getExperimentConfig('hero-button-color-test');
   const buttonColor = buttonConfig?.buttonColor || '#007bff';
   const buttonText = buttonConfig?.buttonText || 'Get Started';
 
-  // Get headline from experiment
   const headlineConfig = getExperimentConfig('hero-headline-test');
   const headline = headlineConfig?.headline || 'Default Headline';
 
@@ -230,7 +297,7 @@ function LandingPage() {
 }
 ```
 
-### Vue.js Example
+#### Vue.js Example
 
 ```vue
 <template>
@@ -256,10 +323,10 @@ const sessionId = ref('');
 onMounted(async () => {
   const params = new URLSearchParams({ page: props.page });
   if (props.userId) params.append('userId', props.userId);
-  
+
   const response = await fetch(`/api/experiments?${params}`);
   const data = await response.json();
-  
+
   experiments.value = data.experiments;
   sessionId.value = data.sessionId;
 });
@@ -269,29 +336,26 @@ const getConfig = (experimentId: string) => {
   return exp?.config || {};
 };
 
-const buttonColor = computed(() => 
+const buttonColor = computed(() =>
   getConfig('hero-button-color-test').buttonColor || '#007bff'
 );
 
-const buttonText = computed(() => 
+const buttonText = computed(() =>
   getConfig('hero-button-color-test').buttonText || 'Get Started'
 );
 
-const headline = computed(() => 
+const headline = computed(() =>
   getConfig('hero-headline-test').headline || 'Default Headline'
 );
 </script>
 ```
 
-## Analytics Integration
+### Analytics Integration
 
-### Tracking Experiment Exposure
-
-When an experiment is shown to a user, send an event to your analytics system:
+#### Tracking Experiment Exposure
 
 ```typescript
 function trackExperimentExposure(experiment: Experiment, sessionId: string) {
-  // Google Analytics example
   gtag('event', 'experiment_exposure', {
     experiment_id: experiment.id,
     experiment_name: experiment.name,
@@ -299,21 +363,10 @@ function trackExperimentExposure(experiment: Experiment, sessionId: string) {
     session_id: sessionId,
     page: window.location.pathname
   });
-
-  // Custom analytics example
-  analytics.track('Experiment Exposure', {
-    experimentId: experiment.id,
-    experimentName: experiment.name,
-    variant: experiment.variant,
-    sessionId: sessionId,
-    timestamp: new Date().toISOString()
-  });
 }
 ```
 
-### Tracking Conversions
-
-Track when users complete key actions:
+#### Tracking Conversions
 
 ```typescript
 function trackConversion(experimentId: string, variant: string, action: string) {
@@ -326,66 +379,31 @@ function trackConversion(experimentId: string, variant: string, action: string) 
 }
 ```
 
-## Best Practices
+### Best Practices
 
-### 1. Store Session ID
+1. **Store Session ID** in local storage for anonymous users:
+   ```typescript
+   const { sessionId } = await fetchExperiments('landing');
+   localStorage.setItem('experimentSessionId', sessionId);
+   ```
+2. **Use User ID When Available** for authenticated users to ensure consistent cross-device experiences.
+3. **Handle Loading States** to avoid layout shifts.
+4. **Provide Fallbacks** in case experiments fail to load:
+   ```typescript
+   const buttonColor = getConfig('button-test')?.color || '#007bff';
+   ```
+5. **Track Exposures Early** — as soon as the variant is shown, not just on user interaction.
 
-Store the returned `sessionId` in local storage or session storage for anonymous users:
+### Creating New Experiments
 
-```typescript
-const { sessionId } = await fetchExperiments('landing');
-localStorage.setItem('experimentSessionId', sessionId);
-```
-
-### 2. Use User ID When Available
-
-Always pass the `userId` parameter for authenticated users to ensure consistent experiences across devices:
-
-```typescript
-const userId = getCurrentUser()?.id;
-const experiments = await fetchExperiments('landing', userId);
-```
-
-### 3. Handle Loading States
-
-Show appropriate loading states while fetching experiments to avoid layout shifts:
-
-```typescript
-if (loading) {
-  return <DefaultLayout />; // Show default without experimental changes
-}
-```
-
-### 4. Provide Fallbacks
-
-Always provide fallback values in case experiments fail to load:
-
-```typescript
-const buttonColor = getConfig('button-test')?.color || '#007bff';
-```
-
-### 5. Track Exposures Early
-
-Track experiment exposures as soon as the variant is shown, not just on user interaction:
-
-```typescript
-useEffect(() => {
-  if (experiments.length > 0) {
-    experiments.forEach(exp => trackExperimentExposure(exp, sessionId));
-  }
-}, [experiments]);
-```
-
-## Creating New Experiments
-
-Experiments are stored in Cosmos DB. To create a new experiment:
+Experiments are stored in Cosmos DB. To create a new experiment programmatically:
 
 ```csharp
 var experiment = new Experiment
 {
     id = "unique-experiment-id",
     Name = "Descriptive Experiment Name",
-    Page = "landing", // or "pricing", "signup", etc.
+    Page = "landing",
     IsActive = true,
     Variants = new List<ExperimentVariant>
     {
@@ -394,10 +412,7 @@ var experiment = new Experiment
             Id = "control",
             Name = "Control Group",
             TrafficPercentage = 50,
-            Config = new Dictionary<string, object>
-            {
-                { "featureEnabled", false }
-            }
+            Config = new Dictionary<string, object> { { "featureEnabled", false } }
         },
         new ExperimentVariant
         {
@@ -416,16 +431,11 @@ var experiment = new Experiment
 await experimentRepository.CreateAsync(experiment);
 ```
 
-### Traffic Allocation Rules
+**Traffic Allocation Rules**: Percentages must sum to 100; use whole numbers only.
 
-- Traffic percentages must sum to 100
-- Minimum percentage: 1
-- Maximum percentage: 100
-- Use whole numbers only
+### Rate Limiting
 
-## Rate Limiting
-
-Currently, there is no rate limiting on the experiments endpoint. Consider implementing caching on the frontend to reduce API calls:
+Currently there is no rate limiting on the experiments endpoint. Consider caching on the frontend:
 
 ```typescript
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
@@ -433,28 +443,77 @@ const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 function getCachedExperiments(page: string) {
   const cached = localStorage.getItem(`experiments_${page}`);
   if (!cached) return null;
-  
   const { data, timestamp } = JSON.parse(cached);
   if (Date.now() - timestamp > CACHE_DURATION) return null;
-  
   return data;
-}
-
-function setCachedExperiments(page: string, data: any) {
-  localStorage.setItem(`experiments_${page}`, JSON.stringify({
-    data,
-    timestamp: Date.now()
-  }));
 }
 ```
 
-## Support
+---
 
-For issues or questions:
+## Implementation Details
 
-- Check the README in `/SeedExperiments` for seeding sample data
-- Review test files in `/OnePageAuthor.Test/Services/ExperimentServiceTests.cs`
-- Contact the development team
+### Architecture Overview
+
+The implementation follows the standard repository/service pattern used across the codebase:
+
+| Layer | File | Responsibility |
+|-------|------|----------------|
+| Entity | `OnePageAuthorLib/entities/Experiment.cs` | Data models |
+| Container | `OnePageAuthorLib/nosql/ExperimentsContainerManager.cs` | Cosmos DB container (`/Page` partition key, 400 RU/s) |
+| Repository | `OnePageAuthorLib/nosql/ExperimentRepository.cs` | CRUD operations |
+| Repository Interface | `OnePageAuthorLib/interfaces/IExperimentRepository.cs` | Contract |
+| Service | `OnePageAuthorLib/services/ExperimentService.cs` | Bucketing logic |
+| Service Interface | `OnePageAuthorLib/interfaces/IExperimentService.cs` | Contract |
+| API Endpoint | `InkStainedWretchFunctions/GetExperiments.cs` | HTTP function |
+| DI Registration | `OnePageAuthorLib/ServiceFactory.cs` | `AddExperimentRepository()`, `AddExperimentServices()` |
+
+### Bucketing Algorithm
+
+1. **Create Bucketing Key**: `experimentId + ":" + (userId || sessionId)`
+2. **Compute Hash**: SHA256 hash of bucketing key
+3. **Convert to Percentage**: First 4 bytes of hash → integer → modulo 100
+4. **Assign Variant**: Map to variant based on cumulative traffic percentages
+
+### Testing
+
+Run experiment-specific tests:
+
+```bash
+# Test experiment service
+dotnet test --filter "FullyQualifiedName~ExperimentServiceTests"
+
+# Test API function
+dotnet test --filter "FullyQualifiedName~GetExperimentsTests"
+
+# Test all experiment-related code
+dotnet test --filter "FullyQualifiedName~Experiment"
+```
+
+### Sample Data Seeder
+
+`SeedExperiments/` contains a console application with 4 example experiments:
+
+1. **Landing Page - Hero Button Color Test** (50/50 split)
+2. **Landing Page - Hero Headline Test** (33/33/34 split)
+3. **Pricing Page - Card Design Test** (50/50 split)
+4. **Pricing Page - CTA Button Text Test** (40/30/30 split)
+
+```bash
+cd SeedExperiments
+export COSMOSDB_ENDPOINT_URI="your-endpoint"
+export COSMOSDB_PRIMARY_KEY="your-key"
+export COSMOSDB_DATABASE_ID="OnePageAuthor"
+dotnet run
+```
+
+### Deployment Checklist
+
+1. Ensure the "Experiments" container is created (seeder handles this automatically; partition key `/Page`)
+2. Deploy `InkStainedWretchFunctions` with the `GetExperiments` endpoint
+3. Run `SeedExperiments` to create initial experiments
+4. Integrate frontend to call `/api/experiments?page=<page>` on page load
+5. Track experiment exposures via analytics
 
 ## Version History
 
