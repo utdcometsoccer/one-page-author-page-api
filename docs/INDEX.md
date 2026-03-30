@@ -69,9 +69,10 @@ Complete deployment workflow documentation:
 - [**DEPLOYMENT_GUIDE**](DEPLOYMENT_GUIDE.md) - **START HERE** - Complete deployment workflow (includes WHMCS Worker Service)
 - [**DEPLOYMENT_ARCHITECTURE**](DEPLOYMENT_ARCHITECTURE.md) - Infrastructure architecture overview (includes WHMCS proxy diagram)
 - [**GITHUB_SECRETS_REFERENCE**](GITHUB_SECRETS_REFERENCE.md) - **Essential** - All GitHub Secrets explained
-- [**COSMOS_APPINSIGHTS_DEPLOYMENT**](COSMOS_APPINSIGHTS_DEPLOYMENT.md) - Monitoring deployment
-- [**QUICKSTART_COSMOS_APPINSIGHTS**](QUICKSTART_COSMOS_APPINSIGHTS.md) - Quick start for monitoring
+- [**SECRETS_QUICK_REFERENCE**](SECRETS_QUICK_REFERENCE.md) - Quick reference card for all secrets
+- [**COSMOS_APPINSIGHTS**](COSMOS_APPINSIGHTS.md) - Cosmos DB and Application Insights deployment (quick start, configuration, implementation details)
 - [**GITHUB_ACTIONS_UPDATE**](GITHUB_ACTIONS_UPDATE.md) - CI/CD pipeline updates
+- [**BACKWARD_COMPATIBILITY_PLAN**](BACKWARD_COMPATIBILITY_PLAN.md) - API backward compatibility strategy
 
 ### 📈 Monitoring & Telemetry
 
@@ -87,6 +88,8 @@ Comprehensive API reference and guides:
 - [**GITHUB_ACTIONS_SINGLE_APP_PROMPT**](GITHUB_ACTIONS_SINGLE_APP_PROMPT.md) — Copilot prompt to rebuild the GitHub Actions CI/CD workflow for the consolidated single Function App
 - [**ADMIN_DOMAIN_CREATION_API**](ADMIN_DOMAIN_CREATION_API.md) - **Admin endpoint** — complete domain provisioning without Stripe (JS/TS client guide)
 - [**API-Documentation**](API-Documentation.md) - **Complete API reference** with TypeScript examples
+- [**AB_TESTING**](AB_TESTING.md) - A/B testing configuration API: endpoint reference, frontend integration, bucketing algorithm, and implementation details
+- [**API_CATEGORIZATION**](API_CATEGORIZATION.md) - API endpoint categorization and grouping reference
 - [**Complete-System-Documentation**](Complete-System-Documentation.md) - Auto-generated system overview
 - [**README-Documentation**](README-Documentation.md) - Documentation generation system
 - [**LocalizationREADME**](LocalizationREADME.md) - Internationalization and localization guide
@@ -107,14 +110,15 @@ Detailed implementation documentation for specific features:
 
 #### Core Features
 
-- [**IMPLEMENTATION_SUMMARY**](IMPLEMENTATION_SUMMARY.md) - DNS zone automation
+- [**AUTHOR_INVITATION_INITIAL_IMPLEMENTATION**](AUTHOR_INVITATION_INITIAL_IMPLEMENTATION.md) - Author Invitation System initial implementation (Dec 2024)
 - [**IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES**](IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES.md) - Entra ID RBAC
 - [**IMPLEMENTATION_SUMMARY_LANGUAGES**](IMPLEMENTATION_SUMMARY_LANGUAGES.md) - Multi-language support
 - [**IMPLEMENTATION_SUMMARY_MULTI_FUNCTION_DEPLOYMENT**](IMPLEMENTATION_SUMMARY_MULTI_FUNCTION_DEPLOYMENT.md) - Multi-function architecture
+- [**IMPLEMENTATION_SUMMARY_MULTI_DOMAIN_INVITATIONS**](IMPLEMENTATION_SUMMARY_MULTI_DOMAIN_INVITATIONS.md) - Multi-domain invitation system
 
 #### Infrastructure
 
-- [**IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS**](IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS.md) - Monitoring implementation
+- [**COSMOS_APPINSIGHTS**](COSMOS_APPINSIGHTS.md) - Cosmos DB and Application Insights deployment and implementation
 - [**IMPLEMENTATION_SUMMARY_CONDITIONAL_ENV_VARS**](IMPLEMENTATION_SUMMARY_CONDITIONAL_ENV_VARS.md) - Configuration patterns
 - [**IMPLEMENTATION_SUMMARY_PERMISSIONS_FIX**](IMPLEMENTATION_SUMMARY_PERMISSIONS_FIX.md) - Permission fixes
 
@@ -133,7 +137,7 @@ Detailed implementation documentation for specific features:
 
 #### User Features
 
-- [**AUTHOR_INVITATION_IMPLEMENTATION_SUMMARY**](AUTHOR_INVITATION_IMPLEMENTATION_SUMMARY.md) - Invitation system
+- [**DNS_ZONE_CREATION_IMPLEMENTATION**](DNS_ZONE_CREATION_IMPLEMENTATION.md) - DNS Zone Creation Azure Function
 - [**AUTHOR_INVITATION_SYSTEM**](AUTHOR_INVITATION_SYSTEM.md) - Invitation overview
 - [**INK_STAINED_WRETCH_USER_FEATURES**](INK_STAINED_WRETCH_USER_FEATURES.md) - User features
 
@@ -145,7 +149,7 @@ Documentation for specific feature improvements:
 - [**ACTIVE_PRODUCTS_FILTER_ENHANCEMENT**](ACTIVE_PRODUCTS_FILTER_ENHANCEMENT.md) - Stripe product filtering
 - [**LABEL_VALIDATION_ENHANCEMENT**](LABEL_VALIDATION_ENHANCEMENT.md) - Input validation
 - [**SUBSCRIPTION_PLAN_SERVICE_REFACTORING**](SUBSCRIPTION_PLAN_SERVICE_REFACTORING.md) - Service architecture
-- [**REFACTORING_SUMMARY**](REFACTORING_SUMMARY.md) - General refactoring documentation
+- [**GETUSERUPN_REFACTORING**](GETUSERUPN_REFACTORING.md) - GetUserUpn refactoring details
 
 ### 🔄 Migration & Testing
 
@@ -164,7 +168,8 @@ Guides for utility tools and scripts:
 - [**UPDATE_STRIPE_PRICE_NICKNAME_EXAMPLES**](UPDATE_STRIPE_PRICE_NICKNAME_EXAMPLES.md) - Stripe configuration
 - [**STRIPE_PAYMENT_DASHBOARD**](STRIPE_PAYMENT_DASHBOARD.md) - Payment dashboard guide
 - [**QUICK_START_INVITATION_TOOL**](QUICK_START_INVITATION_TOOL.md) - Invitation tool quick start
-- [**SERVICE_PRINCIPAL_PERMISSIONS_FIX**](SERVICE_PRINCIPAL_PERMISSIONS_FIX.md) - Permission fixes
+- [**ROLE_ASSIGNMENT_PERMISSIONS**](ROLE_ASSIGNMENT_PERMISSIONS.md) - Service principal role assignment: quick fix, detailed solution, and workflow context
+- [**GITHUB_SECRETS_SCRIPT_EXAMPLES**](GITHUB_SECRETS_SCRIPT_EXAMPLES.md) - GitHub Secrets initialization script usage examples
 - [**STEP_BY_STEP_CLEANUP**](STEP_BY_STEP_CLEANUP.md) - Repository cleanup procedures
 
 ## 🎓 Learning Paths
@@ -181,7 +186,7 @@ Guides for utility tools and scripts:
 1. Read [DEPLOYMENT_GUIDE](DEPLOYMENT_GUIDE.md)
 2. Configure [GITHUB_SECRETS_REFERENCE](GITHUB_SECRETS_REFERENCE.md)
 3. Review [DEPLOYMENT_ARCHITECTURE](DEPLOYMENT_ARCHITECTURE.md)
-4. Check [COSMOS_APPINSIGHTS_DEPLOYMENT](COSMOS_APPINSIGHTS_DEPLOYMENT.md)
+4. Check [COSMOS_APPINSIGHTS](COSMOS_APPINSIGHTS.md)
 5. **Deploy WHMCS Worker**: Follow [WhmcsWorkerService/README.md](../WhmcsWorkerService/README.md)
 
 ### WHMCS API Proxy Setup
@@ -207,10 +212,10 @@ Guides for utility tools and scripts:
 
 ## 📊 Documentation Statistics
 
-- **Total Documentation Files**: 70+ markdown files
+- **Total Documentation Files**: 65+ markdown files
 - **Main README Size**: 4,500+ lines (consolidated overview)
 - **Documentation Categories**: 9 major categories
-- **Implementation Summaries**: 15+ detailed guides
+- **Implementation Summaries**: 12+ detailed guides
 - **API Endpoints Documented**: 40+ endpoints across 4 function apps
 
 ## 🔍 Quick Reference

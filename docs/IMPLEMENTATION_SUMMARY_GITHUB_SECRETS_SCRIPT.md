@@ -70,7 +70,7 @@ Created a comprehensive automation solution that:
    - Troubleshooting section
    - Security best practices
 
-2. **`EXAMPLES.md`** (NEW)
+2. **`GITHUB_SECRETS_SCRIPT_EXAMPLES.md`** (formerly `EXAMPLES.md`)
    - 10 practical usage examples:
      - Example 1: Interactive Mode - Minimal Setup
      - Example 2: Configuration File - Complete Setup

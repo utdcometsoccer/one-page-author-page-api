@@ -225,7 +225,7 @@ Key documentation files:
 
 - [ ] `docs/API-Documentation.md`
 - [ ] `docs/Complete-System-Documentation.md`
-- [ ] `docs/IMPLEMENTATION_SUMMARY.md`
+- [ ] `docs/AUTHOR_INVITATION_INITIAL_IMPLEMENTATION.md`
 - [ ] All other markdown files in docs/
 
 ---

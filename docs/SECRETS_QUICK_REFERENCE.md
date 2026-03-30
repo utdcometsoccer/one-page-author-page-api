@@ -168,7 +168,7 @@ Simply replace the first colon with a hyphen. Subcommands still use colons (stan
 - [docs/GITHUB_SECRETS_CONFIGURATION.md](docs/GITHUB_SECRETS_CONFIGURATION.md) - Comprehensive guide
 - [docs/GITHUB_SECRETS_SETUP.md](docs/GITHUB_SECRETS_SETUP.md) - Initial setup guide
 - [docs/GITHUB_SECRETS_REFERENCE.md](docs/GITHUB_SECRETS_REFERENCE.md) - Complete reference
-- [docs/GITHUB_SECRETS_IMPLEMENTATION_SUMMARY.md](docs/GITHUB_SECRETS_IMPLEMENTATION_SUMMARY.md) - Implementation details
+- [docs/GITHUB_SECRETS_SCRIPT_EXAMPLES.md](docs/GITHUB_SECRETS_SCRIPT_EXAMPLES.md) - Script usage examples
 
 ## Security Notes
 

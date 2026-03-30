@@ -703,7 +703,7 @@ cd infra
 ./Grant-ServicePrincipalPermissions.sh   # Linux/macOS
 ```
 
-This grants your GitHub Actions service principal the required permissions to assign roles during deployment. See [PERMISSIONS_QUICK_FIX.md](PERMISSIONS_QUICK_FIX.md) for detailed instructions.
+This grants your GitHub Actions service principal the required permissions to assign roles during deployment. See [ROLE_ASSIGNMENT_PERMISSIONS.md](docs/ROLE_ASSIGNMENT_PERMISSIONS.md) for detailed instructions.
 
 ### Manual Deployment (Alternative)
 
@@ -756,16 +756,16 @@ For detailed documentation on specific features, enhancements, and implementatio
 
 ### Implementation Summaries
 
-- [DNS Zone Implementation](docs/IMPLEMENTATION_SUMMARY.md) - Azure DNS zone automation
+- [Author Invitation System (Initial)](docs/AUTHOR_INVITATION_INITIAL_IMPLEMENTATION.md) - Author Invitation System initial implementation
 - [Entra ID Roles](docs/IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES.md) - Role-based access control
 - [Language Support](docs/IMPLEMENTATION_SUMMARY_LANGUAGES.md) - Multi-language implementation
 - [Country Data](docs/COUNTRIES_IMPLEMENTATION_SUMMARY.md) - Geographic data implementation
 - [StateProvince Boilerplate](docs/STATEPROVINCE_BOILERPLATE_SUMMARY.md) - Geographic entities
 - [Multi-Function Deployment](docs/IMPLEMENTATION_SUMMARY_MULTI_FUNCTION_DEPLOYMENT.md) - Deployment architecture
-- [Cosmos DB & App Insights](docs/IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS.md) - Monitoring setup
+- [Cosmos DB & App Insights](docs/COSMOS_APPINSIGHTS.md) - Monitoring setup
 - [Conditional Environment Variables](docs/IMPLEMENTATION_SUMMARY_CONDITIONAL_ENV_VARS.md) - Configuration patterns
 - [Permissions Fix](docs/IMPLEMENTATION_SUMMARY_PERMISSIONS_FIX.md) - Access control fixes
-- [Author Invitation System](docs/AUTHOR_INVITATION_IMPLEMENTATION_SUMMARY.md) - User onboarding
+- [DNS Zone Creation](docs/DNS_ZONE_CREATION_IMPLEMENTATION.md) - DNS Zone Creation Azure Function
 - [Key Vault Implementation](docs/KEY_VAULT_IMPLEMENTATION_SUMMARY.md) - Secrets management
 
 ## 📖 Configuration & Setup
@@ -4399,18 +4399,18 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 
 | Document | Description |
 |----------|-------------|
-| [IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md) | DNS zone automation |
+| [AUTHOR_INVITATION_INITIAL_IMPLEMENTATION.md](docs/AUTHOR_INVITATION_INITIAL_IMPLEMENTATION.md) | Author Invitation System initial implementation |
 | [IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES.md](docs/IMPLEMENTATION_SUMMARY_ENTRA_ID_ROLES.md) | Entra ID integration |
 | [IMPLEMENTATION_SUMMARY_LANGUAGES.md](docs/IMPLEMENTATION_SUMMARY_LANGUAGES.md) | Language support |
 | [IMPLEMENTATION_SUMMARY_MULTI_FUNCTION_DEPLOYMENT.md](docs/IMPLEMENTATION_SUMMARY_MULTI_FUNCTION_DEPLOYMENT.md) | Multi-function deployment |
-| [IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS.md](docs/IMPLEMENTATION_SUMMARY_COSMOS_APPINSIGHTS.md) | Monitoring implementation |
+| [COSMOS_APPINSIGHTS.md](docs/COSMOS_APPINSIGHTS.md) | Monitoring implementation |
 | [IMPLEMENTATION_SUMMARY_CONDITIONAL_ENV_VARS.md](docs/IMPLEMENTATION_SUMMARY_CONDITIONAL_ENV_VARS.md) | Conditional configuration |
 | [IMPLEMENTATION_SUMMARY_PERMISSIONS_FIX.md](docs/IMPLEMENTATION_SUMMARY_PERMISSIONS_FIX.md) | Permissions fixes |
 | [COUNTRIES_IMPLEMENTATION_SUMMARY.md](docs/COUNTRIES_IMPLEMENTATION_SUMMARY.md) | Country data implementation |
 | [STATEPROVINCE_BOILERPLATE_SUMMARY.md](docs/STATEPROVINCE_BOILERPLATE_SUMMARY.md) | Geographic data |
 | [KEY_VAULT_IMPLEMENTATION_SUMMARY.md](docs/KEY_VAULT_IMPLEMENTATION_SUMMARY.md) | Key Vault implementation |
 | [KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION.md](docs/KEY_VAULT_ROLE_ASSIGNMENT_IMPLEMENTATION.md) | Key Vault RBAC |
-| [AUTHOR_INVITATION_IMPLEMENTATION_SUMMARY.md](docs/AUTHOR_INVITATION_IMPLEMENTATION_SUMMARY.md) | Author invitation system |
+| [DNS_ZONE_CREATION_IMPLEMENTATION.md](docs/DNS_ZONE_CREATION_IMPLEMENTATION.md) | DNS Zone Creation Azure Function |
 | [AUTHOR_INVITATION_SYSTEM.md](docs/AUTHOR_INVITATION_SYSTEM.md) | Invitation system overview |
 | [INK_STAINED_WRETCH_USER_FEATURES.md](docs/INK_STAINED_WRETCH_USER_FEATURES.md) | User features documentation |
 
@@ -4422,7 +4422,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [ACTIVE_PRODUCTS_FILTER_ENHANCEMENT.md](docs/ACTIVE_PRODUCTS_FILTER_ENHANCEMENT.md) | Product filtering |
 | [LABEL_VALIDATION_ENHANCEMENT.md](docs/LABEL_VALIDATION_ENHANCEMENT.md) | Validation improvements |
 | [SUBSCRIPTION_PLAN_SERVICE_REFACTORING.md](docs/SUBSCRIPTION_PLAN_SERVICE_REFACTORING.md) | Service refactoring |
-| [REFACTORING_SUMMARY.md](docs/REFACTORING_SUMMARY.md) | Refactoring documentation |
+| [GETUSERUPN_REFACTORING.md](docs/GETUSERUPN_REFACTORING.md) | Refactoring documentation |
 
 ### Deployment & Infrastructure
 
@@ -4432,8 +4432,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [DEPLOYMENT_ARCHITECTURE.md](docs/DEPLOYMENT_ARCHITECTURE.md) | Infrastructure architecture |
 | [GITHUB_SECRETS_REFERENCE.md](docs/GITHUB_SECRETS_REFERENCE.md) | GitHub Secrets configuration guide |
 | [GITHUB_ACTIONS_UPDATE.md](docs/GITHUB_ACTIONS_UPDATE.md) | CI/CD pipeline updates |
-| [COSMOS_APPINSIGHTS_DEPLOYMENT.md](docs/COSMOS_APPINSIGHTS_DEPLOYMENT.md) | Monitoring deployment |
-| [QUICKSTART_COSMOS_APPINSIGHTS.md](docs/QUICKSTART_COSMOS_APPINSIGHTS.md) | Quick start guide |
+| [COSMOS_APPINSIGHTS.md](docs/COSMOS_APPINSIGHTS.md) | Cosmos DB and Application Insights deployment |
 
 ### Configuration & Setup
 
@@ -4465,7 +4464,7 @@ All detailed documentation has been organized in the [`docs/`](docs/) folder. Fo
 | [UPDATE_STRIPE_PRICE_NICKNAME_EXAMPLES.md](docs/UPDATE_STRIPE_PRICE_NICKNAME_EXAMPLES.md) | Stripe price configuration |
 | [STRIPE_PAYMENT_DASHBOARD.md](docs/STRIPE_PAYMENT_DASHBOARD.md) | Payment dashboard guide |
 | [QUICK_START_INVITATION_TOOL.md](docs/QUICK_START_INVITATION_TOOL.md) | Invitation tool quick start |
-| [SERVICE_PRINCIPAL_PERMISSIONS_FIX.md](docs/SERVICE_PRINCIPAL_PERMISSIONS_FIX.md) | Service principal permissions |
+| [ROLE_ASSIGNMENT_PERMISSIONS.md](docs/ROLE_ASSIGNMENT_PERMISSIONS.md) | Service principal role assignment permissions |
 | [STEP_BY_STEP_CLEANUP.md](docs/STEP_BY_STEP_CLEANUP.md) | Cleanup procedures |
 
 ---

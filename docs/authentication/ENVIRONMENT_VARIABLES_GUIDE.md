@@ -628,7 +628,7 @@ $env:AAD_AUDIENCE = "your-audience"
 - [ENTRA_CIAM_CONFIGURATION_GUIDE.md](ENTRA_CIAM_CONFIGURATION_GUIDE.md) - Complete Entra ID setup guide
 - [JWT_INVALID_TOKEN_TROUBLESHOOTING.md](JWT_INVALID_TOKEN_TROUBLESHOOTING.md) - Token troubleshooting
 - [AZURE_ENTRA_ID_CONFIGURATION_CHECKLIST.md](AZURE_ENTRA_ID_CONFIGURATION_CHECKLIST.md) - Setup checklist
-- [../SECRETS_QUICK_REFERENCE.md](../../SECRETS_QUICK_REFERENCE.md) - All platform secrets reference
+- [../SECRETS_QUICK_REFERENCE.md](../SECRETS_QUICK_REFERENCE.md) - All platform secrets reference
 
 ## Quick Reference Card
 

@@ -48,7 +48,7 @@ Created two cross-platform scripts to grant the required permissions:
 
 ### Documentation
 
-- `docs/SERVICE_PRINCIPAL_PERMISSIONS_FIX.md` - Detailed solution guide
+- `docs/ROLE_ASSIGNMENT_PERMISSIONS.md` - Detailed solution guide
   - Problem statement and root cause analysis
   - Step-by-step usage instructions
   - Prerequisites and requirements
@@ -56,7 +56,7 @@ Created two cross-platform scripts to grant the required permissions:
   - Troubleshooting guide
   - Security considerations
 
-- `PERMISSIONS_QUICK_FIX.md` - Quick reference guide
+- `docs/ROLE_ASSIGNMENT_PERMISSIONS.md` - Quick reference guide (also contains)
   - One-command solution
   - Minimal explanation for quick resolution
   - Common troubleshooting table
@@ -190,7 +190,7 @@ Both scripts include comprehensive error handling:
 ### Issue 1: Typo in Documentation
 
 **Finding**: Spelling error "ServicePrincial" instead of "ServicePrincipal"
-**Resolution**: Fixed in `docs/SERVICE_PRINCIPAL_PERMISSIONS_FIX.md`
+**Resolution**: Fixed in `docs/ROLE_ASSIGNMENT_PERMISSIONS.md`
 
 ### Issue 2: Missing jq Dependency Check
 
@@ -286,7 +286,7 @@ The solution is ready for use in development, testing, and production environmen
 
 ## Next Steps for User
 
-1. **Review Documentation**: Read `PERMISSIONS_QUICK_FIX.md` or `docs/SERVICE_PRINCIPAL_PERMISSIONS_FIX.md`
+1. **Review Documentation**: Read `docs/ROLE_ASSIGNMENT_PERMISSIONS.md`
 2. **Verify Prerequisites**: Ensure Azure CLI, authentication, and permissions
 3. **Run Script**: Execute appropriate script (PowerShell or Bash)
 4. **Verify Role Assignment**: Check that the role was granted successfully
