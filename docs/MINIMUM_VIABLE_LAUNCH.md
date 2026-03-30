@@ -1,8 +1,9 @@
 # Minimum Viable Launch Checklist - North America
 
 **Created:** 2026-02-11  
+**Last Updated:** 2026-03-30  
 **Target:** First Sale in North America (US, Canada, Mexico)  
-**Status:** 🟡 In Progress - Domain Validation Phase
+**Status:** 🟡 In Progress - Production Configuration Phase (Stage 2)
 
 ## Overview
 
@@ -17,8 +18,8 @@ This document identifies the **absolute minimum** requirements to launch OnePage
 A user can:
 1. ✅ Sign up and authenticate via Entra ID
 2. ✅ Purchase a subscription via Stripe
-3. ⚠️ Register a custom domain for their author page
-4. ⚠️ Have DNS automatically configured and domain go live
+3. ✅ Register a custom domain for their author page
+4. ✅ Have DNS automatically configured and domain go live
 5. ✅ Upload images and content to their author page
 6. ✅ View their live author page at their custom domain
 7. ✅ Manage their subscription (upgrade, cancel)
@@ -27,48 +28,36 @@ A user can:
 
 ## 🔴 CRITICAL PATH TO FIRST SALE
 
-### Stage 1: Pre-Launch Validation (1 Week) ⚠️ CURRENT STAGE
+### Stage 1: Pre-Launch Validation ✅ COMPLETE (2026-03-30)
 
-**Goal:** Validate domain registration workflow works end-to-end
+**Goal:** Validate domain registration workflow works end-to-end — **ACHIEVED**
 
-#### 1.1 Domain Registration E2E Test
-- [ ] Set up WHMCS API test environment
-- [ ] Acquire test domain (e.g., cheap `.xyz` or `.test` domain)
-- [ ] Execute full registration flow with real API calls
-- [ ] Verify domain registration completes successfully
-- [ ] Document any issues found and fix
+#### 1.1 Domain Registration E2E Test ✅ COMPLETE
+- [x] Set up WHMCS API test environment
+- [x] Acquire test domain (e.g., cheap `.xyz` or `.test` domain)
+- [x] Execute full registration flow with real API calls
+- [x] Verify domain registration completes successfully
+- [x] Document any issues found and fix
 
-**Estimated Time:** 4-6 hours  
-**Owner:** DevOps + QA  
-**Blocker:** YES - Cannot launch without this
+#### 1.2 DNS Automation Test ✅ COMPLETE
+- [x] Configure Azure DNS resource group
+- [x] Deploy DNS zone creation trigger function
+- [x] Register test domain and verify DNS zone is auto-created
+- [x] Confirm nameservers are assigned correctly
+- [x] Verify NS records are stored in DomainRegistration entity
 
-#### 1.2 DNS Automation Test
-- [ ] Configure Azure DNS resource group
-- [ ] Deploy DNS zone creation trigger function
-- [ ] Register test domain and verify DNS zone is auto-created
-- [ ] Confirm nameservers are assigned correctly
-- [ ] Verify NS records are stored in DomainRegistration entity
+#### 1.3 Front Door Integration Test ✅ COMPLETE
+- [x] Configure Azure Front Door profile in staging
+- [x] Test automatic domain addition after DNS creation
+- [x] Verify domain validation (CNAME/TXT records)
+- [x] Confirm HTTPS certificate provisioning works
+- [x] Test routing to author pages
 
-**Estimated Time:** 3-4 hours  
-**Owner:** DevOps  
-**Blocker:** YES - Domains won't work without DNS
-
-#### 1.3 Front Door Integration Test
-- [ ] Configure Azure Front Door profile in staging
-- [ ] Test automatic domain addition after DNS creation
-- [ ] Verify domain validation (CNAME/TXT records)
-- [ ] Confirm HTTPS certificate provisioning works
-- [ ] Test routing to author pages
-
-**Estimated Time:** 4-5 hours  
-**Owner:** DevOps  
-**Blocker:** YES - Custom domains won't route without Front Door
-
-**STAGE 1 COMPLETE WHEN:** All three blockers validated and documented
+**STAGE 1 COMPLETE:** All three blockers validated and documented ✅
 
 ---
 
-### Stage 2: Production Configuration (2-3 Days)
+### Stage 2: Production Configuration (2-3 Days) ⚠️ CURRENT STAGE
 
 **Goal:** Configure production environment for real customer traffic
 
@@ -262,15 +251,15 @@ A user can:
 
 ---
 
-## 🛑 Launch Blockers - Current Status
+## ✅ All Launch Blockers Resolved
 
-| Blocker | Status | ETA | Owner |
-|---------|--------|-----|-------|
-| Domain registration E2E test | 🔴 Not Started | 1 week | DevOps |
-| DNS automation validation | 🔴 Not Started | 1 week | DevOps |
-| Front Door integration test | 🔴 Not Started | 1 week | DevOps |
+| Blocker | Status | Completed | Owner |
+|---------|--------|-----------|-------|
+| Domain registration E2E test | ✅ Complete | 2026-03-30 | DevOps |
+| DNS automation validation | ✅ Complete | 2026-03-30 | DevOps |
+| Front Door integration test | ✅ Complete | 2026-03-30 | DevOps |
 
-**GO/NO-GO DECISION POINT:** Cannot proceed to Stage 2 until all blockers are green (✅)
+**ALL BLOCKERS RESOLVED — Proceeding to Stage 2: Production Configuration.**
 
 ---
 
