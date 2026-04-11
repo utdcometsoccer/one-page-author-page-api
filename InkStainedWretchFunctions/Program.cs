@@ -192,11 +192,27 @@ var services = builder.Services
     .AddAuthorInvitationServices() // Add AuthorInvitation service for invitation business logic
     .AddImageApiRepositories();
 
-// Register the RDAP HttpClient with a base address and a sensible timeout.
+// Register the RDAP HttpClient. The base URL defaults to https://rdap.org/ but can be
+// overridden via the RDAP_BASE_URL environment variable for testing or alternate RDAP providers.
+var rdapBaseUrl = configuration["RDAP_BASE_URL"];
+if (string.IsNullOrWhiteSpace(rdapBaseUrl))
+{
+    rdapBaseUrl = "https://rdap.org/";
+    Console.WriteLine("RDAP_BASE_URL not configured — using default: https://rdap.org/");
+}
+else
+{
+    Console.WriteLine($"RDAP base URL configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(rdapBaseUrl)}");
+}
+
+// Ensure the URL ends with a trailing slash so relative paths resolve correctly.
+if (!rdapBaseUrl.EndsWith('/'))
+    rdapBaseUrl += "/";
+
 // IHttpClientFactory manages the underlying socket pool, avoiding socket exhaustion.
 builder.Services.AddHttpClient<IRdapClient, RdapClient>(client =>
 {
-    client.BaseAddress = new Uri("https://rdap.org/");
+    client.BaseAddress = new Uri(rdapBaseUrl);
     client.Timeout = TimeSpan.FromSeconds(10);
     client.DefaultRequestHeaders.Add("Accept", "application/rdap+json, application/json");
 });

@@ -15,8 +15,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Service
 /// </remarks>
 public class RdapClient : IRdapClient
 {
-    private const string RdapSource = "rdap.org";
-
     private readonly HttpClient _httpClient;
     private readonly ILogger<RdapClient> _logger;
 
@@ -37,8 +35,11 @@ public class RdapClient : IRdapClient
         CancellationToken cancellationToken = default)
     {
         var normalizedDomain = domain.ToLowerInvariant().Trim();
-        // Use a relative path; BaseAddress ("https://rdap.org/") is configured via DI.
+        // Use a relative path; BaseAddress is configured via DI (defaults to https://rdap.org/).
         var requestUrl = $"domain/{Uri.EscapeDataString(normalizedDomain)}";
+
+        // Derive the source label from the configured base address rather than hardcoding it.
+        var rdapSource = _httpClient.BaseAddress?.Host ?? "rdap.org";
 
         _logger.LogInformation("Querying RDAP for domain {Domain} at {Url}", normalizedDomain, requestUrl);
 
@@ -55,7 +56,7 @@ public class RdapClient : IRdapClient
                 Available = false,
                 CheckedAt = DateTime.UtcNow,
                 RdapStatus = statusCode,
-                RdapSource = RdapSource
+                RdapSource = rdapSource
             },
             404 => new DomainAvailabilityResponse
             {
@@ -63,7 +64,7 @@ public class RdapClient : IRdapClient
                 Available = true,
                 CheckedAt = DateTime.UtcNow,
                 RdapStatus = statusCode,
-                RdapSource = RdapSource
+                RdapSource = rdapSource
             },
             _ => throw new HttpRequestException(
                 $"RDAP service returned an unexpected HTTP {statusCode} status for domain '{normalizedDomain}'.",
