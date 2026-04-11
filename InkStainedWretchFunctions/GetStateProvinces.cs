@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using InkStainedWretch.OnePageAuthorAPI.Authentication;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 
 namespace InkStainedWretchFunctions;
@@ -14,16 +13,13 @@ public class GetStateProvinces
 {
     private readonly ILogger<GetStateProvinces> _logger;
     private readonly IStateProvinceService _stateProvinceService;
-    private readonly IJwtValidationService _jwtValidationService;
 
     public GetStateProvinces(
         ILogger<GetStateProvinces> logger,
-        IStateProvinceService stateProvinceService,
-        IJwtValidationService jwtValidationService)
+        IStateProvinceService stateProvinceService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _stateProvinceService = stateProvinceService ?? throw new ArgumentNullException(nameof(stateProvinceService));
-        _jwtValidationService = jwtValidationService ?? throw new ArgumentNullException(nameof(jwtValidationService));
     }
 
     /// <summary>
@@ -44,13 +40,6 @@ public class GetStateProvinces
         {
             _logger.LogWarning("Culture parameter is null or empty");
             return new BadRequestObjectResult(new { error = "Culture parameter is required" });
-        }
-
-        // Authenticate the request using JWT token
-        var (user, errorResult) = await JwtAuthenticationHelper.ValidateJwtTokenAsync(req, _jwtValidationService, _logger);
-        if (errorResult != null)
-        {
-            return errorResult;
         }
 
         try
