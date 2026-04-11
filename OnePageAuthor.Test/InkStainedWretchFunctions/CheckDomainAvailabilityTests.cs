@@ -164,9 +164,8 @@ public class CheckDomainAvailabilityTests
 
         // Domain stored in the response must not have a trailing dot or upper-case letters.
         Assert.Equal("example.com", result.Domain);
-        // The URL path must also use the cleaned domain.
-        Assert.Contains("example.com", capturedPath, StringComparison.Ordinal);
-        Assert.DoesNotContain("example.com.", capturedPath, StringComparison.Ordinal);
+        // The URL path must also use the cleaned domain and the expected RDAP path prefix.
+        Assert.StartsWith("/domain/example.com", capturedPath, StringComparison.Ordinal);
     }
 
     // -------------------------------------------------------------------------
