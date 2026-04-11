@@ -1,4 +1,5 @@
 using InkStainedWretch.OnePageAuthorAPI;
+using InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Services;
 using InkStainedWretch.OnePageAuthorAPI.Functions.Testing;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
@@ -190,6 +191,15 @@ var services = builder.Services
     .AddAuthorInvitationRepository() // Add AuthorInvitation repository for managing author invitations
     .AddAuthorInvitationServices() // Add AuthorInvitation service for invitation business logic
     .AddImageApiRepositories();
+
+// Register the RDAP HttpClient with a base address and a sensible timeout.
+// IHttpClientFactory manages the underlying socket pool, avoiding socket exhaustion.
+builder.Services.AddHttpClient<IRdapClient, RdapClient>(client =>
+{
+    client.BaseAddress = new Uri("https://rdap.org/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+    client.DefaultRequestHeaders.Add("Accept", "application/rdap+json, application/json");
+});
 
 // Add Stripe services if API key is configured (needed for subscription validation)
 if (!string.IsNullOrWhiteSpace(stripeApiKey))
