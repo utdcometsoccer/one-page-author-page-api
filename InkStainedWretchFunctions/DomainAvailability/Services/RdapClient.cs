@@ -34,7 +34,9 @@ public class RdapClient : IRdapClient
         string domain,
         CancellationToken cancellationToken = default)
     {
-        var normalizedDomain = domain.ToLowerInvariant().Trim();
+        // Trim whitespace and trailing dot (FQDN notation) so that inputs like "example.com."
+        // are sent to RDAP as "example.com", consistent with DomainValidator normalization.
+        var normalizedDomain = domain.ToLowerInvariant().Trim().TrimEnd('.');
         // Use a relative path; BaseAddress is configured via DI (defaults to https://rdap.org/).
         var requestUrl = $"domain/{Uri.EscapeDataString(normalizedDomain)}";
 
@@ -43,7 +45,11 @@ public class RdapClient : IRdapClient
 
         _logger.LogInformation("Querying RDAP for domain {Domain} at {Url}", normalizedDomain, requestUrl);
 
-        using var response = await _httpClient.GetAsync(requestUrl, cancellationToken).ConfigureAwait(false);
+        // ResponseHeadersRead avoids buffering the RDAP JSON body; only the status code is needed.
+        using var response = await _httpClient.GetAsync(
+            requestUrl,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken).ConfigureAwait(false);
 
         var statusCode = (int)response.StatusCode;
         _logger.LogInformation("RDAP returned HTTP {StatusCode} for domain {Domain}", statusCode, normalizedDomain);

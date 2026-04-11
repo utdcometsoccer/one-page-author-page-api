@@ -136,6 +136,39 @@ public class CheckDomainAvailabilityTests
         Assert.Throws<ArgumentNullException>(() => new RdapClient(new HttpClient(), null!));
     }
 
+    [Theory]
+    [InlineData("example.com.")]    // trailing FQDN dot stripped to "example.com"
+    [InlineData("EXAMPLE.COM.")]    // upper-case + trailing dot
+    public async Task RdapClient_TrailingDotAndCasing_NormalizesBeforeRequest(string rawDomain)
+    {
+        // Capture the URL that was actually requested.
+        string? capturedPath = null;
+        var handler = new Mock<HttpMessageHandler>();
+        handler.Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>())
+               .Callback<HttpRequestMessage, CancellationToken>((req, _) =>
+                   capturedPath = req.RequestUri?.PathAndQuery)
+               .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
+
+        var httpClient = new HttpClient(handler.Object)
+        {
+            BaseAddress = new Uri("https://rdap.org/")
+        };
+        var logger = new Mock<ILogger<RdapClient>>().Object;
+        var client = new RdapClient(httpClient, logger);
+
+        var result = await client.CheckAvailabilityAsync(rawDomain);
+
+        // Domain stored in the response must not have a trailing dot or upper-case letters.
+        Assert.Equal("example.com", result.Domain);
+        // The URL path must also use the cleaned domain.
+        Assert.Contains("example.com", capturedPath, StringComparison.Ordinal);
+        Assert.DoesNotContain("example.com.", capturedPath, StringComparison.Ordinal);
+    }
+
     // -------------------------------------------------------------------------
     // CheckDomainAvailability Function Tests
     // -------------------------------------------------------------------------
@@ -281,5 +314,31 @@ public class CheckDomainAvailabilityTests
         Assert.Equal(502, obj.StatusCode);
         var error = Assert.IsType<ErrorResponse>(obj.Value);
         Assert.Equal("RdapLookupFailed", error.Error);
+    }
+
+    [Fact]
+    public async Task Run_ClientCancellation_Returns499()
+    {
+        using var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+
+        var rdapMock = new Mock<IRdapClient>();
+        rdapMock.Setup(r => r.CheckAvailabilityAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new OperationCanceledException());
+
+        // Create a request whose RequestAborted token is already cancelled.
+        var reqMock = new Mock<HttpRequest>();
+        var queryDict = new Dictionary<string, StringValues> { ["domain"] = "example.com" };
+        reqMock.Setup(r => r.Query).Returns(new QueryCollection(queryDict));
+
+        var contextMock = new Mock<HttpContext>();
+        contextMock.Setup(c => c.RequestAborted).Returns(cts.Token);
+        reqMock.Setup(r => r.HttpContext).Returns(contextMock.Object);
+
+        var function = BuildFunction(rdapMock.Object);
+        var result = await function.Run(reqMock.Object);
+
+        var status = Assert.IsType<StatusCodeResult>(result);
+        Assert.Equal(499, status.StatusCode);
     }
 }

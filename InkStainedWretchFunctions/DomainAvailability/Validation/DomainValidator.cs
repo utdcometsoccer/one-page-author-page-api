@@ -5,6 +5,16 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Validat
 /// <summary>
 /// Validates that a domain string is a well-formed, registerable root domain.
 /// </summary>
+/// <remarks>
+/// <para>
+/// This validator enforces structural rules (label length, allowed characters, valid TLD format)
+/// and requires exactly two dot-separated labels (e.g., <c>example.com</c>). It does
+/// <strong>not</strong> consult the Public Suffix List (PSL), so domains under multi-part
+/// public suffixes such as <c>example.co.uk</c> or <c>example.com.au</c> will be rejected
+/// as apparent subdomains. For general-purpose registrability checks across all TLDs,
+/// integrate a PSL library (e.g., <c>Nager.PublicSuffix</c>).
+/// </para>
+/// </remarks>
 public static partial class DomainValidator
 {
     // Labels (parts separated by dots) may contain letters, digits, and hyphens.

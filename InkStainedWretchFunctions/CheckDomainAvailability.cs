@@ -93,6 +93,12 @@ public class CheckDomainAvailability
 
             return new OkObjectResult(result);
         }
+        catch (OperationCanceledException) when (req.HttpContext.RequestAborted.IsCancellationRequested)
+        {
+            // Client disconnected before the RDAP call completed — not an RDAP error.
+            _logger.LogInformation("Domain availability check cancelled by client for domain '{Domain}'.", domain);
+            return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex, "RDAP lookup failed for domain '{Domain}'.", domain);
