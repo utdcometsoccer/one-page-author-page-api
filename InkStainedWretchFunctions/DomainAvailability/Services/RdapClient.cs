@@ -10,11 +10,12 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Service
 /// The RDAP (Registration Data Access Protocol) service at <c>rdap.org</c> acts as a universal
 /// bootstrap proxy. An HTTP 200 response means the domain is registered; an HTTP 404 means the
 /// domain is available. Any other status code is treated as a lookup failure.
+/// The <see cref="HttpClient.BaseAddress"/> is configured at registration time (via
+/// <c>AddHttpClient</c> in <c>Program.cs</c>); this class uses relative paths only.
 /// </remarks>
 public class RdapClient : IRdapClient
 {
     private const string RdapSource = "rdap.org";
-    private const string RdapBaseUrl = "https://rdap.org/domain/";
 
     private readonly HttpClient _httpClient;
     private readonly ILogger<RdapClient> _logger;
@@ -36,7 +37,8 @@ public class RdapClient : IRdapClient
         CancellationToken cancellationToken = default)
     {
         var normalizedDomain = domain.ToLowerInvariant().Trim();
-        var requestUrl = $"{RdapBaseUrl}{Uri.EscapeDataString(normalizedDomain)}";
+        // Use a relative path; BaseAddress ("https://rdap.org/") is configured via DI.
+        var requestUrl = $"domain/{Uri.EscapeDataString(normalizedDomain)}";
 
         _logger.LogInformation("Querying RDAP for domain {Domain} at {Url}", normalizedDomain, requestUrl);
 
