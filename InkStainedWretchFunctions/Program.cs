@@ -191,6 +191,21 @@ var services = builder.Services
     .AddAuthorInvitationServices() // Add AuthorInvitation service for invitation business logic
     .AddImageApiRepositories();
 
+// Register the RDAP HttpClient via ServiceFactory. The base URL defaults to https://rdap.org/ but can be
+// overridden via the RDAP_BASE_URL environment variable for testing or alternate RDAP providers.
+var rdapBaseUrl = configuration["RDAP_BASE_URL"];
+if (string.IsNullOrWhiteSpace(rdapBaseUrl))
+{
+    rdapBaseUrl = "https://rdap.org/";
+    Console.WriteLine("RDAP_BASE_URL not configured — using default: https://rdap.org/");
+}
+else
+{
+    Console.WriteLine($"RDAP base URL configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(rdapBaseUrl)}");
+}
+
+builder.Services.AddRdapClient(rdapBaseUrl);
+
 // Add Stripe services if API key is configured (needed for subscription validation)
 if (!string.IsNullOrWhiteSpace(stripeApiKey))
 {

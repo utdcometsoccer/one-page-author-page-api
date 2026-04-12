@@ -1,0 +1,78 @@
+{
+  "examples": [
+    {
+      "scenario": "Registered domain",
+      "request": {
+        "method": "GET",
+        "path": "/api/domain-availability",
+        "queryParameters": {
+          "domain": "example.com"
+        }
+      },
+      "response": {
+        "statusCode": 200,
+        "body": {
+          "domain": "example.com",
+          "available": false,
+          "checkedAt": "2026-04-11T19:39:00Z",
+          "rdapStatus": 200,
+          "rdapSource": "rdap.org"
+        }
+      }
+    },
+    {
+      "scenario": "Available domain",
+      "request": {
+        "method": "GET",
+        "path": "/api/domain-availability",
+        "queryParameters": {
+          "domain": "mynewdomain123.com"
+        }
+      },
+      "response": {
+        "statusCode": 200,
+        "body": {
+          "domain": "mynewdomain123.com",
+          "available": true,
+          "checkedAt": "2026-04-11T19:39:00Z",
+          "rdapStatus": 404,
+          "rdapSource": "rdap.org"
+        }
+      }
+    },
+    {
+      "scenario": "Invalid domain — subdomain supplied",
+      "request": {
+        "method": "GET",
+        "path": "/api/domain-availability",
+        "queryParameters": {
+          "domain": "www.example.com"
+        }
+      },
+      "response": {
+        "statusCode": 400,
+        "body": {
+          "error": "InvalidDomain",
+          "message": "Subdomains are not allowed. Please supply a root domain (e.g., example.com)."
+        }
+      }
+    },
+    {
+      "scenario": "RDAP service failure",
+      "request": {
+        "method": "GET",
+        "path": "/api/domain-availability",
+        "queryParameters": {
+          "domain": "example.com"
+        }
+      },
+      "response": {
+        "statusCode": 502,
+        "body": {
+          "error": "RdapLookupFailed",
+          "message": "The RDAP service returned an unexpected response."
+        }
+      }
+    }
+  ]
+}
