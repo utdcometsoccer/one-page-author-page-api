@@ -1,6 +1,6 @@
-using InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Models;
+using InkStainedWretch.OnePageAuthorLib.Models;
 
-namespace InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Services;
+namespace InkStainedWretch.OnePageAuthorAPI.Interfaces;
 
 /// <summary>
 /// Provides domain availability lookups using the RDAP protocol.

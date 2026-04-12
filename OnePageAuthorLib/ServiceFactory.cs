@@ -1185,5 +1185,35 @@ namespace InkStainedWretch.OnePageAuthorAPI
             services.AddScoped<API.IReferralService, Services.ReferralService>();
             return services;
         }
+
+        /// <summary>
+        /// Registers the typed <see cref="API.RdapClient"/> and its <see cref="Interfaces.IRdapClient"/> interface,
+        /// configuring <see cref="System.Net.Http.HttpClient"/> with the supplied base URL, a 10-second timeout,
+        /// and RDAP-specific Accept headers.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <param name="rdapBaseUrl">
+        /// The fully-qualified RDAP provider base URL (e.g., <c>https://rdap.org/</c>).
+        /// Must not be null or whitespace.
+        /// </param>
+        /// <returns>The <see cref="IServiceCollection"/> for chaining.</returns>
+        public static IServiceCollection AddRdapClient(this IServiceCollection services, string rdapBaseUrl)
+        {
+            if (string.IsNullOrWhiteSpace(rdapBaseUrl))
+                throw new ArgumentException("rdapBaseUrl cannot be null or empty.", nameof(rdapBaseUrl));
+
+            // Ensure the URL ends with a trailing slash so relative paths resolve correctly.
+            if (!rdapBaseUrl.EndsWith('/'))
+                rdapBaseUrl += "/";
+
+            services.AddHttpClient<Interfaces.IRdapClient, API.RdapClient>(client =>
+            {
+                client.BaseAddress = new Uri(rdapBaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(10);
+                client.DefaultRequestHeaders.Add("Accept", "application/rdap+json, application/json");
+            });
+
+            return services;
+        }
     }
 }

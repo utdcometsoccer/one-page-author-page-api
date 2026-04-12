@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Validation;
+namespace InkStainedWretch.OnePageAuthorAPI.Services;
 
 /// <summary>
 /// Validates that a domain string is a well-formed, registerable root domain.
@@ -15,7 +15,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Validat
 /// integrate a PSL library (e.g., <c>Nager.PublicSuffix</c>).
 /// </para>
 /// </remarks>
-public static partial class DomainValidator
+public static partial class DomainAvailabilityValidator
 {
     // Labels (parts separated by dots) may contain letters, digits, and hyphens.
     // They must not start or end with a hyphen and must be 1–63 characters long.

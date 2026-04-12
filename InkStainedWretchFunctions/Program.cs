@@ -1,5 +1,4 @@
 using InkStainedWretch.OnePageAuthorAPI;
-using InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Services;
 using InkStainedWretch.OnePageAuthorAPI.Functions.Testing;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
@@ -192,7 +191,7 @@ var services = builder.Services
     .AddAuthorInvitationServices() // Add AuthorInvitation service for invitation business logic
     .AddImageApiRepositories();
 
-// Register the RDAP HttpClient. The base URL defaults to https://rdap.org/ but can be
+// Register the RDAP HttpClient via ServiceFactory. The base URL defaults to https://rdap.org/ but can be
 // overridden via the RDAP_BASE_URL environment variable for testing or alternate RDAP providers.
 var rdapBaseUrl = configuration["RDAP_BASE_URL"];
 if (string.IsNullOrWhiteSpace(rdapBaseUrl))
@@ -205,17 +204,7 @@ else
     Console.WriteLine($"RDAP base URL configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(rdapBaseUrl)}");
 }
 
-// Ensure the URL ends with a trailing slash so relative paths resolve correctly.
-if (!rdapBaseUrl.EndsWith('/'))
-    rdapBaseUrl += "/";
-
-// IHttpClientFactory manages the underlying socket pool, avoiding socket exhaustion.
-builder.Services.AddHttpClient<IRdapClient, RdapClient>(client =>
-{
-    client.BaseAddress = new Uri(rdapBaseUrl);
-    client.Timeout = TimeSpan.FromSeconds(10);
-    client.DefaultRequestHeaders.Add("Accept", "application/rdap+json, application/json");
-});
+builder.Services.AddRdapClient(rdapBaseUrl);
 
 // Add Stripe services if API key is configured (needed for subscription validation)
 if (!string.IsNullOrWhiteSpace(stripeApiKey))

@@ -1,4 +1,4 @@
-namespace InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Models;
+namespace InkStainedWretch.OnePageAuthorLib.Models;
 
 /// <summary>
 /// Represents the result of a domain availability check via RDAP.

@@ -1,9 +1,9 @@
-namespace InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Models;
+namespace InkStainedWretch.OnePageAuthorLib.Models;
 
 /// <summary>
 /// Represents a structured error response returned by the domain availability endpoint.
 /// </summary>
-public class ErrorResponse
+public class DomainAvailabilityErrorResponse
 {
     /// <summary>
     /// A short machine-readable error code (e.g., "InvalidDomain", "RdapLookupFailed").

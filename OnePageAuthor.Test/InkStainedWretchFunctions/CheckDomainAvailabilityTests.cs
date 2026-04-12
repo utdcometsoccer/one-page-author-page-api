@@ -6,17 +6,18 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Moq.Protected;
+using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Functions;
-using InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Models;
-using InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Services;
-using InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Validation;
+using InkStainedWretch.OnePageAuthorAPI.Interfaces;
+using InkStainedWretch.OnePageAuthorAPI.Services;
+using InkStainedWretch.OnePageAuthorLib.Models;
 
 namespace OnePageAuthor.Test.InkStainedWretchFunctions;
 
 public class CheckDomainAvailabilityTests
 {
     // -------------------------------------------------------------------------
-    // DomainValidator Tests
+    // DomainAvailabilityValidator Tests
     // -------------------------------------------------------------------------
 
     [Theory]
@@ -24,9 +25,9 @@ public class CheckDomainAvailabilityTests
     [InlineData("my-domain.net")]
     [InlineData("xn--nxasmq6b.com")]  // punycode label
     [InlineData("abc.io")]
-    public void DomainValidator_ValidDomain_ReturnsTrue(string domain)
+    public void DomainAvailabilityValidator_ValidDomain_ReturnsTrue(string domain)
     {
-        var result = DomainValidator.IsValid(domain, out var error);
+        var result = DomainAvailabilityValidator.IsValid(domain, out var error);
         Assert.True(result, $"Expected valid but got error: {error}");
         Assert.Null(error);
     }
@@ -41,20 +42,20 @@ public class CheckDomainAvailabilityTests
     [InlineData("trailing-.com", "invalid characters")]
     [InlineData("example.1", "not valid")]       // numeric-only TLD
     [InlineData("example.c", "not valid")]        // single-char TLD
-    public void DomainValidator_InvalidDomain_ReturnsFalseWithMessage(string? domain, string expectedFragment)
+    public void DomainAvailabilityValidator_InvalidDomain_ReturnsFalseWithMessage(string? domain, string expectedFragment)
     {
-        var result = DomainValidator.IsValid(domain, out var error);
+        var result = DomainAvailabilityValidator.IsValid(domain, out var error);
         Assert.False(result);
         Assert.NotNull(error);
         Assert.Contains(expectedFragment, error, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
-    public void DomainValidator_DomainExceeding253Chars_ReturnsFalse()
+    public void DomainAvailabilityValidator_DomainExceeding253Chars_ReturnsFalse()
     {
         var longLabel = new string('a', 63);
         var domain = $"{longLabel}.{longLabel}.{longLabel}.{longLabel}.com";  // way over 253
-        var result = DomainValidator.IsValid(domain, out var error);
+        var result = DomainAvailabilityValidator.IsValid(domain, out var error);
         // Either too long or subdomain error - both are invalid
         Assert.False(result);
         Assert.NotNull(error);
@@ -218,7 +219,7 @@ public class CheckDomainAvailabilityTests
         var result = await function.Run(req);
 
         var bad = Assert.IsType<BadRequestObjectResult>(result);
-        var error = Assert.IsType<ErrorResponse>(bad.Value);
+        var error = Assert.IsType<DomainAvailabilityErrorResponse>(bad.Value);
         Assert.Equal("InvalidDomain", error.Error);
     }
 
@@ -231,7 +232,7 @@ public class CheckDomainAvailabilityTests
         var result = await function.Run(req);
 
         var bad = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.IsType<ErrorResponse>(bad.Value);
+        Assert.IsType<DomainAvailabilityErrorResponse>(bad.Value);
     }
 
     [Fact]
@@ -243,7 +244,7 @@ public class CheckDomainAvailabilityTests
         var result = await function.Run(req);
 
         var bad = Assert.IsType<BadRequestObjectResult>(result);
-        var error = Assert.IsType<ErrorResponse>(bad.Value);
+        var error = Assert.IsType<DomainAvailabilityErrorResponse>(bad.Value);
         Assert.Equal("InvalidDomain", error.Error);
         Assert.Contains("Subdomain", error.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -311,7 +312,7 @@ public class CheckDomainAvailabilityTests
 
         var obj = Assert.IsType<ObjectResult>(result);
         Assert.Equal(502, obj.StatusCode);
-        var error = Assert.IsType<ErrorResponse>(obj.Value);
+        var error = Assert.IsType<DomainAvailabilityErrorResponse>(obj.Value);
         Assert.Equal("RdapLookupFailed", error.Error);
     }
 

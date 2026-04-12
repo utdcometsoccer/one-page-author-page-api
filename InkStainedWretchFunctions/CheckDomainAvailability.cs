@@ -1,6 +1,6 @@
-using InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Models;
-using InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Services;
-using InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Validation;
+using InkStainedWretch.OnePageAuthorAPI.Interfaces;
+using InkStainedWretch.OnePageAuthorAPI.Services;
+using InkStainedWretch.OnePageAuthorLib.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -64,17 +64,17 @@ public class CheckDomainAvailability
         if (string.IsNullOrWhiteSpace(domain))
         {
             _logger.LogWarning("CheckDomainAvailability called without a domain query parameter.");
-            return new BadRequestObjectResult(new ErrorResponse
+            return new BadRequestObjectResult(new DomainAvailabilityErrorResponse
             {
                 Error = "InvalidDomain",
                 Message = "The 'domain' query parameter is required."
             });
         }
 
-        if (!DomainValidator.IsValid(domain, out var validationError))
+        if (!DomainAvailabilityValidator.IsValid(domain, out var validationError))
         {
             _logger.LogWarning("Domain validation failed for '{Domain}': {Error}", domain, validationError);
-            return new BadRequestObjectResult(new ErrorResponse
+            return new BadRequestObjectResult(new DomainAvailabilityErrorResponse
             {
                 Error = "InvalidDomain",
                 Message = validationError ?? "The domain format is invalid."
@@ -102,7 +102,7 @@ public class CheckDomainAvailability
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex, "RDAP lookup failed for domain '{Domain}'.", domain);
-            return new ObjectResult(new ErrorResponse
+            return new ObjectResult(new DomainAvailabilityErrorResponse
             {
                 Error = "RdapLookupFailed",
                 Message = "The RDAP service returned an unexpected response."
@@ -114,7 +114,7 @@ public class CheckDomainAvailability
         catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
         {
             _logger.LogError(ex, "RDAP lookup timed out for domain '{Domain}'.", domain);
-            return new ObjectResult(new ErrorResponse
+            return new ObjectResult(new DomainAvailabilityErrorResponse
             {
                 Error = "RdapLookupFailed",
                 Message = "The RDAP service did not respond in time."

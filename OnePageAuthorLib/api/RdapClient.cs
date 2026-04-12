@@ -1,17 +1,18 @@
-using InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Models;
+using InkStainedWretch.OnePageAuthorAPI.Interfaces;
+using InkStainedWretch.OnePageAuthorLib.Models;
 using Microsoft.Extensions.Logging;
 
-namespace InkStainedWretch.OnePageAuthorAPI.Functions.DomainAvailability.Services;
+namespace InkStainedWretch.OnePageAuthorAPI.API;
 
 /// <summary>
-/// Implements domain availability checks by querying <c>rdap.org</c>.
+/// Implements domain availability checks by querying an RDAP provider.
 /// </summary>
 /// <remarks>
-/// The RDAP (Registration Data Access Protocol) service at <c>rdap.org</c> acts as a universal
-/// bootstrap proxy. An HTTP 200 response means the domain is registered; an HTTP 404 means the
-/// domain is available. Any other status code is treated as a lookup failure.
+/// The RDAP (Registration Data Access Protocol) service acts as a universal bootstrap proxy.
+/// An HTTP 200 response means the domain is registered; an HTTP 404 means the domain is available.
+/// Any other status code is treated as a lookup failure.
 /// The <see cref="HttpClient.BaseAddress"/> is configured at registration time (via
-/// <c>AddHttpClient</c> in <c>Program.cs</c>); this class uses relative paths only.
+/// <c>AddHttpClient</c> in <c>ServiceFactory</c>); this class uses relative paths only.
 /// </remarks>
 public class RdapClient : IRdapClient
 {
@@ -21,7 +22,7 @@ public class RdapClient : IRdapClient
     /// <summary>
     /// Initializes a new instance of <see cref="RdapClient"/>.
     /// </summary>
-    /// <param name="httpClient">Named <see cref="HttpClient"/> injected by <see cref="IHttpClientFactory"/>.</param>
+    /// <param name="httpClient">Typed <see cref="HttpClient"/> injected by <see cref="IHttpClientFactory"/>.</param>
     /// <param name="logger">Logger for diagnostic output.</param>
     public RdapClient(HttpClient httpClient, ILogger<RdapClient> logger)
     {
