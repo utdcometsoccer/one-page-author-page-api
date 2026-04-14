@@ -1211,6 +1211,9 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 client.BaseAddress = new Uri(rdapBaseUrl);
                 client.Timeout = TimeSpan.FromSeconds(10);
                 client.DefaultRequestHeaders.Add("Accept", "application/rdap+json, application/json");
+                // rdap.org (and other RDAP providers) block requests that omit a User-Agent header
+                // with HTTP 403. Send an identifying header so the service accepts our lookups.
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("OnePageAuthor-DomainAvailability/1.0");
             });
 
             return services;

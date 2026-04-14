@@ -137,6 +137,39 @@ public class CheckDomainAvailabilityTests
         Assert.Throws<ArgumentNullException>(() => new RdapClient(new HttpClient(), null!));
     }
 
+    [Fact]
+    public async Task RdapClient_Request_IncludesUserAgentHeader()
+    {
+        // rdap.org returns 403 when no User-Agent header is present.
+        // Verify that the HttpClient configured via ServiceFactory sends one.
+        HttpRequestMessage? capturedRequest = null;
+        var handler = new Mock<HttpMessageHandler>();
+        handler.Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>())
+               .Callback<HttpRequestMessage, CancellationToken>((req, _) =>
+                   capturedRequest = req)
+               .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
+
+        var httpClient = new HttpClient(handler.Object)
+        {
+            BaseAddress = new Uri("https://rdap.org/")
+        };
+        // Simulate what ServiceFactory.AddRdapClient configures on the HttpClient.
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("OnePageAuthor-DomainAvailability/1.0");
+
+        var logger = new Mock<ILogger<RdapClient>>().Object;
+        var client = new RdapClient(httpClient, logger);
+
+        await client.CheckAvailabilityAsync("example.com");
+
+        Assert.NotNull(capturedRequest);
+        var userAgent = capturedRequest!.Headers.UserAgent.ToString();
+        Assert.Contains("OnePageAuthor-DomainAvailability", userAgent, StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData("example.com.")]    // trailing FQDN dot stripped to "example.com"
     [InlineData("EXAMPLE.COM.")]    // upper-case + trailing dot
