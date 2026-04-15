@@ -2,10 +2,13 @@ using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Moq.Protected;
+using InkStainedWretch.OnePageAuthorAPI;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Functions;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
@@ -138,32 +141,32 @@ public class CheckDomainAvailabilityTests
     }
 
     [Fact]
-    public async Task RdapClient_Request_IncludesUserAgentHeader()
+    public async Task AddRdapClient_ServiceFactory_ConfiguresUserAgentHeader_OnOutgoingRequests()
     {
-        // rdap.org returns 403 when no User-Agent header is present.
-        // Verify that the HttpClient configured via ServiceFactory sends one.
+        // Verifies that ServiceFactory.AddRdapClient (not a manually-constructed HttpClient)
+        // sends the User-Agent header that prevents rdap.org from returning HTTP 403.
         HttpRequestMessage? capturedRequest = null;
-        var handler = new Mock<HttpMessageHandler>();
-        handler.Protected()
-               .Setup<Task<HttpResponseMessage>>(
-                   "SendAsync",
-                   ItExpr.IsAny<HttpRequestMessage>(),
-                   ItExpr.IsAny<CancellationToken>())
-               .Callback<HttpRequestMessage, CancellationToken>((req, _) =>
-                   capturedRequest = req)
-               .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
+        var mockHandler = new Mock<HttpMessageHandler>();
+        mockHandler.Protected()
+                   .Setup<Task<HttpResponseMessage>>(
+                       "SendAsync",
+                       ItExpr.IsAny<HttpRequestMessage>(),
+                       ItExpr.IsAny<CancellationToken>())
+                   .Callback<HttpRequestMessage, CancellationToken>((req, _) => capturedRequest = req)
+                   .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
 
-        var httpClient = new HttpClient(handler.Object)
-        {
-            BaseAddress = new Uri("https://rdap.org/")
-        };
-        // Simulate what ServiceFactory.AddRdapClient configures on the HttpClient.
-        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("OnePageAuthor-DomainAvailability/1.0");
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddRdapClient("https://rdap.org/");
 
-        var logger = new Mock<ILogger<RdapClient>>().Object;
-        var client = new RdapClient(httpClient, logger);
+        // Replace the primary handler so requests are captured without hitting the network.
+        services.ConfigureAll<HttpClientFactoryOptions>(
+            o => o.HttpMessageHandlerBuilderActions.Add(b => b.PrimaryHandler = mockHandler.Object));
 
-        await client.CheckAvailabilityAsync("example.com");
+        await using var sp = services.BuildServiceProvider();
+        var rdapClient = sp.GetRequiredService<IRdapClient>();
+
+        await rdapClient.CheckAvailabilityAsync("example.com");
 
         Assert.NotNull(capturedRequest);
         var userAgent = capturedRequest!.Headers.UserAgent.ToString();
