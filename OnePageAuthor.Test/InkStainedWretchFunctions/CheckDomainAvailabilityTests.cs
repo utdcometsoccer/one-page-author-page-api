@@ -2,10 +2,13 @@ using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Moq.Protected;
+using InkStainedWretch.OnePageAuthorAPI;
 using InkStainedWretch.OnePageAuthorAPI.API;
 using InkStainedWretch.OnePageAuthorAPI.Functions;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
@@ -135,6 +138,39 @@ public class CheckDomainAvailabilityTests
     public void RdapClient_NullLogger_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => new RdapClient(new HttpClient(), null!));
+    }
+
+    [Fact]
+    public async Task AddRdapClient_ServiceFactory_ConfiguresUserAgentHeader_OnOutgoingRequests()
+    {
+        // Verifies that ServiceFactory.AddRdapClient (not a manually-constructed HttpClient)
+        // sends the User-Agent header that prevents rdap.org from returning HTTP 403.
+        HttpRequestMessage? capturedRequest = null;
+        var mockHandler = new Mock<HttpMessageHandler>();
+        mockHandler.Protected()
+                   .Setup<Task<HttpResponseMessage>>(
+                       "SendAsync",
+                       ItExpr.IsAny<HttpRequestMessage>(),
+                       ItExpr.IsAny<CancellationToken>())
+                   .Callback<HttpRequestMessage, CancellationToken>((req, _) => capturedRequest = req)
+                   .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
+
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddRdapClient("https://rdap.org/");
+
+        // Replace the primary handler so requests are captured without hitting the network.
+        services.ConfigureAll<HttpClientFactoryOptions>(
+            o => o.HttpMessageHandlerBuilderActions.Add(b => b.PrimaryHandler = mockHandler.Object));
+
+        await using var sp = services.BuildServiceProvider();
+        var rdapClient = sp.GetRequiredService<IRdapClient>();
+
+        await rdapClient.CheckAvailabilityAsync("example.com");
+
+        Assert.NotNull(capturedRequest);
+        var userAgent = capturedRequest!.Headers.UserAgent.ToString();
+        Assert.Contains("OnePageAuthor-DomainAvailability", userAgent, StringComparison.Ordinal);
     }
 
     [Theory]
