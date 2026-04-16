@@ -63,15 +63,25 @@ public class RdapClient : IRdapClient
             // Caller cancelled the operation — do not retry.
             throw;
         }
-        catch (Exception ex) when (ex is OperationCanceledException or HttpRequestException)
+        catch (OperationCanceledException ex)
         {
-            // Timeout or transient network/HTTP error on the first attempt — retry once.
+            // HttpClient timeout on the first attempt — retry once.
+            _logger.LogWarning(ex,
+                "RDAP lookup for domain {Domain} timed out on first attempt; retrying in {DelayMs} ms.",
+                normalizedDomain, RetryDelayMs);
+
+            await Task.Delay(RetryDelayMs, cancellationToken).ConfigureAwait(false);
+            _logger.LogInformation("Retrying RDAP query for domain {Domain} at {Url}", normalizedDomain, requestUrl);
+            return await QueryRdapAsync(normalizedDomain, requestUrl, rdapSource, cancellationToken).ConfigureAwait(false);
+        }
+        catch (HttpRequestException ex)
+        {
+            // Transient network or HTTP error on the first attempt — retry once.
             _logger.LogWarning(ex,
                 "RDAP lookup for domain {Domain} failed on first attempt; retrying in {DelayMs} ms.",
                 normalizedDomain, RetryDelayMs);
 
             await Task.Delay(RetryDelayMs, cancellationToken).ConfigureAwait(false);
-
             _logger.LogInformation("Retrying RDAP query for domain {Domain} at {Url}", normalizedDomain, requestUrl);
             return await QueryRdapAsync(normalizedDomain, requestUrl, rdapSource, cancellationToken).ConfigureAwait(false);
         }

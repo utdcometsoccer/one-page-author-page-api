@@ -402,23 +402,6 @@ public class CheckDomainAvailabilityTests
     // RdapClient Retry Tests
     // -------------------------------------------------------------------------
 
-    private static HttpClient CreateSequentialHttpClient(params HttpStatusCode[] statusCodes)
-    {
-        var callCount = 0;
-        var handler = new Mock<HttpMessageHandler>();
-        handler.Protected()
-               .Setup<Task<HttpResponseMessage>>(
-                   "SendAsync",
-                   ItExpr.IsAny<HttpRequestMessage>(),
-                   ItExpr.IsAny<CancellationToken>())
-               .ReturnsAsync(() => new HttpResponseMessage(statusCodes[Math.Min(callCount++, statusCodes.Length - 1)]));
-
-        return new HttpClient(handler.Object)
-        {
-            BaseAddress = new Uri("https://rdap.org/")
-        };
-    }
-
     [Fact]
     public async Task RdapClient_FirstAttemptTimesOut_RetriesAndSucceeds()
     {
