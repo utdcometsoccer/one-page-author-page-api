@@ -13,11 +13,19 @@ namespace InkStainedWretch.OnePageAuthorAPI.API;
 /// Any other status code is treated as a lookup failure.
 /// The <see cref="HttpClient.BaseAddress"/> is configured at registration time (via
 /// <c>AddHttpClient</c> in <c>ServiceFactory</c>); this class uses relative paths only.
+/// <para>
+/// When the RDAP service times out or returns a transient error on the first attempt, the lookup
+/// is automatically retried once after a <see cref="RetryDelayMs"/>-millisecond delay.  If the
+/// retry also fails the exception is propagated to the caller.
+/// </para>
 /// </remarks>
 public class RdapClient : IRdapClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<RdapClient> _logger;
+
+    // Delay between the first failed attempt and the single retry.
+    internal const int RetryDelayMs = 1000;
 
     /// <summary>
     /// Initializes a new instance of <see cref="RdapClient"/>.
@@ -46,6 +54,39 @@ public class RdapClient : IRdapClient
 
         _logger.LogInformation("Querying RDAP for domain {Domain} at {Url}", normalizedDomain, requestUrl);
 
+        try
+        {
+            return await QueryRdapAsync(normalizedDomain, requestUrl, rdapSource, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Caller cancelled the operation — do not retry.
+            throw;
+        }
+        catch (Exception ex) when (ex is OperationCanceledException or HttpRequestException)
+        {
+            // Timeout or transient network/HTTP error on the first attempt — retry once.
+            _logger.LogWarning(ex,
+                "RDAP lookup for domain {Domain} failed on first attempt; retrying in {DelayMs} ms.",
+                normalizedDomain, RetryDelayMs);
+
+            await Task.Delay(RetryDelayMs, cancellationToken).ConfigureAwait(false);
+
+            _logger.LogInformation("Retrying RDAP query for domain {Domain} at {Url}", normalizedDomain, requestUrl);
+            return await QueryRdapAsync(normalizedDomain, requestUrl, rdapSource, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Executes a single HTTP request to the RDAP service and maps the response to a
+    /// <see cref="DomainAvailabilityResponse"/>.
+    /// </summary>
+    private async Task<DomainAvailabilityResponse> QueryRdapAsync(
+        string normalizedDomain,
+        string requestUrl,
+        string rdapSource,
+        CancellationToken cancellationToken)
+    {
         // ResponseHeadersRead avoids buffering the RDAP JSON body; only the status code is needed.
         using var response = await _httpClient.GetAsync(
             requestUrl,

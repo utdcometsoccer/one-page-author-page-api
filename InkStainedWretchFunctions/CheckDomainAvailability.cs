@@ -111,8 +111,9 @@ public class CheckDomainAvailability
                 StatusCode = StatusCodes.Status502BadGateway
             };
         }
-        catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+        catch (OperationCanceledException ex) when (!req.HttpContext.RequestAborted.IsCancellationRequested)
         {
+            // Not a client-initiated cancellation — the RDAP service timed out (after all retries).
             _logger.LogError(ex, "RDAP lookup timed out for domain '{Domain}'.", domain);
             return new ObjectResult(new DomainAvailabilityErrorResponse
             {

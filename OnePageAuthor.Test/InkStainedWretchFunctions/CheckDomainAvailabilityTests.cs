@@ -377,4 +377,153 @@ public class CheckDomainAvailabilityTests
         var status = Assert.IsType<StatusCodeResult>(result);
         Assert.Equal(499, status.StatusCode);
     }
+
+    [Fact]
+    public async Task Run_RdapTimeoutNotClientCancellation_Returns502()
+    {
+        // Simulate a non-client-initiated OperationCanceledException (e.g. HttpClient timeout).
+        var rdapMock = new Mock<IRdapClient>();
+        rdapMock.Setup(r => r.CheckAvailabilityAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new TaskCanceledException("Timeout", new TimeoutException()));
+
+        var function = BuildFunction(rdapMock.Object);
+        var req = CreateRequest("example.com");  // RequestAborted = CancellationToken.None (not cancelled)
+
+        var result = await function.Run(req);
+
+        var obj = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(502, obj.StatusCode);
+        var error = Assert.IsType<DomainAvailabilityErrorResponse>(obj.Value);
+        Assert.Equal("RdapLookupFailed", error.Error);
+        Assert.Contains("did not respond in time", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // -------------------------------------------------------------------------
+    // RdapClient Retry Tests
+    // -------------------------------------------------------------------------
+
+    private static HttpClient CreateSequentialHttpClient(params HttpStatusCode[] statusCodes)
+    {
+        var callCount = 0;
+        var handler = new Mock<HttpMessageHandler>();
+        handler.Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>())
+               .ReturnsAsync(() => new HttpResponseMessage(statusCodes[Math.Min(callCount++, statusCodes.Length - 1)]));
+
+        return new HttpClient(handler.Object)
+        {
+            BaseAddress = new Uri("https://rdap.org/")
+        };
+    }
+
+    [Fact]
+    public async Task RdapClient_FirstAttemptTimesOut_RetriesAndSucceeds()
+    {
+        var callCount = 0;
+        var handler = new Mock<HttpMessageHandler>();
+        handler.Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>())
+               .Returns<HttpRequestMessage, CancellationToken>((_, _) =>
+               {
+                   callCount++;
+                   if (callCount == 1)
+                       throw new TaskCanceledException("Simulated timeout", new TimeoutException());
+                   return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+               });
+
+        var httpClient = new HttpClient(handler.Object) { BaseAddress = new Uri("https://rdap.org/") };
+        var logger = new Mock<ILogger<RdapClient>>().Object;
+        var client = new RdapClient(httpClient, logger);
+
+        var result = await client.CheckAvailabilityAsync("newdomain123.com");
+
+        Assert.Equal("newdomain123.com", result.Domain);
+        Assert.True(result.Available);
+        Assert.Equal(2, callCount);  // first attempt + one retry
+    }
+
+    [Fact]
+    public async Task RdapClient_FirstAttemptTransientHttpError_RetriesAndSucceeds()
+    {
+        var callCount = 0;
+        var handler = new Mock<HttpMessageHandler>();
+        handler.Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>())
+               .Returns<HttpRequestMessage, CancellationToken>((_, _) =>
+               {
+                   callCount++;
+                   if (callCount == 1)
+                       throw new HttpRequestException("Simulated transient error");
+                   return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
+               });
+
+        var httpClient = new HttpClient(handler.Object) { BaseAddress = new Uri("https://rdap.org/") };
+        var logger = new Mock<ILogger<RdapClient>>().Object;
+        var client = new RdapClient(httpClient, logger);
+
+        var result = await client.CheckAvailabilityAsync("example.com");
+
+        Assert.Equal("example.com", result.Domain);
+        Assert.False(result.Available);
+        Assert.Equal(2, callCount);
+    }
+
+    [Fact]
+    public async Task RdapClient_BothAttemptsTimeOut_PropagatesException()
+    {
+        var handler = new Mock<HttpMessageHandler>();
+        handler.Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>())
+               .Throws(new TaskCanceledException("Simulated timeout", new TimeoutException()));
+
+        var httpClient = new HttpClient(handler.Object) { BaseAddress = new Uri("https://rdap.org/") };
+        var logger = new Mock<ILogger<RdapClient>>().Object;
+        var client = new RdapClient(httpClient, logger);
+
+        await Assert.ThrowsAsync<TaskCanceledException>(
+            () => client.CheckAvailabilityAsync("example.com"));
+    }
+
+    [Fact]
+    public async Task RdapClient_ClientCancellation_DoesNotRetry()
+    {
+        using var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+
+        var callCount = 0;
+        var handler = new Mock<HttpMessageHandler>();
+        handler.Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>())
+               .Returns<HttpRequestMessage, CancellationToken>((_, ct) =>
+               {
+                   callCount++;
+                   ct.ThrowIfCancellationRequested();
+                   return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
+               });
+
+        var httpClient = new HttpClient(handler.Object) { BaseAddress = new Uri("https://rdap.org/") };
+        var logger = new Mock<ILogger<RdapClient>>().Object;
+        var client = new RdapClient(httpClient, logger);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => client.CheckAvailabilityAsync("example.com", cts.Token));
+
+        // No retry should be attempted when the caller cancels.
+        Assert.Equal(1, callCount);
+    }
 }
