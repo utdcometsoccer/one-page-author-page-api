@@ -68,3 +68,32 @@ RDAP services, including `rdap.org`, may impose rate limits to protect registry 
 - **Privacy-redacted registrations:** Some registrars redact registration data under GDPR. The domain will still return `200` (registered), but the JSON body may contain limited information.
 - **Newly registered domains:** There can be a propagation delay of minutes to hours before a newly registered domain appears in RDAP.
 - **ccTLD support:** Not all country-code TLD registries implement RDAP. If a ccTLD registry does not support RDAP, `rdap.org` may return a non-200/404 status, which this API surfaces as a `502 Bad Gateway`.
+
+---
+
+## Timeout Handling and Retry Behaviour
+
+RDAP bootstrap proxies such as `rdap.org` occasionally take longer than expected to forward a request
+to the authoritative TLD registry. To mitigate transient slowness without immediately failing the
+caller, `RdapClient` implements a **single automatic retry**:
+
+1. The first HTTP request is issued with the configured timeout (default 10 s).
+2. If the request **times out** (`OperationCanceledException` / `TaskCanceledException`) or encounters
+   a **transient network error** (`HttpRequestException`), the client waits **1 second** and tries once
+   more.
+3. If the retry also fails, the exception is propagated and the function returns **502 Bad Gateway**
+   with error code `RdapLookupFailed`.
+
+Client-initiated cancellations (i.e. the HTTP caller disconnecting before a response is returned) are
+**not** retried and always result in a `499 Client Closed Request` response.
+
+### Tuning recommendations for high-timeout environments
+
+If timeouts remain frequent even after the retry, consider the following additional mitigations:
+
+| Mitigation | How |
+|------------|-----|
+| Increase per-request timeout | Raise `client.Timeout` in `ServiceFactory.AddRdapClient` (e.g. to 15 s) |
+| Add a short-lived cache | Cache successful responses for 60–300 s per domain to avoid redundant lookups |
+| Exponential back-off on 429 | Respect the `Retry-After` header when the RDAP service rate-limits the client |
+| Use a registry-specific RDAP endpoint | For `.com`/`.net`, query `https://rdap.verisign.com/` directly to skip the bootstrap proxy |
