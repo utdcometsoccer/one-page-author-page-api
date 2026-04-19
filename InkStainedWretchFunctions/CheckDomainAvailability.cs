@@ -88,8 +88,11 @@ public class CheckDomainAvailability
         try
         {
             // .CA domains are routed to CIRA's authoritative RDAP endpoint for more reliable lookups.
-            var isCaDomain = domain.Trim().TrimEnd('.').EndsWith(".ca", StringComparison.OrdinalIgnoreCase);
-            var rdapClient = isCaDomain ? (IRdapClient)_ciraRdapClient : _rdapClient;
+            // DomainAvailabilityValidator.IsValid() has already confirmed the domain is well-formed,
+            // so a simple case-insensitive suffix check is sufficient here.
+            var isCaDomain = domain.EndsWith(".ca", StringComparison.OrdinalIgnoreCase)
+                             || domain.EndsWith(".ca.", StringComparison.OrdinalIgnoreCase);
+            IRdapClient rdapClient = isCaDomain ? _ciraRdapClient : _rdapClient;
 
             if (isCaDomain)
                 _logger.LogInformation("Domain '{Domain}' is a .CA domain — routing lookup to CIRA RDAP.", domain);
