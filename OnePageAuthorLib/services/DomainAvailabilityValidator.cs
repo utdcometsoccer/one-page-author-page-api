@@ -64,8 +64,14 @@ public static partial class DomainAvailabilityValidator
 
         if (labels.Length > 2)
         {
-            errorMessage = "Subdomains are not allowed. Please supply a root domain (e.g., example.com).";
-            return false;
+            // .ng domains may be registered under second-level domains (e.g., example.com.ng, example.name.ng).
+            // Accept exactly 3 labels when the TLD is "ng"; reject anything deeper.
+            var isTldNg = labels[^1].Equals("ng", StringComparison.OrdinalIgnoreCase);
+            if (!(isTldNg && labels.Length == 3))
+            {
+                errorMessage = "Subdomains are not allowed. Please supply a root domain (e.g., example.com).";
+                return false;
+            }
         }
 
         // Validate each label.
