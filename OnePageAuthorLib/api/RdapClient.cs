@@ -19,7 +19,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API;
 /// retry also fails the exception is propagated to the caller.
 /// </para>
 /// </remarks>
-public class RdapClient : IRdapClient
+public class RdapClient : IRdapClient, ICiraRdapClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<RdapClient> _logger;

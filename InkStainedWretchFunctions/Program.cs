@@ -204,7 +204,20 @@ else
     Console.WriteLine($"RDAP base URL configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(rdapBaseUrl)}");
 }
 
-builder.Services.AddRdapClient(rdapBaseUrl);
+// CIRA's authoritative RDAP endpoint for .CA domain lookups.
+// Can be overridden via CIRA_RDAP_BASE_URL for testing purposes.
+var ciraRdapBaseUrl = configuration["CIRA_RDAP_BASE_URL"];
+if (string.IsNullOrWhiteSpace(ciraRdapBaseUrl))
+{
+    ciraRdapBaseUrl = "https://rdap.cira.ca/";
+    Console.WriteLine("CIRA_RDAP_BASE_URL not configured — using default: https://rdap.cira.ca/");
+}
+else
+{
+    Console.WriteLine($"CIRA RDAP base URL configured: {InkStainedWretch.OnePageAuthorAPI.Utility.MaskUrl(ciraRdapBaseUrl)}");
+}
+
+builder.Services.AddRdapClient(rdapBaseUrl, ciraRdapBaseUrl);
 
 // Add Stripe services if API key is configured (needed for subscription validation)
 if (!string.IsNullOrWhiteSpace(stripeApiKey))

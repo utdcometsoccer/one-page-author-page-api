@@ -15,18 +15,22 @@ public class CheckDomainAvailability
 {
     private readonly ILogger<CheckDomainAvailability> _logger;
     private readonly IRdapClient _rdapClient;
+    private readonly ICiraRdapClient _ciraRdapClient;
 
     /// <summary>
     /// Initializes a new instance of <see cref="CheckDomainAvailability"/>.
     /// </summary>
     /// <param name="logger">Logger for diagnostic output.</param>
-    /// <param name="rdapClient">RDAP client used to query domain registration status.</param>
+    /// <param name="rdapClient">RDAP client used to query domain registration status via the generic bootstrap proxy.</param>
+    /// <param name="ciraRdapClient">RDAP client targeting CIRA's authoritative endpoint for <c>.CA</c> domain lookups.</param>
     public CheckDomainAvailability(
         ILogger<CheckDomainAvailability> logger,
-        IRdapClient rdapClient)
+        IRdapClient rdapClient,
+        ICiraRdapClient ciraRdapClient)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _rdapClient = rdapClient ?? throw new ArgumentNullException(nameof(rdapClient));
+        _ciraRdapClient = ciraRdapClient ?? throw new ArgumentNullException(nameof(ciraRdapClient));
     }
 
     /// <summary>
@@ -83,7 +87,14 @@ public class CheckDomainAvailability
 
         try
         {
-            var result = await _rdapClient.CheckAvailabilityAsync(domain, req.HttpContext.RequestAborted)
+            // .CA domains are routed to CIRA's authoritative RDAP endpoint for more reliable lookups.
+            var isCaDomain = domain.Trim().TrimEnd('.').EndsWith(".ca", StringComparison.OrdinalIgnoreCase);
+            var rdapClient = isCaDomain ? (IRdapClient)_ciraRdapClient : _rdapClient;
+
+            if (isCaDomain)
+                _logger.LogInformation("Domain '{Domain}' is a .CA domain — routing lookup to CIRA RDAP.", domain);
+
+            var result = await rdapClient.CheckAvailabilityAsync(domain, req.HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
             _logger.LogInformation(
