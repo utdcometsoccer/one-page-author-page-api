@@ -1,3 +1,4 @@
+using System.Text.Json;
 using InkStainedWretch.OnePageAuthorAPI.Interfaces;
 using InkStainedWretch.OnePageAuthorAPI.Services;
 using InkStainedWretch.OnePageAuthorLib.Models;
@@ -83,14 +84,16 @@ public class CheckDomainAvailability
             });
         }
 
+        var normalizedDomain = domain.Trim().TrimEnd('.').ToLowerInvariant();
+
         try
         {
-            var result = await _rdapClient.CheckAvailabilityAsync(domain, req.HttpContext.RequestAborted)
+            var result = await _rdapClient.CheckAvailabilityAsync(normalizedDomain, req.HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
             _logger.LogInformation(
                 "Domain availability check complete: {Domain} available={Available}",
-                result.Domain,
+                SanitizeForLog(result.Domain),
                 result.Available);
 
             return new OkObjectResult(result);
@@ -98,12 +101,24 @@ public class CheckDomainAvailability
         catch (OperationCanceledException) when (req.HttpContext.RequestAborted.IsCancellationRequested)
         {
             // Client disconnected before the RDAP call completed — not an RDAP error.
-            _logger.LogInformation("Domain availability check cancelled by client for domain '{Domain}'.", domain);
+            _logger.LogInformation("Domain availability check cancelled by client for domain '{Domain}'.", SanitizeForLog(normalizedDomain));
             return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex, "RDAP lookup failed for domain '{Domain}'.", domain);
+            _logger.LogError(ex, "RDAP lookup failed for domain '{Domain}'.", SanitizeForLog(normalizedDomain));
+            return new ObjectResult(new DomainAvailabilityErrorResponse
+            {
+                Error = "RdapLookupFailed",
+                Message = "The RDAP service returned an unexpected response."
+            })
+            {
+                StatusCode = StatusCodes.Status502BadGateway
+            };
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "RDAP response could not be parsed for domain '{Domain}'.", SanitizeForLog(normalizedDomain));
             return new ObjectResult(new DomainAvailabilityErrorResponse
             {
                 Error = "RdapLookupFailed",
@@ -116,7 +131,7 @@ public class CheckDomainAvailability
         catch (OperationCanceledException ex) when (!req.HttpContext.RequestAborted.IsCancellationRequested)
         {
             // Not a client-initiated cancellation — the RDAP service timed out (after all retries).
-            _logger.LogError(ex, "RDAP lookup timed out for domain '{Domain}'.", domain);
+            _logger.LogError(ex, "RDAP lookup timed out for domain '{Domain}'.", SanitizeForLog(normalizedDomain));
             return new ObjectResult(new DomainAvailabilityErrorResponse
             {
                 Error = "RdapLookupFailed",
@@ -127,4 +142,15 @@ public class CheckDomainAvailability
             };
         }
     }
+
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Strips control characters from a value before it is written to a log entry,
+    /// preventing log-forging attacks.
+    /// </summary>
+    private static string SanitizeForLog(string? value) =>
+        value is null ? string.Empty : value.ReplaceLineEndings("_").Replace('\t', '_');
 }

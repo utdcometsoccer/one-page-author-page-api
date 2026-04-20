@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -569,5 +570,50 @@ public class CheckDomainAvailabilityTests
         Assert.Equal(ngDomain, response.Domain);
         Assert.Equal(available, response.Available);
         Assert.Equal("rdap.org", response.RdapSource);
+    }
+
+    [Theory]
+    [InlineData("EXAMPLE.COM", "example.com")]
+    [InlineData("Example.Com.Ng", "example.com.ng")]
+    [InlineData("EXAMPLE.NET.", "example.net")]       // trailing dot stripped
+    public async Task Run_DomainNormalized_BeforeRdapCall(string rawDomain, string expectedNormalized)
+    {
+        string? capturedDomain = null;
+        var rdapMock = new Mock<IRdapClient>();
+        rdapMock.Setup(r => r.CheckAvailabilityAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, CancellationToken>((d, _) => capturedDomain = d)
+                .ReturnsAsync(new DomainAvailabilityResponse
+                {
+                    Domain = expectedNormalized,
+                    Available = true,
+                    CheckedAt = DateTime.UtcNow,
+                    RdapStatus = 404,
+                    RdapSource = "rdap.org"
+                });
+
+        var function = BuildFunction(rdapMock.Object);
+        var req = CreateRequest(rawDomain);
+
+        await function.Run(req);
+
+        Assert.Equal(expectedNormalized, capturedDomain);
+    }
+
+    [Fact]
+    public async Task Run_RdapJsonException_Returns502()
+    {
+        var rdapMock = new Mock<IRdapClient>();
+        rdapMock.Setup(r => r.CheckAvailabilityAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new JsonException("Unexpected JSON token"));
+
+        var function = BuildFunction(rdapMock.Object);
+        var req = CreateRequest("example.com");
+
+        var result = await function.Run(req);
+
+        var obj = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(502, obj.StatusCode);
+        var error = Assert.IsType<DomainAvailabilityErrorResponse>(obj.Value);
+        Assert.Equal("RdapLookupFailed", error.Error);
     }
 }
