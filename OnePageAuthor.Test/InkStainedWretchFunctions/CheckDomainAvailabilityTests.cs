@@ -226,45 +226,24 @@ public class CheckDomainAvailabilityTests
         return mock.Object;
     }
 
-    private static CheckDomainAvailability BuildFunction(
-        IRdapClient rdapClient,
-        IWhmcsService? whmcsService = null)
+    private static CheckDomainAvailability BuildFunction(IRdapClient rdapClient)
     {
         var logger = new Mock<ILogger<CheckDomainAvailability>>().Object;
-        var whmcs = whmcsService ?? CreateUnconfiguredWhmcsMock().Object;
-        return new CheckDomainAvailability(logger, rdapClient, whmcs);
-    }
-
-    /// <summary>Creates a WHMCS mock that reports itself as not configured (RDAP fallback).</summary>
-    private static Mock<IWhmcsService> CreateUnconfiguredWhmcsMock()
-    {
-        var mock = new Mock<IWhmcsService>();
-        mock.Setup(w => w.IsConfigured).Returns(false);
-        return mock;
+        return new CheckDomainAvailability(logger, rdapClient);
     }
 
     [Fact]
     public void Constructor_NullLogger_Throws()
     {
         var rdap = new Mock<IRdapClient>().Object;
-        var whmcs = CreateUnconfiguredWhmcsMock().Object;
-        Assert.Throws<ArgumentNullException>(() => new CheckDomainAvailability(null!, rdap, whmcs));
+        Assert.Throws<ArgumentNullException>(() => new CheckDomainAvailability(null!, rdap));
     }
 
     [Fact]
     public void Constructor_NullRdapClient_Throws()
     {
         var logger = new Mock<ILogger<CheckDomainAvailability>>().Object;
-        var whmcs = CreateUnconfiguredWhmcsMock().Object;
-        Assert.Throws<ArgumentNullException>(() => new CheckDomainAvailability(logger, null!, whmcs));
-    }
-
-    [Fact]
-    public void Constructor_NullWhmcsService_Throws()
-    {
-        var logger = new Mock<ILogger<CheckDomainAvailability>>().Object;
-        var rdap = new Mock<IRdapClient>().Object;
-        Assert.Throws<ArgumentNullException>(() => new CheckDomainAvailability(logger, rdap, null!));
+        Assert.Throws<ArgumentNullException>(() => new CheckDomainAvailability(logger, null!));
     }
 
     [Fact]
@@ -564,166 +543,31 @@ public class CheckDomainAvailabilityTests
     // .ng TLD — CheckDomainAvailability Function Tests
     // -------------------------------------------------------------------------
 
-    [Fact]
-    public async Task Run_NgDomain_WhmcsConfigured_Available_Returns200WithAvailableTrue()
-    {
-        var whmcsMock = new Mock<IWhmcsService>();
-        whmcsMock.Setup(w => w.IsConfigured).Returns(true);
-        whmcsMock.Setup(w => w.CheckDomainAvailabilityAsync("mynewdomain.ng"))
-                 .ReturnsAsync(true);
-
-        var function = BuildFunction(new Mock<IRdapClient>().Object, whmcsMock.Object);
-        var req = CreateRequest("mynewdomain.ng");
-
-        var result = await function.Run(req);
-
-        var ok = Assert.IsType<OkObjectResult>(result);
-        var response = Assert.IsType<DomainAvailabilityResponse>(ok.Value);
-        Assert.Equal("mynewdomain.ng", response.Domain);
-        Assert.True(response.Available);
-        Assert.Equal("whmcs", response.RdapSource);
-
-        // RDAP must NOT have been called.
-        whmcsMock.Verify(w => w.CheckDomainAvailabilityAsync("mynewdomain.ng"), Times.Once);
-    }
-
-    [Fact]
-    public async Task Run_NgSecondLevelDomain_WhmcsConfigured_Unavailable_Returns200WithAvailableFalse()
-    {
-        var whmcsMock = new Mock<IWhmcsService>();
-        whmcsMock.Setup(w => w.IsConfigured).Returns(true);
-        whmcsMock.Setup(w => w.CheckDomainAvailabilityAsync("example.com.ng"))
-                 .ReturnsAsync(false);
-
-        var function = BuildFunction(new Mock<IRdapClient>().Object, whmcsMock.Object);
-        var req = CreateRequest("example.com.ng");
-
-        var result = await function.Run(req);
-
-        var ok = Assert.IsType<OkObjectResult>(result);
-        var response = Assert.IsType<DomainAvailabilityResponse>(ok.Value);
-        Assert.Equal("example.com.ng", response.Domain);
-        Assert.False(response.Available);
-        Assert.Equal("whmcs", response.RdapSource);
-    }
-
-    [Fact]
-    public async Task Run_NgDomain_WhmcsNotConfigured_FallsBackToRdap()
+    [Theory]
+    [InlineData("example.ng", true)]
+    [InlineData("example.com.ng", false)]
+    public async Task Run_NgDomain_UsesRdap_Returns200(string ngDomain, bool available)
     {
         var rdapMock = new Mock<IRdapClient>();
-        rdapMock.Setup(r => r.CheckAvailabilityAsync("mynewdomain.ng", It.IsAny<CancellationToken>()))
+        rdapMock.Setup(r => r.CheckAvailabilityAsync(ngDomain, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new DomainAvailabilityResponse
                 {
-                    Domain = "mynewdomain.ng",
-                    Available = true,
+                    Domain = ngDomain,
+                    Available = available,
                     CheckedAt = DateTime.UtcNow,
-                    RdapStatus = 404,
+                    RdapStatus = available ? 404 : 200,
                     RdapSource = "rdap.org"
                 });
 
-        var whmcsMock = CreateUnconfiguredWhmcsMock();
-
-        var function = BuildFunction(rdapMock.Object, whmcsMock.Object);
-        var req = CreateRequest("mynewdomain.ng");
+        var function = BuildFunction(rdapMock.Object);
+        var req = CreateRequest(ngDomain);
 
         var result = await function.Run(req);
 
         var ok = Assert.IsType<OkObjectResult>(result);
         var response = Assert.IsType<DomainAvailabilityResponse>(ok.Value);
-        Assert.True(response.Available);
+        Assert.Equal(ngDomain, response.Domain);
+        Assert.Equal(available, response.Available);
         Assert.Equal("rdap.org", response.RdapSource);
-
-        // WHMCS must NOT have been called since it is not configured.
-        whmcsMock.Verify(w => w.CheckDomainAvailabilityAsync(It.IsAny<string>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task Run_NgDomain_WhmcsHttpRequestException_Returns502()
-    {
-        var whmcsMock = new Mock<IWhmcsService>();
-        whmcsMock.Setup(w => w.IsConfigured).Returns(true);
-        whmcsMock.Setup(w => w.CheckDomainAvailabilityAsync(It.IsAny<string>()))
-                 .ThrowsAsync(new HttpRequestException("WHMCS error"));
-
-        var function = BuildFunction(new Mock<IRdapClient>().Object, whmcsMock.Object);
-        var req = CreateRequest("example.ng");
-
-        var result = await function.Run(req);
-
-        var obj = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(502, obj.StatusCode);
-        var error = Assert.IsType<DomainAvailabilityErrorResponse>(obj.Value);
-        Assert.Equal("WhmcsLookupFailed", error.Error);
-    }
-
-    [Fact]
-    public async Task Run_NgDomain_WhmcsInvalidOperationException_Returns502()
-    {
-        var whmcsMock = new Mock<IWhmcsService>();
-        whmcsMock.Setup(w => w.IsConfigured).Returns(true);
-        whmcsMock.Setup(w => w.CheckDomainAvailabilityAsync(It.IsAny<string>()))
-                 .ThrowsAsync(new InvalidOperationException("WHMCS API error"));
-
-        var function = BuildFunction(new Mock<IRdapClient>().Object, whmcsMock.Object);
-        var req = CreateRequest("example.ng");
-
-        var result = await function.Run(req);
-
-        var obj = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(502, obj.StatusCode);
-        var error = Assert.IsType<DomainAvailabilityErrorResponse>(obj.Value);
-        Assert.Equal("WhmcsLookupFailed", error.Error);
-    }
-
-    [Fact]
-    public async Task Run_NgDomain_ClientCancellation_Returns499()
-    {
-        using var cts = new CancellationTokenSource();
-        await cts.CancelAsync();
-
-        var whmcsMock = new Mock<IWhmcsService>();
-        whmcsMock.Setup(w => w.IsConfigured).Returns(true);
-        whmcsMock.Setup(w => w.CheckDomainAvailabilityAsync(It.IsAny<string>()))
-                 .ThrowsAsync(new OperationCanceledException());
-
-        var reqMock = new Mock<HttpRequest>();
-        var queryDict = new Dictionary<string, StringValues> { ["domain"] = "example.ng" };
-        reqMock.Setup(r => r.Query).Returns(new QueryCollection(queryDict));
-
-        var contextMock = new Mock<HttpContext>();
-        contextMock.Setup(c => c.RequestAborted).Returns(cts.Token);
-        reqMock.Setup(r => r.HttpContext).Returns(contextMock.Object);
-
-        var function = BuildFunction(new Mock<IRdapClient>().Object, whmcsMock.Object);
-        var result = await function.Run(reqMock.Object);
-
-        var status = Assert.IsType<StatusCodeResult>(result);
-        Assert.Equal(499, status.StatusCode);
-    }
-
-    [Fact]
-    public async Task Run_NonNgDomain_NeverCallsWhmcs()
-    {
-        var whmcsMock = new Mock<IWhmcsService>();
-        whmcsMock.Setup(w => w.IsConfigured).Returns(true);
-
-        var rdapMock = new Mock<IRdapClient>();
-        rdapMock.Setup(r => r.CheckAvailabilityAsync("example.com", It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new DomainAvailabilityResponse
-                {
-                    Domain = "example.com",
-                    Available = false,
-                    CheckedAt = DateTime.UtcNow,
-                    RdapStatus = 200,
-                    RdapSource = "rdap.org"
-                });
-
-        var function = BuildFunction(rdapMock.Object, whmcsMock.Object);
-        var req = CreateRequest("example.com");
-
-        var result = await function.Run(req);
-
-        Assert.IsType<OkObjectResult>(result);
-        whmcsMock.Verify(w => w.CheckDomainAvailabilityAsync(It.IsAny<string>()), Times.Never);
     }
 }
