@@ -8,7 +8,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.API;
 /// Implements domain availability checks by querying an RDAP provider.
 /// </summary>
 /// <remarks>
-/// The RDAP (Registration Data Access Protocol) service acts as a universal bootstrap proxy.
+/// This implementation can act as either a generic RDAP bootstrap proxy client (e.g. <c>rdap.org</c>)
+/// or a TLD-specific authoritative RDAP client (e.g. CIRA's <c>rdap.cira.ca</c> for <c>.CA</c>
+/// domains), depending on how <see cref="HttpClient.BaseAddress"/> is configured via DI registration.
 /// An HTTP 200 response means the domain is registered; an HTTP 404 means the domain is available.
 /// Any other status code is treated as a lookup failure.
 /// The <see cref="HttpClient.BaseAddress"/> is configured at registration time (via
@@ -19,7 +21,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API;
 /// retry also fails the exception is propagated to the caller.
 /// </para>
 /// </remarks>
-public class RdapClient : IRdapClient
+public class RdapClient : IRdapClient, ICiraRdapClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<RdapClient> _logger;

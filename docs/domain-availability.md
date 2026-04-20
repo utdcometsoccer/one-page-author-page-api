@@ -43,6 +43,16 @@ The following rules are enforced before the RDAP lookup is performed:
 
 Violations return **400 Bad Request** with an `ErrorResponse` body.
 
+### .CA TLD Specialized Validation
+
+Domains ending in `.ca` follow an additional CIRA-mandated rule:
+
+| Rule | Detail |
+|------|--------|
+| SLD length | The second-level domain (SLD) must be **2–50 characters** long. CIRA's registry rejects names outside this range, which is narrower than the general 63-character DNS limit. |
+
+When a `.ca` domain passes all validation checks, the RDAP lookup is routed directly to CIRA's authoritative RDAP service (`rdap.cira.ca`) rather than through the generic `rdap.org` bootstrap proxy. This provides a more reliable availability check for the Canadian TLD.
+
 ---
 
 ## Response Schema
@@ -65,7 +75,7 @@ Violations return **400 Bad Request** with an `ErrorResponse` body.
 | `available` | boolean | `true` = not yet registered; `false` = already registered. |
 | `checkedAt` | string  | ISO-8601 UTC timestamp of the check. |
 | `rdapStatus`| integer | Raw HTTP status code from the RDAP service. |
-| `rdapSource`| string  | RDAP host used for the lookup (`rdap.org`). |
+| `rdapSource`| string  | RDAP host used for the lookup. `rdap.org` for most TLDs; `rdap.cira.ca` for `.CA` domains. |
 
 ---
 
@@ -155,7 +165,23 @@ GET /api/domain-availability?domain=myblog.com.mx
 }
 ```
 
-### 5. RDAP lookup failure
+### 5. .CA domain availability check (routed to CIRA)
+
+```
+GET /api/domain-availability?domain=mysite.ca
+```
+
+```json
+{
+  "domain": "mysite.ca",
+  "available": true,
+  "checkedAt": "2026-04-11T19:39:00Z",
+  "rdapStatus": 404,
+  "rdapSource": "rdap.cira.ca"
+}
+```
+
+### 6. RDAP lookup failure
 
 ```
 GET /api/domain-availability?domain=example.com

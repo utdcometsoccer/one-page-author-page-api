@@ -32,6 +32,11 @@ public static partial class DomainAvailabilityValidator
     // Internationalised TLDs encoded in punycode (xn--...) are also accepted.
     private static readonly Regex TldRegex = TldPattern();
 
+    // CIRA (.CA) specific SLD length constraints.
+    // https://www.cira.ca/en/ca-domains/rules-policies-guidelines/registration-rules/
+    private const int CaSldMinLength = 2;
+    private const int CaSldMaxLength = 50;
+
     // Recognized second-level domains under Mexico's .MX ccTLD.
     // A three-label domain ending in .mx is only valid when the middle label is one of these.
     // This list reflects NIC Mexico's published SLD structure and is intentionally .MX-specific;
@@ -124,6 +129,17 @@ public static partial class DomainAvailabilityValidator
         {
             errorMessage = $"The TLD '{tld}' is not valid. TLDs must contain only letters or be a valid punycode label.";
             return false;
+        }
+
+        // .CA-specific validation: CIRA enforces a narrower SLD length of 2–50 characters.
+        if (tld == "ca")
+        {
+            var sld = labels[0];
+            if (sld.Length < CaSldMinLength || sld.Length > CaSldMaxLength)
+            {
+                errorMessage = $"For .CA domains, the second-level domain must be {CaSldMinLength}–{CaSldMaxLength} characters long (supplied label '{sld}' is {sld.Length} character(s)).";
+                return false;
+            }
         }
 
         return true;

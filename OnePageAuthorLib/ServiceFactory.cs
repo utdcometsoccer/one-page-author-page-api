@@ -1190,21 +1190,37 @@ namespace InkStainedWretch.OnePageAuthorAPI
         /// Registers the typed <see cref="API.RdapClient"/> and its <see cref="Interfaces.IRdapClient"/> interface,
         /// configuring <see cref="System.Net.Http.HttpClient"/> with the supplied base URL, a 10-second timeout,
         /// and RDAP-specific Accept headers.
+        /// Also registers a CIRA-specific <see cref="Interfaces.ICiraRdapClient"/> backed by the same
+        /// <see cref="API.RdapClient"/> implementation but pointed at CIRA's authoritative RDAP service
+        /// for <c>.CA</c> domain lookups.
         /// </summary>
         /// <param name="services">Service collection.</param>
         /// <param name="rdapBaseUrl">
         /// The fully-qualified RDAP provider base URL (e.g., <c>https://rdap.org/</c>).
         /// Must not be null or whitespace.
         /// </param>
+        /// <param name="ciraRdapBaseUrl">
+        /// The fully-qualified CIRA RDAP base URL used for <c>.CA</c> domain lookups.
+        /// Defaults to <c>https://rdap.cira.ca/</c>.
+        /// </param>
         /// <returns>The <see cref="IServiceCollection"/> for chaining.</returns>
-        public static IServiceCollection AddRdapClient(this IServiceCollection services, string rdapBaseUrl)
+        public static IServiceCollection AddRdapClient(
+            this IServiceCollection services,
+            string rdapBaseUrl,
+            string ciraRdapBaseUrl = "https://rdap.cira.ca/")
         {
             if (string.IsNullOrWhiteSpace(rdapBaseUrl))
                 throw new ArgumentException("rdapBaseUrl cannot be null or empty.", nameof(rdapBaseUrl));
 
-            // Ensure the URL ends with a trailing slash so relative paths resolve correctly.
+            if (string.IsNullOrWhiteSpace(ciraRdapBaseUrl))
+                throw new ArgumentException("ciraRdapBaseUrl cannot be null or empty.", nameof(ciraRdapBaseUrl));
+
+            // Ensure the URLs end with a trailing slash so relative paths resolve correctly.
             if (!rdapBaseUrl.EndsWith('/'))
                 rdapBaseUrl += "/";
+
+            if (!ciraRdapBaseUrl.EndsWith('/'))
+                ciraRdapBaseUrl += "/";
 
             services.AddHttpClient<Interfaces.IRdapClient, API.RdapClient>(client =>
             {
@@ -1213,6 +1229,16 @@ namespace InkStainedWretch.OnePageAuthorAPI
                 client.DefaultRequestHeaders.Add("Accept", "application/rdap+json, application/json");
                 // rdap.org (and other RDAP providers) block requests that omit a User-Agent header
                 // with HTTP 403. Send an identifying header so the service accepts our lookups.
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("OnePageAuthor-DomainAvailability/1.0");
+            });
+
+            // Register the CIRA-specific client for .CA domain availability lookups.
+            // Uses the same RdapClient implementation but targets CIRA's authoritative RDAP endpoint.
+            services.AddHttpClient<Interfaces.ICiraRdapClient, API.RdapClient>(client =>
+            {
+                client.BaseAddress = new Uri(ciraRdapBaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(10);
+                client.DefaultRequestHeaders.Add("Accept", "application/rdap+json, application/json");
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("OnePageAuthor-DomainAvailability/1.0");
             });
 
