@@ -268,6 +268,7 @@ namespace OnePageAuthor.Test.Services
         [InlineData("edu")]
         [InlineData("io")]
         [InlineData("app")]
+        [InlineData("mx")]
         public void ValidateDomain_WithSupportedTlds_ReturnsValidResult(string tld)
         {
             // Arrange
