@@ -1,0 +1,44 @@
+// Single Author Page traffic via pageViews (Author is distinguished by domain)
+//
+// Scenario:
+// - You have a single-page app (SPA)
+// - Requests are basically just "/" (static host)
+// - Each author is identified by their domain (custom domain or subdomain)
+
+// ===== Parameters =====
+let startTime = ago(7d);
+let endTime   = now();
+let authorDomain = "jane-doe.com";  // domain that identifies the author
+let bucket    = 1h;
+
+let authorDomains = pack_array(authorDomain, strcat("www.", authorDomain));
+
+// ===== Traffic =====
+pageViews
+| where timestamp between (startTime .. endTime)
+| extend
+    host = tostring(parse_url(url).Host),
+    path = tostring(parse_url(url).Path),
+    fragment = tostring(parse_url(url).Fragment)
+| where host in~ (authorDomains)
+| project
+    timestamp,
+    url,
+    host,
+    path,
+    fragment,
+    duration,
+    user_Id,
+    session_Id,
+    client_CountryOrRegion,
+    client_City,
+    client_Browser,
+    client_OS
+| summarize
+    pageViews = count(),
+    uniqueUsers = dcount(user_Id),
+    uniqueSessions = dcount(session_Id),
+    avgLoadMs = avg(duration),
+    p95LoadMs = percentile(duration, 95)
+  by bin(timestamp, bucket)
+| order by timestamp asc;
