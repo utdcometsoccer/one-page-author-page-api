@@ -33,7 +33,9 @@ The following rules are enforced before the RDAP lookup is performed:
 | Rule | Detail |
 |------|--------|
 | Non-empty | The `domain` parameter must not be blank. |
-| Root domain only | Exactly two labels separated by a dot (e.g. `example.com`). Subdomains such as `www.example.com` are rejected. |
+| Root domain only | The `domain` must be a registrable root domain: typically exactly two labels separated by a dot (e.g. `example.com`), or a supported three-label `.mx` / `.ng` domain as described below. Subdomains such as `www.example.com` are rejected. |
+| .MX second-level domains | Three-label `.mx` domains using a recognized second-level domain — `com.mx`, `net.mx`, `org.mx`, `edu.mx`, or `gob.mx` — are accepted (e.g. `example.com.mx`). Any other three-label `.mx` pattern is rejected. |
+| .NG three-label domains | Three-label `.ng` domains are accepted (e.g. `example.com.ng`). Domains deeper than three labels (e.g. `sub.example.com.ng`) are rejected. |
 | Valid characters | Each label may contain ASCII letters (`a-z`), digits (`0-9`), and hyphens (`-`). No other characters are allowed. |
 | No leading/trailing hyphen | A label may not begin or end with a hyphen. |
 | Label length | Each label must be 1–63 characters. |
@@ -41,6 +43,16 @@ The following rules are enforced before the RDAP lookup is performed:
 | Valid TLD | The TLD (rightmost label) must be at least two ASCII letters, or a valid punycode label (`xn--…`). Numeric-only TLDs are rejected. |
 
 Violations return **400 Bad Request** with an `ErrorResponse` body.
+
+### .CA TLD Specialized Validation
+
+Domains ending in `.ca` follow an additional CIRA-mandated rule:
+
+| Rule | Detail |
+|------|--------|
+| SLD length | The second-level domain (SLD) must be **2–50 characters** long. CIRA's registry rejects names outside this range, which is narrower than the general 63-character DNS limit. |
+
+When a `.ca` domain passes all validation checks, the RDAP lookup is routed directly to CIRA's authoritative RDAP service (`rdap.cira.ca`) rather than through the generic `rdap.org` bootstrap proxy. This provides a more reliable availability check for the Canadian TLD.
 
 ---
 
@@ -64,7 +76,7 @@ Violations return **400 Bad Request** with an `ErrorResponse` body.
 | `available` | boolean | `true` = not yet registered; `false` = already registered. |
 | `checkedAt` | string  | ISO-8601 UTC timestamp of the check. |
 | `rdapStatus`| integer | Raw HTTP status code from the RDAP service. |
-| `rdapSource`| string  | RDAP host used for the lookup (`rdap.org`). |
+| `rdapSource`| string  | RDAP host used for the lookup. `rdap.org` for most TLDs; `rdap.cira.ca` for `.CA` domains. |
 
 ---
 
@@ -138,7 +150,39 @@ GET /api/domain-availability?domain=www.example.com
 }
 ```
 
-### 4. RDAP lookup failure
+### 4. .MX second-level domain (available)
+
+```
+GET /api/domain-availability?domain=myblog.com.mx
+```
+
+```json
+{
+  "domain": "myblog.com.mx",
+  "available": true,
+  "checkedAt": "2026-04-11T19:39:00Z",
+  "rdapStatus": 404,
+  "rdapSource": "rdap.org"
+}
+```
+
+### 5. .CA domain availability check (routed to CIRA)
+
+```
+GET /api/domain-availability?domain=mysite.ca
+```
+
+```json
+{
+  "domain": "mysite.ca",
+  "available": true,
+  "checkedAt": "2026-04-11T19:39:00Z",
+  "rdapStatus": 404,
+  "rdapSource": "rdap.cira.ca"
+}
+```
+
+### 6. RDAP lookup failure
 
 ```
 GET /api/domain-availability?domain=example.com

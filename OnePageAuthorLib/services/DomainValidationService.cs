@@ -30,7 +30,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Services
         // Valid TLDs (this could be expanded or loaded from a configuration source)
         private static readonly HashSet<string> ValidTopLevelDomains = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "com", "org", "net", "edu", "gov", "mil", "int", "co", "io", "app", "dev", "tech", "info", "biz", "name", "me"
+            "com", "org", "net", "edu", "gov", "mil", "int", "co", "io", "app", "dev", "tech", "info", "biz", "name", "me", "mx"
         };
 
         public DomainValidationService(ILogger<DomainValidationService> logger)

@@ -230,21 +230,24 @@ public class CheckDomainAvailabilityTests
     private static CheckDomainAvailability BuildFunction(IRdapClient rdapClient)
     {
         var logger = new Mock<ILogger<CheckDomainAvailability>>().Object;
-        return new CheckDomainAvailability(logger, rdapClient);
+        var ciraRdap = new Mock<ICiraRdapClient>().Object;
+        return new CheckDomainAvailability(logger, rdapClient, ciraRdap);
     }
 
     [Fact]
     public void Constructor_NullLogger_Throws()
     {
         var rdap = new Mock<IRdapClient>().Object;
-        Assert.Throws<ArgumentNullException>(() => new CheckDomainAvailability(null!, rdap));
+        var ciraRdap = new Mock<ICiraRdapClient>().Object;
+        Assert.Throws<ArgumentNullException>(() => new CheckDomainAvailability(null!, rdap, ciraRdap));
     }
 
     [Fact]
     public void Constructor_NullRdapClient_Throws()
     {
         var logger = new Mock<ILogger<CheckDomainAvailability>>().Object;
-        Assert.Throws<ArgumentNullException>(() => new CheckDomainAvailability(logger, null!));
+        var ciraRdap = new Mock<ICiraRdapClient>().Object;
+        Assert.Throws<ArgumentNullException>(() => new CheckDomainAvailability(logger, null!, ciraRdap));
     }
 
     [Fact]
@@ -512,14 +515,101 @@ public class CheckDomainAvailabilityTests
     }
 
     // -------------------------------------------------------------------------
-    // .ng TLD — DomainAvailabilityValidator Tests
+    // .CA TLD Specialized Validation Tests
+    // -------------------------------------------------------------------------
+
+    [Theory]
+    [InlineData("example.ca", true)]
+    [InlineData("my-domain.ca", true)]
+    [InlineData("ab.ca", true)]         // 2-char SLD — CIRA minimum
+    [InlineData("a.ca", false)]         // 1-char SLD — below CIRA minimum
+    public void DomainAvailabilityValidator_CaDomain_ValidatesMinLength(string domain, bool expectValid)
+    {
+        var result = DomainAvailabilityValidator.IsValid(domain, out var error);
+        if (expectValid)
+        {
+            Assert.True(result, $"Expected valid but got error: {error}");
+            Assert.Null(error);
+        }
+        else
+        {
+            Assert.False(result);
+            Assert.NotNull(error);
+            Assert.Contains("2", error, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void DomainAvailabilityValidator_CaDomain_SldExactly50Chars_IsValid()
+    {
+        var sld = new string('a', 50);
+        var domain = $"{sld}.ca";
+        var result = DomainAvailabilityValidator.IsValid(domain, out var error);
+        Assert.True(result, $"Expected valid for 50-char SLD but got: {error}");
+    }
+
+    [Fact]
+    public void DomainAvailabilityValidator_CaDomain_SldExceeds50Chars_ReturnsFalseWithMessage()
+    {
+        var sld = new string('a', 51);
+        var domain = $"{sld}.ca";
+        var result = DomainAvailabilityValidator.IsValid(domain, out var error);
+        Assert.False(result);
+        Assert.NotNull(error);
+        Assert.Contains("50", error, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DomainAvailabilityValidator_CaDomain_SingleCharSld_ReturnsFalseWithMessage()
+    {
+        var result = DomainAvailabilityValidator.IsValid("a.ca", out var error);
+        Assert.False(result);
+        Assert.NotNull(error);
+        Assert.Contains("2", error, StringComparison.Ordinal);
+    }
+
+    // -------------------------------------------------------------------------
+    // .MX TLD Validation Tests
+    // -------------------------------------------------------------------------
+
+    [Theory]
+    [InlineData("example.mx")]
+    [InlineData("mi-empresa.com.mx")]
+    [InlineData("universidad.edu.mx")]
+    [InlineData("gobierno.gob.mx")]
+    [InlineData("asociacion.org.mx")]
+    [InlineData("proveedor.net.mx")]
+    public void DomainAvailabilityValidator_ValidMxDomain_ReturnsTrue(string domain)
+    {
+        var result = DomainAvailabilityValidator.IsValid(domain, out var error);
+        Assert.True(result, $"Expected valid but got error: {error}");
+        Assert.Null(error);
+    }
+
+    [Theory]
+    [InlineData("example.xyz.mx", "not a recognized .MX second-level domain")]
+    [InlineData("example.co.mx", "not a recognized .MX second-level domain")]
+    [InlineData("-bad.com.mx", "invalid characters")]
+    [InlineData("sub.example.com.mx", "Subdomains")]
+    [InlineData("example..mx", "empty label")]        // empty middle label — structural error, not SLD error
+    [InlineData("-invalid.xyz.mx", "invalid characters")]  // structural error surfaced before SLD check
+    public void DomainAvailabilityValidator_InvalidMxDomain_ReturnsFalseWithMessage(string domain, string expectedFragment)
+    {
+        var result = DomainAvailabilityValidator.IsValid(domain, out var error);
+        Assert.False(result);
+        Assert.NotNull(error);
+        Assert.Contains(expectedFragment, error, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // -------------------------------------------------------------------------
+    // .NG TLD Validation Tests
     // -------------------------------------------------------------------------
 
     [Theory]
     [InlineData("example.ng")]              // direct .ng registration
-    [InlineData("example.com.ng")]          // commercial second-level .ng
-    [InlineData("example.name.ng")]         // personal second-level .ng
-    [InlineData("example.org.ng")]          // organisation second-level .ng
+    [InlineData("example.com.ng")]          // common second-level .ng
+    [InlineData("example.name.ng")]         // common second-level .ng
+    [InlineData("example.org.ng")]          // common second-level .ng
     [InlineData("EXAMPLE.COM.NG")]          // upper-case normalised to lower
     public void DomainAvailabilityValidator_ValidNgDomain_ReturnsTrue(string domain)
     {
@@ -540,8 +630,47 @@ public class CheckDomainAvailabilityTests
         Assert.Contains(expectedFragment, error, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public async Task Run_ValidMxSldDomain_CallsRdapAndReturns200()
+    {
+        var rdapMock = new Mock<IRdapClient>();
+        rdapMock.Setup(r => r.CheckAvailabilityAsync("example.com.mx", It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new DomainAvailabilityResponse
+                {
+                    Domain = "example.com.mx",
+                    Available = true,
+                    CheckedAt = DateTime.UtcNow,
+                    RdapStatus = 404,
+                    RdapSource = "rdap.org"
+                });
+
+        var function = BuildFunction(rdapMock.Object);
+        var req = CreateRequest("example.com.mx");
+
+        var result = await function.Run(req);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var response = Assert.IsType<DomainAvailabilityResponse>(ok.Value);
+        Assert.Equal("example.com.mx", response.Domain);
+        Assert.True(response.Available);
+    }
+
+    [Fact]
+    public async Task Run_UnrecognizedMxSld_Returns400()
+    {
+        var function = BuildFunction(new Mock<IRdapClient>().Object);
+        var req = CreateRequest("example.xyz.mx");
+
+        var result = await function.Run(req);
+
+        var bad = Assert.IsType<BadRequestObjectResult>(result);
+        var error = Assert.IsType<DomainAvailabilityErrorResponse>(bad.Value);
+        Assert.Equal("InvalidDomain", error.Error);
+        Assert.Contains("not a recognized .MX second-level domain", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
     // -------------------------------------------------------------------------
-    // .ng TLD — CheckDomainAvailability Function Tests
+    // .NG TLD — CheckDomainAvailability Function Tests
     // -------------------------------------------------------------------------
 
     [Theory]
@@ -616,4 +745,152 @@ public class CheckDomainAvailabilityTests
         var error = Assert.IsType<DomainAvailabilityErrorResponse>(obj.Value);
         Assert.Equal("RdapLookupFailed", error.Error);
     }
+
+    // -------------------------------------------------------------------------
+    // .CA RDAP Routing Tests
+    // -------------------------------------------------------------------------
+
+    private static CheckDomainAvailability BuildFunctionWithCira(IRdapClient rdapClient, ICiraRdapClient ciraRdapClient)
+    {
+        var logger = new Mock<ILogger<CheckDomainAvailability>>().Object;
+        return new CheckDomainAvailability(logger, rdapClient, ciraRdapClient);
+    }
+
+    [Fact]
+    public void Constructor_NullCiraRdapClient_Throws()
+    {
+        var logger = new Mock<ILogger<CheckDomainAvailability>>().Object;
+        var rdap = new Mock<IRdapClient>().Object;
+        Assert.Throws<ArgumentNullException>(
+            () => new CheckDomainAvailability(logger, rdap, null!));
+    }
+
+    [Fact]
+    public async Task Run_CaDomain_UsesCiraRdapClient()
+    {
+        // Arrange: the generic rdap client should NOT be called for .ca domains.
+        var genericRdap = new Mock<IRdapClient>(MockBehavior.Strict);
+
+        var ciraRdap = new Mock<ICiraRdapClient>();
+        ciraRdap.Setup(r => r.CheckAvailabilityAsync("example.ca", It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new DomainAvailabilityResponse
+                {
+                    Domain = "example.ca",
+                    Available = false,
+                    CheckedAt = DateTime.UtcNow,
+                    RdapStatus = 200,
+                    RdapSource = "rdap.cira.ca"
+                });
+
+        var function = BuildFunctionWithCira(genericRdap.Object, ciraRdap.Object);
+        var req = CreateRequest("example.ca");
+
+        // Act
+        var result = await function.Run(req);
+
+        // Assert: CIRA client was invoked; generic client was never called.
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var response = Assert.IsType<DomainAvailabilityResponse>(ok.Value);
+        Assert.Equal("example.ca", response.Domain);
+        Assert.Equal("rdap.cira.ca", response.RdapSource);
+        genericRdap.VerifyNoOtherCalls();
+    }
+
+    [Theory]
+    [InlineData(" example.ca ")]   // leading/trailing whitespace
+    [InlineData("example.ca.")]    // trailing FQDN dot
+    [InlineData(" example.ca. ")]  // both whitespace and trailing dot
+    public async Task Run_CaDomainWithWhitespaceOrTrailingDot_RoutesCorrectlyToCira(string rawDomain)
+    {
+        // Ensure domain normalization (trim + TrimEnd('.')) happens before the TLD routing
+        // check so that values like " example.ca " or "example.ca." still reach CIRA.
+        var genericRdap = new Mock<IRdapClient>(MockBehavior.Strict);
+
+        var ciraRdap = new Mock<ICiraRdapClient>();
+        ciraRdap.Setup(r => r.CheckAvailabilityAsync("example.ca", It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new DomainAvailabilityResponse
+                {
+                    Domain = "example.ca",
+                    Available = true,
+                    CheckedAt = DateTime.UtcNow,
+                    RdapStatus = 404,
+                    RdapSource = "rdap.cira.ca"
+                });
+
+        var function = BuildFunctionWithCira(genericRdap.Object, ciraRdap.Object);
+        var req = CreateRequest(rawDomain);
+
+        var result = await function.Run(req);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var response = Assert.IsType<DomainAvailabilityResponse>(ok.Value);
+        Assert.Equal("example.ca", response.Domain);
+        Assert.Equal("rdap.cira.ca", response.RdapSource);
+        genericRdap.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task Run_NonCaDomain_UsesGenericRdapClient()
+    {
+        // Arrange: the CIRA client should NOT be called for non-.ca domains.
+        var ciraRdap = new Mock<ICiraRdapClient>(MockBehavior.Strict);
+
+        var genericRdap = new Mock<IRdapClient>();
+        genericRdap.Setup(r => r.CheckAvailabilityAsync("example.com", It.IsAny<CancellationToken>()))
+                   .ReturnsAsync(new DomainAvailabilityResponse
+                   {
+                       Domain = "example.com",
+                       Available = true,
+                       CheckedAt = DateTime.UtcNow,
+                       RdapStatus = 404,
+                       RdapSource = "rdap.org"
+                   });
+
+        var function = BuildFunctionWithCira(genericRdap.Object, ciraRdap.Object);
+        var req = CreateRequest("example.com");
+
+        // Act
+        var result = await function.Run(req);
+
+        // Assert: generic RDAP client was invoked; CIRA client was never called.
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var response = Assert.IsType<DomainAvailabilityResponse>(ok.Value);
+        Assert.Equal("example.com", response.Domain);
+        Assert.Equal("rdap.org", response.RdapSource);
+        ciraRdap.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task AddRdapClient_ServiceFactory_RegistersCiraClient()
+    {
+        // Verify that AddRdapClient also registers ICiraRdapClient in the DI container.
+        HttpRequestMessage? capturedRequest = null;
+        var mockHandler = new Mock<HttpMessageHandler>();
+        mockHandler.Protected()
+                   .Setup<Task<HttpResponseMessage>>(
+                       "SendAsync",
+                       ItExpr.IsAny<HttpRequestMessage>(),
+                       ItExpr.IsAny<CancellationToken>())
+                   .Callback<HttpRequestMessage, CancellationToken>((req, _) => capturedRequest = req)
+                   .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
+
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddRdapClient("https://rdap.org/", "https://rdap.cira.ca/");
+
+        services.ConfigureAll<HttpClientFactoryOptions>(
+            o => o.HttpMessageHandlerBuilderActions.Add(b => b.PrimaryHandler = mockHandler.Object));
+
+        await using var sp = services.BuildServiceProvider();
+
+        // ICiraRdapClient must be resolvable from DI.
+        var ciraClient = sp.GetRequiredService<ICiraRdapClient>();
+        Assert.NotNull(ciraClient);
+
+        await ciraClient.CheckAvailabilityAsync("example.ca");
+
+        Assert.NotNull(capturedRequest);
+        Assert.Contains("/domain/example.ca", capturedRequest!.RequestUri?.PathAndQuery, StringComparison.Ordinal);
+    }
+
 }
