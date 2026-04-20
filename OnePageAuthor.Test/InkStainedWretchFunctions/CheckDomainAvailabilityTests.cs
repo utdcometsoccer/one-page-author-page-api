@@ -617,6 +617,38 @@ public class CheckDomainAvailabilityTests
         genericRdap.VerifyNoOtherCalls();
     }
 
+    [Theory]
+    [InlineData(" example.ca ")]   // leading/trailing whitespace
+    [InlineData("example.ca.")]    // trailing FQDN dot
+    [InlineData(" example.ca. ")]  // both whitespace and trailing dot
+    public async Task Run_CaDomainWithWhitespaceOrTrailingDot_RoutesCorrctlyToCira(string rawDomain)
+    {
+        // Ensure domain normalization (trim + TrimEnd('.')) happens before the TLD routing
+        // check so that values like " example.ca " or "example.ca." still reach CIRA.
+        var genericRdap = new Mock<IRdapClient>(MockBehavior.Strict);
+
+        var ciraRdap = new Mock<ICiraRdapClient>();
+        ciraRdap.Setup(r => r.CheckAvailabilityAsync("example.ca", It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new DomainAvailabilityResponse
+                {
+                    Domain = "example.ca",
+                    Available = true,
+                    CheckedAt = DateTime.UtcNow,
+                    RdapStatus = 404,
+                    RdapSource = "rdap.cira.ca"
+                });
+
+        var function = BuildFunctionWithCira(genericRdap.Object, ciraRdap.Object);
+        var req = CreateRequest(rawDomain);
+
+        var result = await function.Run(req);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var response = Assert.IsType<DomainAvailabilityResponse>(ok.Value);
+        Assert.Equal("rdap.cira.ca", response.RdapSource);
+        genericRdap.VerifyNoOtherCalls();
+    }
+
     [Fact]
     public async Task Run_NonCaDomain_UsesGenericRdapClient()
     {

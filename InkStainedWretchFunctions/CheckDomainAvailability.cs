@@ -87,17 +87,19 @@ public class CheckDomainAvailability
 
         try
         {
+            // Normalize the domain once after validation: trim whitespace and remove any
+            // trailing FQDN dot so that inputs like " example.ca " or "example.ca."
+            // are consistently handled for both the routing decision and the RDAP call.
+            var normalizedDomain = domain.Trim().TrimEnd('.');
+
             // .CA domains are routed to CIRA's authoritative RDAP endpoint for more reliable lookups.
-            // DomainAvailabilityValidator.IsValid() has already confirmed the domain is well-formed,
-            // so a simple case-insensitive suffix check is sufficient here.
-            var isCaDomain = domain.EndsWith(".ca", StringComparison.OrdinalIgnoreCase)
-                             || domain.EndsWith(".ca.", StringComparison.OrdinalIgnoreCase);
+            var isCaDomain = normalizedDomain.EndsWith(".ca", StringComparison.OrdinalIgnoreCase);
             IRdapClient rdapClient = isCaDomain ? _ciraRdapClient : _rdapClient;
 
             if (isCaDomain)
-                _logger.LogInformation("Domain '{Domain}' is a .CA domain — routing lookup to CIRA RDAP.", domain);
+                _logger.LogInformation("Domain '{Domain}' is a .CA domain — routing lookup to CIRA RDAP.", normalizedDomain);
 
-            var result = await rdapClient.CheckAvailabilityAsync(domain, req.HttpContext.RequestAborted)
+            var result = await rdapClient.CheckAvailabilityAsync(normalizedDomain, req.HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
             _logger.LogInformation(

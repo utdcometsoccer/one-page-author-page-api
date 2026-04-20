@@ -74,7 +74,7 @@ When a `.ca` domain passes all validation checks, the RDAP lookup is routed dire
 | `available` | boolean | `true` = not yet registered; `false` = already registered. |
 | `checkedAt` | string  | ISO-8601 UTC timestamp of the check. |
 | `rdapStatus`| integer | Raw HTTP status code from the RDAP service. |
-| `rdapSource`| string  | RDAP host used for the lookup (`rdap.org`). |
+| `rdapSource`| string  | RDAP host used for the lookup. `rdap.org` for most TLDs; `rdap.cira.ca` for `.CA` domains. |
 
 ---
 
@@ -148,7 +148,23 @@ GET /api/domain-availability?domain=www.example.com
 }
 ```
 
-### 4. RDAP lookup failure
+### 4. .CA domain availability check (routed to CIRA)
+
+```
+GET /api/domain-availability?domain=mysite.ca
+```
+
+```json
+{
+  "domain": "mysite.ca",
+  "available": true,
+  "checkedAt": "2026-04-11T19:39:00Z",
+  "rdapStatus": 404,
+  "rdapSource": "rdap.cira.ca"
+}
+```
+
+### 5. RDAP lookup failure
 
 ```
 GET /api/domain-availability?domain=example.com
