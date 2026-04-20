@@ -146,15 +146,10 @@ public static partial class DomainAvailabilityValidator
         // labels[0] = registrable name (e.g., "example")
         // labels[1] = .MX second-level domain (e.g., "com")
         // labels[2] = "mx"
-        var sld = labels[1];
 
-        if (!MxSecondLevelDomains.Contains(sld))
-        {
-            errorMessage = $"'{sld}.mx' is not a recognized .MX second-level domain. Supported: {MxSupportedSldList}.";
-            return false;
-        }
-
-        // Validate every label for length and character rules.
+        // Validate structural rules (empty, length, characters) first so that inputs like
+        // "example..mx" or "-bad.com.mx" produce the same accurate errors as the non-.mx path,
+        // rather than falling through to the "not a recognized SLD" message.
         foreach (var label in labels)
         {
             if (string.IsNullOrEmpty(label))
@@ -174,6 +169,14 @@ public static partial class DomainAvailabilityValidator
                 errorMessage = $"Domain label '{label}' contains invalid characters or starts/ends with a hyphen.";
                 return false;
             }
+        }
+
+        // After structural validation, confirm the middle label is a recognized .MX SLD.
+        var sld = labels[1];
+        if (!MxSecondLevelDomains.Contains(sld))
+        {
+            errorMessage = $"'{sld}.mx' is not a recognized .MX second-level domain. Supported: {MxSupportedSldList}.";
+            return false;
         }
 
         errorMessage = null;

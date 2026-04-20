@@ -33,7 +33,7 @@ The following rules are enforced before the RDAP lookup is performed:
 | Rule | Detail |
 |------|--------|
 | Non-empty | The `domain` parameter must not be blank. |
-| Root domain only | Exactly two labels separated by a dot (e.g. `example.com`). Subdomains such as `www.example.com` are rejected. |
+| Root domain only | The `domain` must be a registrable root domain: typically exactly two labels separated by a dot (e.g. `example.com`), or a recognized three-label `.mx` second-level domain as described below. Subdomains such as `www.example.com` are rejected. |
 | .MX second-level domains | Three-label `.mx` domains using a recognized second-level domain — `com.mx`, `net.mx`, `org.mx`, `edu.mx`, or `gob.mx` — are accepted (e.g. `example.com.mx`). Any other three-label `.mx` pattern is rejected. |
 | Valid characters | Each label may contain ASCII letters (`a-z`), digits (`0-9`), and hyphens (`-`). No other characters are allowed. |
 | No leading/trailing hyphen | A label may not begin or end with a hyphen. |

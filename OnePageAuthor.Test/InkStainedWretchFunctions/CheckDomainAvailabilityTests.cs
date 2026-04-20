@@ -533,6 +533,8 @@ public class CheckDomainAvailabilityTests
     [InlineData("example.co.mx", "not a recognized .MX second-level domain")]
     [InlineData("-bad.com.mx", "invalid characters")]
     [InlineData("sub.example.com.mx", "Subdomains")]
+    [InlineData("example..mx", "empty label")]        // empty middle label — structural error, not SLD error
+    [InlineData("-invalid.xyz.mx", "invalid characters")]  // structural error surfaced before SLD check
     public void DomainAvailabilityValidator_InvalidMxDomain_ReturnsFalseWithMessage(string domain, string expectedFragment)
     {
         var result = DomainAvailabilityValidator.IsValid(domain, out var error);
