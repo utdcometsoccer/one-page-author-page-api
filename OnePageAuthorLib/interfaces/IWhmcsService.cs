@@ -9,6 +9,15 @@ namespace InkStainedWretch.OnePageAuthorAPI.Interfaces
     public interface IWhmcsService
     {
         /// <summary>
+        /// Gets a value indicating whether the WHMCS integration is fully configured.
+        /// When <c>false</c>, API method behavior is method-specific: some methods may throw
+        /// <see cref="InvalidOperationException"/>, while others may return a failure result
+        /// such as <c>false</c>. Callers should check this property before invoking operations
+        /// that require WHMCS configuration.
+        /// </summary>
+        bool IsConfigured { get; }
+
+        /// <summary>
         /// Registers a domain using the WHMCS DomainRegister API.
         /// </summary>
         /// <param name="domainRegistration">The domain registration information</param>

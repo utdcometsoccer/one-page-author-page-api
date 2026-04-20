@@ -57,6 +57,9 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             }
         }
 
+        /// <inheritdoc />
+        public bool IsConfigured => _isConfigured;
+
         /// <summary>
         /// Registers a domain using the WHMCS DomainRegister API.
         /// </summary>

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -600,6 +601,35 @@ public class CheckDomainAvailabilityTests
         Assert.Contains(expectedFragment, error, StringComparison.OrdinalIgnoreCase);
     }
 
+    // -------------------------------------------------------------------------
+    // .NG TLD Validation Tests
+    // -------------------------------------------------------------------------
+
+    [Theory]
+    [InlineData("example.ng")]              // direct .ng registration
+    [InlineData("example.com.ng")]          // common second-level .ng
+    [InlineData("example.name.ng")]         // common second-level .ng
+    [InlineData("example.org.ng")]          // common second-level .ng
+    [InlineData("EXAMPLE.COM.NG")]          // upper-case normalised to lower
+    public void DomainAvailabilityValidator_ValidNgDomain_ReturnsTrue(string domain)
+    {
+        var result = DomainAvailabilityValidator.IsValid(domain, out var error);
+        Assert.True(result, $"Expected valid but got error: {error}");
+        Assert.Null(error);
+    }
+
+    [Theory]
+    [InlineData("sub.example.com.ng", "Subdomains")]    // four labels — too deep
+    [InlineData("a.b.c.ng", "Subdomains")]              // four labels — too deep
+    public void DomainAvailabilityValidator_InvalidNgDomain_ReturnsFalseWithMessage(
+        string domain, string expectedFragment)
+    {
+        var result = DomainAvailabilityValidator.IsValid(domain, out var error);
+        Assert.False(result);
+        Assert.NotNull(error);
+        Assert.Contains(expectedFragment, error, StringComparison.OrdinalIgnoreCase);
+    }
+
     [Fact]
     public async Task Run_ValidMxSldDomain_CallsRdapAndReturns200()
     {
@@ -637,6 +667,83 @@ public class CheckDomainAvailabilityTests
         var error = Assert.IsType<DomainAvailabilityErrorResponse>(bad.Value);
         Assert.Equal("InvalidDomain", error.Error);
         Assert.Contains("not a recognized .MX second-level domain", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // -------------------------------------------------------------------------
+    // .NG TLD — CheckDomainAvailability Function Tests
+    // -------------------------------------------------------------------------
+
+    [Theory]
+    [InlineData("example.ng", true)]
+    [InlineData("example.com.ng", false)]
+    public async Task Run_NgDomain_UsesRdap_Returns200(string ngDomain, bool available)
+    {
+        var rdapMock = new Mock<IRdapClient>();
+        rdapMock.Setup(r => r.CheckAvailabilityAsync(ngDomain, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new DomainAvailabilityResponse
+                {
+                    Domain = ngDomain,
+                    Available = available,
+                    CheckedAt = DateTime.UtcNow,
+                    RdapStatus = available ? 404 : 200,
+                    RdapSource = "rdap.org"
+                });
+
+        var function = BuildFunction(rdapMock.Object);
+        var req = CreateRequest(ngDomain);
+
+        var result = await function.Run(req);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var response = Assert.IsType<DomainAvailabilityResponse>(ok.Value);
+        Assert.Equal(ngDomain, response.Domain);
+        Assert.Equal(available, response.Available);
+        Assert.Equal("rdap.org", response.RdapSource);
+    }
+
+    [Theory]
+    [InlineData("EXAMPLE.COM", "example.com")]
+    [InlineData("Example.Com.Ng", "example.com.ng")]
+    [InlineData("EXAMPLE.NET.", "example.net")]       // trailing dot stripped
+    public async Task Run_DomainNormalized_BeforeRdapCall(string rawDomain, string expectedNormalized)
+    {
+        string? capturedDomain = null;
+        var rdapMock = new Mock<IRdapClient>();
+        rdapMock.Setup(r => r.CheckAvailabilityAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, CancellationToken>((d, _) => capturedDomain = d)
+                .ReturnsAsync(new DomainAvailabilityResponse
+                {
+                    Domain = expectedNormalized,
+                    Available = true,
+                    CheckedAt = DateTime.UtcNow,
+                    RdapStatus = 404,
+                    RdapSource = "rdap.org"
+                });
+
+        var function = BuildFunction(rdapMock.Object);
+        var req = CreateRequest(rawDomain);
+
+        await function.Run(req);
+
+        Assert.Equal(expectedNormalized, capturedDomain);
+    }
+
+    [Fact]
+    public async Task Run_RdapJsonException_Returns502()
+    {
+        var rdapMock = new Mock<IRdapClient>();
+        rdapMock.Setup(r => r.CheckAvailabilityAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new JsonException("Unexpected JSON token"));
+
+        var function = BuildFunction(rdapMock.Object);
+        var req = CreateRequest("example.com");
+
+        var result = await function.Run(req);
+
+        var obj = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(502, obj.StatusCode);
+        var error = Assert.IsType<DomainAvailabilityErrorResponse>(obj.Value);
+        Assert.Equal("RdapLookupFailed", error.Error);
     }
 
     // -------------------------------------------------------------------------
