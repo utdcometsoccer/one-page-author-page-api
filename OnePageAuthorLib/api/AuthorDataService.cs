@@ -115,27 +115,27 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         {
             // Re-use the same author-lookup logic to find the resolved author's ID
             var authors = await _authorRepository.GetByDomainAndLocaleAsync(topLevelDomain, secondLevelDomain, languageName, regionName ?? "");
-            if (authors == null) authors = new List<Entities.Author>();
+            authors ??= new List<Entities.Author>();
             var author = authors.FirstOrDefault();
 
             if (author == null)
             {
                 authors = await _authorRepository.GetByDomainAndLocaleAsync(topLevelDomain, secondLevelDomain, languageName, "");
-                if (authors == null) authors = new List<Entities.Author>();
+                authors ??= new List<Entities.Author>();
                 author = authors.FirstOrDefault();
             }
 
             if (author == null)
             {
                 authors = await _authorRepository.GetByDomainAndDefaultAsync(topLevelDomain, secondLevelDomain);
-                if (authors == null) authors = new List<Entities.Author>();
+                authors ??= new List<Entities.Author>();
                 author = authors.FirstOrDefault(a => a.IsDefault);
             }
 
             if (author == null)
             {
                 authors = await _authorRepository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
-                if (authors == null) authors = new List<Entities.Author>();
+                authors ??= new List<Entities.Author>();
                 author = authors.FirstOrDefault();
             }
 
@@ -160,7 +160,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 PrimaryCtaUrl = book.URL?.ToString() ?? string.Empty,
                 SecondaryCtaLabel = book.SecondaryCtaLabel,
                 SecondaryCtaUrl = book.SecondaryCtaUrl,
-                Formats = book.Formats?.AsReadOnly() ?? (IReadOnlyList<string>)Array.Empty<string>()
+                Formats = book.Formats != null ? (IReadOnlyList<string>)book.Formats.AsReadOnly() : Array.Empty<string>()
             };
         }
 
