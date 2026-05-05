@@ -140,6 +140,31 @@ namespace OnePageAuthor.Test.FunctionApp
         }
 
         // -------------------------------------------------------------------------
+        // Test: No session ID header → always control, experiment service not called
+        // -------------------------------------------------------------------------
+
+        [Fact]
+        public async Task Run_NoSessionIdHeader_DefaultsToControlWithoutCallingExperimentService()
+        {
+            // Arrange — experiment service is wired up but should NOT be called
+            _authorDataServiceMock
+                .Setup(s => s.GetHomepageDataAsync("com", "example", "en", null))
+                .ReturnsAsync(BaseResponse);
+
+            var function = new GetAuthorData(_loggerMock.Object, _authorDataServiceMock.Object, _experimentServiceMock.Object);
+            var mockRequest = CreateMockRequest(); // no X-Session-Id header
+
+            // Act
+            var result = await function.Run(mockRequest.Object, "com", "example", "en", null);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var response = Assert.IsType<AuthorResponse>(okResult.Value);
+            Assert.Equal("control", response.Experiment!.HomepageHeroVariant);
+            _experimentServiceMock.Verify(s => s.GetExperimentsAsync(It.IsAny<GetExperimentsRequest>()), Times.Never);
+        }
+
+        // -------------------------------------------------------------------------
         // Test: Featured book + control assignment
         // -------------------------------------------------------------------------
 
@@ -211,13 +236,41 @@ namespace OnePageAuthor.Test.FunctionApp
         }
 
         // -------------------------------------------------------------------------
+        // Test: No featured book + variant assignment → variant downgraded to control
+        // -------------------------------------------------------------------------
+
+        [Fact]
+        public async Task Run_NoFeaturedBook_VariantAssigned_DowngradesToControl()
+        {
+            // Arrange — experiment says variant but there's no featured book to render
+            _authorDataServiceMock
+                .Setup(s => s.GetHomepageDataAsync("com", "example", "en", null))
+                .ReturnsAsync(BaseResponse); // no FeaturedBook
+            _experimentServiceMock
+                .Setup(s => s.GetExperimentsAsync(It.IsAny<GetExperimentsRequest>()))
+                .ReturnsAsync(BuildExperimentResponse("featured-book-hero"));
+
+            var function = new GetAuthorData(_loggerMock.Object, _authorDataServiceMock.Object, _experimentServiceMock.Object);
+            var mockRequest = CreateMockRequest("session-xyz");
+
+            // Act
+            var result = await function.Run(mockRequest.Object, "com", "example", "en", null);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var response = Assert.IsType<AuthorResponse>(okResult.Value);
+            Assert.Null(response.FeaturedBook);
+            Assert.Equal("control", response.Experiment!.HomepageHeroVariant);
+        }
+
+        // -------------------------------------------------------------------------
         // Test: Experiment service unavailable / throws → defaults to control
         // -------------------------------------------------------------------------
 
         [Fact]
         public async Task Run_ExperimentServiceThrows_DefaultsToControl()
         {
-            // Arrange
+            // Arrange — session ID present so experiment is attempted
             _authorDataServiceMock
                 .Setup(s => s.GetHomepageDataAsync("com", "example", "en", null))
                 .ReturnsAsync(BaseResponse);
@@ -226,7 +279,7 @@ namespace OnePageAuthor.Test.FunctionApp
                 .ThrowsAsync(new Exception("Cosmos unavailable"));
 
             var function = new GetAuthorData(_loggerMock.Object, _authorDataServiceMock.Object, _experimentServiceMock.Object);
-            var mockRequest = CreateMockRequest();
+            var mockRequest = CreateMockRequest("session-abc");
 
             // Act
             var result = await function.Run(mockRequest.Object, "com", "example", "en", null);
@@ -258,7 +311,7 @@ namespace OnePageAuthor.Test.FunctionApp
                 });
 
             var function = new GetAuthorData(_loggerMock.Object, _authorDataServiceMock.Object, _experimentServiceMock.Object);
-            var mockRequest = CreateMockRequest();
+            var mockRequest = CreateMockRequest("session-abc");
 
             // Act
             var result = await function.Run(mockRequest.Object, "com", "example", "en", null);
@@ -278,15 +331,21 @@ namespace OnePageAuthor.Test.FunctionApp
         public async Task Run_UnknownVariantAssigned_TreatedAsControl()
         {
             // Arrange
+            var responseClone = new AuthorResponse
+            {
+                Name = ResponseWithFeaturedBook.Name,
+                Books = ResponseWithFeaturedBook.Books,
+                FeaturedBook = ResponseWithFeaturedBook.FeaturedBook
+            };
             _authorDataServiceMock
                 .Setup(s => s.GetHomepageDataAsync("com", "example", "en", null))
-                .ReturnsAsync(ResponseWithFeaturedBook);
+                .ReturnsAsync(responseClone);
             _experimentServiceMock
                 .Setup(s => s.GetExperimentsAsync(It.IsAny<GetExperimentsRequest>()))
                 .ReturnsAsync(BuildExperimentResponse("some-unknown-variant"));
 
             var function = new GetAuthorData(_loggerMock.Object, _authorDataServiceMock.Object, _experimentServiceMock.Object);
-            var mockRequest = CreateMockRequest();
+            var mockRequest = CreateMockRequest("session-abc");
 
             // Act
             var result = await function.Run(mockRequest.Object, "com", "example", "en", null);
@@ -340,7 +399,7 @@ namespace OnePageAuthor.Test.FunctionApp
                 .ReturnsAsync(BuildExperimentResponse("control"));
 
             var function = new GetAuthorData(_loggerMock.Object, _authorDataServiceMock.Object, _experimentServiceMock.Object);
-            var mockRequest = CreateMockRequest();
+            var mockRequest = CreateMockRequest("session-abc");
 
             // Act
             var result = await function.Run(mockRequest.Object, "com", "example", "en", null);

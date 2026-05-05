@@ -302,6 +302,50 @@ namespace OnePageAuthor.Test
         }
 
         // -------------------------------------------------------------------------
+        // Test: Misconfigured — multiple books flagged → deterministic selection by id
+        // -------------------------------------------------------------------------
+
+        [Fact]
+        public async Task GetHomepageDataAsync_MultipleFeaturedBooks_SelectsLowestIdDeterministically()
+        {
+            // Arrange — two books are both marked IsFeaturedHeroBook = true
+            SetupAuthorFound();
+            var featuredA = new EntityBook
+            {
+                id = "aaaaaaaa-0000-0000-0000-000000000001",
+                AuthorID = TestAuthor.id,
+                Title = "Alpha Book",
+                Description = "First",
+                URL = new Uri("https://example.com/a"),
+                Cover = new Uri("https://example.com/a.jpg"),
+                IsFeaturedHeroBook = true
+            };
+            var featuredB = new EntityBook
+            {
+                id = "zzzzzzzz-0000-0000-0000-000000000002",
+                AuthorID = TestAuthor.id,
+                Title = "Zeta Book",
+                Description = "Second",
+                URL = new Uri("https://example.com/z"),
+                Cover = new Uri("https://example.com/z.jpg"),
+                IsFeaturedHeroBook = true
+            };
+            _bookRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<EntityBook> { featuredB, featuredA }); // order reversed to prove sort
+            _articleRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<EntityArticle>());
+            _socialRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<Social>());
+
+            // Act
+            var result = await _service.GetHomepageDataAsync("com", "example", "en");
+
+            // Assert — always picks the book with the lexicographically lowest id
+            Assert.NotNull(result?.FeaturedBook);
+            Assert.Equal("Alpha Book", result.FeaturedBook.Title);
+        }
+
+        // -------------------------------------------------------------------------
         // Test: Misconfigured featured book (no valid books)
         // -------------------------------------------------------------------------
 
@@ -328,6 +372,29 @@ namespace OnePageAuthor.Test
             // Assert
             Assert.NotNull(result);
             Assert.Null(result.FeaturedBook);
+        }
+
+        // -------------------------------------------------------------------------
+        // Test: Single lookup — books list and featured book come from same query
+        // -------------------------------------------------------------------------
+
+        [Fact]
+        public async Task GetHomepageDataAsync_BooksQueryCalledOnlyOnce()
+        {
+            // Arrange
+            SetupAuthorFound();
+            _bookRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<EntityBook> { CreateRegularBook("Book A"), CreateFeaturedBook() });
+            _articleRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<EntityArticle>());
+            _socialRepoMock.Setup(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new List<Social>());
+
+            // Act
+            await _service.GetHomepageDataAsync("com", "example", "en");
+
+            // Assert — exactly one call to the books repository (no double fetch)
+            _bookRepoMock.Verify(r => r.GetByAuthorIdAsync(It.IsAny<Guid>()), Times.Once);
         }
 
         // -------------------------------------------------------------------------

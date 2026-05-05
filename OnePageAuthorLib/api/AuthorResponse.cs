@@ -60,7 +60,10 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
         /// <summary>
         /// The homepage A/B experiment assignment for the current request.
-        /// Defaults to <c>"control"</c> to preserve existing homepage behavior.
+        /// Set by the function layer after the author data is retrieved.
+        /// <c>null</c> when returned directly from the service layer (before experiment resolution).
+        /// The function always sets this to a non-null value with
+        /// <see cref="HomepageExperimentDto.HomepageHeroVariant"/> defaulting to <c>"control"</c>.
         /// </summary>
         public HomepageExperimentDto? Experiment { get; set; }
 

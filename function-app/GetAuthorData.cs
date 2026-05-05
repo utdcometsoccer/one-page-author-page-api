@@ -45,24 +45,28 @@ public class GetAuthorData
             return new NotFoundObjectResult("No author found for the specified domain and culture.");
         }
 
-        result.Experiment = await ResolveExperimentAsync(req);
+        result.Experiment = await ResolveExperimentAsync(req, result.FeaturedBook != null);
 
         return new OkObjectResult(result);
     }
 
-    private async Task<HomepageExperimentDto> ResolveExperimentAsync(HttpRequest req)
+    private async Task<HomepageExperimentDto> ResolveExperimentAsync(HttpRequest req, bool hasFeaturedBook)
     {
+        // Without a stable session ID, we cannot assign a sticky experiment bucket.
+        // Default to control so anonymous visitors are never incorrectly assigned to
+        // a variant and do not pollute exposure/conversion metrics.
+        var sessionId = req.Headers["X-Session-Id"].FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(sessionId))
+            return new HomepageExperimentDto { HomepageHeroVariant = ControlVariant };
+
         if (_experimentService == null)
             return new HomepageExperimentDto { HomepageHeroVariant = ControlVariant };
 
         try
         {
-            var bucketingKey = req.Headers["X-Session-Id"].FirstOrDefault()
-                ?? Guid.NewGuid().ToString();
-
             var experimentResponse = await _experimentService.GetExperimentsAsync(new GetExperimentsRequest
             {
-                UserId = bucketingKey,
+                UserId = sessionId,
                 Page = HomepagePage
             });
 
@@ -70,8 +74,9 @@ public class GetAuthorData
                 .FirstOrDefault(e => e.Name == "homepage-hero")?.Variant
                 ?? ControlVariant;
 
-            // Only allow the known variant identifiers; treat anything else as control.
-            if (heroVariant != FeaturedBookHeroVariant)
+            // Only allow the known treatment variant, and only when featured book data
+            // is present — the frontend cannot render the hero without book data.
+            if (heroVariant != FeaturedBookHeroVariant || !hasFeaturedBook)
                 heroVariant = ControlVariant;
 
             return new HomepageExperimentDto { HomepageHeroVariant = heroVariant };

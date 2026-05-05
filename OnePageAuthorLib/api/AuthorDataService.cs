@@ -22,36 +22,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
         public async Task<AuthorResponse?> GetAuthorWithDataAsync(string topLevelDomain, string secondLevelDomain, string languageName, string? regionName = null)
         {
-            // 1. Try full match (TLD, SLD, language, region)
-
-            var authors = await _authorRepository.GetByDomainAndLocaleAsync(topLevelDomain, secondLevelDomain, languageName, regionName ?? "");
-            if (authors == null) authors = new List<Author>();
-            var author = authors.FirstOrDefault();
-
-            // 2. If not found, try match without region
-            if (author == null)
-            {
-                authors = await _authorRepository.GetByDomainAndLocaleAsync(topLevelDomain, secondLevelDomain, languageName, "");
-                if (authors == null) authors = new List<Author>();
-                author = authors.FirstOrDefault();
-            }
-
-            // 3. If not found, try first default author for TLD and SLD
-            if (author == null)
-            {
-                authors = await _authorRepository.GetByDomainAndDefaultAsync(topLevelDomain, secondLevelDomain);
-                if (authors == null) authors = new List<Author>();
-                author = authors.FirstOrDefault(a => a.IsDefault);
-            }
-
-            // 4. If not found, try first author for TLD and SLD
-            if (author == null)
-            {
-                authors = await _authorRepository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
-                if (authors == null) authors = new List<Author>();
-                author = authors.FirstOrDefault();
-            }
-
+            var author = await ResolveAuthorAsync(topLevelDomain, secondLevelDomain, languageName, regionName);
             if (author == null)
                 return null;
 
@@ -59,7 +30,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             var articles = await _articleRepository.GetByAuthorIdAsync(Guid.Parse(author.id));
             var socials = await _socialRepository.GetByAuthorIdAsync(Guid.Parse(author.id));
 
-            var response = new AuthorResponse
+            return new AuthorResponse
             {
                 Name = author.AuthorName,
                 Welcome = author.WelcomeText,
@@ -71,7 +42,6 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 Email = author.EmailAddress,
                 Articles = ConvertToApiArticles(articles.ToList())
             };
-            return response;
         }
 
         public async Task<List<AuthorApiResponse>> GetAuthorsByDomainAsync(string topLevelDomain, string secondLevelDomain)
@@ -97,27 +67,56 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
 
         public async Task<AuthorResponse?> GetHomepageDataAsync(string topLevelDomain, string secondLevelDomain, string languageName, string? regionName = null)
         {
-            var response = await GetAuthorWithDataAsync(topLevelDomain, secondLevelDomain, languageName, regionName);
-            if (response == null)
+            // Resolve author once and fetch all related data in a single pass,
+            // so author and featured book are guaranteed to come from the same entity.
+            var author = await ResolveAuthorAsync(topLevelDomain, secondLevelDomain, languageName, regionName);
+            if (author == null)
                 return null;
 
-            // Find the explicitly curated featured hero book. No fallback is performed.
-            var featuredEntityBook = await GetFeaturedHeroBookAsync(topLevelDomain, secondLevelDomain, languageName, regionName);
-            if (featuredEntityBook != null)
+            var authorGuid = Guid.Parse(author.id);
+            var books = await _bookRepository.GetByAuthorIdAsync(authorGuid);
+            var articles = await _articleRepository.GetByAuthorIdAsync(authorGuid);
+            var socials = await _socialRepository.GetByAuthorIdAsync(authorGuid);
+
+            var response = new AuthorResponse
             {
-                response.FeaturedBook = MapToFeaturedBookDto(featuredEntityBook, response.Name);
-            }
+                Name = author.AuthorName,
+                Welcome = author.WelcomeText,
+                AboutMe = author.AboutText,
+                Headshot = author.HeadShotURL ?? string.Empty,
+                Books = ConvertToApiBooks(books.ToList()),
+                Copyright = author.CopyrightText,
+                Social = socials.Select(s => new SocialLink { Name = s.Name, Url = s.URL.ToString() }).ToList(),
+                Email = author.EmailAddress,
+                Articles = ConvertToApiArticles(articles.ToList())
+            };
+
+            // Find the explicitly curated featured hero book from the same book list.
+            // Order by id for deterministic selection when multiple books are mistakenly flagged.
+            // No fallback or auto-selection is performed.
+            var featuredBook = books?
+                .Where(b => b.IsFeaturedHeroBook)
+                .OrderBy(b => b.id)
+                .FirstOrDefault();
+
+            if (featuredBook != null)
+                response.FeaturedBook = MapToFeaturedBookDto(featuredBook, response.Name);
 
             return response;
         }
 
-        private async Task<Entities.Book?> GetFeaturedHeroBookAsync(string topLevelDomain, string secondLevelDomain, string languageName, string? regionName)
+        /// <summary>
+        /// Resolves the best-matching <see cref="Author"/> for the given domain and locale
+        /// using the standard 4-step fallback chain.
+        /// </summary>
+        private async Task<Entities.Author?> ResolveAuthorAsync(string topLevelDomain, string secondLevelDomain, string languageName, string? regionName)
         {
-            // Re-use the same author-lookup logic to find the resolved author's ID
+            // 1. Try full match (TLD, SLD, language, region)
             var authors = await _authorRepository.GetByDomainAndLocaleAsync(topLevelDomain, secondLevelDomain, languageName, regionName ?? "");
             authors ??= new List<Entities.Author>();
             var author = authors.FirstOrDefault();
 
+            // 2. If not found, try match without region
             if (author == null)
             {
                 authors = await _authorRepository.GetByDomainAndLocaleAsync(topLevelDomain, secondLevelDomain, languageName, "");
@@ -125,6 +124,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 author = authors.FirstOrDefault();
             }
 
+            // 3. If not found, try first default author for TLD and SLD
             if (author == null)
             {
                 authors = await _authorRepository.GetByDomainAndDefaultAsync(topLevelDomain, secondLevelDomain);
@@ -132,6 +132,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 author = authors.FirstOrDefault(a => a.IsDefault);
             }
 
+            // 4. If not found, try first author for TLD and SLD
             if (author == null)
             {
                 authors = await _authorRepository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
@@ -139,11 +140,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
                 author = authors.FirstOrDefault();
             }
 
-            if (author == null || !Guid.TryParse(author.id, out var authorGuid))
-                return null;
-
-            var books = await _bookRepository.GetByAuthorIdAsync(authorGuid);
-            return books?.FirstOrDefault(b => b.IsFeaturedHeroBook);
+            return author;
         }
 
         private static FeaturedBookDto MapToFeaturedBookDto(Entities.Book book, string authorName)
