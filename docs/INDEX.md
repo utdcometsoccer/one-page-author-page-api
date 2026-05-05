@@ -89,6 +89,7 @@ Comprehensive API reference and guides:
 - [**ADMIN_DOMAIN_CREATION_API**](ADMIN_DOMAIN_CREATION_API.md) - **Admin endpoint** — complete domain provisioning without Stripe (JS/TS client guide)
 - [**API-Documentation**](API-Documentation.md) - **Complete API reference** with TypeScript examples
 - [**AB_TESTING**](AB_TESTING.md) - A/B testing configuration API: endpoint reference, frontend integration, bucketing algorithm, and implementation details
+- [**HOMEPAGE_HERO_BOOK_EXPERIMENT**](HOMEPAGE_HERO_BOOK_EXPERIMENT.md) - **Frontend integration guide** — session ID management, response shape, rendering logic, React example, and analytics for the homepage hero book A/B experiment
 - [**API_CATEGORIZATION**](API_CATEGORIZATION.md) - API endpoint categorization and grouping reference
 - [**Complete-System-Documentation**](Complete-System-Documentation.md) - Auto-generated system overview
 - [**README-Documentation**](README-Documentation.md) - Documentation generation system
