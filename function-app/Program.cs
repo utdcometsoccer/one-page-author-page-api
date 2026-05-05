@@ -68,6 +68,8 @@ builder.Services
     .AddLocaleDataService() // Register Locale data service via DI extension
     .AddDomainRegistrationRepository() // Register Domain Registration repository via DI extension
     .AddUserIdentityServices()
+    .AddExperimentRepository() // Register Experiment repository for homepage A/B testing
+    .AddExperimentServices()   // Register ExperimentService for homepage hero variant assignment
 
     // OpenTelemetry -> Azure Monitor (Application Insights backend).
     // NOTE: As of APPLICATION_INSIGHTS_UPGRADE_MIGRATION_PLAN.md (Phase 2),

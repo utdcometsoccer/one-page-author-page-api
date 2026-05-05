@@ -95,6 +95,75 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
             return await BuildAuthorApiResponsesAsync(pagedAuthors);
         }
 
+        public async Task<AuthorResponse?> GetHomepageDataAsync(string topLevelDomain, string secondLevelDomain, string languageName, string? regionName = null)
+        {
+            var response = await GetAuthorWithDataAsync(topLevelDomain, secondLevelDomain, languageName, regionName);
+            if (response == null)
+                return null;
+
+            // Find the explicitly curated featured hero book. No fallback is performed.
+            var featuredEntityBook = await GetFeaturedHeroBookAsync(topLevelDomain, secondLevelDomain, languageName, regionName);
+            if (featuredEntityBook != null)
+            {
+                response.FeaturedBook = MapToFeaturedBookDto(featuredEntityBook, response.Name);
+            }
+
+            return response;
+        }
+
+        private async Task<Entities.Book?> GetFeaturedHeroBookAsync(string topLevelDomain, string secondLevelDomain, string languageName, string? regionName)
+        {
+            // Re-use the same author-lookup logic to find the resolved author's ID
+            var authors = await _authorRepository.GetByDomainAndLocaleAsync(topLevelDomain, secondLevelDomain, languageName, regionName ?? "");
+            if (authors == null) authors = new List<Entities.Author>();
+            var author = authors.FirstOrDefault();
+
+            if (author == null)
+            {
+                authors = await _authorRepository.GetByDomainAndLocaleAsync(topLevelDomain, secondLevelDomain, languageName, "");
+                if (authors == null) authors = new List<Entities.Author>();
+                author = authors.FirstOrDefault();
+            }
+
+            if (author == null)
+            {
+                authors = await _authorRepository.GetByDomainAndDefaultAsync(topLevelDomain, secondLevelDomain);
+                if (authors == null) authors = new List<Entities.Author>();
+                author = authors.FirstOrDefault(a => a.IsDefault);
+            }
+
+            if (author == null)
+            {
+                authors = await _authorRepository.GetByDomainAsync(topLevelDomain, secondLevelDomain);
+                if (authors == null) authors = new List<Entities.Author>();
+                author = authors.FirstOrDefault();
+            }
+
+            if (author == null || !Guid.TryParse(author.id, out var authorGuid))
+                return null;
+
+            var books = await _bookRepository.GetByAuthorIdAsync(authorGuid);
+            return books?.FirstOrDefault(b => b.IsFeaturedHeroBook);
+        }
+
+        private static FeaturedBookDto MapToFeaturedBookDto(Entities.Book book, string authorName)
+        {
+            return new FeaturedBookDto
+            {
+                Title = book.Title,
+                Subtitle = book.Subtitle,
+                AuthorName = authorName,
+                Description = book.Description,
+                CoverImageUrl = book.Cover?.ToString() ?? string.Empty,
+                CoverImageAlt = book.CoverImageAlt ?? book.Title,
+                PrimaryCtaLabel = book.PrimaryCtaLabel ?? string.Empty,
+                PrimaryCtaUrl = book.URL?.ToString() ?? string.Empty,
+                SecondaryCtaLabel = book.SecondaryCtaLabel,
+                SecondaryCtaUrl = book.SecondaryCtaUrl,
+                Formats = book.Formats?.AsReadOnly() ?? (IReadOnlyList<string>)Array.Empty<string>()
+            };
+        }
+
         private async Task<List<AuthorApiResponse>> BuildAuthorApiResponsesAsync(IList<Entities.Author> authors)
         {
             if (authors == null || !authors.Any())
