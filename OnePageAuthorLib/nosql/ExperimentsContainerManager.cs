@@ -30,8 +30,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.NoSQL
             };
 
             var response = await _database.CreateContainerIfNotExistsAsync(
-                containerProperties,
-                throughput: 400);
+                containerProperties);
 
             return response.Container;
         }
