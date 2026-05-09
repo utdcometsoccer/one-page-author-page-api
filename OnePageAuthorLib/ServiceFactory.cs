@@ -1133,7 +1133,7 @@ namespace InkStainedWretch.OnePageAuthorAPI
         public static IServiceCollection AddExperimentRepository(this IServiceCollection services)
         {
             services.AddTransient<IContainerManager<Entities.Experiment>, NoSQL.ExperimentsContainerManager>();
-            services.AddTransient<Interfaces.IExperimentRepository>(sp =>
+            services.AddSingleton<Interfaces.IExperimentRepository>(sp =>
             {
                 var database = sp.GetRequiredService<Microsoft.Azure.Cosmos.Database>();
                 var containerManager = sp.GetRequiredService<IContainerManager<Entities.Experiment>>();

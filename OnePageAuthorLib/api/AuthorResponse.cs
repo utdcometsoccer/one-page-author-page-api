@@ -51,6 +51,23 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         public List<Article> Articles { get; set; }
 
         /// <summary>
+        /// The explicitly curated featured book for the homepage hero experiment.
+        /// Only populated when the author has a book with <c>IsFeaturedHeroBook = true</c>.
+        /// Returns <c>null</c> when no featured book is configured, preserving the
+        /// current homepage behavior for existing consumers.
+        /// </summary>
+        public FeaturedBookDto? FeaturedBook { get; set; }
+
+        /// <summary>
+        /// The homepage A/B experiment assignment for the current request.
+        /// Set by the function layer after the author data is retrieved.
+        /// <c>null</c> when returned directly from the service layer (before experiment resolution).
+        /// The function always sets this to a non-null value with
+        /// <see cref="HomepageExperimentDto.HomepageHeroVariant"/> defaulting to <c>"control"</c>.
+        /// </summary>
+        public HomepageExperimentDto? Experiment { get; set; }
+
+        /// <summary>
         /// Default constructor. Initializes lists to empty and strings to empty.
         /// </summary>
         public AuthorResponse()

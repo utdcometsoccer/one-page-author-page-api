@@ -34,5 +34,22 @@ namespace InkStainedWretch.OnePageAuthorAPI.API
         /// <param name="pageSize">The number of results per page (defaults to 10).</param>
         /// <returns>Paged list of AuthorApiResponse objects with all associated data.</returns>
         Task<List<AuthorApiResponse>> GetAllAuthorsPagedAsync(int page, int pageSize = 10);
+
+        /// <summary>
+        /// Gets the first author matching the provided domain and locale, along with all
+        /// associated data and an optional featured book for the homepage hero experiment.
+        /// The <see cref="AuthorResponse.FeaturedBook"/> field is populated only when the
+        /// author has a book explicitly tagged with <c>IsFeaturedHeroBook = true</c>.
+        /// No fallback or automatic book selection is performed.
+        /// </summary>
+        /// <param name="topLevelDomain">Top-level domain (e.g., "com").</param>
+        /// <param name="secondLevelDomain">Second-level domain (e.g., "example").</param>
+        /// <param name="languageName">Language name (e.g., "en").</param>
+        /// <param name="regionName">Optional region name (e.g., "US").</param>
+        /// <returns>
+        /// <see cref="AuthorResponse"/> with <see cref="AuthorResponse.FeaturedBook"/> populated
+        /// when a featured hero book is configured, or <c>null</c> if the author is not found.
+        /// </returns>
+        Task<AuthorResponse?> GetHomepageDataAsync(string topLevelDomain, string secondLevelDomain, string languageName, string? regionName = null);
     }
 }

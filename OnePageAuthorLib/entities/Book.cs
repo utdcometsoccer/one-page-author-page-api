@@ -37,6 +37,45 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
         public Uri Cover { get; set; }
 
         /// <summary>
+        /// Indicates whether this book is explicitly designated as the featured hero book
+        /// for the homepage hero A/B experiment. Only books with this flag set to <c>true</c>
+        /// will be returned as the <c>FeaturedBook</c> in the homepage response.
+        /// </summary>
+        public bool IsFeaturedHeroBook { get; set; } = false;
+
+        /// <summary>
+        /// Optional subtitle for the book. Used in the featured hero display.
+        /// </summary>
+        public string? Subtitle { get; set; }
+
+        /// <summary>
+        /// Alt text for the cover image. Used in the featured hero display.
+        /// Defaults to the book title if not set.
+        /// </summary>
+        public string? CoverImageAlt { get; set; }
+
+        /// <summary>
+        /// Label for the primary call-to-action button in the featured hero.
+        /// </summary>
+        public string? PrimaryCtaLabel { get; set; }
+
+        /// <summary>
+        /// Label for the optional secondary call-to-action button in the featured hero.
+        /// </summary>
+        public string? SecondaryCtaLabel { get; set; }
+
+        /// <summary>
+        /// URL for the optional secondary call-to-action button in the featured hero.
+        /// </summary>
+        public string? SecondaryCtaUrl { get; set; }
+
+        /// <summary>
+        /// Available formats for the book (e.g., "Hardcover", "Paperback", "eBook").
+        /// Used in the featured hero display.
+        /// </summary>
+        public List<string> Formats { get; set; } = new List<string>();
+
+        /// <summary>
         /// Default constructor. Initializes all properties to default values.
         /// </summary>
         public Book()
@@ -47,6 +86,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
             Description = string.Empty;
             URL = new Uri("https://example.com");
             Cover = new Uri("https://example.com/cover.jpg");
+            Formats = new List<string>();
         }
 
         /// <summary>
@@ -66,6 +106,7 @@ namespace InkStainedWretch.OnePageAuthorAPI.Entities
             Description = description;
             URL = url;
             Cover = cover;
+            Formats = new List<string>();
         }
 
     }
